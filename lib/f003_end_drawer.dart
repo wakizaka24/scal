@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum EndDrawerMenuType {
   test1(title: 'テスト1'),
@@ -11,56 +14,43 @@ enum EndDrawerMenuType {
   final String title;
 }
 
-class EndDrawer extends StatefulWidget {
+class EndDrawer extends HookConsumerWidget {
   const EndDrawer({super.key});
 
   @override
-  State<EndDrawer> createState() => _EndDrawerState();
-}
-
-class _EndDrawerState extends State<EndDrawer> {
-  int? _highlightedIndex;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final highlightedIndex = useState(-1);
 
     ListView menuList = ListView(
-      physics: const NeverScrollableScrollPhysics(),
+      // physics: const NeverScrollableScrollPhysics(),
       children: [
         for (int i=0; i < EndDrawerMenuType.values.length; i++) ... {
           HighlightAbleButton(
-            title: EndDrawerMenuType.values[i].title,
-            fontSize: 18,
             index: i,
-            isHighlighted: _highlightedIndex == i,
-            onTapDown: (int? i) async {
-              setState(() {
-                _highlightedIndex = i;
-              });
+            isHighlighted: highlightedIndex.value == i,
+            onTapDown: (int i) async {
+              highlightedIndex.value = i;
             },
-            onTap: (int? i) async {
-              setState(() {
-                _highlightedIndex = null;
-              });
+            onTap: (int i) async {
+              highlightedIndex.value = -1;
               Navigator.pop(context);
 
               final snackBar = SnackBar(
-                content: Text('${EndDrawerMenuType
-                    .values[i!].title}をクリックしました!'),
+                content: const Text('クリックしました!'),
                 action: SnackBarAction(
-                  label: '詳細',
+                  label: '取消',
                   onPressed: () {
                   },
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             },
-            onTapCancel: (int? i) async {
-              setState(() {
-                _highlightedIndex = null;
-              });
+            onTapCancel: (int i) async {
+              highlightedIndex.value = -1;
             },
+            title: EndDrawerMenuType.values[i].title,
+            fontSize: 18,
           )
         }
       ],
@@ -81,9 +71,13 @@ class _EndDrawerState extends State<EndDrawer> {
                             horizontal: 8,
                             vertical: 8,
                           ),
-                          child: IconButton(
+                          child: TextButton(
                             onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_forward),
+                            style: const ButtonStyle(
+                                foregroundColor: MaterialStatePropertyAll(
+                                    Colors.black)
+                            ),
+                            child: const Text('戻る')
                           )
                       ),
                       Expanded(
@@ -97,27 +91,28 @@ class _EndDrawerState extends State<EndDrawer> {
   }
 }
 
-class HighlightAbleButton extends StatelessWidget {
+class HighlightAbleButton extends HookConsumerWidget {
   const HighlightAbleButton({super.key,
-    required this.title,
-    this.fontSize,
-    this.index,
+    required this.index,
     required this.isHighlighted,
     required this.onTapDown,
     required this.onTap,
     required this.onTapCancel,
+    required this.title,
+    required this.fontSize,
   });
 
-  final String title;
-  final double? fontSize;
-  final int? index;
+  final int index;
   final bool isHighlighted;
-  final void Function(int?) onTapDown;
-  final void Function(int?) onTap;
-  final void Function(int?) onTapCancel;
+  final void Function(int) onTapDown;
+  final void Function(int) onTap;
+  final void Function(int) onTapCancel;
+
+  final String title;
+  final double fontSize;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return GestureDetector(

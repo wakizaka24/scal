@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f001_calendar_page.dart';
+
+import 'f002_home_page.dart';
 
 void main() {
-  runApp(const SCalApp());
+  // 横向き無効
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    // 縦向き
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(const SCalApp());
+  });
 }
 
 class SCalApp extends StatelessWidget {
@@ -28,7 +38,7 @@ class SCalApp extends StatelessWidget {
             primarySwatch: Colors.green,
           ),
           title: 'SCal',
-        home: const CalendarPage(),
+        home: const HomePage(),
       )
     );
   }
