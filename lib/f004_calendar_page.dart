@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f005_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
+const todayBgColor = Color(0x33DED2BF);
 const double selectedBoarderWidth = 3;
 const double normalBoarderWidth = 0.5;
 
@@ -36,7 +37,7 @@ class CalendarPage extends HookConsumerWidget {
     // アプリバーの高さ
     double appBarHeight = AppBar().preferredSize.height;
     // 週部分の高さ
-    double weekPartHeight = 32;
+    double weekPartHeight = 24;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.4;
     // 月部分の高さ
@@ -49,12 +50,6 @@ class CalendarPage extends HookConsumerWidget {
     double weekPartWidth = deviceWidth / weekPartColumnNum;
     // 週部分のアスペクト比
     double weekPartAspectRate = weekPartWidth / weekPartHeight;
-    // 日部分の行数
-    int dayPartRowNum = 6;
-    // 日部分の高さ
-    double dayPartHeight = monthPartHeight / dayPartRowNum;
-    // 日部分のアスペクト比
-    double dayPartAspectRate = weekPartWidth / dayPartHeight;
 
     return Scaffold(
       body: SafeArea(
@@ -64,14 +59,14 @@ class CalendarPage extends HookConsumerWidget {
             Expanded(
                 child: PageView(
                     children: [
-                      for (int i=0; i < 3; i++) ... {
+                      for (int i=0; i < state.dayLists.length; i++) ... {
                         MonthPart(
-                            weekPartColumnNum: weekPartColumnNum,
-                            weekPartAspectRate: weekPartAspectRate,
-                            weekPartHeight: weekPartHeight,
-                            dayPartRowNum: dayPartRowNum,
-                            dayPartAspectRate: dayPartAspectRate,
-                            dayPartHeight: dayPartHeight
+                          monthPartHeight: monthPartHeight,
+                          weekPartColumnNum: weekPartColumnNum,
+                          weekPartAspectRate: weekPartAspectRate,
+                          weekPartWidth: weekPartWidth,
+                          weekPartHeight: weekPartHeight,
+                          dayList: state.dayLists[i],
                         ),
                       }
                     ]
@@ -84,41 +79,39 @@ class CalendarPage extends HookConsumerWidget {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
-      floatingActionButton: FloatingActionButton(
-        heroTag: "calendar_hero_tag",
-        onPressed: () {
-          //homePageScaffoldKey.currentState!.openEndDrawer();
-        },
-        tooltip: 'イベント追加',
-        child: Icon(state.dayPartActive ? Icons.add : Icons.add_circle_outline),
-      ),
     );
   }
 }
 
 class MonthPart extends HookConsumerWidget {
+  final double monthPartHeight;
   final int weekPartColumnNum;
   final double weekPartAspectRate;
+  final double weekPartWidth;
   final double weekPartHeight;
-  final int dayPartRowNum;
-  final double dayPartAspectRate;
-  final double dayPartHeight;
+  final List<DayDisplay> dayList;
 
   const MonthPart({
     super.key,
+    required this.monthPartHeight,
     required this.weekPartColumnNum,
     required this.weekPartAspectRate,
+    required this.weekPartWidth,
     required this.weekPartHeight,
-    required this.dayPartRowNum,
-    required this.dayPartAspectRate,
-    required this.dayPartHeight,
+    required this.dayList
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(calendarPageNotifierProvider);
     final notifier = ref.watch(calendarPageNotifierProvider.notifier);
+
+    // 日部分の行数
+    int dayPartRowNum = (dayList.length / 7).ceil();
+    // 日部分の高さ
+    double dayPartHeight = monthPartHeight / dayPartRowNum;
+    // 日部分のアスペクト比
+    double dayPartAspectRate = weekPartWidth / dayPartHeight;
 
     return Column(children: [
       GridView.count(
@@ -129,7 +122,7 @@ class MonthPart extends HookConsumerWidget {
         childAspectRatio: weekPartAspectRate, // アスペクト比
         children: [
           for (int i=0; i < weekPartColumnNum; i++) ... {
-            WeekPart(height: weekPartHeight),
+            WeekPart(height: weekPartHeight, weekday: state.weekdayList[i]),
           }
         ],
       ),
@@ -147,7 +140,8 @@ class MonthPart extends HookConsumerWidget {
                 onTapDown: (int i) async {
                   notifier.selectDayPart(i);
                 },
-                height: dayPartHeight
+                height: dayPartHeight,
+                day: dayList[i]
             ),
           }
         ],
@@ -157,8 +151,14 @@ class MonthPart extends HookConsumerWidget {
 }
 
 class WeekPart extends HookConsumerWidget {
-  const WeekPart({super.key, required this.height});
   final double height;
+  final WeekdayDisplay weekday;
+
+  const WeekPart({
+    super.key,
+    required this.height,
+    required this.weekday
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -171,6 +171,10 @@ class WeekPart extends HookConsumerWidget {
             )
         ),
       ),
+      alignment: Alignment.center,
+      child: Text(weekday.title,
+          style: TextStyle(color: weekday.titleColor)
+      )
     );
   }
 }
@@ -181,13 +185,15 @@ class DayPart extends HookConsumerWidget {
   final bool isActive;
   final void Function(int) onTapDown;
   final double height;
+  final DayDisplay day;
 
   const DayPart({super.key,
     required this.index,
     required this.isHighlighted,
     required this.isActive,
     required this.onTapDown,
-    required this.height
+    required this.height,
+    required this.day
   });
 
   @override
@@ -197,7 +203,14 @@ class DayPart extends HookConsumerWidget {
         isHighlighted: isHighlighted,
         isActive: isActive,
         onTapDown: onTapDown,
-        child: Container(),
+        bgColor: day.bgColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(day.title, style: TextStyle(color: day.titleColor)),
+            Expanded(child: Container())
+          ],
+        ),
     );
   }
 }
@@ -263,6 +276,7 @@ class EventPart extends HookConsumerWidget {
       index: index,
       isHighlighted: isHighlighted,
       isActive: true,
+      bgColor: Colors.transparent,
       onTapDown: onTapDown,
       child: Container(
           height: 52,
@@ -336,6 +350,7 @@ class SelectableCalendarCell extends HookConsumerWidget {
   final bool isHighlighted;
   final bool isActive;
   final void Function(int) onTapDown;
+  final Color bgColor;
   final Widget child;
 
   const SelectableCalendarCell({super.key,
@@ -343,6 +358,7 @@ class SelectableCalendarCell extends HookConsumerWidget {
     required this.isHighlighted,
     required this.isActive,
     required this.onTapDown,
+    required this.bgColor,
     required this.child
   });
 
@@ -352,8 +368,9 @@ class SelectableCalendarCell extends HookConsumerWidget {
 
     return GestureDetector(
         onTapDown: (TapDownDetails details) => onTapDown(index),
-        child:Container(
+        child: Container(
           decoration: BoxDecoration(
+            color: bgColor,
             border: Border.fromBorderSide(
                 BorderSide(
                     color: !isHighlighted || !isActive ? borderColor

@@ -71,14 +71,8 @@ class EndDrawer extends HookConsumerWidget {
                             horizontal: 8,
                             vertical: 8,
                           ),
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: const ButtonStyle(
-                                foregroundColor: MaterialStatePropertyAll(
-                                    Colors.black)
-                            ),
-                            child: const Text('戻る')
-                          )
+                          child: IconButton(icon: const Icon(Icons.add),
+                              onPressed: () {})
                       ),
                       Expanded(
                           child: menuList

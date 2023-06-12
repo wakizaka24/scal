@@ -1,40 +1,69 @@
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+
+import 'f004_calendar_page.dart';
 
 class CalendarPageState {
   // UI
   bool dayPartActive = true;
+  int dayPartIndex = 0;
   int? eventListIndex;
-  int? dayPartIndex;
+  PageController homePageController = PageController();
 
   // Data
   late DateTime now;
-  String? appBarTitle;
-  List<String> weekTitleList = [];
+  late DateTime selectDay;
+  String appBarTitle = '';
+  List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
-  String? eventListTitle;
+  String eventListTitle = '';
   List<EventDisplay> eventLists = [];
 
   static CalendarPageState copy(CalendarPageState state) {
     var nState = CalendarPageState();
-    nState.dayPartActive = state.dayPartActive; // 日部分の活性
-    nState.dayPartIndex = state.dayPartIndex; // 日選択
-    nState.eventListIndex = state.eventListIndex; // イベント選択
+
+    // UI
+    nState.dayPartActive = state.dayPartActive;
+    nState.dayPartIndex = state.dayPartIndex;
+    nState.eventListIndex = state.eventListIndex;
+    nState.homePageController = state.homePageController;
+
+    // Data
+    nState.now = state.now;
+    nState.selectDay = state.selectDay;
+    nState.appBarTitle = state.appBarTitle;
+    nState.weekdayList = state.weekdayList;
+    nState.dayLists = state.dayLists;
+    nState.eventListTitle = state.eventListTitle;
+    nState.eventLists = state.eventLists;
     return nState;
   }
+}
+
+class WeekdayDisplay {
+  String title;
+  Color titleColor;
+
+  WeekdayDisplay({
+    required this.title,
+    required this.titleColor
+  });
 }
 
 class DayDisplay {
   DateTime id;
   String title;
+  Color titleColor;
   List<String> eventList;
-  bool inactive; // 非活性(文字を薄くする)
+  Color bgColor;
 
   DayDisplay({
     required this.id,
     required this.title,
+    required this.titleColor,
     required this.eventList,
-    required this.inactive,
+    required this.bgColor
   });
 }
 
@@ -59,12 +88,56 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       : super(state);
 
   initState() async {
+    // Data
+    state.weekdayList = [
+      WeekdayDisplay(title: '日',
+          titleColor: Colors.pink),
+      WeekdayDisplay(title: '月',
+          titleColor: Colors.black),
+      WeekdayDisplay(title: '火',
+          titleColor: Colors.black),
+      WeekdayDisplay(title: '水',
+          titleColor: Colors.black),
+      WeekdayDisplay(title: '木',
+          titleColor: Colors.black),
+      WeekdayDisplay(title: '金',
+          titleColor: Colors.black),
+      WeekdayDisplay(title: '土',
+          titleColor: Colors.green),
+    ];
     state.now = DateTime.now();
-    state.appBarTitle = DateFormat.yMMM('ja')
-        .format(DateTime.now()).toString();
-    state.weekTitleList = ['日','月','火','水','木','金','土'];
     state.dayLists = createDayLists(state.now);
+    state.selectDay = state.now;
+    setCurrentDay(state.selectDay);
+
+    // UI
+    state.dayPartActive = true;
+    DateTime now = state.now;
+    state.dayPartIndex = 0;
+    for (int i=0; i < state.dayLists[1].length; i++) {
+      if (state.dayLists[1][i].id == DateTime(now.year, now.month, now.day)) {
+        state.dayPartIndex = i;
+        break;
+      }
+    }
+
     state = CalendarPageState.copy(state);
+  }
+
+  setCurrentDay(DateTime date) {
+    DateTime now = date;
+    state.appBarTitle = DateFormat.yMMM('ja') // 2023年6月
+        .format(now).toString();
+    state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
+        .format(now).toString();
+    state.eventLists = [
+      EventDisplay(id: 'first', editing: true, head: '連日',
+          title: 'コンテムポレリダンスした日'),
+      for(int i=0; i<4; i++) ... {
+        EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
+            title: 'コンテムポレリダンスした日'),
+      }
+    ];
   }
 
   List<List<DayDisplay>> createDayLists(DateTime now) {
@@ -89,18 +162,28 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     List<List<DayDisplay>> list = [];
     for (int i=0; i<3; i++) {
       if (i > 0) {
-        // 月区切りで1週差し戻す
-        currentDay = DateTime(currentDay.year, currentDay.month,
-            currentDay.day - 7);
+        // 月区切りの直前が翌月
+        if (list.last.last.id.month == months[i].month) {
+          // 月区切りで1週差し戻す
+          currentDay = DateTime(currentDay.year, currentDay.month,
+              currentDay.day - 7);
+        }
       }
+
+      DateTime now = DateTime(state.now.year, state.now.month, state.now.day);
 
       list.add([
         // 翌月かつ土曜日まで
-        for (int j=0; months[i].month == currentDay.month
-            || j == 0 || j % 7 != 0; j++, currentDay=DateTime(currentDay.year,
+        for (int j=0; currentDay.month != months[i].month && j < 7
+            || currentDay.month == months[i].month
+            || currentDay.month != months[i].month && j % 7 != 0; j++,
+            currentDay = DateTime(currentDay.year,
             currentDay.month, currentDay.day + 1)) ... {
-          DayDisplay(id: currentDay, title: currentDay.day.toString(),
-              eventList: [], inactive: months[i].month != currentDay.month)
+              DayDisplay(id: currentDay, title: currentDay.day.toString(),
+                titleColor: j % 7 == 0 ? Colors.pink : j % 7 == 6
+                    ? Colors.green : Colors.black, eventList: [],
+                  bgColor: currentDay == now ? todayBgColor
+                    : Colors.transparent)
         }
       ]);
     }
@@ -112,6 +195,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayPartActive = true;
     state.dayPartIndex = index;
     state.eventListIndex = null;
+    state.selectDay = state.dayLists[1][index].id;
+    setCurrentDay(state.selectDay);
+
     state = CalendarPageState.copy(state);
   }
 
