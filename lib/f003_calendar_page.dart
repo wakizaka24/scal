@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f005_calendar_view_model.dart';
+import 'package:scal/f004_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -21,8 +21,10 @@ class CalendarPage extends HookConsumerWidget {
 
     useEffect(() {
       // Pageの初期化処理
+      notifier.initState();
+
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await notifier.initState();
+        await notifier.widgetDidBuild();
       });
 
       return () {
@@ -39,10 +41,17 @@ class CalendarPage extends HookConsumerWidget {
     // 週部分の高さ
     double weekPartHeight = 24;
     // イベント一覧のアスペクト比
-    double eventListAspectRate = 1.4;
+    double eventListAspectRate = 1.41421356237;
+    // イベント一覧の高さ
+    double eventListHeight = deviceWidth / eventListAspectRate;
+    double eventListMaxHeight = 320;
+    if (eventListHeight > eventListMaxHeight) {
+      eventListAspectRate = deviceWidth / eventListMaxHeight;
+      eventListHeight = eventListMaxHeight;
+    }
     // 月部分の高さ
     double monthPartHeight = deviceHeight - appBarHeight - weekPartHeight
-        - deviceWidth / eventListAspectRate
+        - eventListHeight
         - unSafeAreaTopHeight;
     // 週部分の列数
     int weekPartColumnNum = 7;
@@ -51,6 +60,24 @@ class CalendarPage extends HookConsumerWidget {
     // 週部分のアスペクト比
     double weekPartAspectRate = weekPartWidth / weekPartHeight;
 
+    state.calendarController.addListener(() {
+      double offset = state.calendarController.offset;
+
+      int index = 1;
+      if (offset <= 0) {
+        index = 0;
+      } else if (offset >= deviceWidth * 2) {
+        index = 2;
+      }
+
+      if (index != 1) {
+        int addIndex = index - 1;
+        state.calendarController.jumpTo(
+            offset + deviceWidth * addIndex * -1);
+        notifier.onCalendarPageChanged(addIndex);
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -58,6 +85,7 @@ class CalendarPage extends HookConsumerWidget {
           children: [
             Expanded(
                 child: PageView(
+                    controller: state.calendarController,
                     children: [
                       for (int i=0; i < state.dayLists.length; i++) ... {
                         MonthPart(
@@ -72,9 +100,9 @@ class CalendarPage extends HookConsumerWidget {
                     ]
                 )
             ),
-            const AspectRatio(
-                aspectRatio: 1.4,
-                child: EventListPart()
+            AspectRatio(
+                aspectRatio: eventListAspectRate,
+                child: const EventListPart()
             )
           ],
         ),

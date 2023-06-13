@@ -1,4 +1,4 @@
-package com.wakizaka32.scal
+package com.wakizaka24.scal
 
 import io.flutter.embedding.android.FlutterActivity
 

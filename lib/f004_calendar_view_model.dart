@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'f004_calendar_page.dart';
+import 'f003_calendar_page.dart';
 
 class CalendarPageState {
   // UI
   bool dayPartActive = true;
   int dayPartIndex = 0;
   int? eventListIndex;
-  PageController homePageController = PageController();
+  PageController homePageController = PageController(initialPage: 1);
+  PageController calendarController = PageController(initialPage: 1);
 
   // Data
   late DateTime now;
@@ -120,8 +121,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         break;
       }
     }
+  }
 
-    state = CalendarPageState.copy(state);
+  widgetDidBuild() async {
+    // 親の階層のWidgetの更新
+    await updateState();
+  }
+
+  onCalendarPageChanged(int month) async {
+    debugPrint('onCalendarPageChanged month=$month');
   }
 
   setCurrentDay(DateTime date) {
@@ -191,20 +199,24 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return list;
   }
 
+  updateState() async {
+    state = CalendarPageState.copy(state);
+  }
+
   selectDayPart(int index) {
+    state.now = DateTime.now();
     state.dayPartActive = true;
     state.dayPartIndex = index;
     state.eventListIndex = null;
     state.selectDay = state.dayLists[1][index].id;
     setCurrentDay(state.selectDay);
-
-    state = CalendarPageState.copy(state);
+    updateState();
   }
 
   selectEventListPart(int index) {
     state.dayPartActive = false;
     state.eventListIndex = index;
-    state = CalendarPageState.copy(state);
+    updateState();
   }
 }
 

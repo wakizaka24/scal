@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'f003_end_drawer.dart';
-import 'f004_calendar_page.dart';
-import 'f005_calendar_view_model.dart';
+import 'f002_end_drawer.dart';
+import 'f003_calendar_page.dart';
+import 'f004_calendar_view_model.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
-
-  /*
-  pageViewController.value.animateToPage(index,
-    duration: const Duration(milliseconds: 200),
-    curve: Curves.easeOut);
-   */
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,6 +19,21 @@ class HomePage extends HookConsumerWidget {
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
     double unSafeAreaTopHeight = MediaQuery.of(context).padding.top;
+
+    // 画面の高さ
+    double deviceHeight = MediaQuery.of(context).size.height;
+
+    state.homePageController.addListener(() async {
+      // double offset = state.homePageController.offset;
+
+      // int index = 1;
+      // if (offset <= 0) {
+      //   index = 0;
+      // } else if (offset >= deviceHeight * 2) {
+      //   index = 2;
+      // }
+
+    });
 
     return Scaffold(
       key: homePageScaffoldKey,
