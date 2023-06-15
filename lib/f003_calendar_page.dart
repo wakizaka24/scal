@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f004_calendar_view_model.dart';
 
-import 'f001_home_page.dart';
+import 'f002_home_view_model.dart';
+import 'f004_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -12,22 +12,34 @@ const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
 
-class CalendarPage extends HookConsumerWidget {
+class CalendarPage extends StatefulHookConsumerWidget {
+  final int pageIndex;
   final double unSafeAreaTopHeight;
 
-  const CalendarPage({super.key, required this.unSafeAreaTopHeight});
+  const CalendarPage({super.key, required this.unSafeAreaTopHeight,
+    required this.pageIndex});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(calendarPageNotifierProvider);
-    final notifier = ref.watch(calendarPageNotifierProvider.notifier);
+  ConsumerState<ConsumerStatefulWidget> createState() => _CalendarPageState();
+}
+
+class _CalendarPageState extends ConsumerState<CalendarPage>
+    with AutomaticKeepAliveClientMixin {
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    final homeState = ref.watch(homePageNotifierProvider);
+    final calendarState = ref.watch(calendarPageNotifierProvider(
+        widget.pageIndex));
+    final notifier = ref.watch(calendarPageNotifierProvider(widget.pageIndex)
+        .notifier);
 
     useEffect(() {
       // Pageの初期化処理
-      notifier.initState();
-
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await notifier.widgetDidBuild();
+        await notifier.initState();
       });
 
       return () {
@@ -40,7 +52,7 @@ class CalendarPage extends HookConsumerWidget {
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
-    double appBarHeight = state.appBarHeight;//AppBar().preferredSize.height;
+    double appBarHeight = homeState.appBarHeight;//AppBar().preferredSize.height;
     // 週部分の高さ
     double weekPartHeight = 21;
     // イベント一覧のアスペクト比
@@ -55,7 +67,7 @@ class CalendarPage extends HookConsumerWidget {
     // 月部分の高さ
     double monthPartHeight = deviceHeight - appBarHeight - weekPartHeight
         - eventListHeight
-        - unSafeAreaTopHeight;
+        - widget.unSafeAreaTopHeight;
     // 週部分の列数
     int weekPartColumnNum = 7;
     // 週部分の幅
@@ -63,8 +75,8 @@ class CalendarPage extends HookConsumerWidget {
     // 週部分のアスペクト比
     double weekPartAspectRate = weekPartWidth / weekPartHeight;
 
-    state.calendarController.addListener(() {
-      double offset = state.calendarController.offset;
+    calendarState.calendarController.addListener(() {
+      double offset = calendarState.calendarController.offset;
 
       int index = 1;
       if (offset <= 0) {
@@ -75,7 +87,7 @@ class CalendarPage extends HookConsumerWidget {
 
       if (index != 1) {
         int addIndex = index - 1;
-        state.calendarController.jumpTo(
+        calendarState.calendarController.jumpTo(
             offset + deviceWidth * addIndex * -1);
         notifier.onCalendarPageChanged(addIndex);
       }
@@ -88,16 +100,18 @@ class CalendarPage extends HookConsumerWidget {
           children: [
             Expanded(
                 child: PageView(
-                    controller: state.calendarController,
+                    controller: calendarState.calendarController,
                     children: [
-                      for (int i=0; i < state.dayLists.length; i++) ... {
+                      for (int i=0; i < calendarState.dayLists.length; i++
+                        ) ... {
                         MonthPart(
+                          pageIndex: widget.pageIndex,
                           monthPartHeight: monthPartHeight,
                           weekPartColumnNum: weekPartColumnNum,
                           weekPartAspectRate: weekPartAspectRate,
                           weekPartWidth: weekPartWidth,
                           weekPartHeight: weekPartHeight,
-                          dayList: state.dayLists[i],
+                          dayList: calendarState.dayLists[i],
                         ),
                       }
                     ]
@@ -105,16 +119,20 @@ class CalendarPage extends HookConsumerWidget {
             ),
             AspectRatio(
                 aspectRatio: eventListAspectRate,
-                child: const EventListPart()
+                child: EventListPart(pageIndex: widget.pageIndex)
             )
           ],
         ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class MonthPart extends HookConsumerWidget {
+  final int pageIndex;
   final double monthPartHeight;
   final int weekPartColumnNum;
   final double weekPartAspectRate;
@@ -124,6 +142,7 @@ class MonthPart extends HookConsumerWidget {
 
   const MonthPart({
     super.key,
+    required this.pageIndex,
     required this.monthPartHeight,
     required this.weekPartColumnNum,
     required this.weekPartAspectRate,
@@ -134,8 +153,9 @@ class MonthPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(calendarPageNotifierProvider);
-    final notifier = ref.watch(calendarPageNotifierProvider.notifier);
+    final state = ref.watch(calendarPageNotifierProvider(pageIndex));
+    final notifier = ref.watch(calendarPageNotifierProvider(pageIndex)
+        .notifier);
 
     // 日部分の行数
     int dayPartRowNum = (dayList.length / 7).ceil();
@@ -276,12 +296,18 @@ class DayPart extends HookConsumerWidget {
 }
 
 class EventListPart extends HookConsumerWidget {
-  const EventListPart({super.key});
+  final int pageIndex;
+
+  const EventListPart({
+    super.key,
+    required this.pageIndex,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(calendarPageNotifierProvider);
-    final notifier = ref.watch(calendarPageNotifierProvider.notifier);
+    final state = ref.watch(calendarPageNotifierProvider(pageIndex));
+    final notifier = ref.watch(calendarPageNotifierProvider(pageIndex)
+        .notifier);
 
     return Column(
         children: [

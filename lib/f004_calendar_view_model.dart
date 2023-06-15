@@ -2,21 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'f002_home_view_model.dart';
 import 'f003_calendar_page.dart';
 
 class CalendarPageState {
   // UI
-  double appBarHeight = 39;
   bool dayPartActive = true;
   int dayPartIndex = 0;
   int? eventListIndex;
-  PageController homePageController = PageController(initialPage: 1);
   PageController calendarController = PageController(initialPage: 1);
 
   // Data
   late DateTime now;
   late DateTime selectDay;
-  String appBarTitle = '';
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
   String eventListTitle = '';
@@ -29,12 +27,11 @@ class CalendarPageState {
     nState.dayPartActive = state.dayPartActive;
     nState.dayPartIndex = state.dayPartIndex;
     nState.eventListIndex = state.eventListIndex;
-    nState.homePageController = state.homePageController;
+    nState.calendarController = state.calendarController;
 
     // Data
     nState.now = state.now;
     nState.selectDay = state.selectDay;
-    nState.appBarTitle = state.appBarTitle;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
     nState.eventListTitle = state.eventListTitle;
@@ -123,11 +120,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         break;
       }
     }
-  }
 
-  widgetDidBuild() async {
-    // 親の階層のWidgetの更新
-    await updateState();
+    updateState();
   }
 
   onCalendarPageChanged(int month) async {
@@ -135,11 +129,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   setCurrentDay(DateTime date) {
-    DateTime now = date;
-    state.appBarTitle = DateFormat.yMMM('ja') // 2023年6月
-        .format(now).toString();
+    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
+    homeNotifier.setCurrentDay(date);
+
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
-        .format(now).toString();
+        .format(date).toString();
     state.eventList = [
       EventDisplay(id: 'first', editing: true, head: '連日',
           title: 'コンテムポレリダンスした日'),
@@ -214,10 +208,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return dayLists;
   }
 
-  updateState() async {
-    state = CalendarPageState.copy(state);
-  }
-
   selectDayPart(int index) {
     state.now = DateTime.now();
     state.dayPartActive = true;
@@ -233,10 +223,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.eventListIndex = index;
     updateState();
   }
+
+  updateState() async {
+    state = CalendarPageState.copy(state);
+  }
 }
 
-final calendarPageNotifierProvider =
-StateNotifierProvider.autoDispose<CalendarPageNotifier,
-    CalendarPageState>((ref) {
-  return CalendarPageNotifier(ref, CalendarPageState());
+final calendarPageNotifierProvider = StateNotifierProvider.family
+    .autoDispose<CalendarPageNotifier, CalendarPageState, int>((ref, index) {
+      var list = List.filled(2, CalendarPageState());
+      return CalendarPageNotifier(ref, list[index]);
 });
