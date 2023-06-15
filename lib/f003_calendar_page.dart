@@ -4,9 +4,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f004_calendar_view_model.dart';
 
+import 'f001_home_page.dart';
+
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
-const double selectedBoarderWidth = 3;
+const double selectedBoarderWidth = 2;
+const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
 
 class CalendarPage extends HookConsumerWidget {
@@ -37,9 +40,9 @@ class CalendarPage extends HookConsumerWidget {
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
-    double appBarHeight = AppBar().preferredSize.height;
+    double appBarHeight = state.appBarHeight;//AppBar().preferredSize.height;
     // 週部分の高さ
-    double weekPartHeight = 24;
+    double weekPartHeight = 21;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.41421356237;
     // イベント一覧の高さ
@@ -145,23 +148,23 @@ class MonthPart extends HookConsumerWidget {
       GridView.count(
         shrinkWrap: true,
         // physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero, // セーフエリア下非表示を無効にすると下に余白ができる
+        padding: EdgeInsets.zero, // セーフエリア下を無効にすると下に余白ができる
         crossAxisCount: weekPartColumnNum, // 列の数
         childAspectRatio: weekPartAspectRate, // アスペクト比
         children: [
-          for (int i=0; i < weekPartColumnNum; i++) ... {
-            WeekPart(height: weekPartHeight, weekday: state.weekdayList[i]),
+          for (int i = 0; i < weekPartColumnNum; i++) ... {
+            WeekdayPart(height: weekPartHeight, weekday: state.weekdayList[i]),
           }
         ],
       ),
       GridView.count(
         shrinkWrap: true,
         // physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero, // セーフエリア下非表示を無効にすると下に余白ができる
+        padding: EdgeInsets.zero, // セーフエリア下を無効にすると下に余白ができる
         crossAxisCount: weekPartColumnNum, // 列の数
         childAspectRatio: dayPartAspectRate, // アスペクト比
         children: [
-          for (int i=0; i < weekPartColumnNum * dayPartRowNum; i++) ... {
+          for (int i = 0; i < weekPartColumnNum * dayPartRowNum; i++) ... {
             DayPart(index: i,
                 isHighlighted: state.dayPartIndex == i,
                 isActive: state.dayPartActive,
@@ -178,11 +181,11 @@ class MonthPart extends HookConsumerWidget {
   }
 }
 
-class WeekPart extends HookConsumerWidget {
+class WeekdayPart extends HookConsumerWidget {
   final double height;
   final WeekdayDisplay weekday;
 
-  const WeekPart({
+  const WeekdayPart({
     super.key,
     required this.height,
     required this.weekday
@@ -201,7 +204,11 @@ class WeekPart extends HookConsumerWidget {
       ),
       alignment: Alignment.center,
       child: Text(weekday.title,
-          style: TextStyle(color: weekday.titleColor)
+          style: TextStyle(
+            height: 1.3,
+            fontSize: 11,
+            color: weekday.titleColor
+          )
       )
     );
   }
@@ -227,18 +234,43 @@ class DayPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SelectableCalendarCell(
-        index: index,
-        isHighlighted: isHighlighted,
-        isActive: isActive,
-        onTapDown: onTapDown,
-        bgColor: day.bgColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(day.title, style: TextStyle(color: day.titleColor)),
-            Expanded(child: Container())
-          ],
-        ),
+      index: index,
+      isHighlighted: isHighlighted,
+      isActive: isActive,
+      onTapDown: onTapDown,
+      selectedBoarderWidth: selectedBoarderWidth,
+      borderCircular: 0,
+      bgColor: day.bgColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(day.title,
+              style: TextStyle(
+                fontSize: 13,
+                color: day.titleColor
+              )
+          ),
+          Expanded(child:
+            ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                child: ListView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    for(int i = 0; i < day.eventList.length; i++) ... {
+                      Text(day.eventList[i],
+                        maxLines: 1,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            height: 1.2
+                        ),
+                      ),
+                    }
+                  ],
+                )
+            )
+          )
+        ],
+      ),
     );
   }
 }
@@ -254,13 +286,18 @@ class EventListPart extends HookConsumerWidget {
     return Column(
         children: [
           SizedBox(
-              height: 32,
+              height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   color: borderColor,
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Text('6月10日(土)'),
+                      Text(state.eventListTitle,
+                        style: const TextStyle(
+                            height: 1.3,
+                            fontSize: 13
+                        )
+                      ),
                     ],
                   )
               )
@@ -269,13 +306,14 @@ class EventListPart extends HookConsumerWidget {
             ListView(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
                 children: [
-                  for(int i=0; i < 5; i++) ... {
+                  for(int i=0; i < state.eventList.length; i++) ... {
                     EventPart(
                       index: i,
                       isHighlighted: state.eventListIndex == i,
                       onTapDown: (int i) async {
                         notifier.selectEventListPart(i);
                       },
+                      event: state.eventList[i],
                     )
                   }
                 ]
@@ -290,85 +328,118 @@ class EventPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final void Function(int) onTapDown;
+  final EventDisplay event;
 
   const EventPart({super.key,
     required this.index,
     required this.isHighlighted,
     required this.onTapDown,
+    required this.event,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return SelectableCalendarCell(
-      index: index,
-      isHighlighted: isHighlighted,
-      isActive: true,
-      bgColor: Colors.transparent,
-      onTapDown: onTapDown,
-      child: Container(
-          height: 52,
-          padding: const EdgeInsets.all(selectedBoarderWidth),
-        child: Row(
-          children: [
-            if (index != 0)
-              const SizedBox(width: 45, child: Text('09:00\n18:00')),
-            if (index == 0)
-              const SizedBox(width: 45, child: Text('連日',
-                  textAlign: TextAlign.center)),
-            Container(
-                padding: const EdgeInsets
-                    .symmetric(horizontal: selectedBoarderWidth,
-                    vertical: 0),
-                child: Container(
-                    width: normalBoarderWidth,
-                    color: theme.colorScheme.secondaryContainer
+        index: index,
+        isHighlighted: isHighlighted,
+        isActive: true,
+        borderCircular: 10,
+        selectedBoarderWidth: eventSelectedBoarderWidth,
+        bgColor: Colors.transparent,
+        onTapDown: onTapDown,
+        child: Container(
+            height: 45,
+            padding: const EdgeInsets.all(selectedBoarderWidth),
+          child: Row(
+            children: [
+              SizedBox(width: 45, child:
+                Text(event.head,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 13
+                    )
                 )
-            ),
-            const Expanded(child: Text('コンテムポレリダンスした日')),
-            if (index == 0)
-              TextButton(
-                onPressed: () {
-                },
-                style: TextButton.styleFrom(
-                  textStyle: const TextStyle(fontSize: 15),
-                  padding: const EdgeInsets.all(0),
+              ),
+              Container(
+                  padding: const EdgeInsets
+                      .symmetric(horizontal: selectedBoarderWidth,
+                      vertical: 0),
+                  child: Container(
+                      width: normalBoarderWidth,
+                      color: theme.colorScheme.secondaryContainer
+                  )
+              ),
+              Expanded(child:
+                Text(event.title,
+                    style: const TextStyle(
+                        fontSize: 13
+                    )
+                )
+              ),
+              if (event.editing)
+                TextButton(
+                  onPressed: () {
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('移動',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
                 ),
-                child: const Text('移動'),
-              ),
-            if (index == 0)
-            TextButton(
-              onPressed: () {
-              },
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 15),
-                padding: const EdgeInsets.all(0),
-              ),
-              child: const Text('取消'),
-            ),
-            if (index != 0)
-            TextButton(
-              onPressed: () {
-              },
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 15),
-                padding: const EdgeInsets.all(0),
-              ),
-              child: const Text('削除'),
-            ),
-            if (index != 0)
-            TextButton(
-              onPressed: () {
-              },
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 15),
-                padding: const EdgeInsets.all(0),
-              ),
-              child: const Text('詳細'),
-            ),
-          ],
+              if (event.editing)
+                TextButton(
+                  onPressed: () {
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('取消',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
+                ),
+              if (!event.editing)
+                TextButton(
+                  onPressed: () {
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('削除',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
+                ),
+              if (!event.editing)
+                TextButton(
+                  onPressed: () {
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('詳細',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
+                ),
+            ],
+          )
         )
-      )
     );
   }
 }
@@ -378,6 +449,9 @@ class SelectableCalendarCell extends HookConsumerWidget {
   final bool isHighlighted;
   final bool isActive;
   final void Function(int) onTapDown;
+  final double borderCircular;
+  // 選択時の罫線の幅(通常の罫線の幅以上であること)
+  final double selectedBoarderWidth;
   final Color bgColor;
   final Widget child;
 
@@ -386,6 +460,8 @@ class SelectableCalendarCell extends HookConsumerWidget {
     required this.isHighlighted,
     required this.isActive,
     required this.onTapDown,
+    required this.borderCircular,
+    required this.selectedBoarderWidth,
     required this.bgColor,
     required this.child
   });
@@ -399,6 +475,8 @@ class SelectableCalendarCell extends HookConsumerWidget {
         child: Container(
           decoration: BoxDecoration(
             color: bgColor,
+            borderRadius: BorderRadius.circular(isHighlighted
+                ? borderCircular : 0),
             border: Border.fromBorderSide(
                 BorderSide(
                     color: !isHighlighted || !isActive ? borderColor
@@ -410,6 +488,8 @@ class SelectableCalendarCell extends HookConsumerWidget {
           ),
           child: Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(isHighlighted ?
+                  borderCircular : 0),
                 border: Border.fromBorderSide(
                     BorderSide(
                         color: Colors.transparent,

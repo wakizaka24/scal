@@ -6,6 +6,7 @@ import 'f003_calendar_page.dart';
 
 class CalendarPageState {
   // UI
+  double appBarHeight = 39;
   bool dayPartActive = true;
   int dayPartIndex = 0;
   int? eventListIndex;
@@ -19,7 +20,7 @@ class CalendarPageState {
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
   String eventListTitle = '';
-  List<EventDisplay> eventLists = [];
+  List<EventDisplay> eventList = [];
 
   static CalendarPageState copy(CalendarPageState state) {
     var nState = CalendarPageState();
@@ -37,7 +38,7 @@ class CalendarPageState {
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
     nState.eventListTitle = state.eventListTitle;
-    nState.eventLists = state.eventLists;
+    nState.eventList = state.eventList;
     return nState;
   }
 }
@@ -108,6 +109,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     ];
     state.now = DateTime.now();
     state.dayLists = createDayLists(state.now);
+    state.dayLists = addEvents(state.dayLists);
     state.selectDay = state.now;
     setCurrentDay(state.selectDay);
 
@@ -138,12 +140,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         .format(now).toString();
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(now).toString();
-    state.eventLists = [
+    state.eventList = [
       EventDisplay(id: 'first', editing: true, head: '連日',
           title: 'コンテムポレリダンスした日'),
       for(int i=0; i<4; i++) ... {
         EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
-            title: 'コンテムポレリダンスした日'),
+            title: 'コンテムポレリダンスした日ああああああああああああああああ'),
       }
     ];
   }
@@ -197,6 +199,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     return list;
+  }
+
+  List<List<DayDisplay>> addEvents(List<List<DayDisplay>> dayLists) {
+    for (int month = 0; month < dayLists.length; month++) {
+      for (int day = 0; day < dayLists[month].length; day++) {
+        dayLists[month][day].eventList = [
+          for (int i = 0; i < 16; i++) ... {
+            'コンテムポレリダンスした日'
+          }
+        ];
+      }
+    }
+    return dayLists;
   }
 
   updateState() async {
