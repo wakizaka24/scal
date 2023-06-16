@@ -86,7 +86,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   CalendarPageNotifier(this.ref, CalendarPageState state)
       : super(state);
 
-  initState() async {
+  initState(bool update) async {
     // Data
     state.weekdayList = [
       WeekdayDisplay(title: '日',
@@ -108,7 +108,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayLists = createDayLists(state.now);
     state.dayLists = addEvents(state.dayLists);
     state.selectDay = state.now;
-    setCurrentDay(state.selectDay);
+    setCurrentDay(state.selectDay, update);
 
     // UI
     state.dayPartActive = true;
@@ -121,16 +121,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
     }
 
-    updateState();
+    if (update) {
+      updateState();
+    }
   }
 
   onCalendarPageChanged(int month) async {
     debugPrint('onCalendarPageChanged month=$month');
   }
 
-  setCurrentDay(DateTime date) {
+  setCurrentDay(DateTime date, bool update) {
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    homeNotifier.setCurrentDay(date);
+    homeNotifier.setCurrentDay(date, update);
 
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date).toString();
@@ -214,7 +216,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayPartIndex = index;
     state.eventListIndex = null;
     state.selectDay = state.dayLists[1][index].id;
-    setCurrentDay(state.selectDay);
+    setCurrentDay(state.selectDay, true);
     updateState();
   }
 

@@ -33,26 +33,17 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     final homeState = ref.watch(homePageNotifierProvider);
     final calendarState = ref.watch(calendarPageNotifierProvider(
         widget.pageIndex));
-    final notifier = ref.watch(calendarPageNotifierProvider(widget.pageIndex)
-        .notifier);
-
-    useEffect(() {
-      // Pageの初期化処理
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await notifier.initState();
-      });
-
-      return () {
-        // Pageの解放処理
-      };
-    }, const []);
+    final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
+        widget.pageIndex).notifier);
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
-    double appBarHeight = homeState.appBarHeight;//AppBar().preferredSize.height;
+    //double appBarHeight = AppBar().preferredSize.height;
+    double appBarHeight = homeState.appBarHeight;
     // 週部分の高さ
     double weekPartHeight = 21;
     // イベント一覧のアスペクト比
@@ -75,23 +66,41 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     // 週部分のアスペクト比
     double weekPartAspectRate = weekPartWidth / weekPartHeight;
 
-    calendarState.calendarController.addListener(() {
-      double offset = calendarState.calendarController.offset;
+    useEffect(() {
+      debugPrint('child useEffect');
+      // Pageの初期化処理
+      // useEffect終了までにstateの値を設定できれば、
+      // 同じ階層のWidgetのStateは反映すると推測する。
+      calendarNotifier.initState(false);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        debugPrint('child addPostFrameCallback');
+        // 親階層はStateの変更が反映されないので、
+        // このタイミングで親階層のStateを更新する。
+        homeNotifier.updateState();
+      });
 
-      int index = 1;
-      if (offset <= 0) {
-        index = 0;
-      } else if (offset >= deviceWidth * 2) {
-        index = 2;
-      }
+      calendarState.calendarController.addListener(() {
+        double offset = calendarState.calendarController.offset;
 
-      if (index != 1) {
-        int addIndex = index - 1;
-        calendarState.calendarController.jumpTo(
-            offset + deviceWidth * addIndex * -1);
-        notifier.onCalendarPageChanged(addIndex);
-      }
-    });
+        int index = 1;
+        if (offset <= 0) {
+          index = 0;
+        } else if (offset >= deviceWidth * 2) {
+          index = 2;
+        }
+
+        if (index != 1) {
+          int addIndex = index - 1;
+          calendarState.calendarController.jumpTo(
+              offset + deviceWidth * addIndex * -1);
+          calendarNotifier.onCalendarPageChanged(addIndex);
+        }
+      });
+
+      return () {
+        // Pageの解放処理
+      };
+    }, const []);
 
     return Scaffold(
       body: SafeArea(
@@ -266,13 +275,15 @@ class DayPart extends HookConsumerWidget {
         children: [
           Text(day.title,
               style: TextStyle(
-                fontSize: 13,
-                color: day.titleColor
+                  fontSize: 11,
+                  height: 1.2,
+                  color: day.titleColor,
               )
           ),
           Expanded(child:
             ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                behavior: ScrollConfiguration.of(context).copyWith(
+                    scrollbars: false),
                 child: ListView(
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
@@ -280,7 +291,7 @@ class DayPart extends HookConsumerWidget {
                       Text(day.eventList[i],
                         maxLines: 1,
                         style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 8.8,
                             height: 1.2
                         ),
                       ),

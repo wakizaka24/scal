@@ -40,10 +40,12 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
     updateState();
   }
 
-  setCurrentDay(DateTime date) {
+  setCurrentDay(DateTime date, bool update) {
     state.appBarTitle = DateFormat.yMMM('ja') // 2023年6月
         .format(date).toString();
-    updateState();
+    if (update) {
+      updateState();
+    }
   }
 
   updateState() async {
