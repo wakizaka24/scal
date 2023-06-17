@@ -7,9 +7,7 @@ import 'f003_calendar_page.dart';
 
 class CalendarPageState {
   // Control
-  PageController calendarController = PageController(initialPage: 1);
-  MonthPartScrollState monthPartScrollState
-    = MonthPartScrollState(monthPartIndex: 1);
+  PageController calendarController = PageController(initialPage: 36001);
 
   // UI
   bool dayPartActive = true;
@@ -29,7 +27,6 @@ class CalendarPageState {
 
     // Control
     nState.calendarController = state.calendarController;
-    nState.monthPartScrollState = state.monthPartScrollState;
 
     // UI
     nState.dayPartActive = state.dayPartActive;
@@ -45,17 +42,6 @@ class CalendarPageState {
     nState.eventList = state.eventList;
     return nState;
   }
-}
-
-class MonthPartScrollState {
-  int monthPartIndex;
-  bool pointerDown = false;
-  bool afterScroll = false;
-
-
-  MonthPartScrollState({
-    required this.monthPartIndex,
-  });
 }
 
 class WeekdayDisplay {
@@ -241,11 +227,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   selectEventListPart(int index) {
     state.dayPartActive = false;
     state.eventListIndex = index;
-    updateState();
-  }
-
-  selectMonthPart(int index) {
-    state.monthPartScrollState.monthPartIndex = index;
     updateState();
   }
 

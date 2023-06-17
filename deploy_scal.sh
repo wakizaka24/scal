@@ -1,5 +1,6 @@
 REMOTE_HOST=wakizaka24@wakizaka24.sakura.ne.jp
 PATH_TO_REPLACE=/home/wakizaka24/www/scal/deploy
+sh deploy_local.sh demo1
 ssh $REMOTE_HOST mkdir $PATH_TO_REPLACE
 ssh $REMOTE_HOST rm -rf $PATH_TO_REPLACE/*
 cd ./deploy

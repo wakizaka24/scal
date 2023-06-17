@@ -29,10 +29,10 @@ class EndDrawer extends HookConsumerWidget {
           HighlightAbleButton(
             index: i,
             isHighlighted: highlightedIndex.value == i,
-            onPointerDown: (int i) async {
+            onTapDown: (int i) async {
               highlightedIndex.value = i;
             },
-            onPointerUp: (int i) async {
+            onTapUp: (int i) async {
               highlightedIndex.value = -1;
               Navigator.pop(context);
 
@@ -46,7 +46,7 @@ class EndDrawer extends HookConsumerWidget {
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             },
-            onPointerCancel: (int i) async {
+            onTapCancel: (int i) async {
               highlightedIndex.value = -1;
             },
             title: EndDrawerMenuType.values[i].title,
@@ -89,18 +89,18 @@ class HighlightAbleButton extends HookConsumerWidget {
   const HighlightAbleButton({super.key,
     required this.index,
     required this.isHighlighted,
-    required this.onPointerDown,
-    required this.onPointerUp,
-    required this.onPointerCancel,
+    required this.onTapDown,
+    required this.onTapUp,
+    required this.onTapCancel,
     required this.title,
     required this.fontSize,
   });
 
   final int index;
   final bool isHighlighted;
-  final void Function(int) onPointerDown;
-  final void Function(int) onPointerUp;
-  final void Function(int) onPointerCancel;
+  final void Function(int) onTapDown;
+  final void Function(int) onTapUp;
+  final void Function(int) onTapCancel;
 
   final String title;
   final double fontSize;
@@ -109,10 +109,10 @@ class HighlightAbleButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    return Listener(
-      onPointerDown: (PointerDownEvent event) => onPointerDown(index),
-      onPointerUp: (PointerUpEvent event) => onPointerUp(index),
-      onPointerCancel: (PointerCancelEvent event) => onPointerCancel(index),
+    return GestureDetector(
+      onTapDown: (TapDownDetails details) => onTapDown(index),
+      onTapUp: (TapUpDetails details) => onTapUp(index),
+      onTapCancel: () => onTapCancel(index),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
