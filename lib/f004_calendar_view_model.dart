@@ -6,11 +6,15 @@ import 'f002_home_view_model.dart';
 import 'f003_calendar_page.dart';
 
 class CalendarPageState {
+  // Control
+  PageController calendarController = PageController(initialPage: 1);
+  MonthPartScrollState monthPartScrollState
+    = MonthPartScrollState(monthPartIndex: 1);
+
   // UI
   bool dayPartActive = true;
   int dayPartIndex = 0;
   int? eventListIndex;
-  PageController calendarController = PageController(initialPage: 1);
 
   // Data
   late DateTime now;
@@ -23,11 +27,14 @@ class CalendarPageState {
   static CalendarPageState copy(CalendarPageState state) {
     var nState = CalendarPageState();
 
+    // Control
+    nState.calendarController = state.calendarController;
+    nState.monthPartScrollState = state.monthPartScrollState;
+
     // UI
     nState.dayPartActive = state.dayPartActive;
     nState.dayPartIndex = state.dayPartIndex;
     nState.eventListIndex = state.eventListIndex;
-    nState.calendarController = state.calendarController;
 
     // Data
     nState.now = state.now;
@@ -38,6 +45,17 @@ class CalendarPageState {
     nState.eventList = state.eventList;
     return nState;
   }
+}
+
+class MonthPartScrollState {
+  int monthPartIndex;
+  bool pointerDown = false;
+  bool afterScroll = false;
+
+
+  MonthPartScrollState({
+    required this.monthPartIndex,
+  });
 }
 
 class WeekdayDisplay {
@@ -223,6 +241,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   selectEventListPart(int index) {
     state.dayPartActive = false;
     state.eventListIndex = index;
+    updateState();
+  }
+
+  selectMonthPart(int index) {
+    state.monthPartScrollState.monthPartIndex = index;
     updateState();
   }
 

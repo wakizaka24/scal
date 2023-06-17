@@ -29,10 +29,10 @@ class EndDrawer extends HookConsumerWidget {
           HighlightAbleButton(
             index: i,
             isHighlighted: highlightedIndex.value == i,
-            onTapDown: (int i) async {
+            onPointerDown: (int i) async {
               highlightedIndex.value = i;
             },
-            onTap: (int i) async {
+            onPointerUp: (int i) async {
               highlightedIndex.value = -1;
               Navigator.pop(context);
 
@@ -46,7 +46,7 @@ class EndDrawer extends HookConsumerWidget {
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             },
-            onTapCancel: (int i) async {
+            onPointerCancel: (int i) async {
               highlightedIndex.value = -1;
             },
             title: EndDrawerMenuType.values[i].title,
@@ -89,18 +89,18 @@ class HighlightAbleButton extends HookConsumerWidget {
   const HighlightAbleButton({super.key,
     required this.index,
     required this.isHighlighted,
-    required this.onTapDown,
-    required this.onTap,
-    required this.onTapCancel,
+    required this.onPointerDown,
+    required this.onPointerUp,
+    required this.onPointerCancel,
     required this.title,
     required this.fontSize,
   });
 
   final int index;
   final bool isHighlighted;
-  final void Function(int) onTapDown;
-  final void Function(int) onTap;
-  final void Function(int) onTapCancel;
+  final void Function(int) onPointerDown;
+  final void Function(int) onPointerUp;
+  final void Function(int) onPointerCancel;
 
   final String title;
   final double fontSize;
@@ -109,10 +109,10 @@ class HighlightAbleButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTapDown: (TapDownDetails details) => onTapDown(index),
-      onTap: () => onTap(index),
-      onTapCancel: () => onTapCancel(index),
+    return Listener(
+      onPointerDown: (PointerDownEvent event) => onPointerDown(index),
+      onPointerUp: (PointerUpEvent event) => onPointerUp(index),
+      onPointerCancel: (PointerCancelEvent event) => onPointerCancel(index),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
