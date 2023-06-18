@@ -23,7 +23,7 @@ class HomePage extends HookConsumerWidget {
     // アンセーフエリア上の高さ
     double unSafeAreaTopHeight = MediaQuery.of(context).padding.top;
     // アンセーフエリア下の高さ
-    // double unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
+    double unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
@@ -89,8 +89,12 @@ class HomePage extends HookConsumerWidget {
         onPageChanged: (index) {
         },
         children: <Widget>[
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight, pageIndex: 0),
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight, pageIndex: 1),
+          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+              unSafeAreaBottomHeight: unSafeAreaBottomHeight,
+              pageIndex: 0),
+          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+              unSafeAreaBottomHeight: unSafeAreaBottomHeight,
+              pageIndex: 1),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,

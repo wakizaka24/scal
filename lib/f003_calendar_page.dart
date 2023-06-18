@@ -15,8 +15,11 @@ const double normalBoarderWidth = 0.5;
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
   final double unSafeAreaTopHeight;
+  final double unSafeAreaBottomHeight;
 
-  const CalendarPage({super.key, required this.unSafeAreaTopHeight,
+  const CalendarPage({super.key,
+    required this.unSafeAreaTopHeight,
+    required this.unSafeAreaBottomHeight,
     required this.pageIndex});
 
   @override
@@ -25,6 +28,7 @@ class CalendarPage extends StatefulHookConsumerWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
+  List<MonthPart> monthPartList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     //double appBarHeight = AppBar().preferredSize.height;
     double appBarHeight = homeState.appBarHeight;
     // 週部分の高さ
-    double weekPartHeight = 21;
+    double weekdayPartHeight = 21;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.41421356237;
     // イベント一覧の高さ
@@ -56,22 +60,20 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       eventListHeight = eventListMaxHeight;
     }
     // 月部分の高さ
-    double monthPartHeight = deviceHeight - appBarHeight - weekPartHeight
+    double monthPartHeight = deviceHeight - appBarHeight - weekdayPartHeight
         - eventListHeight
         - widget.unSafeAreaTopHeight;
     // 週部分の列数
-    int weekPartColumnNum = 7;
+    int weekdayPartColumnNum = 7;
     // 週部分の幅
-    double weekPartWidth = deviceWidth / weekPartColumnNum;
-    // 週部分のアスペクト比
-    double weekPartAspectRate = weekPartWidth / weekPartHeight;
+    double weekdayPartWidth = deviceWidth / weekdayPartColumnNum;
 
     useEffect(() {
       debugPrint('child useEffect');
       // Pageの初期化処理
       // useEffect終了までにstateの値を設定できれば、
       // 同じ階層のWidgetのStateは反映すると推測する。
-      calendarNotifier.initState(false);
+      calendarNotifier.initState();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('child addPostFrameCallback');
         // 親階層はStateの変更が反映されないので、
@@ -84,6 +86,23 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       };
     }, const []);
 
+    if (monthPartList.isEmpty) {
+      monthPartList = [
+        for (int i=0; i < 3; i++) ... {
+          MonthPart(
+            pageIndex: widget.pageIndex,
+            monthPartHeight: monthPartHeight,
+            weekdayPartColumnNum: weekdayPartColumnNum,
+            weekdayPartWidth: weekdayPartWidth,
+            weekdayPartHeight: weekdayPartHeight,
+            onPointerDown: (int pageIndex) async {},
+            onPointerUp: (int pageIndex) async {},
+            dayList: calendarState.dayLists[0],
+          ),
+        }
+      ];
+    }
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -92,31 +111,20 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
             Expanded(
                 child: PageView.builder(
                   controller: calendarState.calendarController,
-                  physics: const CustomScrollPhysics(mass: 150, stiffness: 110,
-                      damping: 0.65),
+                  physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+                      damping: 0.85),
                   onPageChanged: (int index) {
                     calendarNotifier.onCalendarPageChanged(index);
                   },
                   itemBuilder: (context, index) {
-                    return MonthPart(
-                      pageIndex: widget.pageIndex,
-                      monthPartHeight: monthPartHeight,
-                      weekPartColumnNum: weekPartColumnNum,
-                      weekPartAspectRate: weekPartAspectRate,
-                      weekPartWidth: weekPartWidth,
-                      weekPartHeight: weekPartHeight,
-                      onPointerDown: (int pageIndex) async {
-                      },
-                      onPointerUp: (int pageIndex) async {
-                      },
-                      dayList: calendarState.dayLists[0],
-                    );
+                    return monthPartList[index % 3];
                   },
                 )
             ),
             AspectRatio(
                 aspectRatio: eventListAspectRate,
-                child: EventListPart(pageIndex: widget.pageIndex)
+                child: EventListPart(pageIndex: widget.pageIndex,
+                    unSafeAreaBottomHeight: widget.unSafeAreaBottomHeight)
             )
           ],
         ),
@@ -129,9 +137,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 }
 
 class CustomScrollPhysics extends ScrollPhysics {
-  final double mass; // 速度(100)
+  final double mass; // 速度(50)
   final double stiffness; // 100
-  final double damping; // 0.65
+  final double damping; // 0.85
 
   const CustomScrollPhysics({
     ScrollPhysics? parent,
@@ -157,10 +165,9 @@ class CustomScrollPhysics extends ScrollPhysics {
 class MonthPart extends HookConsumerWidget {
   final int pageIndex;
   final double monthPartHeight;
-  final int weekPartColumnNum;
-  final double weekPartAspectRate;
-  final double weekPartWidth;
-  final double weekPartHeight;
+  final int weekdayPartColumnNum;
+  final double weekdayPartWidth;
+  final double weekdayPartHeight;
   final void Function(int) onPointerDown;
   final void Function(int) onPointerUp;
   final List<DayDisplay> dayList;
@@ -169,10 +176,9 @@ class MonthPart extends HookConsumerWidget {
     super.key,
     required this.pageIndex,
     required this.monthPartHeight,
-    required this.weekPartColumnNum,
-    required this.weekPartAspectRate,
-    required this.weekPartWidth,
-    required this.weekPartHeight,
+    required this.weekdayPartColumnNum,
+    required this.weekdayPartWidth,
+    required this.weekdayPartHeight,
     required this.onPointerDown,
     required this.onPointerUp,
     required this.dayList,
@@ -184,86 +190,39 @@ class MonthPart extends HookConsumerWidget {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
 
-    // // 週部分のアスペクト比
-    // double weekdayPartAspectRate = weekPartWidth / weekPartHeight;
     // 日部分の行数
     int dayPartRowNum = (dayList.length / calendarState.weekdayList
         .length).ceil();
     // 日部分の高さ
     double dayPartHeight = monthPartHeight / dayPartRowNum;
-    // // 日部分のアスペクト比
-    // double dayPartAspectRate = weekPartWidth / dayPartHeight;
 
     return Column(children: [
-      // SizedBox(height: weekPartHeight, child :
-      //   GridView.builder(
-      //       itemCount: weekPartColumnNum,
-      //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      //         crossAxisCount: weekPartColumnNum, // 列数
-      //         crossAxisSpacing: 0, // 左右の間隔
-      //         mainAxisSpacing: 0, // 上下の間隔
-      //         childAspectRatio: weekdayPartAspectRate,
-      //       ),
-      //       itemBuilder: (BuildContext context, int index) {
-      //         return WeekdayPart(height: weekPartHeight,
-      //             weekday: calendarState.weekdayList[index]);
-      //       }
-      //   )
-      // ),
-
       Row(
         children: [
-          for (int rowIndex = 0; rowIndex < calendarState.weekdayList
-              .length; rowIndex++) ... {
-            WeekdayPart(width: weekPartWidth, height: weekPartHeight,
+          for (int rowIndex = 0; rowIndex < weekdayPartColumnNum;
+            rowIndex++) ... {
+            WeekdayPart(width: weekdayPartWidth, height: weekdayPartHeight,
               weekday: calendarState.weekdayList[rowIndex]),
           }
         ],
       ),
-
-      // SizedBox(height: monthPartHeight, child :
-      //   GridView.builder(
-      //     itemCount: dayList.length,
-      //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      //       crossAxisCount: weekPartColumnNum, // 列数
-      //       crossAxisSpacing: 0, // 左右の間隔
-      //       mainAxisSpacing: 0, // 上下の間隔
-      //       childAspectRatio: dayPartAspectRate,
-      //     ),
-      //     itemBuilder: (BuildContext context, int index) {
-      //       return DayPart(index: index,
-      //         isHighlighted: calendarState.dayPartIndex == index,
-      //         isActive: calendarState.dayPartActive,
-      //         onTapDown: (int i) async {
-      //           calendarNotifier.selectDayPart(i);
-      //         },
-      //         onTapUp: (int i) async {
-      //         },
-      //         height: dayPartHeight,
-      //         day: dayList[index],
-      //       );
-      //     }
-      //   )
-      // ),
-
       for (int colIndex = 0; colIndex < dayPartRowNum; colIndex++) ... {
         Row(
           children: [
-            for (int rowIndex = 0; rowIndex < calendarState.weekdayList
-                .length; rowIndex++) ... {
-              DayPart(width: weekPartWidth,
+            for (int rowIndex = 0; rowIndex < weekdayPartColumnNum;
+              rowIndex++) ... {
+              DayPart(width: weekdayPartWidth,
                 height: dayPartHeight,
-                index: colIndex * calendarState.weekdayList.length + rowIndex,
+                index: colIndex * weekdayPartColumnNum + rowIndex,
                 isHighlighted: calendarState.dayPartIndex
-                    == colIndex * calendarState.weekdayList.length + rowIndex,
+                    == colIndex * weekdayPartColumnNum + rowIndex,
                 isActive: calendarState.dayPartActive,
                 onTapDown: (int i) async {
                   calendarNotifier.selectDayPart(i);
                 },
                 onTapUp: (int i) async {
                 },
-                day: dayList[colIndex * calendarState.weekdayList.length
-                    + rowIndex],
+                day: dayList[colIndex * weekdayPartColumnNum + rowIndex],
               ),
             }
           ],
@@ -302,7 +261,7 @@ class WeekdayPart extends HookConsumerWidget {
         child: Text(weekday.title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              height: 1,
+              height: 1.3,
               fontSize: 11,
               color: weekday.titleColor
 
@@ -352,30 +311,30 @@ class DayPart extends HookConsumerWidget {
           Text(day.title,
               style: TextStyle(
                   fontSize: 11,
-                  height: 1.2,
+                  height: 1,
                   color: day.titleColor,
               )
           ),
-          // Expanded(child:
-          //   ScrollConfiguration(
-          //       behavior: ScrollConfiguration.of(context).copyWith(
-          //           scrollbars: false),
-          //       child: ListView(
-          //         physics: const NeverScrollableScrollPhysics(),
-          //         children: [
-          //           for(int i = 0; i < day.eventList.length; i++) ... {
-          //             Text(day.eventList[i],
-          //               maxLines: 1,
-          //               style: const TextStyle(
-          //                   fontSize: 8.8,
-          //                   height: 1.2
-          //               ),
-          //             ),
-          //           }
-          //         ],
-          //       )
-          //   )
-          // )
+          Expanded(child:
+            ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                    scrollbars: false),
+                child: ListView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    for(int i = 0; i < day.eventList.length; i++) ... {
+                      Text(day.eventList[i],
+                        maxLines: 1,
+                        style: const TextStyle(
+                            fontSize: 8.8,
+                            height: 1
+                        ),
+                      ),
+                    }
+                  ],
+                )
+            )
+          )
         ],
       ),
     );
@@ -384,10 +343,12 @@ class DayPart extends HookConsumerWidget {
 
 class EventListPart extends HookConsumerWidget {
   final int pageIndex;
+  final double unSafeAreaBottomHeight;
 
   const EventListPart({
     super.key,
     required this.pageIndex,
+    required this.unSafeAreaBottomHeight,
   });
 
   @override
@@ -417,7 +378,8 @@ class EventListPart extends HookConsumerWidget {
           ),
           Expanded(child:
             ListView(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 56
+                    + unSafeAreaBottomHeight),
                 children: [
                   for(int i=0; i < state.eventList.length; i++) ... {
                     EventPart(

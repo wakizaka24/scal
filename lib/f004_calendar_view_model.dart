@@ -90,7 +90,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   CalendarPageNotifier(this.ref, CalendarPageState state)
       : super(state);
 
-  initState(bool update) async {
+  initState() async {
     // Data
     state.weekdayList = [
       WeekdayDisplay(title: '日',
@@ -112,7 +112,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayLists = createDayLists(state.now);
     state.dayLists = addEvents(state.dayLists);
     state.selectDay = state.now;
-    setCurrentDay(state.selectDay, update);
+    setCurrentDay(state.selectDay);
+    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
+    homeNotifier.setCurrentDay(state.selectDay, false);
 
     // UI
     state.dayPartActive = true;
@@ -124,26 +126,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         break;
       }
     }
-
-    if (update) {
-      updateState();
-    }
   }
 
   onCalendarPageChanged(int month) async {
     debugPrint('onCalendarPageChanged month=$month');
   }
 
-  setCurrentDay(DateTime date, bool update) {
-    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    homeNotifier.setCurrentDay(date, update);
-
+  setCurrentDay(DateTime date) {
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date).toString();
     state.eventList = [
       EventDisplay(id: 'first', editing: true, head: '連日',
           title: 'コンテムポレリダンスした日'),
-      for(int i=0; i<4; i++) ... {
+      for(int i=0; i<6; i++) ... {
         EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
             title: 'コンテムポレリダンスした日ああああああああああああああああ'),
       }
@@ -205,7 +200,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
         dayLists[month][day].eventList = [
-          for (int i = 0; i < 16; i++) ... {
+          for (int i = 0; i < 11; i++) ... {
             'コンテムポレリダンスした日'
           }
         ];
@@ -220,7 +215,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayPartIndex = index;
     state.eventListIndex = null;
     state.selectDay = state.dayLists[1][index].id;
-    setCurrentDay(state.selectDay, true);
+    setCurrentDay(state.selectDay);
+
+    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
+    homeNotifier.setCurrentDay(state.selectDay, true);
     updateState();
   }
 
