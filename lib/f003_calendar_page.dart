@@ -29,6 +29,8 @@ class CalendarPage extends StatefulHookConsumerWidget {
 class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
   List<MonthPart> monthPartList = [];
+  double preDeviceWidth = 0;
+  double preDeviceHeight = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +65,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     double monthPartHeight = deviceHeight - appBarHeight - weekdayPartHeight
         - eventListHeight
         - widget.unSafeAreaTopHeight;
-    // 週部分の列数
-    int weekdayPartColumnNum = 7;
     // 週部分の幅
-    double weekdayPartWidth = deviceWidth / weekdayPartColumnNum;
+    double weekdayPartWidth = deviceWidth / CalendarPageState
+        .weekdayPartColumnNum;
 
     useEffect(() {
       debugPrint('child useEffect');
@@ -81,23 +82,36 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         homeNotifier.updateState();
       });
 
+      calendarState.calendarController.addListener(() {
+        double offset = calendarState.calendarController.offset;
+        calendarNotifier.onCalendarPageChanged((offset / deviceWidth).round());
+      });
+
       return () {
         // Pageの解放処理
       };
     }, const []);
 
-    if (monthPartList.isEmpty) {
+    if (preDeviceWidth != deviceWidth || preDeviceHeight != deviceHeight
+      || calendarState.calendarReload) {
+      calendarState.calendarReload = false;
+
+      // for (int i = 0; i < 3; i++) {
+      //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
+      // }
+
       monthPartList = [
         for (int i=0; i < 3; i++) ... {
           MonthPart(
             pageIndex: widget.pageIndex,
             monthPartHeight: monthPartHeight,
-            weekdayPartColumnNum: weekdayPartColumnNum,
+            weekdayPartColumnNum: CalendarPageState
+                .weekdayPartColumnNum,
             weekdayPartWidth: weekdayPartWidth,
             weekdayPartHeight: weekdayPartHeight,
             onPointerDown: (int pageIndex) async {},
             onPointerUp: (int pageIndex) async {},
-            dayList: calendarState.dayLists[0],
+            dayList: calendarState.dayLists[i],
           ),
         }
       ];
@@ -110,14 +124,15 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
           children: [
             Expanded(
                 child: PageView.builder(
+                  // pageSnapping: false,
                   controller: calendarState.calendarController,
                   physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
                       damping: 0.85),
                   onPageChanged: (int index) {
-                    calendarNotifier.onCalendarPageChanged(index);
                   },
                   itemBuilder: (context, index) {
-                    return monthPartList[index % 3];
+                    var adjustmentIndex = index - calendarState.addMonth;
+                    return monthPartList[adjustmentIndex % 3];
                   },
                 )
             ),
@@ -218,7 +233,7 @@ class MonthPart extends HookConsumerWidget {
                     == colIndex * weekdayPartColumnNum + rowIndex,
                 isActive: calendarState.dayPartActive,
                 onTapDown: (int i) async {
-                  calendarNotifier.selectDayPart(i);
+                  calendarNotifier.selectDayPart(index: i);
                 },
                 onTapUp: (int i) async {
                 },
@@ -381,6 +396,16 @@ class EventListPart extends HookConsumerWidget {
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 56
                     + unSafeAreaBottomHeight),
                 children: [
+                  if (state.eventList.isEmpty)
+                    EventPart(
+                      height: 45,
+                      index: 0,
+                      isHighlighted: state.eventListIndex == 0,
+                      onTapDown: (int i) async {
+                        notifier.selectEventListPart(0);
+                      },
+                      emptyMessage: 'イベントがありません',
+                    ),
                   for(int i=0; i < state.eventList.length; i++) ... {
                     EventPart(
                       height: 45,
@@ -405,14 +430,16 @@ class EventPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final void Function(int) onTapDown;
-  final EventDisplay event;
+  final String? emptyMessage;
+  final EventDisplay? event;
 
   const EventPart({super.key,
     required this.height,
     required this.index,
     required this.isHighlighted,
     required this.onTapDown,
-    required this.event,
+    this.emptyMessage,
+    this.event,
   });
 
   @override
@@ -433,31 +460,42 @@ class EventPart extends HookConsumerWidget {
             padding: const EdgeInsets.all(selectedBoarderWidth),
           child: Row(
             children: [
-              SizedBox(width: 45, child:
-                Text(event.head,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 13
-                    )
-                )
-              ),
-              Container(
-                  padding: const EdgeInsets
-                      .symmetric(horizontal: selectedBoarderWidth,
-                      vertical: 0),
-                  child: Container(
-                      width: normalBoarderWidth,
-                      color: theme.colorScheme.secondaryContainer
+              if (emptyMessage != null)
+                Expanded(child:
+                  Text(emptyMessage!,
+                      style: const TextStyle(
+                          fontSize: 13
+                      )
                   )
               ),
-              Expanded(child:
-                Text(event.title,
-                    style: const TextStyle(
-                        fontSize: 13
+              if (event != null)
+                SizedBox(width: 45, child:
+                  Text(event!.head,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 13
+                      )
+                  )
+                ),
+              if (event != null)
+                Container(
+                    padding: const EdgeInsets
+                        .symmetric(horizontal: selectedBoarderWidth,
+                        vertical: 0),
+                    child: Container(
+                        width: normalBoarderWidth,
+                        color: theme.colorScheme.secondaryContainer
                     )
-                )
-              ),
-              if (event.editing)
+                ),
+              if (event != null)
+                Expanded(child:
+                  Text(event!.title,
+                      style: const TextStyle(
+                          fontSize: 13
+                      )
+                  )
+                ),
+              if (event != null && event!.editing)
                 TextButton(
                   onPressed: () {
                   },
@@ -472,7 +510,7 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
-              if (event.editing)
+              if (event != null && event!.editing)
                 TextButton(
                   onPressed: () {
                   },
@@ -487,7 +525,7 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
-              if (!event.editing)
+              if (event != null && !event!.editing)
                 TextButton(
                   onPressed: () {
                   },
@@ -502,7 +540,7 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
-              if (!event.editing)
+              if (event != null && !event!.editing)
                 TextButton(
                   onPressed: () {
                   },

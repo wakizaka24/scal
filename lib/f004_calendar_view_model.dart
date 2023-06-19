@@ -7,7 +7,10 @@ import 'f003_calendar_page.dart';
 
 class CalendarPageState {
   // Control
-  PageController calendarController = PageController(initialPage: 36001);
+  static const int basisIndex = 36001;
+  PageController calendarController = PageController(
+      initialPage: basisIndex);
+  bool calendarReload = false;
 
   // UI
   bool dayPartActive = true;
@@ -15,6 +18,9 @@ class CalendarPageState {
   int? eventListIndex;
 
   // Data
+  static const int weekdayPartColumnNum = 7;
+  DateTime basisDate = DateTime.now();
+  int addMonth = 0;
   late DateTime now;
   late DateTime selectDay;
   List<WeekdayDisplay> weekdayList = [];
@@ -27,6 +33,7 @@ class CalendarPageState {
 
     // Control
     nState.calendarController = state.calendarController;
+    nState.calendarReload = state.calendarReload;
 
     // UI
     nState.dayPartActive = state.dayPartActive;
@@ -34,6 +41,8 @@ class CalendarPageState {
     nState.eventListIndex = state.eventListIndex;
 
     // Data
+    nState.basisDate = state.basisDate;
+    nState.addMonth = state.addMonth;
     nState.now = state.now;
     nState.selectDay = state.selectDay;
     nState.weekdayList = state.weekdayList;
@@ -109,7 +118,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           titleColor: Colors.green),
     ];
     state.now = DateTime.now();
-    state.dayLists = createDayLists(state.now);
+    state.dayLists = createDayLists(state.basisDate, state.addMonth);
     state.dayLists = addEvents(state.dayLists);
     state.selectDay = state.now;
     setCurrentDay(state.selectDay);
@@ -128,29 +137,42 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
   }
 
-  onCalendarPageChanged(int month) async {
-    debugPrint('onCalendarPageChanged month=$month');
+  onCalendarPageChanged(int monthIndex) async {
+    int addMonth = monthIndex - CalendarPageState.basisIndex;
+    if (state.addMonth == addMonth) {
+      return;
+    }
+    debugPrint('onCalendarPageChanged addMonth=$addMonth');
+    state.addMonth = addMonth;
+    state.now = DateTime.now();
+    state.dayLists = createDayLists(state.basisDate, state.addMonth);
+    state.dayLists = addEvents(state.dayLists);
+    state.calendarReload = true;
+
+    selectDayPart();
   }
 
   setCurrentDay(DateTime date) {
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date).toString();
     state.eventList = [
-      EventDisplay(id: 'first', editing: true, head: '連日',
-          title: 'コンテムポレリダンスした日'),
-      for(int i=0; i<6; i++) ... {
-        EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
-            title: 'コンテムポレリダンスした日ああああああああああああああああ'),
-      }
+      // EventDisplay(id: 'first', editing: true, head: '連日',
+      //     title: 'コンテムポレリダンスした日'),
+      // for(int i=0; i<6; i++) ... {
+      //   EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
+      //       title: 'コンテムポレリダンスした日ああああああああああああああああ'),
+      // }
     ];
   }
 
-  List<List<DayDisplay>> createDayLists(DateTime now) {
-    DateTime prevMonth = DateTime(now.year, now.month - 1, 1);
+  List<List<DayDisplay>> createDayLists(DateTime now, int addMonth) {
+    DateTime prevMonth = DateTime(now.year, now.month - 1 + addMonth, 1);
 
     // 月部分の先頭の日付
     int subDay = 0;
-    for (int weekday = prevMonth.weekday; weekday % 7 != 0; weekday--) {
+    const columnNum = CalendarPageState.weekdayPartColumnNum;
+    for (int weekday = prevMonth.weekday; weekday
+        % columnNum != 0; weekday--) {
       subDay--;
     }
     DateTime currentDay = DateTime(prevMonth.year, prevMonth.month,
@@ -165,13 +187,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     ];
 
     List<List<DayDisplay>> list = [];
-    for (int i=0; i<3; i++) {
+    for (int i=0; i < 3; i++) {
       if (i > 0) {
         // 月区切りの直前が翌月
         if (list.last.last.id.month == months[i].month) {
           // 月区切りで1週差し戻す
           currentDay = DateTime(currentDay.year, currentDay.month,
-              currentDay.day - 7);
+              currentDay.day - columnNum);
         }
       }
 
@@ -179,13 +201,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
       list.add([
         // 翌月かつ土曜日まで
-        for (int j=0; currentDay.month != months[i].month && j < 7
+        for (int j=0; currentDay.month != months[i].month && j < columnNum
             || currentDay.month == months[i].month
-            || currentDay.month != months[i].month && j % 7 != 0; j++,
+            || currentDay.month != months[i].month && j % columnNum != 0; j++,
             currentDay = DateTime(currentDay.year,
             currentDay.month, currentDay.day + 1)) ... {
               DayDisplay(id: currentDay, title: currentDay.day.toString(),
-                titleColor: j % 7 == 0 ? Colors.pink : j % 7 == 6
+                titleColor: j % columnNum == 0 ? Colors.pink
+                    : j % columnNum == columnNum - 1
                     ? Colors.green : Colors.black, eventList: [],
                   bgColor: currentDay == now ? todayBgColor
                     : Colors.transparent)
@@ -200,21 +223,27 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
         dayLists[month][day].eventList = [
-          for (int i = 0; i < 11; i++) ... {
-            'コンテムポレリダンスした日'
-          }
+          // for (int i = 0; i < 11; i++) ... {
+          //   'コンテムポレリダンスした日'
+          // }
         ];
       }
     }
     return dayLists;
   }
 
-  selectDayPart(int index) {
+  selectDayPart({int? index}) {
     state.now = DateTime.now();
-    state.dayPartActive = true;
-    state.dayPartIndex = index;
-    state.eventListIndex = null;
-    state.selectDay = state.dayLists[1][index].id;
+
+    if (index != null) {
+      state.dayPartActive = true;
+      state.dayPartIndex = index;
+      state.eventListIndex = null;
+    } else if (state.dayPartIndex >= state.dayLists[1].length) {
+      state.dayPartIndex -= CalendarPageState.weekdayPartColumnNum;
+    }
+
+    state.selectDay = state.dayLists[1][state.dayPartIndex].id;
     setCurrentDay(state.selectDay);
 
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
