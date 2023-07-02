@@ -45,6 +45,8 @@ dependencies:
   shared_preferences: ^2.1.2
   # WidgetとStateNotifierの分離
   hooks_riverpod: ^2.3.6
+  # カレンダーアクセス
+  device_calendar: ^4.3.1
   # APIアクセス
   http: ^1.0.0
   # Jsonとモデルのパース指定

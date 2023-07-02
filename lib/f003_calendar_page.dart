@@ -82,10 +82,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         homeNotifier.updateState();
       });
 
-      calendarState.calendarController.addListener(() {
-        double offset = calendarState.calendarController.offset;
-        calendarNotifier.onCalendarPageChanged((offset / deviceWidth).round());
-      });
+      // calendarState.calendarController.addListener(() {
+      //   double offset = calendarState.calendarController.offset;
+      //   calendarNotifier.onCalendarPageChanged((offset / deviceWidth).round());
+      // });
 
       return () {
         // Pageの解放処理
@@ -129,6 +129,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                   physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
                       damping: 0.85),
                   onPageChanged: (int index) {
+                    calendarNotifier.onCalendarPageChanged(index);
                   },
                   itemBuilder: (context, index) {
                     var adjustmentIndex = index - calendarState.addMonth;

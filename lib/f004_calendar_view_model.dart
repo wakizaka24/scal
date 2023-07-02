@@ -1,9 +1,12 @@
+import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'f002_home_view_model.dart';
 import 'f003_calendar_page.dart';
+import 'f005_calendar_repository.dart';
+import 'f006_calendar_date_utils.dart';
 
 class CalendarPageState {
   // Control
@@ -23,6 +26,7 @@ class CalendarPageState {
   int addMonth = 0;
   late DateTime now;
   late DateTime selectDay;
+  Map<DateTime, List<Event>> events = {};
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
   String eventListTitle = '';
@@ -45,6 +49,7 @@ class CalendarPageState {
     nState.addMonth = state.addMonth;
     nState.now = state.now;
     nState.selectDay = state.selectDay;
+    nState.events = state.events;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
     nState.eventListTitle = state.eventListTitle;
@@ -117,9 +122,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       WeekdayDisplay(title: '土',
           titleColor: Colors.green),
     ];
-    state.now = DateTime.now();
-    state.dayLists = createDayLists(state.basisDate, state.addMonth);
-    state.dayLists = addEvents(state.dayLists);
+
+    await updateCalendarData();
     state.selectDay = state.now;
     setCurrentDay(state.selectDay);
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
@@ -144,12 +148,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
     debugPrint('onCalendarPageChanged addMonth=$addMonth');
     state.addMonth = addMonth;
-    state.now = DateTime.now();
-    state.dayLists = createDayLists(state.basisDate, state.addMonth);
-    state.dayLists = addEvents(state.dayLists);
+    await updateCalendarData();
     state.calendarReload = true;
 
     selectDayPart();
+  }
+
+  updateCalendarData() async {
+    state.now = DateTime.now();
+    state.dayLists = createDayLists(state.basisDate, state.addMonth);
+    var startDate = state.dayLists.first.first.id;
+    var endDate = state.dayLists.last.last.id;
+    state.events = await getEvents(startDate, endDate);
+    state.dayLists = await addEvents(state.dayLists, state.events);
   }
 
   setCurrentDay(DateTime date) {
@@ -204,8 +215,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         for (int j=0; currentDay.month != months[i].month && j < columnNum
             || currentDay.month == months[i].month
             || currentDay.month != months[i].month && j % columnNum != 0; j++,
-            currentDay = DateTime(currentDay.year,
-            currentDay.month, currentDay.day + 1)) ... {
+            currentDay = currentDay.add(const Duration(days: 1))) ... {
               DayDisplay(id: currentDay, title: currentDay.day.toString(),
                 titleColor: j % columnNum == 0 ? Colors.pink
                     : j % columnNum == columnNum - 1
@@ -219,13 +229,47 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return list;
   }
 
-  List<List<DayDisplay>> addEvents(List<List<DayDisplay>> dayLists) {
+  Future<Map<DateTime, List<Event>>> getEvents(DateTime startDate,
+      DateTime endDate) async {
+    Map<DateTime, List<Event>> events = {};
+    if (await CalendarRepository().hasPermissions()) {
+      var calendars = await CalendarRepository().getCalendars();
+      debugPrint('カレンダー数 ${calendars.length}');
+
+      for (int i = 0; i < calendars.length; i++) {
+        var calendar = calendars[i];
+
+        // if (!calendar.isDefault!) {
+        //   break;
+        // }
+
+        var calendarEvents = await CalendarRepository()
+            .getEvents(calendar.id!, startDate, endDate);
+
+        for (int i = 0; i < calendarEvents.length; i++) {
+          var event = calendarEvents[i];
+          var allDays = CalendarDateUtils().getAllDays(event.start, event.end);
+          allDays.fold(events, (events, day) {
+            events[day] = events[day] ?? [];
+            events[day]!.add(event);
+            return events;
+          });
+        }
+      }
+      debugPrint('日付ごとのイベント数 ${events.length}');
+    }
+    return events;
+  }
+
+  Future<List<List<DayDisplay>>> addEvents(List<List<DayDisplay>> dayLists,
+    Map<DateTime, List<Event>> events) async {
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
-        dayLists[month][day].eventList = [
-          // for (int i = 0; i < 11; i++) ... {
-          //   'コンテムポレリダンスした日'
-          // }
+        var dayInfo = dayLists[month][day];
+        dayInfo.eventList = [
+          for (int i = 0; i < (events[dayInfo.id] ?? []).length; i++) ... {
+            events[dayInfo.id]![i].title!
+          }
         ];
       }
     }
