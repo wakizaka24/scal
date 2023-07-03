@@ -26,7 +26,7 @@ class CalendarPageState {
   int addMonth = 0;
   late DateTime now;
   late DateTime selectDay;
-  Map<DateTime, List<Event>> events = {};
+  Map<DateTime, List<Event>> eventsMap = {};
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
   String eventListTitle = '';
@@ -49,7 +49,7 @@ class CalendarPageState {
     nState.addMonth = state.addMonth;
     nState.now = state.now;
     nState.selectDay = state.selectDay;
-    nState.events = state.events;
+    nState.eventsMap = state.eventsMap;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
     nState.eventListTitle = state.eventListTitle;
@@ -72,7 +72,7 @@ class DayDisplay {
   DateTime id;
   String title;
   Color titleColor;
-  List<String> eventList;
+  List<DayEventDisplay> eventList;
   Color bgColor;
 
   DayDisplay({
@@ -81,6 +81,16 @@ class DayDisplay {
     required this.titleColor,
     required this.eventList,
     required this.bgColor
+  });
+}
+
+class DayEventDisplay {
+  String title;
+  Color titleColor;
+
+  DayEventDisplay({
+    required this.title,
+    required this.titleColor
   });
 }
 
@@ -104,7 +114,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   CalendarPageNotifier(this.ref, CalendarPageState state)
       : super(state);
 
-  initState() async {
+  initState(VoidCallback afterInit) async {
     // Data
     state.weekdayList = [
       WeekdayDisplay(title: '日',
@@ -125,7 +135,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     await updateCalendarData();
     state.selectDay = state.now;
-    setCurrentDay(state.selectDay);
+    setCurrentDay(state.selectDay, state.eventsMap);
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
     homeNotifier.setCurrentDay(state.selectDay, false);
 
@@ -139,6 +149,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         break;
       }
     }
+
+    afterInit();
   }
 
   onCalendarPageChanged(int monthIndex) async {
@@ -159,21 +171,36 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.dayLists = createDayLists(state.basisDate, state.addMonth);
     var startDate = state.dayLists.first.first.id;
     var endDate = state.dayLists.last.last.id;
-    state.events = await getEvents(startDate, endDate);
-    state.dayLists = await addEvents(state.dayLists, state.events);
+    state.eventsMap = await getEvents(startDate, endDate);
+    state.dayLists = await addEvents(state.dayLists, state.eventsMap);
   }
 
-  setCurrentDay(DateTime date) {
+  setCurrentDay(DateTime date, Map<DateTime, List<Event>> eventsMap) async {
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date).toString();
-    state.eventList = [
-      // EventDisplay(id: 'first', editing: true, head: '連日',
-      //     title: 'コンテムポレリダンスした日'),
-      // for(int i=0; i<6; i++) ... {
-      //   EventDisplay(id: i.toString(), editing: false, head: '09:00\n18:00',
-      //       title: 'コンテムポレリダンスした日ああああああああああああああああ'),
-      // }
-    ];
+    var events = eventsMap[date] ?? [];
+    state.eventList = [];
+    for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+      var calendars = await CalendarRepository().getCalendars();
+      var calendar = calendars.firstWhere((calendar) =>
+      calendar.id == event.calendarId);
+      var head = '${DateFormat.jm('ja').format(event.start!)}\n'
+          '${DateFormat.jm('ja').format(event.end!)}';
+      if (event.start!.year != event.end!.year
+        || event.start!.month != event.end!.month
+        || event.start!.day != event.end!.day) {
+        head = '連日';
+      } else if (event.allDay!) {
+        head = '終日';
+      }
+      var id = event.eventId!;
+      var editing = calendar.isReadOnly!;
+      var title = event.title!;
+
+      state.eventList.add(EventDisplay(id: id, editing: editing,
+          head: head, title: title));
+    }
   }
 
   List<List<DayDisplay>> createDayLists(DateTime now, int addMonth) {
@@ -262,15 +289,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   Future<List<List<DayDisplay>>> addEvents(List<List<DayDisplay>> dayLists,
-    Map<DateTime, List<Event>> events) async {
+    Map<DateTime, List<Event>> eventsMap) async {
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
         var dayInfo = dayLists[month][day];
-        dayInfo.eventList = [
-          for (int i = 0; i < (events[dayInfo.id] ?? []).length; i++) ... {
-            events[dayInfo.id]![i].title!
-          }
-        ];
+        dayInfo.eventList = [];
+        var events = eventsMap[dayInfo.id] ?? [];
+        for (int i = 0; i < events.length; i++) {
+          var calendars = await CalendarRepository().getCalendars();
+          var calendar = calendars.firstWhere((calendar) =>
+            calendar.id == events[i].calendarId);
+          var defaultCalendar = calendar.isDefault!;
+          // var calendarColor = Color(calendar.color!);
+          dayInfo.eventList.add(DayEventDisplay(
+              title: eventsMap[dayInfo.id]![i].title!,
+              titleColor: defaultCalendar ? Colors.black : Colors.black87));
+        }
       }
     }
     return dayLists;
@@ -288,7 +322,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     state.selectDay = state.dayLists[1][state.dayPartIndex].id;
-    setCurrentDay(state.selectDay);
+    setCurrentDay(state.selectDay, state.eventsMap);
 
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
     homeNotifier.setCurrentDay(state.selectDay, true);

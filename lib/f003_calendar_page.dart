@@ -71,15 +71,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 
     useEffect(() {
       debugPrint('child useEffect');
+
       // Pageの初期化処理
-      // useEffect終了までにstateの値を設定できれば、
-      // 同じ階層のWidgetのStateは反映すると推測する。
-      calendarNotifier.initState();
+      calendarNotifier.initState(() {
+        homeNotifier.updateState();
+      });
+
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('child addPostFrameCallback');
-        // 親階層はStateの変更が反映されないので、
-        // このタイミングで親階層のStateを更新する。
-        homeNotifier.updateState();
       });
 
       // calendarState.calendarController.addListener(() {
@@ -339,11 +338,12 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(day.eventList[i],
+                      Text(day.eventList[i].title,
                         maxLines: 1,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 8.8,
-                            height: 1
+                            height: 1,
+                            color: day.eventList[i].titleColor
                         ),
                       ),
                     }

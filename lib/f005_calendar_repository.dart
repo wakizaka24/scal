@@ -1,15 +1,30 @@
 import 'package:flutter/foundation.dart';
 import 'package:device_calendar/device_calendar.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 class CalendarRepository {
   static final CalendarRepository _instance = CalendarRepository._internal();
-  CalendarRepository._internal();
+  CalendarRepository._internal() {
+    setNativeLocation();
+  }
 
   factory CalendarRepository() {
     return _instance;
   }
 
+  Future setNativeLocation() async {
+    try {
+      String timezone = await FlutterNativeTimezone.getLocalTimezone();
+      _location = getLocation(timezone);
+      setLocalLocation(_location);
+    } catch (e) {
+      debugPrint('ネイティブのロケーションを取得できませんでした');
+    }
+  }
+
   final DeviceCalendarPlugin _plugin = DeviceCalendarPlugin();
+  Location _location = local;
 
   Future<bool> hasPermissions() async {
     var permissions = await _plugin.hasPermissions();
@@ -57,6 +72,14 @@ class CalendarRepository {
     List<Event> events = result.data ?? [];
 
     for (int i = 0; i < events.length; i++) {
+      // ロケーションを日時に適用する。
+      if (events[i].start != null) {
+        events[i].start = TZDateTime.from(events[i].start!, _location);
+      }
+      if (events[i].end != null) {
+        events[i].end = TZDateTime.from(events[i].end!, _location);
+      }
+
       if (i == 0) {
         debugPrint('イベント一覧');
       }
