@@ -134,7 +134,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     ];
 
     await updateCalendarData();
-    state.selectDay = state.now;
+    state.selectDay = DateTime(state.now.year, state.now.month, state.now.day);
     setCurrentDay(state.selectDay, state.eventsMap);
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
     homeNotifier.setCurrentDay(state.selectDay, false);
@@ -149,7 +149,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         break;
       }
     }
-
     afterInit();
   }
 
@@ -179,7 +178,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.eventListTitle = DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date).toString();
     var events = eventsMap[date] ?? [];
-    state.eventList = [];
+
+    debugPrint('!!!eventsMap[date] ${events.length}');
+
+    state.eventList.clear();
     for (int i = 0; i < events.length; i++) {
       var event = events[i];
       var calendars = await CalendarRepository().getCalendars();
@@ -293,7 +295,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
         var dayInfo = dayLists[month][day];
-        dayInfo.eventList = [];
+        dayInfo.eventList.clear();
         var events = eventsMap[dayInfo.id] ?? [];
         for (int i = 0; i < events.length; i++) {
           var calendars = await CalendarRepository().getCalendars();
@@ -303,7 +305,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           // var calendarColor = Color(calendar.color!);
           dayInfo.eventList.add(DayEventDisplay(
               title: eventsMap[dayInfo.id]![i].title!,
-              titleColor: defaultCalendar ? Colors.black : Colors.black87));
+              titleColor: defaultCalendar ? Colors.black : Colors.black26));
         }
       }
     }
