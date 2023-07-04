@@ -373,8 +373,6 @@ class EventListPart extends HookConsumerWidget {
     final notifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
 
-    debugPrint('!!!EventListPart ${state.eventList.length}');
-
     return Column(
         children: [
           SizedBox(
