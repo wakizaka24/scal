@@ -99,9 +99,6 @@ class EventDisplay {
   bool editing;
   String head;
   Color lineColor;
-  bool onlyTitle;
-  String accountName;
-  String calendarName;
   String title;
   Color fontColor;
 
@@ -110,9 +107,6 @@ class EventDisplay {
     required this.editing,
     required this.head,
     required this.lineColor,
-    required this.onlyTitle,
-    required this.accountName,
-    required this.calendarName,
     required this.title,
     required this.fontColor
   });
@@ -217,9 +211,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           : const Color(0xffaaaaaa);
 
       state.eventList.add(EventDisplay(id: id, editing: editing,
-        head: head, lineColor: lineColor, onlyTitle: onlyTitle,
-        accountName: accountName, calendarName: calendarName, title: title,
-        fontColor: fontColor
+        head: head, lineColor: lineColor, title: title, fontColor: fontColor
       ));
     }
   }

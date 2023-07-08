@@ -511,45 +511,6 @@ class EventPart extends HookConsumerWidget {
                         color: event!.lineColor
                     )
                 ),
-              if (event != null && !event!.onlyTitle)
-                Expanded(child:
-                  Container(
-                    padding: const EdgeInsets
-                        .symmetric(horizontal: 4),
-                    child: Column(
-                      mainAxisAlignment:MainAxisAlignment.center,
-                      children: [
-                        Text(event!.accountName,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: eventListFontSize2,
-                                fontWeight: eventListFontWidth2,
-                                color: event!.fontColor
-                            )
-                        ),
-                        Text(event!.calendarName,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: eventListFontSize2,
-                                fontWeight: eventListFontWidth2,
-                                color: event!.fontColor
-                            )
-                        )
-                      ],)
-                  )
-                ),
-              if (event != null && !event!.onlyTitle)
-                Container(
-                    padding: const EdgeInsets
-                        .symmetric(horizontal: selectedBoarderWidth,
-                        vertical: 0),
-                    child: Container(
-                        width: normalBoarderWidth * 2,
-                        color: borderColor
-                    )
-                ),
               if (event != null)
                 Expanded(child:
                   Container(
