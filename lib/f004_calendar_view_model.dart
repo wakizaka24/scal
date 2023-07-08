@@ -99,16 +99,22 @@ class EventDisplay {
   bool editing;
   String head;
   Color lineColor;
+  bool onlyTitle;
+  String accountName;
   String calendarName;
   String title;
+  Color fontColor;
 
   EventDisplay({
     required this.id,
     required this.editing,
     required this.head,
     required this.lineColor,
+    required this.onlyTitle,
+    required this.accountName,
     required this.calendarName,
     required this.title,
+    required this.fontColor
   });
 }
 
@@ -203,12 +209,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         head = '終日';
       }
       var lineColor = Color(calendar.color!);
-      var calendarName = calendar.name ?? calendar.accountName!;
+      var onlyTitle = calendar.isDefault!;
+      var accountName = calendar.accountName!;
+      var calendarName = calendar.name!;
       var title = event.title!;
+      var fontColor = calendar.isDefault! ? Colors.black
+          : const Color(0xffaaaaaa);
 
       state.eventList.add(EventDisplay(id: id, editing: editing,
-          head: head, lineColor: lineColor, calendarName: calendarName,
-          title: title));
+        head: head, lineColor: lineColor, onlyTitle: onlyTitle,
+        accountName: accountName, calendarName: calendarName, title: title,
+        fontColor: fontColor
+      ));
     }
   }
 
@@ -319,7 +331,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           var calendar = calendarMap[event.calendarId]!;
           dayInfo.eventList.add(DayEventDisplay(
               title: eventsMap[dayInfo.id]![i].title!,
-              titleColor: calendar.isDefault! ? Colors.black : Colors.black54));
+              titleColor: calendar.isDefault! ? Colors.black
+                  : const Color(0xffaaaaaa)));
         }
       }
     }
