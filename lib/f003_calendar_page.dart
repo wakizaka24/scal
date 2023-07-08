@@ -11,6 +11,14 @@ const todayBgColor = Color(0x33DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
+const double calendarFontSize1 = 13;
+const FontWeight calendarFontWidth1 = FontWeight.w500;
+const double calendarFontSize2 = 10.2;
+const FontWeight calendarFontWidth2 = FontWeight.w600;
+const double eventListFontSize1 = 13.5;
+const FontWeight eventListFontWidth1 = FontWeight.w600;
+const double eventListFontSize2 = 13;
+const FontWeight eventListFontWidth2 = FontWeight.w600;
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
@@ -277,9 +285,9 @@ class WeekdayPart extends HookConsumerWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               height: 1.3,
-              fontSize: 11,
-              color: weekday.titleColor
-
+              fontSize: calendarFontSize1,
+              fontWeight: calendarFontWidth1,
+              color: weekday.titleColor,
             )
         )
     );
@@ -325,7 +333,8 @@ class DayPart extends HookConsumerWidget {
         children: [
           Text(day.title,
               style: TextStyle(
-                  fontSize: 11,
+                  fontSize: calendarFontSize1,
+                  fontWeight: calendarFontWidth1,
                   height: 1,
                   color: day.titleColor,
               )
@@ -341,7 +350,8 @@ class DayPart extends HookConsumerWidget {
                       Text(day.eventList[i].title,
                         maxLines: 1,
                         style: TextStyle(
-                            fontSize: 8.8,
+                            fontSize: calendarFontSize2,
+                            fontWeight: calendarFontWidth2,
                             height: 1,
                             color: day.eventList[i].titleColor
                         ),
@@ -385,7 +395,9 @@ class EventListPart extends HookConsumerWidget {
                       Text(state.eventListTitle,
                         style: const TextStyle(
                             height: 1.3,
-                            fontSize: 13
+                            fontSize: eventListFontSize1,
+                            fontWeight: eventListFontWidth1,
+                            color: Colors.black
                         )
                       ),
                     ],
@@ -463,18 +475,27 @@ class EventPart extends HookConsumerWidget {
             children: [
               if (emptyMessage != null)
                 Expanded(child:
-                  Text(emptyMessage!,
-                      style: const TextStyle(
-                          fontSize: 13
+                  Container(
+                      padding: const EdgeInsets
+                          .symmetric(horizontal: 8,
+                          vertical: 0),
+                      child: Text(emptyMessage!,
+                        style: const TextStyle(
+                          fontSize: eventListFontSize2,
+                          fontWeight: eventListFontWidth2,
+                          color: Colors.black
+                        )
                       )
                   )
-              ),
+                ),
               if (event != null)
                 SizedBox(width: 45, child:
                   Text(event!.head,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          fontSize: 13
+                          fontSize: eventListFontSize2,
+                          fontWeight: eventListFontWidth2,
+                          color: Colors.black
                       )
                   )
                 ),
@@ -484,16 +505,24 @@ class EventPart extends HookConsumerWidget {
                         .symmetric(horizontal: selectedBoarderWidth,
                         vertical: 0),
                     child: Container(
-                        width: normalBoarderWidth,
-                        color: theme.colorScheme.secondaryContainer
+                        width: normalBoarderWidth * 2,
+                        color: event!.lineColor
                     )
                 ),
               if (event != null)
                 Expanded(child:
-                  Text(event!.title,
-                      style: const TextStyle(
-                          fontSize: 13
-                      )
+                  Container(
+                      padding: const EdgeInsets
+                          .symmetric(horizontal: 4,
+                          vertical: 0),
+                      child:
+                      Text(event!.title,
+                        style: const TextStyle(
+                            fontSize: eventListFontSize2,
+                            fontWeight: eventListFontWidth2,
+                            color: Colors.black
+                        )
+                    )
                   )
                 ),
               if (event != null && event!.editing)

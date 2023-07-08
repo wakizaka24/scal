@@ -98,12 +98,14 @@ class EventDisplay {
   String id;
   bool editing;
   String head;
+  Color lineColor;
   String title;
 
   EventDisplay({
     required this.id,
     required this.editing,
     required this.head,
+    required this.lineColor,
     required this.title,
   });
 }
@@ -187,6 +189,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var calendars = await CalendarRepository().getCalendars();
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
+      var id = event.eventId!;
+      var editing = calendar.isReadOnly!;
       var head = '${DateFormat.jm('ja').format(event.start!)}\n'
           '${DateFormat.jm('ja').format(event.end!)}';
       if (event.start!.year != event.end!.year
@@ -196,12 +200,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       } else if (event.allDay!) {
         head = '終日';
       }
-      var id = event.eventId!;
-      var editing = calendar.isReadOnly!;
+      var lineColor = Color(calendar.color!);
       var title = event.title!;
 
       state.eventList.add(EventDisplay(id: id, editing: editing,
-          head: head, title: title));
+          head: head, lineColor: lineColor, title: title));
     }
   }
 
@@ -310,11 +313,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         for (int i = 0; i < events.length; i++) {
           var event = events[i];
           var calendar = calendarMap[event.calendarId]!;
-          var defaultCalendar = calendar.isDefault!;
-          // var calendarColor = Color(calendar.color!);
           dayInfo.eventList.add(DayEventDisplay(
               title: eventsMap[dayInfo.id]![i].title!,
-              titleColor: defaultCalendar ? Colors.black : Colors.black26));
+              titleColor: calendar.isDefault! ? Colors.black : Colors.black54));
         }
       }
     }
