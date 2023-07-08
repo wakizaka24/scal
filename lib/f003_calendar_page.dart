@@ -457,7 +457,6 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     return SelectableCalendarCell(
         height: 45,
         index: index,
@@ -492,6 +491,31 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 45, child:
                   Text(event!.head,
                       textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: eventListFontSize2,
+                          fontWeight: eventListFontWidth2,
+                          color: Colors.black
+                      )
+                  )
+                ),
+              if (event != null)
+                Container(
+                    padding: const EdgeInsets
+                        .symmetric(horizontal: selectedBoarderWidth,
+                        vertical: 0),
+                    child: Container(
+                        width: normalBoarderWidth * 2,
+                        color: event!.lineColor
+                    )
+                ),
+              if (event != null)
+                Container(
+                  width: 45,
+                  padding: const EdgeInsets
+                      .symmetric(horizontal: 4,
+                      vertical: 0),
+                  child:
+                  Text(event!.calendarName,
                       style: const TextStyle(
                           fontSize: eventListFontSize2,
                           fontWeight: eventListFontWidth2,

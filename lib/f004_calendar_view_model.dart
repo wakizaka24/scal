@@ -99,6 +99,7 @@ class EventDisplay {
   bool editing;
   String head;
   Color lineColor;
+  String calendarName;
   String title;
 
   EventDisplay({
@@ -106,6 +107,7 @@ class EventDisplay {
     required this.editing,
     required this.head,
     required this.lineColor,
+    required this.calendarName,
     required this.title,
   });
 }
@@ -201,10 +203,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         head = '終日';
       }
       var lineColor = Color(calendar.color!);
+      var calendarName = calendar.name ?? calendar.accountName!;
       var title = event.title!;
 
       state.eventList.add(EventDisplay(id: id, editing: editing,
-          head: head, lineColor: lineColor, title: title));
+          head: head, lineColor: lineColor, calendarName: calendarName,
+          title: title));
     }
   }
 
