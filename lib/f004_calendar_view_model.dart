@@ -203,9 +203,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         head = '終日';
       }
       var lineColor = Color(calendar.color!);
-      var onlyTitle = calendar.isDefault!;
-      var accountName = calendar.accountName!;
-      var calendarName = calendar.name!;
       var title = event.title!;
       var fontColor = calendar.isDefault! ? Colors.black
           : const Color(0xffaaaaaa);

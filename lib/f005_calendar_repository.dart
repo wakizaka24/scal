@@ -3,6 +3,8 @@ import 'package:device_calendar/device_calendar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
+import 'f007_common_utils.dart';
+
 class CalendarRepository {
   static final CalendarRepository _instance = CalendarRepository._internal();
   CalendarRepository._internal() {
@@ -69,33 +71,37 @@ class CalendarRepository {
       DateTime startDate, DateTime endDate) async {
     var params = RetrieveEventsParams(startDate: startDate, endDate: endDate);
     var result = await _plugin.retrieveEvents(calendarId, params);
-    List<Event> events = result.data ?? [];
+    List<Event> events = [...result.data ?? []];
 
     for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+
       // ロケーションを日時に適用する。
-      if (events[i].start != null) {
-        events[i].start = TZDateTime.from(events[i].start!, _location);
+      if (event.start != null) {
+        event.start = TZDateTime.from(event.start!, _location);
       }
       if (events[i].end != null) {
-        events[i].end = TZDateTime.from(events[i].end!, _location);
+        event.end = TZDateTime.from(event.end!, _location);
+      }
+      event.title = CommonUtils().replaceUnsupportedCharacters(
+          event.title!);
+
+      if (i == 0) {
+        debugPrint('イベント一覧');
       }
 
-      // if (i == 0) {
-      //   debugPrint('イベント一覧');
-      // }
-      // var event = events[i];
-      // var eventId = event.eventId;
-      // var calendarId = event.calendarId;
-      // var title = event.title;
-      // var description = event.description;
-      // var start = event.start;
-      // var end = event.end;
-      // var allDay = event.allDay;
-      // var location = event.location;
-      // var url = event.url;
-      // debugPrint('eventId=$eventId calendarId=$calendarId title=$title '
-      //     'description=$description start=$start end=$end '
-      //     'allDay=$allDay location=$location url=$url');
+      var eventId = event.eventId;
+      var calendarId = event.calendarId;
+      var title = event.title;
+      var description = event.description;
+      var start = event.start;
+      var end = event.end;
+      var allDay = event.allDay;
+      var location = event.location;
+      var url = event.url;
+      debugPrint('eventId=$eventId calendarId=$calendarId title=$title '
+          'description=$description start=$start end=$end '
+          'allDay=$allDay location=$location url=$url');
     }
 
     return events;

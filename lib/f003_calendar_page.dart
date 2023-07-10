@@ -12,15 +12,15 @@ const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
 const double calendarFontSize1 = 13;
-const FontWeight calendarFontWidth1 = FontWeight.w500;
+const FontWeight calendarFontWidth1 = FontWeight.w300;//.w500;
 const double calendarFontSize2 = 10.2;
-const FontWeight calendarFontWidth2 = FontWeight.w600;
+const FontWeight calendarFontWidth2 = FontWeight.w300;//.w600;
 const double eventListFontSize1 = 13.5;
-const FontWeight eventListFontWidth1 = FontWeight.w500;
+const FontWeight eventListFontWidth1 = FontWeight.w300;//.w500;
 const double eventListFontSize2 = 13;
-const FontWeight eventListFontWidth2 = FontWeight.w600;
+const FontWeight eventListFontWidth2 = FontWeight.w300;//.w600;
 const double eventListFontSize3 = 14;
-const FontWeight eventListFontWidth3 = FontWeight.w600;
+const FontWeight eventListFontWidth3 = FontWeight.w300;//.w600;
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
