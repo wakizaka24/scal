@@ -8,8 +8,9 @@ class CommonUtils {
     return _instance;
   }
 
+  var parser = EmojiParser();
+
   String replaceUnsupportedCharacters(String str) {
-    var parser = EmojiParser();
     return parser.unemojify(str);
   }
 }
