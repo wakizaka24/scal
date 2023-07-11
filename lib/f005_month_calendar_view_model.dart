@@ -8,7 +8,7 @@ import 'f003_month_calendar_page.dart';
 import 'f008_calendar_repository.dart';
 import 'f015_calendar_date_utils.dart';
 
-class CalendarPageState {
+class MonthCalendarPageState {
   // Control
   static const int basisIndex = 36001;
   PageController calendarController = PageController(
@@ -32,8 +32,8 @@ class CalendarPageState {
   String eventListTitle = '';
   List<EventDisplay> eventList = [];
 
-  static CalendarPageState copy(CalendarPageState state) {
-    var nState = CalendarPageState();
+  static MonthCalendarPageState copy(MonthCalendarPageState state) {
+    var nState = MonthCalendarPageState();
 
     // Control
     nState.calendarController = state.calendarController;
@@ -112,10 +112,10 @@ class EventDisplay {
   });
 }
 
-class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
+class CalendarPageNotifier extends StateNotifier<MonthCalendarPageState> {
   final Ref ref;
 
-  CalendarPageNotifier(this.ref, CalendarPageState state)
+  CalendarPageNotifier(this.ref, MonthCalendarPageState state)
       : super(state);
 
   initState(VoidCallback afterInit) async {
@@ -157,7 +157,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   onCalendarPageChanged(int monthIndex) async {
-    int addMonth = monthIndex - CalendarPageState.basisIndex;
+    int addMonth = monthIndex - MonthCalendarPageState.basisIndex;
     if (state.addMonth == addMonth) {
       return;
     }
@@ -218,7 +218,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     // 月部分の先頭の日付
     int subDay = 0;
-    const columnNum = CalendarPageState.weekdayPartColumnNum;
+    const columnNum = MonthCalendarPageState.weekdayPartColumnNum;
     for (int weekday = prevMonth.weekday; weekday
         % columnNum != 0; weekday--) {
       subDay--;
@@ -336,7 +336,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       state.dayPartIndex = index;
       state.eventListIndex = null;
     } else if (state.dayPartIndex >= state.dayLists[1].length) {
-      state.dayPartIndex -= CalendarPageState.weekdayPartColumnNum;
+      state.dayPartIndex -= MonthCalendarPageState.weekdayPartColumnNum;
     }
 
     state.selectDay = state.dayLists[1][state.dayPartIndex].id;
@@ -354,12 +354,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   updateState() async {
-    state = CalendarPageState.copy(state);
+    state = MonthCalendarPageState.copy(state);
   }
 }
 
 final calendarPageNotifierProvider = StateNotifierProvider.family
-    .autoDispose<CalendarPageNotifier, CalendarPageState, int>((ref, index) {
-  var list = List.filled(2, CalendarPageState());
+    .autoDispose<CalendarPageNotifier, MonthCalendarPageState, int>((ref, index) {
+  var list = List.filled(2, MonthCalendarPageState());
   return CalendarPageNotifier(ref, list[index]);
 });

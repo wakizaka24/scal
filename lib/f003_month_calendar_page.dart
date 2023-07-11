@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
-import 'f007_calendar_view_model.dart';
+import 'f005_month_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -77,7 +77,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
         - eventListHeight
         - widget.unSafeAreaTopHeight;
     // 週部分の幅
-    double weekdayPartWidth = deviceWidth / CalendarPageState
+    double weekdayPartWidth = deviceWidth / MonthCalendarPageState
         .weekdayPartColumnNum;
 
     useEffect(() {
@@ -115,7 +115,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
           MonthPart(
             pageIndex: widget.pageIndex,
             monthPartHeight: monthPartHeight,
-            weekdayPartColumnNum: CalendarPageState
+            weekdayPartColumnNum: MonthCalendarPageState
                 .weekdayPartColumnNum,
             weekdayPartWidth: weekdayPartWidth,
             weekdayPartHeight: weekdayPartHeight,
