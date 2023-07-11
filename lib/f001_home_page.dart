@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f011_end_drawer.dart';
-import 'f003_month_calendar_page.dart';
-import 'f005_month_calendar_view_model.dart';
+import 'f003_calendar_page.dart';
+import 'f005_calendar_view_model.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -51,7 +51,7 @@ class HomePage extends HookConsumerWidget {
           homeNotifier.setHomePageIndex(index);
           final calendarNotifier = ref.watch(calendarPageNotifierProvider(
               homeState.homePageIndex).notifier);
-          calendarNotifier.selectDayPart();
+          calendarNotifier.selectDay();
         }
       });
 
@@ -72,12 +72,19 @@ class HomePage extends HookConsumerWidget {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(homeState.appBarTitle,
-                        style: const TextStyle(
-                            height: 1.3,
-                            fontSize: 21
-                        )
-                    ),
+                    Hero(tag: 'AppBar1TitleText', child:
+                      Material(
+                        color: Colors.transparent,
+                        child: Text(homeState.appBarTitle,
+                            style: const TextStyle(
+                                height: 1.3,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 21
+                            )
+                        ),
+                      )
+                    )
                   ],
                 );
               })
@@ -92,10 +99,10 @@ class HomePage extends HookConsumerWidget {
         onPageChanged: (index) {
         },
         children: <Widget>[
-          MonthCalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
               unSafeAreaBottomHeight: unSafeAreaBottomHeight,
               pageIndex: 0),
-          MonthCalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
               unSafeAreaBottomHeight: unSafeAreaBottomHeight,
               pageIndex: 1),
         ],

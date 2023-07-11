@@ -38,7 +38,7 @@ class SCalApp extends StatelessWidget {
             primarySwatch: Colors.green,
           ),
           title: 'SCal',
-        home: const HomePage(),
+          home: const HomePage(),
       )
     );
   }

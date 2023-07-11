@@ -15,4 +15,14 @@ class CalendarDateUtils {
     }
     return allDays;
   }
+
+  List<DateTime> getAllHours(startDate, endDate) {
+    var date = DateTime(startDate.year, startDate.month, startDate.day);
+    List<DateTime> allHours = [];
+    while (!endDate.isBefore(date)) {
+      allHours.add(date);
+      date = date.add(const Duration(hours: 1));
+    }
+    return allHours;
+  }
 }

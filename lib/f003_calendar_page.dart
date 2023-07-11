@@ -4,7 +4,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
-import 'f005_month_calendar_view_model.dart';
+import 'f005_calendar_view_model.dart';
+import 'f006_week_calendar_page.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -22,22 +23,22 @@ const FontWeight eventListFontWidth2 = FontWeight.w300;//.w600;
 const double eventListFontSize3 = 14;
 const FontWeight eventListFontWidth3 = FontWeight.w300;//.w600;
 
-class MonthCalendarPage extends StatefulHookConsumerWidget {
+class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
   final double unSafeAreaTopHeight;
   final double unSafeAreaBottomHeight;
 
-  const MonthCalendarPage({super.key,
+  const CalendarPage({super.key,
     required this.unSafeAreaTopHeight,
     required this.unSafeAreaBottomHeight,
     required this.pageIndex});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
-    => _MonthCalendarPageState();
+    => _CalendarPageState();
 }
 
-class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
+class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
   List<MonthPart> monthPartList = [];
   double preDeviceWidth = 0;
@@ -77,7 +78,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
         - eventListHeight
         - widget.unSafeAreaTopHeight;
     // 週部分の幅
-    double weekdayPartWidth = deviceWidth / MonthCalendarPageState
+    double weekdayPartWidth = deviceWidth / CalendarPageState
         .weekdayPartColumnNum;
 
     useEffect(() {
@@ -115,7 +116,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
           MonthPart(
             pageIndex: widget.pageIndex,
             monthPartHeight: monthPartHeight,
-            weekdayPartColumnNum: MonthCalendarPageState
+            weekdayPartColumnNum: CalendarPageState
                 .weekdayPartColumnNum,
             weekdayPartWidth: weekdayPartWidth,
             weekdayPartHeight: weekdayPartHeight,
@@ -142,7 +143,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
                     calendarNotifier.onCalendarPageChanged(index);
                   },
                   itemBuilder: (context, index) {
-                    var adjustmentIndex = index - calendarState.addMonth;
+                    var adjustmentIndex = index - calendarState.addingMonth;
                     return monthPartList[adjustmentIndex % 3];
                   },
                 )
@@ -232,27 +233,30 @@ class MonthPart extends HookConsumerWidget {
           }
         ],
       ),
-      for (int colIndex = 0; colIndex < dayPartRowNum; colIndex++) ... {
+      for (int rowIndex = 0; rowIndex < dayPartRowNum; rowIndex++) ... {
         Row(
           children: [
-            for (int rowIndex = 0; rowIndex < weekdayPartColumnNum;
-              rowIndex++) ... {
+            for (int colIndex = 0; colIndex < weekdayPartColumnNum;
+              colIndex++) ... {
               DayPart(width: weekdayPartWidth,
                 height: dayPartHeight,
-                index: colIndex * weekdayPartColumnNum + rowIndex,
+                index: rowIndex * weekdayPartColumnNum + colIndex,
                 isHighlighted: calendarState.dayPartIndex
-                    == colIndex * weekdayPartColumnNum + rowIndex,
+                    == rowIndex * weekdayPartColumnNum + colIndex,
                 isActive: calendarState.dayPartActive,
                 onTapDown: (int i) async {
                   if (calendarState.dayPartIndex != i) {
-                    calendarNotifier.selectDayPart(index: i);
+                    calendarNotifier.selectDay(index: i);
                   } else {
-                    debugPrint('aaaaa');
+                    Navigator.push(context,
+                      MaterialPageRoute(builder: (context) =>
+                          WeekCalendarPage(pageIndex: pageIndex)),
+                    );
                   }
                 },
                 onTapUp: (int i) async {
                 },
-                day: dayList[colIndex * weekdayPartColumnNum + rowIndex],
+                day: dayList[rowIndex * weekdayPartColumnNum + colIndex],
               ),
             }
           ],
@@ -387,8 +391,8 @@ class EventListPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(calendarPageNotifierProvider(pageIndex));
-    final notifier = ref.watch(calendarPageNotifierProvider(pageIndex)
+    final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
 
     return Column(
@@ -400,7 +404,7 @@ class EventListPart extends HookConsumerWidget {
                   color: borderColor,
                   child: Row(
                     children: [
-                      Text(state.eventListTitle,
+                      Text(calendarState.eventListTitle,
                         style: const TextStyle(
                             height: 1.3,
                             fontSize: eventListFontSize1,
@@ -417,25 +421,25 @@ class EventListPart extends HookConsumerWidget {
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 56
                     + unSafeAreaBottomHeight),
                 children: [
-                  if (state.eventList.isEmpty)
+                  if (calendarState.eventList.isEmpty)
                     EventPart(
                       height: 45,
                       index: 0,
-                      isHighlighted: state.eventListIndex == 0,
+                      isHighlighted: calendarState.eventListIndex == 0,
                       onTapDown: (int i) async {
-                        notifier.selectEventListPart(0);
+                        calendarNotifier.selectEventListPart(0);
                       },
                       emptyMessage: 'イベントがありません',
                     ),
-                  for(int i=0; i < state.eventList.length; i++) ... {
+                  for(int i=0; i < calendarState.eventList.length; i++) ... {
                     EventPart(
                       height: 45,
                       index: i,
-                      isHighlighted: state.eventListIndex == i,
+                      isHighlighted: calendarState.eventListIndex == i,
                       onTapDown: (int i) async {
-                        notifier.selectEventListPart(i);
+                        calendarNotifier.selectEventListPart(i);
                       },
-                      event: state.eventList[i],
+                      event: calendarState.eventList[i],
                     )
                   }
                 ]
