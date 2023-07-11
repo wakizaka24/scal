@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
-import 'f004_calendar_view_model.dart';
+import 'f007_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -22,21 +22,22 @@ const FontWeight eventListFontWidth2 = FontWeight.w300;//.w600;
 const double eventListFontSize3 = 14;
 const FontWeight eventListFontWidth3 = FontWeight.w300;//.w600;
 
-class CalendarPage extends StatefulHookConsumerWidget {
+class MonthCalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
   final double unSafeAreaTopHeight;
   final double unSafeAreaBottomHeight;
 
-  const CalendarPage({super.key,
+  const MonthCalendarPage({super.key,
     required this.unSafeAreaTopHeight,
     required this.unSafeAreaBottomHeight,
     required this.pageIndex});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CalendarPageState();
+  ConsumerState<ConsumerStatefulWidget> createState()
+    => _MonthCalendarPageState();
 }
 
-class _CalendarPageState extends ConsumerState<CalendarPage>
+class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
     with AutomaticKeepAliveClientMixin {
   List<MonthPart> monthPartList = [];
   double preDeviceWidth = 0;
@@ -243,7 +244,11 @@ class MonthPart extends HookConsumerWidget {
                     == colIndex * weekdayPartColumnNum + rowIndex,
                 isActive: calendarState.dayPartActive,
                 onTapDown: (int i) async {
-                  calendarNotifier.selectDayPart(index: i);
+                  if (calendarState.dayPartIndex != i) {
+                    calendarNotifier.selectDayPart(index: i);
+                  } else {
+                    debugPrint('aaaaa');
+                  }
                 },
                 onTapUp: (int i) async {
                 },
@@ -342,6 +347,7 @@ class DayPart extends HookConsumerWidget {
               )
           ),
           Expanded(child:
+            // Webビューのスクロールバー非表示
             ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(
                     scrollbars: false),

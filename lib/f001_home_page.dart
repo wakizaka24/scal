@@ -4,9 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
-import 'f008_end_drawer.dart';
-import 'f003_calendar_page.dart';
-import 'f004_calendar_view_model.dart';
+import 'f011_end_drawer.dart';
+import 'f003_month_calendar_page.dart';
+import 'f007_calendar_view_model.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -16,8 +16,8 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(homePageNotifierProvider);
-    final notifier = ref.watch(homePageNotifierProvider.notifier);
+    final homeState = ref.watch(homePageNotifierProvider);
+    final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -27,7 +27,7 @@ class HomePage extends HookConsumerWidget {
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
-    double appBarHeight = state.appBarHeight;//AppBar().preferredSize.height;
+    double appBarHeight = homeState.appBarHeight;//AppBar().preferredSize.height;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -36,19 +36,22 @@ class HomePage extends HookConsumerWidget {
         debugPrint('parent addPostFrameCallback');
       });
 
-      state.homePageController.addListener(() async {
-        double offset = state.homePageController.offset;
+      homeState.homePageController.addListener(() async {
+        double offset = homeState.homePageController.offset;
         double contentHeight = deviceHeight - appBarHeight
             - unSafeAreaTopHeight;
-        var index = state.homePageIndex;
+        var index = homeState.homePageIndex;
         if (offset <= 0) {
           index = 0;
         } else if (offset >= contentHeight) {
           index = 1;
         }
-        if (index != state.homePageIndex) {
-          state.homePageIndex = index;
-          notifier.setHomePageIndex(index);
+        if (index != homeState.homePageIndex) {
+          homeState.homePageIndex = index;
+          homeNotifier.setHomePageIndex(index);
+          final calendarNotifier = ref.watch(calendarPageNotifierProvider(
+              homeState.homePageIndex).notifier);
+          calendarNotifier.selectDayPart();
         }
       });
 
@@ -61,7 +64,7 @@ class HomePage extends HookConsumerWidget {
       key: homePageScaffoldKey,
       endDrawer: const EndDrawer(),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(state.appBarHeight),
+        preferredSize: Size.fromHeight(homeState.appBarHeight),
         child: AppBar(
           title: Consumer(
               builder: ((context, ref, child) {
@@ -84,15 +87,15 @@ class HomePage extends HookConsumerWidget {
       body: PageView(
         // physics: const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.vertical, // 縦
-        controller: state.homePageController,
+        controller: homeState.homePageController,
         pageSnapping: true, // ページごとにスクロールを止める
         onPageChanged: (index) {
         },
         children: <Widget>[
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+          MonthCalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
               unSafeAreaBottomHeight: unSafeAreaBottomHeight,
               pageIndex: 0),
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+          MonthCalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
               unSafeAreaBottomHeight: unSafeAreaBottomHeight,
               pageIndex: 1),
         ],
