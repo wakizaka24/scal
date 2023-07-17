@@ -179,12 +179,31 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
   }
 
   onCalendarPageChanged(int hourPart) async {
+    const timeColNum = WeekCalendarPageState.timePartColNum;
+    const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
+
     int addingHourPart = hourPart - WeekCalendarPageState.basisIndex
       + state.baseAddingHourPart;
-    if (state.addingHourPart == addingHourPart) {
+
+    DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
+        state.basisDate.day - selectionDay.weekday, state.basisDate.hour
+            + addingHourPart * timeColNum);
+    if (addingHourPart < state.addingHourPart) { // 過去の時間帯へ移動
+      if (currentHour.hour == 0) { // 日付が跨る
+        addingHourPart = addingHourPart + 1
+            - weekdayRowNum * (24 / timeColNum).floor();
+      }
+    } else if (addingHourPart > state.addingHourPart) { // 未来の時間帯へ移動
+      // TODO 計算を補正する
+      if (currentHour.hour == 0) { // 日付が跨る
+        addingHourPart = addingHourPart - 1
+            + weekdayRowNum * (24 / timeColNum).floor();
+      }
+    } else {
       return;
     }
     debugPrint('onCalendarPageChanged addingHourPart=$addingHourPart');
+
     state.addingHourPart = addingHourPart;
     await updateCalendarData();
     state.calendarReload = true;
@@ -275,21 +294,22 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     return dayAndWeekdayList;
   }
 
-  List<List<HourDisplay>> createHourLists(DateTime basisDate, int addHourPart,
+  List<List<HourDisplay>> createHourLists(DateTime basisDate, int addingHourPart,
       DateTime selectionDay) {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
     DateTime currentHour = DateTime(basisDate.year, basisDate.month,
-        basisDate.day - selectionDay.weekday, basisDate.hour + addHourPart
+        basisDate.day - selectionDay.weekday, basisDate.hour + addingHourPart
             * timeColNum);
 
     int prevHourAdding = currentHour.hour == 0 ? -weekdayRowNum * 24
         : -timeColNum;
     int nextHourAdding = currentHour.hour + timeColNum == 24
         ? weekdayRowNum * 24 : timeColNum;
+
     DateTime prevHour = DateTime(currentHour.year, currentHour.month,
-        currentHour.day, currentHour.hour - prevHourAdding);
+        currentHour.day, currentHour.hour + prevHourAdding);
     DateTime nextHour = DateTime(currentHour.year, currentHour.month,
         currentHour.day, currentHour.hour + nextHourAdding);
 

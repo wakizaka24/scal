@@ -140,7 +140,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       ];
     }
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(homeState.appBarHeight),
           child: AppBar(
@@ -173,7 +175,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextButton(
                     child: const Text(
-                      '月表示へ',
+                      '[戻るアイコン]',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -186,7 +188,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             ],
           ),
         ),
-      body: SafeArea(
+        body: SafeArea(
           bottom: false,
           child: Column(
               children: [
@@ -213,6 +215,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                 )
               ]
           )
+      )
       )
     );
   }

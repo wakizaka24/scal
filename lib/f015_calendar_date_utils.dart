@@ -17,7 +17,8 @@ class CalendarDateUtils {
   }
 
   List<DateTime> getAllHours(startDate, endDate) {
-    var date = DateTime(startDate.year, startDate.month, startDate.day);
+    var date = DateTime(startDate.year, startDate.month, startDate.day,
+      startDate.hour);
     List<DateTime> allHours = [];
     while (!endDate.isBefore(date)) {
       allHours.add(date);
