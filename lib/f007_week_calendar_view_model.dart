@@ -151,8 +151,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     ];
 
     var now = DateTime.now();
-    state.basisDate = DateTime(selectionDay.year, selectionDay.month,
-        selectionDay.day);
+    state.basisDate = selectionDay;
     state.baseAddingHourPart = (now.hour / WeekCalendarPageState.timePartColNum
       ).floor();
     state.addingHourPart = state.baseAddingHourPart;
@@ -190,14 +189,13 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
             + addingHourPart * timeColNum);
     if (addingHourPart < state.addingHourPart) { // 過去の時間帯へ移動
       if (currentHour.hour == 0) { // 日付が跨る
-        addingHourPart = addingHourPart + 1
-            - weekdayRowNum * (24 / timeColNum).floor();
+        addingHourPart = addingHourPart
+            - (weekdayRowNum - 1) * (24 / timeColNum).floor();
       }
     } else if (addingHourPart > state.addingHourPart) { // 未来の時間帯へ移動
-      // TODO 計算を補正する
       if (currentHour.hour == 0) { // 日付が跨る
-        addingHourPart = addingHourPart - 1
-            + weekdayRowNum * (24 / timeColNum).floor();
+        addingHourPart = addingHourPart
+            + (weekdayRowNum - 1) * (24 / timeColNum).floor();
       }
     } else {
       return;
@@ -412,8 +410,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
       Map<DateTime, List<Event>> hourEventsMap,
       Map<String, Calendar> calendarMap) {
     for (int hourPart = 0; hourPart < hourLists.length; hourPart++) {
-      for (int i = 0; i < hourLists[hourPart].length; i++) {
-        var hourInfo = hourLists[hourPart][i];
+      for (int hourIdx = 0; hourIdx < hourLists[hourPart].length; hourIdx++) {
+        var hourInfo = hourLists[hourPart][hourIdx];
         hourInfo.eventList.clear();
 
         var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
