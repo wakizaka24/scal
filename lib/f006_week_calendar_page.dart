@@ -58,7 +58,9 @@ class WeekCalendarPage extends StatefulHookConsumerWidget {
 
 class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     with AutomaticKeepAliveClientMixin {
-  List<WeekPart> weekPartList = [];
+
+  List<DaysAndWeekdaysPart> daysAndWeekdaysPartList = [];
+  List<HoursPart> weekPartList = [];
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
 
@@ -86,6 +88,8 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     // アプリバーの高さ
     //double appBarHeight = AppBar().preferredSize.height;
     double appBarHeight = homeState.appBarHeight;
+    // 時間ヘッダー部分の高さ
+    double hourHeaderPartHeight = 21;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.41421356237;
     // イベント一覧の高さ
@@ -96,8 +100,8 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       eventListHeight = eventListMaxHeight;
     }
     // 週部分の高さ
-    double weekPartHeight = deviceHeight - appBarHeight - eventListHeight
-        - unSafeAreaTopHeight;
+    double weekPartHeight = deviceHeight - appBarHeight - hourHeaderPartHeight
+        - eventListHeight - unSafeAreaTopHeight;
 
     useEffect(() {
       debugPrint('child useEffect');
@@ -116,6 +120,11 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       };
     }, const []);
 
+    double hourPartWidth = deviceWidth / (WeekCalendarPageState.timePartColNum
+        + 2);
+    double hourPartHeight = weekPartHeight / WeekCalendarPageState
+        .weekdayPartRowNum;
+
     if (preDeviceWidth != deviceWidth || preDeviceHeight != deviceHeight
         || weekCalendarState.calendarReload) {
       weekCalendarState.calendarReload = false;
@@ -124,19 +133,31 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
       // }
 
-      weekPartList = weekCalendarState.hourLists.map((hourList) => WeekPart(
+      weekPartList = weekCalendarState.hourLists.map((hourList) => HoursPart(
+          hourPartWidth: hourPartWidth,
+          hourPartHeight: hourPartHeight,
           pageIndex: widget.pageIndex,
-          weekPartWidth: deviceWidth,
-          weekPartHeight: weekPartHeight,
-          weekPartColNum: WeekCalendarPageState.timePartColNum + 1,
+          weekPartColNum: WeekCalendarPageState.timePartColNum,
           weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
           onPointerDown: (int pageIndex) async {},
           onPointerUp: (int pageIndex) async {},
-          hourList: hourList,
+          hourList: hourList
         )
+      ).toList();
+
+      daysAndWeekdaysPartList = weekCalendarState.hourLists.map((hourList) =>
+          DaysAndWeekdaysPart(
+            hourPartWidth: hourPartWidth,
+            hourPartHeight: hourPartHeight,
+            pageIndex: widget.pageIndex,
+            weekPartColNum: WeekCalendarPageState.timePartColNum,
+            weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
+            hourList:hourList,
+          )
       ).toList();
     }
 
+    // 右端スワイプでナビゲーションを戻さない
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -169,16 +190,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             ),
             actions: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: TextButton(
-                    child: const Text(
-                      '[戻るアイコン]',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
+                padding: const EdgeInsets.all(0),
+                child: IconButton(
+                    icon: const Icon(Icons.arrow_back),
                     onPressed: () => Navigator.of(context).pop()
                 ),
               )
@@ -189,25 +203,50 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
           bottom: false,
           child: Column(
               children: [
+                SizedBox(
+                  height: hourHeaderPartHeight,
+                  child: Container(),
+                ),
                 Expanded(
-                    child: PageView.builder(
-                      // pageSnapping: false,
-                      controller: weekCalendarState.calendarController,
-                      physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
-                          damping: 0.85),
-                      onPageChanged: (int index) {
-                        weekCalendarNotifier.onCalendarPageChanged(index);
-                      },
-                      itemBuilder: (context, index) {
-                        var adjustmentIndex = index
-                            + weekCalendarState.baseAddingHourPart
-                            - weekCalendarState.addingHourPart;
-
-                        // debugPrint('adjustmentIndex = $adjustmentIndex');
-
-                        return weekPartList[adjustmentIndex % 3];
-                      },
-                    )
+                    child: Row(children: [
+                      SizedBox(width: hourPartWidth * 2,
+                          child: PageView.builder(
+                            scrollDirection: Axis.vertical,
+                            // pageSnapping: false,
+                            // controller: weekCalendarState.calendarController,
+                            physics: const CustomScrollPhysics(mass: 75,
+                                stiffness: 100, damping: 0.85),
+                            onPageChanged: (int index) {
+                              // weekCalendarNotifier.onCalendarPageChanged(index);
+                            },
+                            itemBuilder: (context, index) {
+                              // var adjustmentIndex = index
+                              //     + weekCalendarState.baseAddingHourPart
+                              //     - weekCalendarState.addingHourPart;
+                              var adjustmentIndex = 1;
+                              return daysAndWeekdaysPartList[
+                                adjustmentIndex % 3];
+                            },
+                          )
+                      ),
+                      Expanded(
+                          child: PageView.builder(
+                            // pageSnapping: false,
+                            controller: weekCalendarState.calendarController,
+                            physics: const CustomScrollPhysics(mass: 75,
+                                stiffness: 100, damping: 0.85),
+                            onPageChanged: (int index) {
+                              weekCalendarNotifier.onCalendarPageChanged(index);
+                            },
+                            itemBuilder: (context, index) {
+                              var adjustmentIndex = index
+                                  + weekCalendarState.baseAddingHourPart
+                                  - weekCalendarState.addingHourPart;
+                              return weekPartList[adjustmentIndex % 3];
+                            },
+                          )
+                      )
+                    ])
                 ),
                 AspectRatio(
                     aspectRatio: eventListAspectRate,
@@ -252,68 +291,6 @@ class CustomScrollPhysics extends ScrollPhysics {
   );
 }
 
-class WeekPart extends HookConsumerWidget {
-  final int pageIndex;
-  final double weekPartWidth;
-  final double weekPartHeight;
-  final int weekPartColNum;
-  final int weekPartRowNum;
-  final void Function(int) onPointerDown;
-  final void Function(int) onPointerUp;
-  final List<HourDisplay> hourList;
-
-  const WeekPart({
-    super.key,
-    required this.pageIndex,
-    required this.weekPartWidth,
-    required this.weekPartHeight,
-    required this.weekPartColNum,
-    required this.weekPartRowNum,
-    required this.onPointerDown,
-    required this.onPointerUp,
-    required this.hourList,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
-        pageIndex));
-    final weekCalendarNotifier = ref.watch(weekCalendarPageNotifierProvider(
-        pageIndex).notifier);
-
-    // 時部分の高さ
-    double hourPartWidth = weekPartWidth / weekPartColNum;
-    // 時部分の高さ
-    double hourPartHeight = weekPartHeight / weekPartRowNum;
-
-    return Column(children: [
-      for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++) ... {
-        Row(
-          children: [
-            for (int colIndex = 1; colIndex < weekPartColNum; colIndex++) ... {
-              HourPart(width: hourPartWidth,
-                height: hourPartHeight,
-                index: rowIndex * weekPartColNum + colIndex,
-                isHighlighted: weekCalendarState.hourPartIndex
-                    == rowIndex * weekPartColNum + colIndex,
-                isActive: weekCalendarState.hourPartActive,
-                onTapDown: (int i) async {
-                  if (weekCalendarState.hourPartIndex != i) {
-                    weekCalendarNotifier.selectHour(index: i);
-                  }
-                },
-                onTapUp: (int i) async {
-                },
-                hour: hourList[rowIndex * weekPartColNum + colIndex],
-              ),
-            }
-          ],
-        ),
-      }
-    ],);
-  }
-}
-
 class HourTitlePart extends HookConsumerWidget {
   final double width;
   final double height;
@@ -350,6 +327,162 @@ class HourTitlePart extends HookConsumerWidget {
             )
         )
     );
+  }
+}
+
+class DaysAndWeekdaysPart extends HookConsumerWidget {
+  final int weekPartColNum;
+  final int weekPartRowNum;
+  final int pageIndex;
+  final double hourPartWidth;
+  final double hourPartHeight;
+  final List<HourDisplay> hourList;
+
+  const DaysAndWeekdaysPart({
+    super.key,
+    required this.weekPartColNum,
+    required this.weekPartRowNum,
+    required this.pageIndex,
+    required this.hourPartWidth,
+    required this.hourPartHeight,
+    required this.hourList
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
+        pageIndex));
+    final weekCalendarNotifier = ref.watch(weekCalendarPageNotifierProvider(
+        pageIndex).notifier);
+
+    return Row(children: [
+      for (int colIndex = 0; colIndex < 2; colIndex++) ... {
+        Column(children: [
+          for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++)
+            ... {
+              Visibility(visible: colIndex == 0,
+                child: DayAndWeekdayPart(
+                  width: hourPartWidth,
+                  height: hourPartHeight
+                ),
+              ),
+              Visibility(visible: colIndex == 1,
+                child: HourPart(width: hourPartWidth,
+                  height: hourPartHeight,
+                  index: rowIndex * (weekPartColNum + 1),
+                  isHighlighted: weekCalendarState.hourPartIndex
+                      == rowIndex * (weekPartColNum + 1),
+                  isActive: weekCalendarState.hourPartActive,
+                  onTapDown: (int i) async {
+                    if (weekCalendarState.hourPartIndex != i) {
+                      weekCalendarNotifier.selectHour(index: i);
+                    }
+                  },
+                  onTapUp: (int i) async {
+                  },
+                  hour: hourList[rowIndex * (weekPartColNum + 1)],
+                ),
+              ),
+          }
+        ])
+      }
+    ]);
+  }
+}
+
+class DayAndWeekdayPart extends HookConsumerWidget {
+  final double width;
+  final double height;
+  // final WeekdayDisplay weekday;
+
+  const DayAndWeekdayPart({
+    super.key,
+    required this.width,
+    required this.height,
+    // required this.weekday
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+        width: width,
+        height: height,
+        decoration: const BoxDecoration(
+          border: Border.fromBorderSide(
+              BorderSide(
+                  color: borderColor,
+                  width: normalBoarderWidth
+              )
+          ),
+        ),
+        alignment: Alignment.center,
+        child: const Text(/*weekday.title*/'12/23\n(日)',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              height: 1.3,
+              fontSize: calendarFontSize1,
+              fontWeight: calendarFontWidth1,
+              // color: weekday.titleColor,
+            )
+        )
+    );
+  }
+}
+
+class HoursPart extends HookConsumerWidget {
+  final int weekPartColNum;
+  final int weekPartRowNum;
+  final int pageIndex;
+  final double hourPartWidth;
+  final double hourPartHeight;
+  final void Function(int) onPointerDown;
+  final void Function(int) onPointerUp;
+  final List<HourDisplay> hourList;
+
+  const HoursPart({
+    super.key,
+    required this.hourPartWidth,
+    required this.hourPartHeight,
+    required this.pageIndex,
+    required this.weekPartColNum,
+    required this.weekPartRowNum,
+    required this.onPointerDown,
+    required this.onPointerUp,
+    required this.hourList,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
+        pageIndex));
+    final weekCalendarNotifier = ref.watch(weekCalendarPageNotifierProvider(
+        pageIndex).notifier);
+
+    return Row(children: [
+      for (int colIndex = 1; colIndex < weekPartColNum + 1; colIndex++) ... {
+        Column(
+          children: [
+            for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++) ... {
+              HourPart(width: hourPartWidth,
+                height: hourPartHeight,
+                index: rowIndex * (weekPartColNum + 1) + colIndex,
+                isHighlighted: weekCalendarState.hourPartIndex
+                    == rowIndex * (weekPartColNum + 1) + colIndex,
+                isActive: weekCalendarState.hourPartActive,
+                onTapDown: (int i) async {
+                  if (weekCalendarState.hourPartIndex != i) {
+                    weekCalendarNotifier.selectHour(index: i);
+                  }
+                },
+                onTapUp: (int i) async {
+                },
+                hour: hourList[rowIndex * (weekPartColNum + 1) + colIndex],
+              ),
+            }
+          ],
+        ),
+      }
+    ],);
   }
 }
 

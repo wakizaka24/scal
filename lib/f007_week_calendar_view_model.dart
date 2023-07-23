@@ -22,7 +22,7 @@ class WeekCalendarPageState {
   int? eventListIndex;
 
   // Data
-  static const int timePartColNum = 4;
+  static const int timePartColNum = 6;
   static const int weekdayPartRowNum = 7;
   late DateTime basisDate;
   late int baseAddingHourPart;

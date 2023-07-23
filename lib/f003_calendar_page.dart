@@ -75,8 +75,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     }
     // 月部分の高さ
     double monthPartHeight = deviceHeight - appBarHeight - weekdayPartHeight
-        - eventListHeight
-        - widget.unSafeAreaTopHeight;
+        - eventListHeight - widget.unSafeAreaTopHeight;
     // 週部分の幅
     double weekdayPartWidth = deviceWidth / CalendarPageState
         .weekdayPartColumnNum;
@@ -222,10 +221,10 @@ class MonthPart extends HookConsumerWidget {
     return Column(children: [
       Row(
         children: [
-          for (int rowIndex = 0; rowIndex < weekdayPartColumnNum;
-            rowIndex++) ... {
+          for (int colIndex = 0; colIndex < weekdayPartColumnNum;
+            colIndex++) ... {
             WeekdayPart(width: weekdayPartWidth, height: weekdayPartHeight,
-              weekday: calendarState.weekdayList[rowIndex]),
+              weekday: calendarState.weekdayList[colIndex]),
           }
         ],
       ),
