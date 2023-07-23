@@ -183,19 +183,24 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
     int addingHourPart = hourPart - WeekCalendarPageState.basisIndex
       + state.baseAddingHourPart;
+    // debugPrint('addingHourPart=$addingHourPart ${state.baseAddingHourPart}');
 
     DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
         state.basisDate.day - selectionDay.weekday, state.basisDate.hour
             + addingHourPart * timeColNum);
     if (addingHourPart < state.addingHourPart) { // 過去の時間帯へ移動
-      if (currentHour.hour == 0) { // 日付が跨る
-        addingHourPart = addingHourPart
-            - (weekdayRowNum - 1) * (24 / timeColNum).floor();
+      if (currentHour.hour == 24 - timeColNum) { // 日付が跨る
+        var moveHour = - (weekdayRowNum - 1) * (24 / timeColNum).floor();
+        addingHourPart += moveHour;
+        state.baseAddingHourPart = -(hourPart - WeekCalendarPageState
+            .basisIndex - addingHourPart);
       }
     } else if (addingHourPart > state.addingHourPart) { // 未来の時間帯へ移動
       if (currentHour.hour == 0) { // 日付が跨る
-        addingHourPart = addingHourPart
-            + (weekdayRowNum - 1) * (24 / timeColNum).floor();
+        var moveHour = (weekdayRowNum - 1) * (24 / timeColNum).floor();
+        addingHourPart += moveHour;
+        state.baseAddingHourPart = -(hourPart - WeekCalendarPageState
+            .basisIndex - addingHourPart);
       }
     } else {
       return;
@@ -292,8 +297,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     return dayAndWeekdayList;
   }
 
-  List<List<HourDisplay>> createHourLists(DateTime basisDate, int addingHourPart,
-      DateTime selectionDay) {
+  List<List<HourDisplay>> createHourLists(DateTime basisDate,
+      int addingHourPart, DateTime selectionDay) {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
@@ -301,10 +306,10 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
         basisDate.day - selectionDay.weekday, basisDate.hour + addingHourPart
             * timeColNum);
 
-    int prevHourAdding = currentHour.hour == 0 ? -weekdayRowNum * 24
-        : -timeColNum;
+    int prevHourAdding = currentHour.hour == 0
+        ? -(4 + (weekdayRowNum - 1) * 24) : -timeColNum;
     int nextHourAdding = currentHour.hour + timeColNum == 24
-        ? weekdayRowNum * 24 : timeColNum;
+        ? 4 + (weekdayRowNum - 1) * 24 : timeColNum;
 
     DateTime prevHour = DateTime(currentHour.year, currentHour.month,
         currentHour.day, currentHour.hour + prevHourAdding);
@@ -340,7 +345,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     List<Calendar> calendars = [];
     if (await CalendarRepository().hasPermissions()) {
       calendars = await CalendarRepository().getCalendars();
-      debugPrint('カレンダー数 ${calendars.length}');
+      // debugPrint('カレンダー数 ${calendars.length}');
     }
     return calendars;
   }
@@ -380,7 +385,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
         var id = event.start!;
         eventsMap[id] = eventsMap[id] ?? [];
       }
-      debugPrint('終日ごとのイベント数 ${eventsMap.length}');
+      // debugPrint('終日ごとのイベント数 ${eventsMap.length}');
     }
     return eventsMap;
   }
@@ -400,7 +405,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
           return events;
         });
       }
-      debugPrint('時間ごとのイベント数 ${eventsMap.length}');
+      // debugPrint('時間ごとのイベント数 ${eventsMap.length}');
     }
     return eventsMap;
   }

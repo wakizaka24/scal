@@ -161,7 +161,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.addingMonth == addingMonth) {
       return;
     }
-    debugPrint('onCalendarPageChanged addingMonth=$addingMonth');
+    // debugPrint('onCalendarPageChanged addingMonth=$addingMonth');
     state.addingMonth = addingMonth;
     await updateCalendarData();
     state.calendarReload = true;
@@ -271,7 +271,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     List<Calendar> calendars = [];
     if (await CalendarRepository().hasPermissions()) {
       calendars = await CalendarRepository().getCalendars();
-      debugPrint('カレンダー数 ${calendars.length}');
+      // debugPrint('カレンダー数 ${calendars.length}');
     }
     return calendars;
   }
@@ -310,7 +310,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           return events;
         });
       }
-      debugPrint('日付ごとのイベント数 ${eventsMap.length}');
+      // debugPrint('日付ごとのイベント数 ${eventsMap.length}');
     }
     return eventsMap;
   }

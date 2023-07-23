@@ -203,7 +203,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                             + weekCalendarState.baseAddingHourPart
                             - weekCalendarState.addingHourPart;
 
-                        debugPrint('adjustmentIndex = $adjustmentIndex');
+                        // debugPrint('adjustmentIndex = $adjustmentIndex');
 
                         return weekPartList[adjustmentIndex % 3];
                       },

@@ -86,22 +86,22 @@ class CalendarRepository {
       event.title = CommonUtils().replaceUnsupportedCharacters(
           event.title!);
 
-      if (i == 0) {
-        debugPrint('イベント一覧');
-      }
-
-      var eventId = event.eventId;
-      var calendarId = event.calendarId;
-      var title = event.title;
-      var description = event.description;
-      var start = event.start;
-      var end = event.end;
-      var allDay = event.allDay;
-      var location = event.location;
-      var url = event.url;
-      debugPrint('eventId=$eventId calendarId=$calendarId title=$title '
-          'description=$description start=$start end=$end '
-          'allDay=$allDay location=$location url=$url');
+      // if (i == 0) {
+      //   debugPrint('イベント一覧');
+      // }
+      //
+      // var eventId = event.eventId;
+      // var calendarId = event.calendarId;
+      // var title = event.title;
+      // var description = event.description;
+      // var start = event.start;
+      // var end = event.end;
+      // var allDay = event.allDay;
+      // var location = event.location;
+      // var url = event.url;
+      // debugPrint('eventId=$eventId calendarId=$calendarId title=$title '
+      //     'description=$description start=$start end=$end '
+      //     'allDay=$allDay location=$location url=$url');
     }
 
     return events;
