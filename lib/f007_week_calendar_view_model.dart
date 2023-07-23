@@ -169,7 +169,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     state.hourPartIndex = 0;
     for (int i=0; i < state.hourLists[1].length; i++) {
       if (state.hourLists[1][i].id == DateTime(state.basisDate.year,
-        state.basisDate.month, state.basisDate.day, state.basisDate.hour)) {
+        state.basisDate.month, state.basisDate.day, now.hour)) {
         state.hourPartIndex = i;
         break;
       }

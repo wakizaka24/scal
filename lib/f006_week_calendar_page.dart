@@ -124,20 +124,17 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
       // }
 
-      weekPartList = [
-        for (int i=0; i < 3; i++) ... {
-          WeekPart(
-            pageIndex: widget.pageIndex,
-            weekPartWidth: deviceWidth,
-            weekPartHeight: weekPartHeight,
-            weekPartColNum: WeekCalendarPageState.timePartColNum + 1,
-            weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
-            onPointerDown: (int pageIndex) async {},
-            onPointerUp: (int pageIndex) async {},
-            hourList: weekCalendarState.hourLists[i],
-          ),
-        }
-      ];
+      weekPartList = weekCalendarState.hourLists.map((hourList) => WeekPart(
+          pageIndex: widget.pageIndex,
+          weekPartWidth: deviceWidth,
+          weekPartHeight: weekPartHeight,
+          weekPartColNum: WeekCalendarPageState.timePartColNum + 1,
+          weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
+          onPointerDown: (int pageIndex) async {},
+          onPointerUp: (int pageIndex) async {},
+          hourList: hourList,
+        )
+      ).toList();
     }
 
     return WillPopScope(
@@ -202,8 +199,12 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                         weekCalendarNotifier.onCalendarPageChanged(index);
                       },
                       itemBuilder: (context, index) {
-                        var adjustmentIndex = index - weekCalendarState
-                            .addingHourPart;
+                        var adjustmentIndex = index
+                            + weekCalendarState.baseAddingHourPart
+                            - weekCalendarState.addingHourPart;
+
+                        debugPrint('adjustmentIndex = $adjustmentIndex');
+
                         return weekPartList[adjustmentIndex % 3];
                       },
                     )

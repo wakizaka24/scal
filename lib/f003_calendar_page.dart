@@ -111,21 +111,17 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
       // }
 
-      monthPartList = [
-        for (int i=0; i < 3; i++) ... {
-          MonthPart(
-            pageIndex: widget.pageIndex,
-            monthPartHeight: monthPartHeight,
-            weekdayPartColumnNum: CalendarPageState
-                .weekdayPartColumnNum,
-            weekdayPartWidth: weekdayPartWidth,
-            weekdayPartHeight: weekdayPartHeight,
-            onPointerDown: (int pageIndex) async {},
-            onPointerUp: (int pageIndex) async {},
-            dayList: calendarState.dayLists[i],
-          ),
-        }
-      ];
+      monthPartList = calendarState.dayLists.map((dayList) => MonthPart(
+          pageIndex: widget.pageIndex,
+          monthPartHeight: monthPartHeight,
+          weekdayPartColumnNum: CalendarPageState.weekdayPartColumnNum,
+          weekdayPartWidth: weekdayPartWidth,
+          weekdayPartHeight: weekdayPartHeight,
+          onPointerDown: (int pageIndex) async {},
+          onPointerUp: (int pageIndex) async {},
+          dayList: dayList,
+        )
+      ).toList();
     }
 
     return Scaffold(
