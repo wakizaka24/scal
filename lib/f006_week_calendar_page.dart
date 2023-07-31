@@ -117,8 +117,8 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       });
 
       weekCalendarState.calendarController.addListener(() {
-        // double page = weekCalendarState.calendarController.page!;
-        // weekCalendarState.hourTitlesController.jumpTo(page);
+        weekCalendarState.hourTitlesController.jumpTo(
+            weekCalendarState.calendarController.offset);
       });
 
       return () {
@@ -244,7 +244,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                       Expanded(
                         child: PageView.builder(
                           scrollDirection: Axis.horizontal,
-                          // pageSnapping: false,
+                          pageSnapping: false,
                           controller: weekCalendarState.hourTitlesController,
                           physics: const CustomScrollPhysics(mass: 75,
                               stiffness: 100, damping: 0.85),
