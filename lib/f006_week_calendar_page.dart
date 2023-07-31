@@ -116,6 +116,11 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
         debugPrint('child addPostFrameCallback');
       });
 
+      weekCalendarState.calendarController.addListener(() {
+        // double page = weekCalendarState.calendarController.page!;
+        // weekCalendarState.hourTitlesController.jumpTo(page);
+      });
+
       return () {
         // Pageの解放処理
       };
@@ -240,7 +245,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                         child: PageView.builder(
                           scrollDirection: Axis.horizontal,
                           // pageSnapping: false,
-                          // controller: weekCalendarState.calendarController,
+                          controller: weekCalendarState.hourTitlesController,
                           physics: const CustomScrollPhysics(mass: 75,
                               stiffness: 100, damping: 0.85),
                           onPageChanged: (int index) {
@@ -248,10 +253,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                             // index);
                           },
                           itemBuilder: (context, index) {
-                            // var adjustmentIndex = index
-                            //     + weekCalendarState.baseAddingHourPart
-                            //     - weekCalendarState.addingHourPart;
-                            var adjustmentIndex = 1;
+                            var adjustmentIndex = index
+                                + weekCalendarState.baseAddingHourPart
+                                - weekCalendarState.addingHourPart;
                             return hourTitlesPartList[
                               adjustmentIndex % 3];
                           },

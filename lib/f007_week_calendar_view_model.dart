@@ -14,6 +14,8 @@ class WeekCalendarPageState {
   static const int basisIndex = 36001;
   PageController calendarController = PageController(
       initialPage: basisIndex);
+  PageController hourTitlesController = PageController(
+      initialPage: basisIndex);
   bool calendarReload = false;
 
   // UI
@@ -44,6 +46,7 @@ class WeekCalendarPageState {
 
     // Control
     nState.calendarController = state.calendarController;
+    nState.hourTitlesController = state.hourTitlesController;
     nState.calendarReload = state.calendarReload;
 
     // UI
@@ -146,13 +149,6 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     state.alldayTitle = HourTitleDisplay(title: '終日',
         titleColor: Colors.black);
 
-    state.hourTitleLists = List.filled(3, [
-      for (int i = 0; i < 6; i++) ... {
-        HourTitleDisplay(title: '$i:00',
-            titleColor: Colors.black),
-      }
-    ]);
-
     var now = DateTime.now();
     state.basisDate = selectionDay;
     state.baseAddingHourPart = (now.hour / WeekCalendarPageState.timePartColNum
@@ -221,6 +217,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     state.now = now ?? DateTime.now();
     state.dayAndWeekdayLists = createDayAndWeekdayLists(state.basisDate,
         state.addingHourPart, selectionDay);
+    state.hourTitleLists = createHourTitleLists(state.basisDate,
+        state.addingHourPart);
     state.hourLists = createHourLists(state.basisDate, state.addingHourPart,
         selectionDay);
     var calendars  = await getCalendars();
@@ -304,14 +302,29 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     return dayAndWeekdayLists;
   }
 
+  List<List<HourTitleDisplay>> createHourTitleLists(DateTime basisDate,
+      int addingHourPart) {
+    const timeColNum = WeekCalendarPageState.timePartColNum;
+    int hour = -timeColNum + addingHourPart * timeColNum;
+    return [
+      for (int hourPart = 0; hourPart < 3; hourPart++) ... {
+        [
+          for (int i = 0; i < timeColNum; i++, hour++) ... {
+            HourTitleDisplay(title: '${hour % 24}:00',
+                titleColor: Colors.black),
+          }
+        ],
+      }
+    ];
+  }
+
   List<List<HourDisplay>> createHourLists(DateTime basisDate,
       int addingHourPart, DateTime selectionDay) {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
     DateTime currentHour = DateTime(basisDate.year, basisDate.month,
-        basisDate.day - selectionDay.weekday, basisDate.hour + addingHourPart
-            * timeColNum);
+        basisDate.day - selectionDay.weekday, addingHourPart * timeColNum);
 
     int prevHourAdding = currentHour.hour == 0
         ? -((weekdayRowNum - 1) * 24 + timeColNum) : -timeColNum;
