@@ -292,8 +292,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
             currentDay.year, currentDay.month, currentDay.day
             + pageIndex * weekdayRowNum + rowIndex);
         dayAndWeekdayList.add(DayAndWeekdayDisplay(
-            dayAndWeekTitle: '${DateFormat.MMMd('ja').format(day)}\n'
-                '(${DateFormat.E('ja').format(day)})',
+            dayAndWeekTitle: DateFormat('MMMd\n(E)').format(day),
             dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
                 : rowIndex % weekdayRowNum == weekdayRowNum - 1
                 ? Colors.green : Colors.black
@@ -315,9 +314,9 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
             * timeColNum);
 
     int prevHourAdding = currentHour.hour == 0
-        ? -(4 + (weekdayRowNum - 1) * 24) : -timeColNum;
+        ? -((weekdayRowNum - 1) * 24 + timeColNum) : -timeColNum;
     int nextHourAdding = currentHour.hour + timeColNum == 24
-        ? 4 + (weekdayRowNum - 1) * 24 : timeColNum;
+        ? (weekdayRowNum - 1) * 24 + timeColNum : timeColNum;
 
     DateTime prevHour = DateTime(currentHour.year, currentHour.month,
         currentHour.day, currentHour.hour + prevHourAdding);
@@ -336,7 +335,10 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
           bool allDay = colIndex == 0;
           DateTime id = DateTime(hour.year, hour.month, hour.day
               + rowIndex, allDay ? 0 : hour.hour + colIndex - 1);
-          Color bgColor = selectionDay == hour ? todayBgColor
+          DateTime now = DateTime(state.now.year, state.now.month,
+              state.now.day);
+          DateTime currentDay = DateTime(id.year, id.month, id.day);
+          Color bgColor = now == currentDay ? todayBgColor
               : Colors.transparent;
           timeList.add(HourDisplay(id: id, allDay: allDay, eventList: [],
               bgColor: bgColor));
@@ -429,6 +431,11 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
         var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
             : hourEventsMap[hourInfo.id]) ?? [];
+
+        var dhmStr = DateFormat('dd HH:mm').format(hourInfo.id);
+        hourInfo.eventList.add(HourEventDisplay(
+            title: dhmStr, titleColor: Colors.black));
+
         for (int i = 0; i < events.length; i++) {
           var event = events[i];
           var calendar = calendarMap[event.calendarId]!;

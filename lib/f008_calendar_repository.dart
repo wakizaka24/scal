@@ -83,8 +83,6 @@ class CalendarRepository {
       if (events[i].end != null) {
         event.end = TZDateTime.from(event.end!, _location);
       }
-      event.title = CommonUtils().replaceUnsupportedCharacters(
-          event.title!);
 
       // if (i == 0) {
       //   debugPrint('イベント一覧');
