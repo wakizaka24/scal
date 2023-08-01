@@ -445,7 +445,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
         var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
             : hourEventsMap[hourInfo.id]) ?? [];
 
-        var dhmStr = DateFormat('dd HH:mm').format(hourInfo.id);
+        var dhmStr = DateFormat('dd HH').format(hourInfo.id);
         hourInfo.eventList.add(HourEventDisplay(
             title: dhmStr, titleColor: Colors.black));
 

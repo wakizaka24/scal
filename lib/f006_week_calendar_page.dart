@@ -246,8 +246,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                           scrollDirection: Axis.horizontal,
                           pageSnapping: false,
                           controller: weekCalendarState.hourTitlesController,
-                          physics: const CustomScrollPhysics(mass: 75,
-                              stiffness: 100, damping: 0.85),
+                            physics: const NeverScrollableScrollPhysics(),
                           onPageChanged: (int index) {
                             // weekCalendarNotifier.onCalendarPageChanged(
                             // index);
