@@ -6,7 +6,7 @@ import 'f002_home_view_model.dart';
 import 'f007_week_calendar_view_model.dart';
 
 /*
-     終日 0:00 1:00 2:00 3:00 4:00 5:00
+    0:00 1:00 2:00 3:00 4:00 5:00 終日
 11/1
 (日)
 
@@ -117,13 +117,31 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       });
 
       weekCalendarState.hoursCalendarController.addListener(() {
-        weekCalendarState.hourTitlesController.jumpTo(
-            weekCalendarState.hoursCalendarController.offset);
+        try {
+          weekCalendarState.hourTitlesController.jumpTo(
+              weekCalendarState.hoursCalendarController.offset);
+        } catch (e) {
+          // 横スクロール中に縦スクロールをするとエラーになる。
+          // 'package:flutter/src/widgets/scroll_controller.dart':
+          // Failed assertion: line 106 pos 12: '_positions.length == 1':
+          // ScrollController attached to multiple scroll views.
+          debugPrint(e.toString());
+        }
       });
 
       weekCalendarState.weeksCalendarController.addListener(() {
-        weekCalendarState.daysAndWeekdaysController.jumpTo(
-            weekCalendarState.weeksCalendarController.offset);
+        try {
+          weekCalendarState.daysAndWeekdaysController.jumpTo(
+              weekCalendarState.weeksCalendarController.offset);
+          weekCalendarState.hourTitlesController.jumpTo(
+              weekCalendarState.hoursCalendarController.offset);
+        } catch (e) {
+          // 横スクロール中に縦スクロールをするとエラーになる。
+          // 'package:flutter/src/widgets/scroll_controller.dart':
+          // Failed assertion: line 106 pos 12: '_positions.length == 1':
+          // ScrollController attached to multiple scroll views.
+          debugPrint(e.toString());
+        }
       });
 
       return () {
@@ -152,8 +170,8 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                   pageIndex: widget.pageIndex,
                   hourPartWidth: hourPartWidth,
                   hourPartHeight: hourPartHeight,
-                  allDayTitle: weekCalendarState.allDayTitle,
-                  hourTitleList: hourTitleList
+                  hourTitleList: hourTitleList,
+                  allDayTitle: weekCalendarState.allDayTitle
               )
       ).toList();
 
@@ -374,8 +392,8 @@ class HourTitlesPart extends HookConsumerWidget {
   final int pageIndex;
   final double hourPartWidth;
   final double hourPartHeight;
-  final HourTitleDisplay allDayTitle;
   final List<HourTitleDisplay> hourTitleList;
+  final HourTitleDisplay allDayTitle;
 
   const HourTitlesPart({
     super.key,
@@ -383,25 +401,25 @@ class HourTitlesPart extends HookConsumerWidget {
     required this.pageIndex,
     required this.hourPartWidth,
     required this.hourPartHeight,
-    required this.allDayTitle,
-    required this.hourTitleList
+    required this.hourTitleList,
+    required this.allDayTitle
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(children: [
-      HourTitlePart(
-          width: hourPartWidth,
-          height: hourPartHeight,
-          hourTitle: allDayTitle
-      ),
       for (int colIndex = 0; colIndex < weekPartColNum; colIndex++) ... {
         HourTitlePart(
             width: hourPartWidth,
             height: hourPartHeight,
             hourTitle: hourTitleList[colIndex]
         ),
-      }
+      },
+      HourTitlePart(
+          width: hourPartWidth,
+          height: hourPartHeight,
+          hourTitle: allDayTitle
+      ),
     ]);
   }
 }

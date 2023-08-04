@@ -221,8 +221,6 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     await selectHour();
   }
 
-
-
   updateCalendarData({DateTime? now}) async {
     state.now = now ?? DateTime.now();
     state.daysAndWeekdaysList = createDayAndWeekdayLists(state.basisDate,
@@ -376,9 +374,9 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
       List<HourDisplay> timeList = [];
       for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
         for (int colIndex = 0; colIndex < timeColNum + 1; colIndex++) {
-          bool allDay = colIndex == 0;
+          bool allDay = colIndex == timeColNum;
           DateTime id = DateTime(hour.year, hour.month, hour.day
-              + rowIndex, allDay ? 0 : hour.hour + colIndex - 1);
+              + rowIndex, allDay ? 0 : hour.hour + colIndex);
           DateTime now = DateTime(state.now.year, state.now.month,
               state.now.day);
           DateTime currentDay = DateTime(id.year, id.month, id.day);
