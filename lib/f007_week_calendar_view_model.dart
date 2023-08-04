@@ -12,10 +12,15 @@ import 'f015_calendar_date_utils.dart';
 class WeekCalendarPageState {
   // Control
   static const int basisIndex = 36001;
-  PageController calendarController = PageController(
+  PageController hoursCalendarController = PageController(
+      initialPage: basisIndex);
+  PageController weeksCalendarController = PageController(
       initialPage: basisIndex);
   PageController hourTitlesController = PageController(
       initialPage: basisIndex);
+  PageController daysAndWeekdaysController = PageController(
+      initialPage: basisIndex);
+
   bool calendarReload = false;
 
   // UI
@@ -36,7 +41,7 @@ class WeekCalendarPageState {
   Map<DateTime, List<Event>> hourEventsMap = {};
   late HourTitleDisplay allDayTitle;
   List<List<HourTitleDisplay>> hourTitleLists = [];
-  List<List<DayAndWeekdayDisplay>> dayAndWeekdayLists = [];
+  List<List<DayAndWeekdayDisplay>> daysAndWeekdaysList = [];
   List<List<List<HourDisplay>>> hoursListsList = [];
   String eventListTitle = '';
   List<EventDisplay> eventList = [];
@@ -45,8 +50,10 @@ class WeekCalendarPageState {
     var nState = WeekCalendarPageState();
 
     // Control
-    nState.calendarController = state.calendarController;
+    nState.hoursCalendarController = state.hoursCalendarController;
+    nState.weeksCalendarController = state.weeksCalendarController;
     nState.hourTitlesController = state.hourTitlesController;
+    nState.daysAndWeekdaysController = state.daysAndWeekdaysController;
     nState.calendarReload = state.calendarReload;
 
     // UI
@@ -64,6 +71,7 @@ class WeekCalendarPageState {
     nState.hourEventsMap = state.hourEventsMap;
     nState.allDayTitle = state.allDayTitle;
     nState.hourTitleLists = state.hourTitleLists;
+    nState.daysAndWeekdaysList = state.daysAndWeekdaysList;
     nState.hoursListsList = state.hoursListsList;
     nState.eventListTitle = state.eventListTitle;
     nState.eventList = state.eventList;
@@ -176,7 +184,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     afterInit();
   }
 
-  onCalendarPageChanged(int hourPart) async {
+  onHourCalendarPageChanged(int hourPart) async {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
@@ -213,9 +221,11 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     await selectHour();
   }
 
+
+
   updateCalendarData({DateTime? now}) async {
     state.now = now ?? DateTime.now();
-    state.dayAndWeekdayLists = createDayAndWeekdayLists(state.basisDate,
+    state.daysAndWeekdaysList = createDayAndWeekdayLists(state.basisDate,
         state.addingHourPart, selectionDay);
     state.hourTitleLists = createHourTitleLists(state.basisDate,
         state.addingHourPart);
@@ -239,7 +249,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
         .format(date)} ${allDay ? '終日' : DateFormat.Hm('ja') // 0:00
         .format(date)}';
 
-    var eventList = (allDay ? allDayEventsMap[date] : hourEventsMap[date]) ?? [];
+    var eventList = (allDay ? allDayEventsMap[date] : hourEventsMap[date])
+        ?? [];
     await setEventList(eventList);
   }
 
@@ -290,7 +301,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
             currentDay.year, currentDay.month, currentDay.day
             + pageIndex * weekdayRowNum + rowIndex);
         dayAndWeekdayList.add(DayAndWeekdayDisplay(
-            dayAndWeekTitle: DateFormat('MMMd\n(E)').format(day),
+            dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(day),
             dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
                 : rowIndex % weekdayRowNum == weekdayRowNum - 1
                 ? Colors.green : Colors.black

@@ -6,7 +6,7 @@ import 'f002_home_view_model.dart';
 import 'f007_week_calendar_view_model.dart';
 
 /*
-     終日 0:00 1:00 2:00 3:00
+     終日 0:00 1:00 2:00 3:00 4:00 5:00
 11/1
 (日)
 
@@ -61,7 +61,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
   List<HourTitlesPart> hourTitlesPartList = [];
   List<DaysAndWeekdaysPart> daysAndWeekdaysPartList = [];
-  List<HoursPart> weeksPartList = [];
+  List<List<HoursPart>> weeksPartLists = [];
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
 
@@ -116,9 +116,14 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
         debugPrint('child addPostFrameCallback');
       });
 
-      weekCalendarState.calendarController.addListener(() {
+      weekCalendarState.hoursCalendarController.addListener(() {
         weekCalendarState.hourTitlesController.jumpTo(
-            weekCalendarState.calendarController.offset);
+            weekCalendarState.hoursCalendarController.offset);
+      });
+
+      weekCalendarState.weeksCalendarController.addListener(() {
+        weekCalendarState.daysAndWeekdaysController.jumpTo(
+            weekCalendarState.weeksCalendarController.offset);
       });
 
       return () {
@@ -152,28 +157,30 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
               )
       ).toList();
 
-      daysAndWeekdaysPartList = weekCalendarState.hoursListsList[1]
-          .map((hourList) => DaysAndWeekdaysPart(
+      daysAndWeekdaysPartList = weekCalendarState.daysAndWeekdaysList
+          .map((daysAndWeekdays) => DaysAndWeekdaysPart(
             weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
             pageIndex: widget.pageIndex,
             hourPartWidth: daysAndWeekdaysPartWidth,
             hourPartHeight: hourPartHeight,
-            hourList: hourList,
+            daysAndWeekdays: daysAndWeekdays,
           )
       ).toList();
 
-      weeksPartList = weekCalendarState.hoursListsList[1].map((hourList)
-        => HoursPart(
-            weekPartColNum: WeekCalendarPageState.timePartColNum,
-            weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
-            pageIndex: widget.pageIndex,
-            hourPartWidth: hourPartWidth,
-            hourPartHeight: hourPartHeight,
-            onPointerDown: (int pageIndex) async {},
-            onPointerUp: (int pageIndex) async {},
-            hourList: hourList
-          )
-      ).toList();
+      weeksPartLists = weekCalendarState.hoursListsList.map((hourLists) {
+        return hourLists.map((hourList) {
+          return HoursPart(
+              weekPartColNum: WeekCalendarPageState.timePartColNum,
+              weekPartRowNum: WeekCalendarPageState.weekdayPartRowNum,
+              pageIndex: widget.pageIndex,
+              hourPartWidth: hourPartWidth,
+              hourPartHeight: hourPartHeight,
+              onPointerDown: (int pageIndex) async {},
+              onPointerUp: (int pageIndex) async {},
+              hourList: hourList
+          );
+        }).toList();
+      }).toList();
     }
 
     var hourTitlePageView = PageView.builder(
@@ -195,10 +202,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
     var daysAndWeekPageView = PageView.builder(
       scrollDirection: Axis.vertical,
-      // pageSnapping: false,
-      // controller: weekCalendarState.calendarController,
-      physics: const CustomScrollPhysics(mass: 75,
-          stiffness: 100, damping: 0.85),
+      pageSnapping: false,
+      controller: weekCalendarState.daysAndWeekdaysController,
+      physics: const NeverScrollableScrollPhysics(),
       onPageChanged: (int index) {
         // weekCalendarNotifier.onCalendarPageChanged(index);
       },
@@ -212,19 +218,38 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       },
     );
 
+    var hourPageViews = weeksPartLists.map((weeksPartList) {
+      return PageView.builder(
+        // pageSnapping: false,
+        controller: weekCalendarState.hoursCalendarController,
+        physics: const CustomScrollPhysics(mass: 75,
+            stiffness: 100, damping: 0.85),
+        onPageChanged: (int index) {
+          weekCalendarNotifier.onHourCalendarPageChanged(index);
+        },
+        itemBuilder: (context, index) {
+          var adjustmentIndex = index
+              + weekCalendarState.baseAddingHourPart
+              - weekCalendarState.addingHourPart;
+          return weeksPartList[adjustmentIndex % 3];
+        },
+      );
+    }).toList();
+
     var weeksPageView = PageView.builder(
+      scrollDirection: Axis.vertical,
       // pageSnapping: false,
-      controller: weekCalendarState.calendarController,
+      controller: weekCalendarState.weeksCalendarController,
       physics: const CustomScrollPhysics(mass: 75,
           stiffness: 100, damping: 0.85),
       onPageChanged: (int index) {
-        weekCalendarNotifier.onCalendarPageChanged(index);
+        //weekCalendarNotifier.onCalendarPageChanged(index);
       },
       itemBuilder: (context, index) {
         var adjustmentIndex = index
-            + weekCalendarState.baseAddingHourPart
-            - weekCalendarState.addingHourPart;
-        return weeksPartList[adjustmentIndex % 3];
+            /*+ weekCalendarState.baseAddingHourPart
+            - weekCalendarState.addingHourPart*/;
+        return hourPageViews[/*adjustmentIndex % 3*/1];
       },
     );
 
@@ -425,7 +450,7 @@ class DaysAndWeekdaysPart extends HookConsumerWidget {
   final int pageIndex;
   final double hourPartWidth;
   final double hourPartHeight;
-  final List<HourDisplay> hourList;
+  final List<DayAndWeekdayDisplay> daysAndWeekdays;
 
   const DaysAndWeekdaysPart({
     super.key,
@@ -433,7 +458,7 @@ class DaysAndWeekdaysPart extends HookConsumerWidget {
     required this.pageIndex,
     required this.hourPartWidth,
     required this.hourPartHeight,
-    required this.hourList
+    required this.daysAndWeekdays
   });
 
   @override
@@ -442,49 +467,24 @@ class DaysAndWeekdaysPart extends HookConsumerWidget {
       for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++) ... {
           DayAndWeekdayPart(
               width: hourPartWidth,
-              height: hourPartHeight
+              height: hourPartHeight,
+              dayAndWeekday: daysAndWeekdays[rowIndex]
           ),
         }
     ]);
   }
 }
 
-/*
-TODO 移動
-
-    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
-        pageIndex));
-    final weekCalendarNotifier = ref.watch(weekCalendarPageNotifierProvider(
-        pageIndex).notifier);
-
-
-HourPart(width: hourPartWidth,
-                  height: hourPartHeight,
-                  index: rowIndex * (weekPartColNum + 1),
-                  isHighlighted: weekCalendarState.hourPartIndex
-                      == rowIndex * (weekPartColNum + 1),
-                  isActive: weekCalendarState.hourPartActive,
-                  onTapDown: (int i) async {
-                    if (weekCalendarState.hourPartIndex != i) {
-                      weekCalendarNotifier.selectHour(index: i);
-                    }
-                  },
-                  onTapUp: (int i) async {
-                  },
-                  hour: hourList[rowIndex * (weekPartColNum + 1)],
-                ),
- */
-
 class DayAndWeekdayPart extends HookConsumerWidget {
   final double width;
   final double height;
-  // final WeekdayDisplay weekday;
+  final DayAndWeekdayDisplay dayAndWeekday;
 
   const DayAndWeekdayPart({
     super.key,
     required this.width,
     required this.height,
-    // required this.weekday
+    required this.dayAndWeekday
   });
 
   @override
@@ -501,13 +501,13 @@ class DayAndWeekdayPart extends HookConsumerWidget {
           ),
         ),
         alignment: Alignment.center,
-        child: const Text(/*weekday.title*/'12/23\n(日)',
+        child: Text(dayAndWeekday.dayAndWeekTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               height: 1.3,
               fontSize: calendarFontSize1,
               fontWeight: calendarFontWidth1,
-              // color: weekday.titleColor,
+              color: dayAndWeekday.dayAndWeekTitleColor,
             )
         )
     );
