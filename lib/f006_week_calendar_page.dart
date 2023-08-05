@@ -115,25 +115,25 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('child addPostFrameCallback');
 
-        var weekCalendarNotifier = weekCalendarState.weekCalendarController
-            .position.isScrollingNotifier;
-        weekCalendarNotifier.addListener(() {
-          if (weekCalendarNotifier.value) {
-            weekCalendarState.weekCalendarScrolling = true;
-          } else {
-            weekCalendarState.weekCalendarScrolling = false;
-          }
-        });
+        // var weekCalendarNotifier = weekCalendarState.weekCalendarController
+        //     .position.isScrollingNotifier;
+        // weekCalendarNotifier.addListener(() {
+        //   if (weekCalendarNotifier.value) {
+        //     weekCalendarState.weekCalendarScrolling = true;
+        //   } else {
+        //     weekCalendarState.weekCalendarScrolling = false;
+        //   }
+        // });
 
-        var hourCalendarNotifier = weekCalendarState.hourCalendarController
-            .position.isScrollingNotifier;
-        hourCalendarNotifier.addListener(() {
-          if (hourCalendarNotifier.value) {
-            weekCalendarState.hourCalendarScrolling = true;
-          } else {
-            weekCalendarState.hourCalendarScrolling = false;
-          }
-        });
+        // var hourCalendarNotifier = weekCalendarState.hourCalendarController
+        //     .position.isScrollingNotifier;
+        // hourCalendarNotifier.addListener(() {
+        //   if (hourCalendarNotifier.value) {
+        //     weekCalendarState.hourCalendarScrolling = true;
+        //   } else {
+        //     weekCalendarState.hourCalendarScrolling = false;
+        //   }
+        // });
       });
 
       weekCalendarState.hourCalendarController.addListener(() {
@@ -268,37 +268,62 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     );
 
     var hourPageViews = weeksPartLists.map((weeksPartList) {
-      return PageView.builder(
+      return NotificationListener(
+          child: PageView.builder(
+            // pageSnapping: false,
+            controller: weekCalendarState.hourCalendarController,
+            physics: WeeksPageViewScrollPhysics(ref: ref,
+                pageIndex: widget.pageIndex, horizontal: true),
+            onPageChanged: (int index) {
+              weekCalendarNotifier.onHourCalendarPageChanged(index);
+            },
+            itemBuilder: (context, index) {
+              var adjustmentIndex = index
+                  + weekCalendarState.baseAddingHourPart
+                  - weekCalendarState.addingHourPart;
+              return weeksPartList[adjustmentIndex % 3];
+            },
+          ),
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollStartNotification) {
+              debugPrint('start');
+              weekCalendarState.hourCalendarScrolling = true;
+            } else if (scrollNotification is ScrollUpdateNotification) {
+              debugPrint('update');
+            } else if (scrollNotification is ScrollEndNotification) {
+              debugPrint('end');
+              weekCalendarState.hourCalendarScrolling = false;
+            }
+            return false;
+          },
+        );
+    }).toList();
+
+    var weeksPageView = NotificationListener(
+      child: PageView.builder(
+        scrollDirection: Axis.vertical,
         // pageSnapping: false,
-        controller: weekCalendarState.hourCalendarController,
+        controller: weekCalendarState.weekCalendarController,
         physics: WeeksPageViewScrollPhysics(ref: ref,
-            pageIndex: widget.pageIndex, horizontal: true),
+            pageIndex: widget.pageIndex, horizontal: false),
         onPageChanged: (int index) {
-          weekCalendarNotifier.onHourCalendarPageChanged(index);
+          //weekCalendarNotifier.onCalendarPageChanged(index);
         },
         itemBuilder: (context, index) {
           var adjustmentIndex = index
-              + weekCalendarState.baseAddingHourPart
-              - weekCalendarState.addingHourPart;
-          return weeksPartList[adjustmentIndex % 3];
+              /*+ weekCalendarState.baseAddingHourPart
+              - weekCalendarState.addingHourPart*/;
+          return hourPageViews[/*adjustmentIndex % 3*/1];
         },
-      );
-    }).toList();
-
-    var weeksPageView = PageView.builder(
-      scrollDirection: Axis.vertical,
-      // pageSnapping: false,
-      controller: weekCalendarState.weekCalendarController,
-      physics: WeeksPageViewScrollPhysics(ref: ref,
-          pageIndex: widget.pageIndex, horizontal: false),
-      onPageChanged: (int index) {
-        //weekCalendarNotifier.onCalendarPageChanged(index);
-      },
-      itemBuilder: (context, index) {
-        var adjustmentIndex = index
-            /*+ weekCalendarState.baseAddingHourPart
-            - weekCalendarState.addingHourPart*/;
-        return hourPageViews[/*adjustmentIndex % 3*/1];
+      ),
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollStartNotification) {
+          weekCalendarState.weekCalendarScrolling = true;
+        } else if (scrollNotification is ScrollUpdateNotification) {
+        } else if (scrollNotification is ScrollEndNotification) {
+          weekCalendarState.weekCalendarScrolling = false;
+        }
+        return false;
       },
     );
 
@@ -432,14 +457,28 @@ class WeeksPageViewScrollPhysics extends CustomScrollPhysics {
   }) : super(parent: parent, mass: 75, stiffness: 100, damping: 0.85);
 
   @override
+  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    if (allowUserScrolling) {
+      return super.applyTo(ancestor);
+    } else {
+      return WeeksPageViewScrollPhysics(parent: buildParent(ancestor),
+          ref: ref, pageIndex: pageIndex, horizontal: horizontal);
+    }
+  }
+
+  @override
   bool get allowUserScrolling => _getAllowUserScrolling();
 
   bool _getAllowUserScrolling() {
-    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
+    final weekCalendarState = ref.read(weekCalendarPageNotifierProvider(
         pageIndex));
     if (!horizontal) {
+      debugPrint('hourCalendar scrollable='
+          '${!weekCalendarState.hourCalendarScrolling}');
       return !weekCalendarState.hourCalendarScrolling;
     } else {
+      debugPrint('weekCalendar scrollable='
+          '${!weekCalendarState.weekCalendarScrolling}');
       return !weekCalendarState.weekCalendarScrolling;
     }
   }
