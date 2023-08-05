@@ -138,10 +138,16 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
       weekCalendarState.hourCalendarController.addListener(() {
         try {
+          // var page = weekCalendarState.hourCalendarController.page;
+          // if (page != null && page % 1 == 0) {
+          //   weekCalendarState.hourCalendarScrolling = false;
+          // }
+
           weekCalendarState.hourTitlesController.jumpTo(
               weekCalendarState.hourCalendarController.offset);
         } catch (e) {
           // 横スクロール中に縦スクロールをするとエラーになる。
+          // 横スクロール中に離し、戻る途中で縦スクロールでエラーになる。
           // 'package:flutter/src/widgets/scroll_controller.dart':
           // Failed assertion: line 106 pos 12: '_positions.length == 1':
           // ScrollController attached to multiple scroll views.
@@ -152,6 +158,11 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
       weekCalendarState.weekCalendarController.addListener(() {
         try {
+          // var page = weekCalendarState.weekCalendarController.page;
+          // if (page != null && page % 1 == 0) {
+          //   weekCalendarState.weekCalendarScrolling = false;
+          // }
+
           weekCalendarState.daysAndWeekdaysController.jumpTo(
               weekCalendarState.weekCalendarController.offset);
         } catch (e) {
