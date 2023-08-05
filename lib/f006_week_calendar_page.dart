@@ -114,33 +114,53 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('child addPostFrameCallback');
+
+        var weekCalendarNotifier = weekCalendarState.weekCalendarController
+            .position.isScrollingNotifier;
+        weekCalendarNotifier.addListener(() {
+          if (weekCalendarNotifier.value) {
+            weekCalendarState.weekCalendarScrolling = true;
+          } else {
+            weekCalendarState.weekCalendarScrolling = false;
+          }
+        });
+
+        var hourCalendarNotifier = weekCalendarState.hourCalendarController
+            .position.isScrollingNotifier;
+        hourCalendarNotifier.addListener(() {
+          if (hourCalendarNotifier.value) {
+            weekCalendarState.hourCalendarScrolling = true;
+          } else {
+            weekCalendarState.hourCalendarScrolling = false;
+          }
+        });
       });
 
-      weekCalendarState.hoursCalendarController.addListener(() {
+      weekCalendarState.hourCalendarController.addListener(() {
         try {
           weekCalendarState.hourTitlesController.jumpTo(
-              weekCalendarState.hoursCalendarController.offset);
+              weekCalendarState.hourCalendarController.offset);
         } catch (e) {
           // 横スクロール中に縦スクロールをするとエラーになる。
           // 'package:flutter/src/widgets/scroll_controller.dart':
           // Failed assertion: line 106 pos 12: '_positions.length == 1':
           // ScrollController attached to multiple scroll views.
-          debugPrint(e.toString());
+          // debugPrint(e.toString());
+          debugPrint('横スクロールの同期でエラー');
         }
       });
 
-      weekCalendarState.weeksCalendarController.addListener(() {
+      weekCalendarState.weekCalendarController.addListener(() {
         try {
           weekCalendarState.daysAndWeekdaysController.jumpTo(
-              weekCalendarState.weeksCalendarController.offset);
-          weekCalendarState.hourTitlesController.jumpTo(
-              weekCalendarState.hoursCalendarController.offset);
+              weekCalendarState.weekCalendarController.offset);
         } catch (e) {
           // 横スクロール中に縦スクロールをするとエラーになる。
           // 'package:flutter/src/widgets/scroll_controller.dart':
           // Failed assertion: line 106 pos 12: '_positions.length == 1':
           // ScrollController attached to multiple scroll views.
-          debugPrint(e.toString());
+          // debugPrint(e.toString());
+          debugPrint('縦スクロールの同期でエラー');
         }
       });
 
@@ -239,9 +259,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     var hourPageViews = weeksPartLists.map((weeksPartList) {
       return PageView.builder(
         // pageSnapping: false,
-        controller: weekCalendarState.hoursCalendarController,
-        physics: const CustomScrollPhysics(mass: 75,
-            stiffness: 100, damping: 0.85),
+        controller: weekCalendarState.hourCalendarController,
+        physics: WeeksPageViewScrollPhysics(ref: ref,
+            pageIndex: widget.pageIndex, horizontal: true),
         onPageChanged: (int index) {
           weekCalendarNotifier.onHourCalendarPageChanged(index);
         },
@@ -257,9 +277,9 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     var weeksPageView = PageView.builder(
       scrollDirection: Axis.vertical,
       // pageSnapping: false,
-      controller: weekCalendarState.weeksCalendarController,
-      physics: const CustomScrollPhysics(mass: 75,
-          stiffness: 100, damping: 0.85),
+      controller: weekCalendarState.weekCalendarController,
+      physics: WeeksPageViewScrollPhysics(ref: ref,
+          pageIndex: widget.pageIndex, horizontal: false),
       onPageChanged: (int index) {
         //weekCalendarNotifier.onCalendarPageChanged(index);
       },
@@ -385,6 +405,33 @@ class CustomScrollPhysics extends ScrollPhysics {
     stiffness: stiffness,
     damping: damping,
   );
+}
+
+class WeeksPageViewScrollPhysics extends CustomScrollPhysics {
+  final WidgetRef ref;
+  final int pageIndex;
+  final bool horizontal;
+
+  const WeeksPageViewScrollPhysics({
+    ScrollPhysics? parent,
+    required this.ref,
+    required this.pageIndex,
+    required this.horizontal
+
+  }) : super(parent: parent, mass: 75, stiffness: 100, damping: 0.85);
+
+  @override
+  bool get allowUserScrolling => _getAllowUserScrolling();
+
+  bool _getAllowUserScrolling() {
+    final weekCalendarState = ref.watch(weekCalendarPageNotifierProvider(
+        pageIndex));
+    if (!horizontal) {
+      return !weekCalendarState.hourCalendarScrolling;
+    } else {
+      return !weekCalendarState.weekCalendarScrolling;
+    }
+  }
 }
 
 class HourTitlesPart extends HookConsumerWidget {
