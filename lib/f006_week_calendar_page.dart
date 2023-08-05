@@ -136,33 +136,23 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
         // });
       });
 
-      weekCalendarState.hourCalendarController.addListener(() {
+      weekCalendarState.hourCalendarControllers[1].addListener(() {
         try {
-          // var page = weekCalendarState.hourCalendarController.page;
-          // if (page != null && page % 1 == 0) {
-          //   weekCalendarState.hourCalendarScrolling = false;
-          // }
-
           weekCalendarState.hourTitlesController.jumpTo(
-              weekCalendarState.hourCalendarController.offset);
+              weekCalendarState.hourCalendarControllers[1].offset);
         } catch (e) {
           // 横スクロール中に縦スクロールをするとエラーになる。
           // 横スクロール中に離し、戻る途中で縦スクロールでエラーになる。
           // 'package:flutter/src/widgets/scroll_controller.dart':
           // Failed assertion: line 106 pos 12: '_positions.length == 1':
           // ScrollController attached to multiple scroll views.
-          // debugPrint(e.toString());
           debugPrint('横スクロールの同期でエラー');
+          debugPrint(e.toString());
         }
       });
 
       weekCalendarState.weekCalendarController.addListener(() {
         try {
-          // var page = weekCalendarState.weekCalendarController.page;
-          // if (page != null && page % 1 == 0) {
-          //   weekCalendarState.weekCalendarScrolling = false;
-          // }
-
           weekCalendarState.daysAndWeekdaysController.jumpTo(
               weekCalendarState.weekCalendarController.offset);
         } catch (e) {
@@ -267,13 +257,15 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       },
     );
 
-    var hourPageViews = weeksPartLists.map((weeksPartList) {
+    var hourPageViews = weeksPartLists.asMap().entries.map((entry) {
+      var weeksPartList = entry.value;
+      var i = entry.key;
       return NotificationListener(
           child: PageView.builder(
             // pageSnapping: false,
-            controller: weekCalendarState.hourCalendarController,
-            physics: WeeksPageViewScrollPhysics(ref: ref,
-                pageIndex: widget.pageIndex, horizontal: true),
+            controller: weekCalendarState.hourCalendarControllers[i],
+            physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+                damping: 0.85),
             onPageChanged: (int index) {
               weekCalendarNotifier.onHourCalendarPageChanged(index);
             },
@@ -286,13 +278,15 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
           ),
           onNotification: (scrollNotification) {
             if (scrollNotification is ScrollStartNotification) {
-              debugPrint('start');
+              // debugPrint('start');
               weekCalendarState.hourCalendarScrolling = true;
+              weekCalendarNotifier.updateState();
             } else if (scrollNotification is ScrollUpdateNotification) {
-              debugPrint('update');
+              // debugPrint('update');
             } else if (scrollNotification is ScrollEndNotification) {
-              debugPrint('end');
+              // debugPrint('end');
               weekCalendarState.hourCalendarScrolling = false;
+              weekCalendarNotifier.updateState();
             }
             return false;
           },
@@ -304,8 +298,10 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
         scrollDirection: Axis.vertical,
         // pageSnapping: false,
         controller: weekCalendarState.weekCalendarController,
-        physics: WeeksPageViewScrollPhysics(ref: ref,
-            pageIndex: widget.pageIndex, horizontal: false),
+        physics: weekCalendarState.hourCalendarScrolling
+            ? const NeverScrollableScrollPhysics()
+            : const CustomScrollPhysics(mass: 75, stiffness: 100,
+            damping: 0.85),
         onPageChanged: (int index) {
           //weekCalendarNotifier.onCalendarPageChanged(index);
         },
@@ -441,47 +437,6 @@ class CustomScrollPhysics extends ScrollPhysics {
     stiffness: stiffness,
     damping: damping,
   );
-}
-
-class WeeksPageViewScrollPhysics extends CustomScrollPhysics {
-  final WidgetRef ref;
-  final int pageIndex;
-  final bool horizontal;
-
-  const WeeksPageViewScrollPhysics({
-    ScrollPhysics? parent,
-    required this.ref,
-    required this.pageIndex,
-    required this.horizontal
-
-  }) : super(parent: parent, mass: 75, stiffness: 100, damping: 0.85);
-
-  @override
-  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    if (allowUserScrolling) {
-      return super.applyTo(ancestor);
-    } else {
-      return WeeksPageViewScrollPhysics(parent: buildParent(ancestor),
-          ref: ref, pageIndex: pageIndex, horizontal: horizontal);
-    }
-  }
-
-  @override
-  bool get allowUserScrolling => _getAllowUserScrolling();
-
-  bool _getAllowUserScrolling() {
-    final weekCalendarState = ref.read(weekCalendarPageNotifierProvider(
-        pageIndex));
-    if (!horizontal) {
-      debugPrint('hourCalendar scrollable='
-          '${!weekCalendarState.hourCalendarScrolling}');
-      return !weekCalendarState.hourCalendarScrolling;
-    } else {
-      debugPrint('weekCalendar scrollable='
-          '${!weekCalendarState.weekCalendarScrolling}');
-      return !weekCalendarState.weekCalendarScrolling;
-    }
-  }
 }
 
 class HourTitlesPart extends HookConsumerWidget {

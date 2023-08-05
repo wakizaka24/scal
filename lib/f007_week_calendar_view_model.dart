@@ -12,10 +12,12 @@ import 'f015_calendar_date_utils.dart';
 class WeekCalendarPageState {
   // Control
   static const int basisIndex = 36001;
-  PageController hourCalendarController = PageController(
-      initialPage: basisIndex);
   PageController weekCalendarController = PageController(
       initialPage: basisIndex);
+  List<PageController> hourCalendarControllers = [
+    PageController(initialPage: basisIndex),
+    PageController(initialPage: basisIndex),
+    PageController(initialPage: basisIndex)];
   PageController hourTitlesController = PageController(
       initialPage: basisIndex);
   PageController daysAndWeekdaysController = PageController(
@@ -52,8 +54,8 @@ class WeekCalendarPageState {
     var nState = WeekCalendarPageState();
 
     // Control
-    nState.hourCalendarController = state.hourCalendarController;
     nState.weekCalendarController = state.weekCalendarController;
+    nState.hourCalendarControllers = state.hourCalendarControllers;
     nState.hourTitlesController = state.hourTitlesController;
     nState.daysAndWeekdaysController = state.daysAndWeekdaysController;
     nState.weekCalendarScrolling = state.weekCalendarScrolling;
