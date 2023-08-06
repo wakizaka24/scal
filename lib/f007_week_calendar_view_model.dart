@@ -29,7 +29,7 @@ class WeekCalendarPageState {
 
   // UI
   bool hourPartActive = true;
-  int hourPartIndex = 0;
+  int? hourPartIndex;
   int? eventListIndex;
 
   // Data
@@ -181,7 +181,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
     // UI
     state.hourPartActive = true;
-    state.hourPartIndex = 0;
+    state.hourPartIndex = null;
     for (int i=0; i < state.hoursListsList[1][1].length; i++) {
       if (state.hoursListsList[1][1][i].id == DateTime(state.basisDate.year,
         state.basisDate.month, state.basisDate.day, now.hour)) {
@@ -523,9 +523,9 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
       state.eventListIndex = null;
     }
 
-    state.selectionAllDay = state.hoursListsList[1][1][state.hourPartIndex]
+    state.selectionAllDay = state.hoursListsList[1][1][state.hourPartIndex!]
         .allDay;
-    state.selectionDayAndHour = state.hoursListsList[1][1][state.hourPartIndex]
+    state.selectionDayAndHour = state.hoursListsList[1][1][state.hourPartIndex!]
         .id;
 
     await setCurrentHour(state.selectionAllDay, state.selectionDayAndHour,
