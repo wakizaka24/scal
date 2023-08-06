@@ -228,8 +228,6 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       controller: weekCalendarState.hourTitlesController,
       physics: const NeverScrollableScrollPhysics(),
       onPageChanged: (int index) {
-        // weekCalendarNotifier.onCalendarPageChanged(
-        // index);
       },
       itemBuilder: (context, index) {
         var adjustmentIndex = index
@@ -245,15 +243,10 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       controller: weekCalendarState.daysAndWeekdaysController,
       physics: const NeverScrollableScrollPhysics(),
       onPageChanged: (int index) {
-        // weekCalendarNotifier.onCalendarPageChanged(index);
       },
       itemBuilder: (context, index) {
-        // var adjustmentIndex = index
-        //     + weekCalendarState.baseAddingHourPart
-        //     - weekCalendarState.addingHourPart;
-        var adjustmentIndex = 1;
-        return daysAndWeekdaysPartList[
-        adjustmentIndex % 3];
+        var adjustmentIndex = index - weekCalendarState.addingWeek;
+        return daysAndWeekdaysPartList[adjustmentIndex % 3];
       },
     );
 
@@ -303,13 +296,11 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             : const CustomScrollPhysics(mass: 75, stiffness: 100,
             damping: 0.85),
         onPageChanged: (int index) {
-          //weekCalendarNotifier.onCalendarPageChanged(index);
+          weekCalendarNotifier.onWeekCalendarPageChanged(index);
         },
         itemBuilder: (context, index) {
-          var adjustmentIndex = index
-              /*+ weekCalendarState.baseAddingHourPart
-              - weekCalendarState.addingHourPart*/;
-          return hourPageViews[/*adjustmentIndex % 3*/1];
+          var adjustmentIndex = index - weekCalendarState.addingWeek;
+          return hourPageViews[adjustmentIndex % 3];
         },
       ),
       onNotification: (scrollNotification) {
