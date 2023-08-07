@@ -198,7 +198,6 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
     int addingHourPart = hourPart - WeekCalendarPageState.basisIndex
       + state.baseAddingHourPart;
-
     DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
         state.basisDate.day - selectionDay.weekday % weekdayRowNum
             + state.addingWeek * weekdayRowNum, state.basisDate.hour
@@ -496,9 +495,9 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
           var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
               : hourEventsMap[hourInfo.id]) ?? [];
 
-          // var dhmStr = DateFormat('dd HH').format(hourInfo.id);
-          // hourInfo.eventList.add(HourEventDisplay(
-          //     title: dhmStr, titleColor: Colors.black));
+          var dhmStr = DateFormat('dd HH').format(hourInfo.id);
+          hourInfo.eventList.add(HourEventDisplay(
+              title: dhmStr, titleColor: Colors.black));
 
           for (var event in events) {
             var calendar = calendarMap[event.calendarId]!;
