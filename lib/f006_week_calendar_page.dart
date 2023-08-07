@@ -75,8 +75,6 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final weekCalendarNotifier = ref.watch(weekCalendarPageNotifierProvider(
         widget.pageIndex).notifier);
-    final hourIndex = useState(WeekCalendarPageState.basisIndex);
-    final addingHourIndex = useState(0);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -262,10 +260,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
                 damping: 0.85),
             onPageChanged: (int index) {
-              debugPrint('hourPageViews index=${index+addingHourIndex.value}');
-              weekCalendarNotifier.onHourCalendarPageChanged(index
-                + addingHourIndex.value);
-              hourIndex.value = index;
+              weekCalendarNotifier.onHourCalendarPageChanged(index);
             },
             itemBuilder: (context, index) {
               var adjustmentIndex = index
@@ -302,9 +297,6 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             damping: 0.85),
         onPageChanged: (int index) {
           weekCalendarNotifier.onWeekCalendarPageChanged(index);
-          addingHourIndex.value += hourIndex.value
-              - WeekCalendarPageState.basisIndex;
-          debugPrint('${addingHourIndex.value} ${hourIndex.value}');
         },
         itemBuilder: (context, index) {
           var adjustmentIndex = index - weekCalendarState.addingWeek;
