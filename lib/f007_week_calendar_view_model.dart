@@ -198,10 +198,10 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
     int addingHourPart = hourPart - WeekCalendarPageState.basisIndex
       + state.baseAddingHourPart;
-    // debugPrint('addingHourPart=$addingHourPart ${state.baseAddingHourPart}');
 
     DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
-        state.basisDate.day - selectionDay.weekday, state.basisDate.hour
+        state.basisDate.day - selectionDay.weekday % weekdayRowNum
+            + state.addingWeek * weekdayRowNum, state.basisDate.hour
             + addingHourPart * timeColNum);
     if (addingHourPart < state.addingHourPart) { // 過去の時間帯へ移動
       if (currentHour.hour == 24 - timeColNum) { // 日付が跨る
@@ -307,8 +307,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
     DateTime currentDay = DateTime(basisDate.year, basisDate.month,
-        basisDate.day - selectionDay.weekday % weekdayRowNum - weekdayRowNum,
-        basisDate.hour + addingWeek * weekdayRowNum * 24 + addingHourPart
+        basisDate.day - selectionDay.weekday % weekdayRowNum - weekdayRowNum
+        + addingWeek * weekdayRowNum, basisDate.hour + addingHourPart
             * timeColNum);
 
     List<List<DayAndWeekdayDisplay>> dayAndWeekdayLists = [];
@@ -353,8 +353,8 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
     DateTime currentWeek = DateTime(basisDate.year, basisDate.month,
-        basisDate.day - selectionDay.weekday % weekdayRowNum, addingWeek
-            * weekdayRowNum * 24 + addingHourPart * timeColNum);
+        basisDate.day - selectionDay.weekday % weekdayRowNum + addingWeek
+            * weekdayRowNum, basisDate.hour + addingHourPart * timeColNum);
 
     DateTime prevWeek = DateTime(currentWeek.year, currentWeek.month,
         currentWeek.day - weekdayRowNum, currentWeek.hour);
