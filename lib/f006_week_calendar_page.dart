@@ -260,6 +260,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
                 damping: 0.85),
             onPageChanged: (int index) {
+              debugPrint('hourPageViews index=$index');
               weekCalendarNotifier.onHourCalendarPageChanged(index);
             },
             itemBuilder: (context, index) {
@@ -271,7 +272,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
           ),
           onNotification: (scrollNotification) {
             if (scrollNotification is ScrollStartNotification) {
-              // debugPrint('start');
+              // debugPrint('start1');
               weekCalendarState.hourCalendarScrolling = true;
               weekCalendarNotifier.updateState();
             } else if (scrollNotification is ScrollUpdateNotification) {
@@ -305,6 +306,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       ),
       onNotification: (scrollNotification) {
         if (scrollNotification is ScrollStartNotification) {
+          // debugPrint('start2');
           weekCalendarState.weekCalendarScrolling = true;
         } else if (scrollNotification is ScrollUpdateNotification) {
         } else if (scrollNotification is ScrollEndNotification) {
