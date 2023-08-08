@@ -232,6 +232,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       itemBuilder: (context, index) {
         var adjustmentIndex = index
             + weekCalendarState.baseAddingHourPart
+            + weekCalendarState.indexAddingHourPart
             - weekCalendarState.addingHourPart;
         return hourTitlesPartList[adjustmentIndex % 3];
       },
@@ -266,6 +267,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             itemBuilder: (context, index) {
               var adjustmentIndex = index
                   + weekCalendarState.baseAddingHourPart
+                  + weekCalendarState.indexAddingHourPart
                   - weekCalendarState.addingHourPart;
               return weeksPartList[adjustmentIndex % 3];
             },
