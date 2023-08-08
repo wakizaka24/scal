@@ -298,6 +298,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             damping: 0.85),
         onPageChanged: (int index) {
           weekCalendarNotifier.onWeekCalendarPageChanged(index);
+
         },
         itemBuilder: (context, index) {
           var adjustmentIndex = index - weekCalendarState.addingWeek;

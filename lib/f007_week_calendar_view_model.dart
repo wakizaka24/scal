@@ -38,6 +38,8 @@ class WeekCalendarPageState {
   late DateTime basisDate;
   late int baseAddingHourPart;
   late int addingHourPart;
+  int preAddingHourPart = 0;
+  int indexAddingHourPart = 0;
   int addingWeek = 0;
   late DateTime now;
   late bool selectionAllDay;
@@ -72,6 +74,8 @@ class WeekCalendarPageState {
     nState.basisDate = state.basisDate;
     nState.baseAddingHourPart = state.baseAddingHourPart;
     nState.addingHourPart = state.addingHourPart;
+    nState.preAddingHourPart = state.preAddingHourPart;
+    nState.indexAddingHourPart = state.indexAddingHourPart;
     nState.addingWeek = state.addingWeek;
     nState.now = state.now;
     nState.selectionDayAndHour = state.selectionDayAndHour;
@@ -192,46 +196,51 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     afterInit();
   }
 
-  onHourCalendarPageChanged(int hourPart) async {
+  onHourCalendarPageChanged(int index) async {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
-    int addingHourPart = hourPart - WeekCalendarPageState.basisIndex
-      + state.baseAddingHourPart;
+    int addingHourPart = index - WeekCalendarPageState.basisIndex
+        + state.indexAddingHourPart;
+    state.preAddingHourPart = addingHourPart;
+
+    int adding = addingHourPart + state.baseAddingHourPart;
+    debugPrint('adding=$adding $index $addingHourPart '
+        '${state.indexAddingHourPart}');
     DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
         state.basisDate.day - selectionDay.weekday % weekdayRowNum
             + state.addingWeek * weekdayRowNum, state.basisDate.hour
-            + addingHourPart * timeColNum);
-    if (addingHourPart < state.addingHourPart) { // 過去の時間帯へ移動
+            + adding * timeColNum);
+    debugPrint('currentHour=$currentHour');
+    if (adding < state.addingHourPart) { // 過去の時間帯へ移動
       if (currentHour.hour == 24 - timeColNum) { // 日付が跨る
         var moveHour = - (weekdayRowNum - 1) * (24 / timeColNum).floor();
-        addingHourPart += moveHour;
-        state.baseAddingHourPart = -(hourPart - WeekCalendarPageState
-            .basisIndex - addingHourPart);
+        adding += moveHour;
+        state.baseAddingHourPart = -(addingHourPart - adding);
       }
-    } else if (addingHourPart > state.addingHourPart) { // 未来の時間帯へ移動
+    } else if (adding > state.addingHourPart) { // 未来の時間帯へ移動
       if (currentHour.hour == 0) { // 日付が跨る
         var moveHour = (weekdayRowNum - 1) * (24 / timeColNum).floor();
-        addingHourPart += moveHour;
-        state.baseAddingHourPart = -(hourPart - WeekCalendarPageState
-            .basisIndex - addingHourPart);
+        adding += moveHour;
+        state.baseAddingHourPart = -(addingHourPart - adding);
       }
     } else {
       return;
     }
-    debugPrint('onHourCalendarPageChanged addingHourPart=$addingHourPart');
+    debugPrint('onHourCalendarPageChanged addingHourPart=$adding');
 
-    state.addingHourPart = addingHourPart;
+    state.addingHourPart = adding;
     await updateCalendarData();
     state.calendarReload = true;
 
     await selectHour();
   }
 
-  onWeekCalendarPageChanged(int week) async {
-    int addingWeek = week - WeekCalendarPageState.basisIndex;
+  onWeekCalendarPageChanged(int index) async {
+    int addingWeek = index - WeekCalendarPageState.basisIndex;
     debugPrint('onWeekCalendarPageChanged addingWeek=$addingWeek');
 
+    state.indexAddingHourPart = state.preAddingHourPart;
     state.addingWeek = addingWeek;
     await updateCalendarData();
     state.calendarReload = true;
