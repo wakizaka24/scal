@@ -62,6 +62,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
   List<HourTitlesPart> hourTitlesPartList = [];
   List<DaysAndWeekdaysPart> daysAndWeekdaysPartList = [];
   List<List<HoursPart>> weeksPartLists = [];
+  PageView? hourTitlePageView;
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
 
@@ -222,21 +223,23 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
       }).toList();
     }
 
-    var hourTitlePageView = PageView.builder(
-      scrollDirection: Axis.horizontal,
-      pageSnapping: false,
-      controller: weekCalendarState.hourTitlesController,
-      physics: const NeverScrollableScrollPhysics(),
-      onPageChanged: (int index) {
-      },
-      itemBuilder: (context, index) {
-        var adjustmentIndex = index
-            + weekCalendarState.baseAddingHourPart
-            + weekCalendarState.indexAddingHourPart
-            - weekCalendarState.addingHourPart;
-        return hourTitlesPartList[adjustmentIndex % 3];
-      },
-    );
+    if (hourTitlePageView == null || weekCalendarState.hourCalendarScrolling) {
+      hourTitlePageView = PageView.builder(
+        scrollDirection: Axis.horizontal,
+        pageSnapping: false,
+        controller: weekCalendarState.hourTitlesController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (int index) {
+        },
+        itemBuilder: (context, index) {
+          var adjustmentIndex = index
+              + weekCalendarState.baseAddingHourPart
+              + weekCalendarState.indexAddingHourPart
+              - weekCalendarState.addingHourPart;
+          return hourTitlesPartList[adjustmentIndex % 3];
+        },
+      );
+    }
 
     var daysAndWeekPageView = PageView.builder(
       scrollDirection: Axis.vertical,
@@ -300,7 +303,6 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
             damping: 0.85),
         onPageChanged: (int index) {
           weekCalendarNotifier.onWeekCalendarPageChanged(index);
-
         },
         itemBuilder: (context, index) {
           var adjustmentIndex = index - weekCalendarState.addingWeek;
@@ -381,7 +383,7 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
                             ),
                           )
                       ),
-                      Expanded(child: hourTitlePageView)
+                      Expanded(child: hourTitlePageView!)
                     ],
                   ),
                 ),

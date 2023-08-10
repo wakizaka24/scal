@@ -205,8 +205,6 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     state.preAddingHourPart = addingHourPart;
 
     int adding = addingHourPart + state.baseAddingHourPart;
-    debugPrint('adding=$adding $index $addingHourPart '
-        '${state.indexAddingHourPart}');
     DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
         state.basisDate.day - selectionDay.weekday % weekdayRowNum
             + state.addingWeek * weekdayRowNum, state.basisDate.hour
@@ -242,6 +240,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
     state.indexAddingHourPart = state.preAddingHourPart;
     state.addingWeek = addingWeek;
+
     await updateCalendarData();
     state.calendarReload = true;
 
