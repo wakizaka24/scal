@@ -218,12 +218,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<List<DayDisplay>> createDayLists(DateTime basisDate, int addingMonth) {
+    const columnNum = CalendarPageState.weekdayPartColumnNum;
+
     DateTime prevMonth = DateTime(basisDate.year, basisDate.month
         - 1 + addingMonth, 1);
 
     // 月部分の先頭の日付
     DateTime currentDay = DateTime(prevMonth.year, prevMonth.month,
-        prevMonth.day - prevMonth.weekday);
+        prevMonth.day - prevMonth.weekday % columnNum);
 
     // 基準月
     List<DateTime> months = [
@@ -232,8 +234,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         DateTime(prevMonth.year, prevMonth.month + i, 1)
       }
     ];
-
-    const columnNum = CalendarPageState.weekdayPartColumnNum;
 
     List<List<DayDisplay>> list = [];
     for (int i=0; i < 3; i++) {

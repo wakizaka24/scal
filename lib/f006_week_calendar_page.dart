@@ -625,6 +625,8 @@ class HoursPart extends HookConsumerWidget {
                 onTapDown: (int i) async {
                   if (weekCalendarState.hourPartIndex != i) {
                     weekCalendarNotifier.selectHour(index: i);
+                  } else {
+                    Navigator.pop(context);
                   }
                 },
                 onTapUp: (int i) async {

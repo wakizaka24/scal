@@ -455,17 +455,17 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
 
   Map<DateTime, List<Event>> createAllDayEventsMap(List<Event> events) {
     Map<DateTime, List<Event>> eventsMap = {};
-    if (events.isNotEmpty) {
-      for (int i = 0; i < events.length; i++) {
-        var event = events[i];
-        if (!event.allDay!) {
-          continue;
-        }
-        var id = event.start!;
-        eventsMap[id] = eventsMap[id] ?? [];
+    for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+      if (!event.allDay!) {
+        continue;
       }
-      // debugPrint('終日ごとのイベント数 ${eventsMap.length}');
+      var dateTime = event.start!;
+      var id = DateTime(dateTime.year, dateTime.month, dateTime.day);
+      eventsMap[id] = eventsMap[id] ?? [];
+      eventsMap[id]!.add(event);
     }
+    //debugPrint('終日ごとのイベント数 ${eventsMap.length}');
     return eventsMap;
   }
 
