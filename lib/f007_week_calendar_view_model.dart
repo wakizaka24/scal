@@ -11,6 +11,8 @@ import 'f015_calendar_date_utils.dart';
 
 class WeekCalendarPageState {
   // Control
+  bool calendarReload = false;
+
   static const int basisIndex = 36001;
   PageController weekCalendarController = PageController(
       initialPage: basisIndex);
@@ -24,8 +26,6 @@ class WeekCalendarPageState {
       initialPage: basisIndex);
   bool weekCalendarScrolling = false;
   bool hourCalendarScrolling = false;
-
-  bool calendarReload = false;
 
   // UI
   bool hourPartActive = true;
@@ -57,13 +57,13 @@ class WeekCalendarPageState {
     var nState = WeekCalendarPageState();
 
     // Control
+    nState.calendarReload = state.calendarReload;
     nState.weekCalendarController = state.weekCalendarController;
     nState.hourCalendarControllers = state.hourCalendarControllers;
     nState.hourTitlesController = state.hourTitlesController;
     nState.daysAndWeekdaysController = state.daysAndWeekdaysController;
     nState.weekCalendarScrolling = state.weekCalendarScrolling;
     nState.hourCalendarScrolling = state.hourCalendarScrolling;
-    nState.calendarReload = state.calendarReload;
 
     // UI
     nState.hourPartActive = state.hourPartActive;

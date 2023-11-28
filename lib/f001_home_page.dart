@@ -51,7 +51,7 @@ class HomePage extends HookConsumerWidget {
           homeNotifier.setHomePageIndex(index);
           final calendarNotifier = ref.watch(calendarPageNotifierProvider(
               homeState.homePageIndex).notifier);
-          calendarNotifier.selectDay();
+          calendarNotifier.updateSelectionDayOfHome();
         }
       });
 

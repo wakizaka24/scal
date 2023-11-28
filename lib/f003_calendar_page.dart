@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
-import 'f006_week_calendar_page.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -40,9 +39,11 @@ class CalendarPage extends StatefulHookConsumerWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
-  List<MonthPart> monthPartList = [];
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
+
+  // 月カレンダーパーツ
+  List<MonthPart> monthPartList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -243,10 +244,10 @@ class MonthPart extends HookConsumerWidget {
                   if (calendarState.dayPartIndex != i) {
                     calendarNotifier.selectDay(index: i);
                   } else {
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) =>
-                          WeekCalendarPage(pageIndex: pageIndex)),
-                    );
+                    // Navigator.push(context,
+                    //   MaterialPageRoute(builder: (context) =>
+                    //       WeekCalendarPage(pageIndex: pageIndex)),
+                    // );
                   }
                 },
                 onTapUp: (int i) async {

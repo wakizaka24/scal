@@ -59,10 +59,13 @@ class WeekCalendarPage extends StatefulHookConsumerWidget {
 class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
     with AutomaticKeepAliveClientMixin {
 
+
   List<HourTitlesPart> hourTitlesPartList = [];
   List<DaysAndWeekdaysPart> daysAndWeekdaysPartList = [];
   List<List<HoursPart>> weeksPartLists = [];
   PageView? hourTitlePageView;
+
+
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
 

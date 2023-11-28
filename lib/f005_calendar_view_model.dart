@@ -10,10 +10,10 @@ import 'f015_calendar_date_utils.dart';
 
 class CalendarPageState {
   // Control
+  bool calendarReload = false;
   static const int basisIndex = 36001;
   PageController calendarController = PageController(
       initialPage: basisIndex);
-  bool calendarReload = false;
 
   // UI
   bool dayPartActive = true;
@@ -36,8 +36,8 @@ class CalendarPageState {
     var nState = CalendarPageState();
 
     // Control
-    nState.calendarController = state.calendarController;
     nState.calendarReload = state.calendarReload;
+    nState.calendarController = state.calendarController;
 
     // UI
     nState.dayPartActive = state.dayPartActive;
@@ -349,9 +349,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.selectionDay = state.dayLists[1][state.dayPartIndex].id;
     await setCurrentDay(state.selectionDay, state.eventsMap);
 
+    await updateSelectionDayOfHome();
+    updateState();
+  }
+
+  updateSelectionDayOfHome() async {
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
     homeNotifier.setCurrentDay(state.selectionDay, true);
-    updateState();
   }
 
   selectEventListPart(int index) {
