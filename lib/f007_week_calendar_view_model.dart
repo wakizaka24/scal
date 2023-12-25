@@ -11,31 +11,30 @@ import 'f015_calendar_date_utils.dart';
 
 class WeekCalendarPageState {
   // Control
-  bool calendarReload = false;
-
-  static const int basisIndex = 36001;
+  static const int pseudoUnlimitedCenterIndex = 36001;
+  bool weekCalendarReload = false;
   PageController weekCalendarController = PageController(
-      initialPage: basisIndex);
+      initialPage: pseudoUnlimitedCenterIndex);
   List<PageController> hourCalendarControllers = [
-    PageController(initialPage: basisIndex),
-    PageController(initialPage: basisIndex),
-    PageController(initialPage: basisIndex)];
+    PageController(initialPage: pseudoUnlimitedCenterIndex),
+    PageController(initialPage: pseudoUnlimitedCenterIndex),
+    PageController(initialPage: pseudoUnlimitedCenterIndex)];
   PageController hourTitlesController = PageController(
-      initialPage: basisIndex);
+      initialPage: pseudoUnlimitedCenterIndex);
   PageController daysAndWeekdaysController = PageController(
-      initialPage: basisIndex);
+      initialPage: pseudoUnlimitedCenterIndex);
   bool weekCalendarScrolling = false;
   bool hourCalendarScrolling = false;
 
   // UI
-  bool hourPartActive = true;
-  int? hourPartIndex;
+  bool cellActive = true;
+  int hourPartIndex = 0;
   int? eventListIndex;
 
   // Data
   static const int timePartColNum = 6;
   static const int weekdayPartRowNum = 7;
-  late DateTime basisDate;
+  late DateTime basisWeekDate;
   late int baseAddingHourPart;
   late int addingHourPart;
   int preAddingHourPart = 0;
@@ -50,6 +49,7 @@ class WeekCalendarPageState {
   List<List<HourTitleDisplay>> hourTitleLists = [];
   List<List<DayAndWeekdayDisplay>> daysAndWeekdaysList = [];
   List<List<List<HourDisplay>>> hoursListsList = [];
+
   String eventListTitle = '';
   List<EventDisplay> eventList = [];
 
@@ -57,7 +57,7 @@ class WeekCalendarPageState {
     var nState = WeekCalendarPageState();
 
     // Control
-    nState.calendarReload = state.calendarReload;
+    nState.weekCalendarReload = state.weekCalendarReload;
     nState.weekCalendarController = state.weekCalendarController;
     nState.hourCalendarControllers = state.hourCalendarControllers;
     nState.hourTitlesController = state.hourTitlesController;
@@ -66,12 +66,12 @@ class WeekCalendarPageState {
     nState.hourCalendarScrolling = state.hourCalendarScrolling;
 
     // UI
-    nState.hourPartActive = state.hourPartActive;
+    nState.cellActive = state.cellActive;
     nState.hourPartIndex = state.hourPartIndex;
     nState.eventListIndex = state.eventListIndex;
 
     // Data
-    nState.basisDate = state.basisDate;
+    nState.basisWeekDate = state.basisWeekDate;
     nState.baseAddingHourPart = state.baseAddingHourPart;
     nState.addingHourPart = state.addingHourPart;
     nState.preAddingHourPart = state.preAddingHourPart;
@@ -170,11 +170,12 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
         titleColor: Colors.black);
 
     var now = DateTime.now();
-    state.basisDate = selectionDay;
+    state.basisWeekDate = selectionDay;
     state.baseAddingHourPart = (now.hour / WeekCalendarPageState.timePartColNum
       ).floor();
     state.addingHourPart = state.baseAddingHourPart;
-    await updateCalendarData(now: now);
+    state.now = now;
+    await updateWeekCalendarData();
     state.selectionAllDay = false;
     state.selectionDayAndHour = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day, state.now.hour);
@@ -184,11 +185,11 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     homeNotifier.setCurrentDay(state.selectionDayAndHour, false);
 
     // UI
-    state.hourPartActive = true;
-    state.hourPartIndex = null;
+    state.cellActive = true;
+    state.hourPartIndex = 0;
     for (int i=0; i < state.hoursListsList[1][1].length; i++) {
-      if (state.hoursListsList[1][1][i].id == DateTime(state.basisDate.year,
-        state.basisDate.month, state.basisDate.day, now.hour)) {
+      if (state.hoursListsList[1][1][i].id == DateTime(state.basisWeekDate.year,
+        state.basisWeekDate.month, state.basisWeekDate.day, state.now.hour)) {
         state.hourPartIndex = i;
         break;
       }
@@ -200,14 +201,14 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     const timeColNum = WeekCalendarPageState.timePartColNum;
     const weekdayRowNum = WeekCalendarPageState.weekdayPartRowNum;
 
-    int addingHourPart = index - WeekCalendarPageState.basisIndex
+    int addingHourPart = index - WeekCalendarPageState.pseudoUnlimitedCenterIndex
         + state.indexAddingHourPart;
     state.preAddingHourPart = addingHourPart;
 
     int adding = addingHourPart + state.baseAddingHourPart;
-    DateTime currentHour = DateTime(state.basisDate.year, state.basisDate.month,
-        state.basisDate.day - selectionDay.weekday % weekdayRowNum
-            + state.addingWeek * weekdayRowNum, state.basisDate.hour
+    DateTime currentHour = DateTime(state.basisWeekDate.year, state.basisWeekDate.month,
+        state.basisWeekDate.day - selectionDay.weekday % weekdayRowNum
+            + state.addingWeek * weekdayRowNum, state.basisWeekDate.hour
             + adding * timeColNum);
     debugPrint('currentHour=$currentHour');
     if (adding < state.addingHourPart) { // 過去の時間帯へ移動
@@ -228,32 +229,33 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     debugPrint('onHourCalendarPageChanged addingHourPart=$adding');
 
     state.addingHourPart = adding;
-    await updateCalendarData();
-    state.calendarReload = true;
+    state.now = DateTime.now();
+    await updateWeekCalendarData();
+    state.weekCalendarReload = true;
 
     await selectHour();
   }
 
   onWeekCalendarPageChanged(int index) async {
-    int addingWeek = index - WeekCalendarPageState.basisIndex;
+    int addingWeek = index - WeekCalendarPageState.pseudoUnlimitedCenterIndex;
     debugPrint('onWeekCalendarPageChanged addingWeek=$addingWeek');
 
     state.indexAddingHourPart = state.preAddingHourPart;
     state.addingWeek = addingWeek;
 
-    await updateCalendarData();
-    state.calendarReload = true;
+    state.now = DateTime.now();
+    await updateWeekCalendarData();
+    state.weekCalendarReload = true;
 
     await selectHour();
   }
 
-  updateCalendarData({DateTime? now}) async {
-    state.now = now ?? DateTime.now();
-    state.daysAndWeekdaysList = createDayAndWeekdayLists(state.basisDate,
+  updateWeekCalendarData() async {
+    state.daysAndWeekdaysList = createDayAndWeekdayLists(state.basisWeekDate,
         state.addingWeek, state.addingHourPart, selectionDay);
-    state.hourTitleLists = createHourTitleLists(state.basisDate,
+    state.hourTitleLists = createHourTitleLists(state.basisWeekDate,
         state.addingHourPart);
-    state.hoursListsList = createHourListsList(state.basisDate,
+    state.hoursListsList = createHourListsList(state.basisWeekDate,
         state.addingWeek, state.addingHourPart, selectionDay);
     var calendars  = await getCalendars();
     var calendarMap = convertCalendarMap(calendars);
@@ -525,7 +527,7 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     state.now = DateTime.now();
 
     if (index != null) {
-      state.hourPartActive = true;
+      state.cellActive = true;
       state.hourPartIndex = index;
       state.eventListIndex = null;
     }
@@ -538,13 +540,17 @@ class WeekCalendarPageNotifier extends StateNotifier<WeekCalendarPageState> {
     await setCurrentHour(state.selectionAllDay, state.selectionDayAndHour,
         state.allDayEventsMap, state.hourEventsMap);
 
-    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    homeNotifier.setCurrentDay(state.selectionDayAndHour, true);
+    await updateSelectionDayOfHome();
     updateState();
   }
 
+  updateSelectionDayOfHome() async {
+    final homeNotifier = ref.read(homePageNotifierProvider.notifier);
+    homeNotifier.setCurrentDay(state.selectionDayAndHour, true);
+  }
+
   selectEventListPart(int index) {
-    state.hourPartActive = false;
+    state.cellActive = false;
     state.eventListIndex = index;
     updateState();
   }

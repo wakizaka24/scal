@@ -39,11 +39,16 @@ class CalendarPage extends StatefulHookConsumerWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
+  // Common
   double preDeviceWidth = 0;
   double preDeviceHeight = 0;
 
-  // 月カレンダーパーツ
+  // Month Calendar
   List<MonthPart> monthPartList = [];
+
+  // Week Calendar
+  List<DaysAndWeekdaysPart> daysAndWeekdaysPartList = [];
+  List<List<HoursPart>> weeksPartLists = [];
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +61,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(
         widget.pageIndex).notifier);
 
+    // Month Calendar/Week Calendar
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
@@ -63,13 +69,15 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     // アプリバーの高さ
     //double appBarHeight = AppBar().preferredSize.height;
     double appBarHeight = homeState.appBarHeight;
-    // 週部分の高さ
-    double weekdayPartHeight = 21;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.41421356237;
     // イベント一覧の高さ
     double eventListHeight = deviceWidth / eventListAspectRate;
     double eventListMaxHeight = 320;
+
+    // Month Calendar
+    // 週部分の高さ
+    double weekdayPartHeight = 21;
     if (eventListHeight > eventListMaxHeight) {
       eventListAspectRate = deviceWidth / eventListMaxHeight;
       eventListHeight = eventListMaxHeight;
@@ -79,7 +87,16 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         - eventListHeight - widget.unSafeAreaTopHeight;
     // 週部分の幅
     double weekdayPartWidth = deviceWidth / CalendarPageState
-        .weekdayPartColumnNum;
+        .weekdayPartColNum;
+
+    // Week Calendar
+    if (eventListHeight > eventListMaxHeight) {
+      eventListAspectRate = deviceWidth / eventListMaxHeight;
+      eventListHeight = eventListMaxHeight;
+    }
+    // 週部分の高さ
+    double weekPartHeight = deviceHeight - appBarHeight - eventListHeight
+        - widget.unSafeAreaTopHeight;
 
     useEffect(() {
       debugPrint('child useEffect');
@@ -93,19 +110,47 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         debugPrint('child addPostFrameCallback');
       });
 
-      // calendarState.calendarController.addListener(() {
-      //   double offset = calendarState.calendarController.offset;
-      //   calendarNotifier.onCalendarPageChanged((offset / deviceWidth).round());
-      // });
+      // Week Calendar
+      calendarState.hourCalendarControllers[1].addListener(() {
+        try {
+          // calendarState.hourCalendarControllers[0].jumpTo(
+          //     calendarState.hourCalendarControllers[1].offset);
+          // calendarState.hourCalendarControllers[2].jumpTo(
+          //     calendarState.hourCalendarControllers[1].offset);
+        } catch (e) {
+          // 横スクロール中に縦スクロールをするとエラーになる。
+          // 横スクロール中に離し、戻る途中で縦スクロールでエラーになる。
+          // 'package:flutter/src/widgets/scroll_controller.dart':
+          // Failed assertion: line 106 pos 12: '_positions.length == 1':
+          // ScrollController attached to multiple scroll views.
+          debugPrint('横スクロールの同期でエラー');
+          debugPrint(e.toString());
+        }
+      });
+
+      calendarState.weekCalendarController.addListener(() {
+        try {
+          calendarState.daysAndWeekdaysController.jumpTo(
+              calendarState.weekCalendarController.offset);
+        } catch (e) {
+          // 横スクロール中に縦スクロールをするとエラーになる。
+          // 'package:flutter/src/widgets/scroll_controller.dart':
+          // Failed assertion: line 106 pos 12: '_positions.length == 1':
+          // ScrollController attached to multiple scroll views.
+          // debugPrint(e.toString());
+          debugPrint('縦スクロールの同期でエラー');
+        }
+      });
 
       return () {
         // Pageの解放処理
       };
     }, const []);
 
+    // Month Calendar
     if (preDeviceWidth != deviceWidth || preDeviceHeight != deviceHeight
-      || calendarState.calendarReload) {
-      calendarState.calendarReload = false;
+      || calendarState.monthCalendarReload) {
+      calendarState.monthCalendarReload = false;
 
       // for (int i = 0; i < 3; i++) {
       //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
@@ -114,7 +159,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       monthPartList = calendarState.dayLists.map((dayList) => MonthPart(
           pageIndex: widget.pageIndex,
           monthPartHeight: monthPartHeight,
-          weekdayPartColumnNum: CalendarPageState.weekdayPartColumnNum,
+          weekdayPartColumnNum: CalendarPageState.weekdayPartColNum,
           weekdayPartWidth: weekdayPartWidth,
           weekdayPartHeight: weekdayPartHeight,
           onPointerDown: (int pageIndex) async {},
@@ -124,24 +169,166 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       ).toList();
     }
 
+    var monthCalendar = PageView.builder(
+      // pageSnapping: false,
+      controller: calendarState.monthCalendarController,
+      physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+          damping: 0.85),
+      onPageChanged: (int index) {
+        calendarNotifier.onCalendarPageChanged(index);
+      },
+      itemBuilder: (context, index) {
+        var adjustmentIndex = index - calendarState.addingMonth;
+        return monthPartList[adjustmentIndex % 3];
+      },
+    );
+
+    // Week Calendar
+    double daysAndWeekdaysPartWidth = 47;
+    if (preDeviceWidth != deviceWidth || preDeviceHeight != deviceHeight
+        || calendarState.weekCalendarReload) {
+      calendarState.weekCalendarReload = false;
+
+      double hourPartWidth = (deviceWidth - daysAndWeekdaysPartWidth)
+          / (CalendarPageState.timePartColNum + 1);
+      double hourPartHeight = weekPartHeight / CalendarPageState
+          .weekdayPartRowNum;
+
+      // for (int i = 0; i < 3; i++) {
+      //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
+      // }
+
+      daysAndWeekdaysPartList = calendarState.daysAndWeekdaysList
+          .map((daysAndWeekdays) => DaysAndWeekdaysPart(
+        weekPartRowNum: CalendarPageState.weekdayPartRowNum,
+        pageIndex: widget.pageIndex,
+        hourPartWidth: daysAndWeekdaysPartWidth,
+        hourPartHeight: hourPartHeight,
+        daysAndWeekdays: daysAndWeekdays,
+      )
+      ).toList();
+
+      weeksPartLists = calendarState.hoursListsList.map((hourLists) {
+        return hourLists.map((hourList) {
+          return HoursPart(
+              weekPartColNum: CalendarPageState.timePartColNum,
+              weekPartRowNum: CalendarPageState.weekdayPartRowNum,
+              pageIndex: widget.pageIndex,
+              hourPartWidth: hourPartWidth,
+              hourPartHeight: hourPartHeight,
+              onPointerDown: (int pageIndex) async {},
+              onPointerUp: (int pageIndex) async {},
+              hourList: hourList
+          );
+        }).toList();
+      }).toList();
+    }
+
+    var daysAndWeekPageView = PageView.builder(
+      scrollDirection: Axis.vertical,
+      pageSnapping: false,
+      controller: calendarState.daysAndWeekdaysController,
+      physics: const NeverScrollableScrollPhysics(),
+      onPageChanged: (int index) {
+      },
+      itemBuilder: (context, index) {
+        var adjustmentIndex = index - calendarState.addingWeek;
+        return daysAndWeekdaysPartList[adjustmentIndex % 3];
+      },
+    );
+
+    var hourPageViews = weeksPartLists.asMap().entries.map((entry) {
+      var weeksPartList = entry.value;
+      var i = entry.key;
+      return NotificationListener(
+        child: PageView.builder(
+          // pageSnapping: false,
+          controller: calendarState.hourCalendarControllers[i],
+          physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+              damping: 0.85),
+          onPageChanged: (int index) {
+            debugPrint('hourPageViews index=$index');
+            calendarNotifier.onHourCalendarPageChanged(index);
+            //calendarState.weekCalendarController.load
+          },
+          itemBuilder: (context, index) {
+            var adjustmentIndex = index
+                + calendarState.baseAddingHourPart
+                + calendarState.indexAddingHourPart
+                - calendarState.addingHourPart;
+            return weeksPartList[adjustmentIndex % 3];
+          },
+        ),
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollStartNotification) {
+            // debugPrint('start1');
+            calendarNotifier.updateState();
+          } else if (scrollNotification is ScrollUpdateNotification) {
+            // debugPrint('update');
+          } else if (scrollNotification is ScrollEndNotification) {
+            // debugPrint('end');
+            calendarNotifier.updateState();
+          }
+          return false;
+        },
+      );
+    }).toList();
+
+    var weeksPageView = NotificationListener(
+      child: PageView.builder(
+        scrollDirection: Axis.vertical,
+        // pageSnapping: false,
+        controller: calendarState.weekCalendarController,
+        physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+            damping: 0.85),
+        onPageChanged: (int index) {
+          calendarNotifier.onWeekCalendarPageChanged(index);
+        },
+        itemBuilder: (context, index) {
+          var adjustmentIndex = index - calendarState.addingWeek;
+          return hourPageViews[adjustmentIndex % 3];
+        },
+      ),
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollStartNotification) {
+          // debugPrint('start2');
+        } else if (scrollNotification is ScrollUpdateNotification) {
+        } else if (scrollNotification is ScrollEndNotification) {
+        }
+        return false;
+      },
+    );
+
+    var weekCalendar = Column(
+        children: [
+          // 週と日付部分
+          Expanded(
+              child: Row(children: [
+                SizedBox(width: daysAndWeekdaysPartWidth,
+                    child: daysAndWeekPageView),
+                Expanded(child: weeksPageView)
+              ])
+          ),
+        ]
+    );
+
+    var calendarWidgets = [monthCalendar, weekCalendar];
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             Expanded(
-                child: PageView.builder(
-                  // pageSnapping: false,
-                  controller: calendarState.calendarController,
-                  physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
-                      damping: 0.85),
-                  onPageChanged: (int index) {
-                    calendarNotifier.onCalendarPageChanged(index);
-                  },
-                  itemBuilder: (context, index) {
-                    var adjustmentIndex = index - calendarState.addingMonth;
-                    return monthPartList[adjustmentIndex % 3];
-                  },
+                child: PageView(
+                    scrollDirection: Axis.vertical,
+                    controller: calendarState.calendarSwitchingController,
+                    physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+                        damping: 0.85),
+                    onPageChanged: (int index) {
+                      // calendarNotifier.onCalendarPageChanged(index);
+                    },
+                    children: calendarWidgets
                 )
             ),
             AspectRatio(
@@ -159,6 +346,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
   bool get wantKeepAlive => true;
 }
 
+// Common
 class CustomScrollPhysics extends ScrollPhysics {
   final double mass; // 速度(50)
   final double stiffness; // 100
@@ -184,6 +372,78 @@ class CustomScrollPhysics extends ScrollPhysics {
     damping: damping,
   );
 }
+
+class SelectableCalendarCell extends HookConsumerWidget {
+  final double? width;
+  final double height;
+  final int index;
+  final bool isHighlighted;
+  final bool isActive;
+  final void Function(int) onTapDown;
+  final void Function(int) onTapUp;
+  final double borderCircular;
+  // 選択時の罫線の幅(通常の罫線の幅以上であること)
+  final double selectedBoarderWidth;
+  final Color bgColor;
+  final Widget child;
+
+  const SelectableCalendarCell({super.key,
+    this.width,
+    required this.height,
+    required this.index,
+    required this.isHighlighted,
+    required this.isActive,
+    required this.onTapDown,
+    required this.onTapUp,
+    required this.borderCircular,
+    required this.selectedBoarderWidth,
+    required this.bgColor,
+    required this.child
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+        onTapDown: (TapDownDetails details) => onTapDown(index),
+        onTapUp: (TapUpDetails event) => onTapUp(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(isHighlighted
+                ? borderCircular : 0),
+            border: Border.fromBorderSide(
+                BorderSide(
+                    color: !isHighlighted || !isActive ? borderColor
+                        : theme.colorScheme.secondaryContainer,
+                    width: !isHighlighted ? normalBoarderWidth
+                        : selectedBoarderWidth
+                )
+            ),
+          ),
+          child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(isHighlighted ?
+                borderCircular : 0),
+                border: Border.fromBorderSide(
+                    BorderSide(
+                        color: Colors.transparent,
+                        width: !isHighlighted ? selectedBoarderWidth
+                            - normalBoarderWidth : 0
+                    )
+                ),
+              ),
+              child: child),
+        )
+    );
+  }
+}
+
+// Month Calendar
 
 class MonthPart extends HookConsumerWidget {
   final int pageIndex;
@@ -239,7 +499,7 @@ class MonthPart extends HookConsumerWidget {
                 index: rowIndex * weekdayPartColumnNum + colIndex,
                 isHighlighted: calendarState.dayPartIndex
                     == rowIndex * weekdayPartColumnNum + colIndex,
-                isActive: calendarState.dayPartActive,
+                isActive: calendarState.cellActive,
                 onTapDown: (int i) async {
                   if (calendarState.dayPartIndex != i) {
                     calendarNotifier.selectDay(index: i);
@@ -374,6 +634,8 @@ class DayPart extends HookConsumerWidget {
     );
   }
 }
+
+// Event List
 
 class EventListPart extends HookConsumerWidget {
   final int pageIndex;
@@ -601,72 +863,266 @@ class EventPart extends HookConsumerWidget {
   }
 }
 
-class SelectableCalendarCell extends HookConsumerWidget {
-  final double? width;
+// Week Calendar
+
+class HourTitlesPart extends HookConsumerWidget {
+  final int weekPartColNum;
+  final int pageIndex;
+  final double hourPartWidth;
+  final double hourPartHeight;
+  final List<HourTitleDisplay> hourTitleList;
+  final HourTitleDisplay allDayTitle;
+
+  const HourTitlesPart({
+    super.key,
+    required this.weekPartColNum,
+    required this.pageIndex,
+    required this.hourPartWidth,
+    required this.hourPartHeight,
+    required this.hourTitleList,
+    required this.allDayTitle
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(children: [
+      for (int colIndex = 0; colIndex < weekPartColNum; colIndex++) ... {
+        HourTitlePart(
+            width: hourPartWidth,
+            height: hourPartHeight,
+            hourTitle: hourTitleList[colIndex]
+        ),
+      },
+      HourTitlePart(
+          width: hourPartWidth,
+          height: hourPartHeight,
+          hourTitle: allDayTitle
+      ),
+    ]);
+  }
+}
+
+class HourTitlePart extends HookConsumerWidget {
+  final double width;
+  final double height;
+  final HourTitleDisplay hourTitle;
+
+  const HourTitlePart({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.hourTitle
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+        width: width,
+        height: height,
+        decoration: const BoxDecoration(
+          border: Border.fromBorderSide(
+              BorderSide(
+                  color: borderColor,
+                  width: normalBoarderWidth
+              )
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(hourTitle.title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              height: 1.3,
+              fontSize: calendarFontSize1,
+              fontWeight: calendarFontWidth1,
+              color: hourTitle.titleColor,
+            )
+        )
+    );
+  }
+}
+
+class DaysAndWeekdaysPart extends HookConsumerWidget {
+  final int weekPartRowNum;
+  final int pageIndex;
+  final double hourPartWidth;
+  final double hourPartHeight;
+  final List<DayAndWeekdayDisplay> daysAndWeekdays;
+
+  const DaysAndWeekdaysPart({
+    super.key,
+    required this.weekPartRowNum,
+    required this.pageIndex,
+    required this.hourPartWidth,
+    required this.hourPartHeight,
+    required this.daysAndWeekdays
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(children: [
+      for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++) ... {
+        DayAndWeekdayPart(
+            width: hourPartWidth,
+            height: hourPartHeight,
+            dayAndWeekday: daysAndWeekdays[rowIndex]
+        ),
+      }
+    ]);
+  }
+}
+
+class DayAndWeekdayPart extends HookConsumerWidget {
+  final double width;
+  final double height;
+  final DayAndWeekdayDisplay dayAndWeekday;
+
+  const DayAndWeekdayPart({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.dayAndWeekday
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+        width: width,
+        height: height,
+        decoration: const BoxDecoration(
+          border: Border.fromBorderSide(
+              BorderSide(
+                  color: borderColor,
+                  width: normalBoarderWidth
+              )
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(dayAndWeekday.dayAndWeekTitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              height: 1.3,
+              fontSize: calendarFontSize1,
+              fontWeight: calendarFontWidth1,
+              color: dayAndWeekday.dayAndWeekTitleColor,
+            )
+        )
+    );
+  }
+}
+
+class HoursPart extends HookConsumerWidget {
+  final int weekPartColNum;
+  final int weekPartRowNum;
+  final int pageIndex;
+  final double hourPartWidth;
+  final double hourPartHeight;
+  final void Function(int) onPointerDown;
+  final void Function(int) onPointerUp;
+  final List<HourDisplay> hourList;
+
+  const HoursPart({
+    super.key,
+    required this.hourPartWidth,
+    required this.hourPartHeight,
+    required this.pageIndex,
+    required this.weekPartColNum,
+    required this.weekPartRowNum,
+    required this.onPointerDown,
+    required this.onPointerUp,
+    required this.hourList,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weekCalendarState = ref.watch(calendarPageNotifierProvider(
+        pageIndex));
+    final weekCalendarNotifier = ref.watch(calendarPageNotifierProvider(
+        pageIndex).notifier);
+
+    return Row(children: [
+      for (int colIndex = 0; colIndex < weekPartColNum + 1; colIndex++) ... {
+        Column(
+          children: [
+            for (int rowIndex = 0; rowIndex < weekPartRowNum; rowIndex++) ... {
+              HourPart(width: hourPartWidth,
+                height: hourPartHeight,
+                index: rowIndex * (weekPartColNum + 1) + colIndex,
+                isHighlighted: weekCalendarState.hourPartIndex
+                    == rowIndex * (weekPartColNum + 1) + colIndex,
+                isActive: weekCalendarState.cellActive,
+                onTapDown: (int i) async {
+                  if (weekCalendarState.hourPartIndex != i) {
+                    weekCalendarNotifier.selectHour(index: i);
+                  } else {
+                    // Navigator.pop(context);
+                  }
+                },
+                onTapUp: (int i) async {
+                },
+                hour: hourList[rowIndex * (weekPartColNum + 1) + colIndex],
+              ),
+            }
+          ],
+        ),
+      }
+    ],);
+  }
+}
+
+class HourPart extends HookConsumerWidget {
+  final double width;
   final double height;
   final int index;
   final bool isHighlighted;
   final bool isActive;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
-  final double borderCircular;
-  // 選択時の罫線の幅(通常の罫線の幅以上であること)
-  final double selectedBoarderWidth;
-  final Color bgColor;
-  final Widget child;
+  final HourDisplay hour;
 
-  const SelectableCalendarCell({super.key,
-    this.width,
+  const HourPart({super.key,
+    required this.width,
     required this.height,
     required this.index,
     required this.isHighlighted,
     required this.isActive,
     required this.onTapDown,
     required this.onTapUp,
-    required this.borderCircular,
-    required this.selectedBoarderWidth,
-    required this.bgColor,
-    required this.child
+    required this.hour
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-        onTapDown: (TapDownDetails details) => onTapDown(index),
-        onTapUp: (TapUpDetails event) => onTapUp(index),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(isHighlighted
-                ? borderCircular : 0),
-            border: Border.fromBorderSide(
-                BorderSide(
-                    color: !isHighlighted || !isActive ? borderColor
-                        : theme.colorScheme.secondaryContainer,
-                    width: !isHighlighted ? normalBoarderWidth
-                        : selectedBoarderWidth
-                )
-            ),
-          ),
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(isHighlighted ?
-                  borderCircular : 0),
-                border: Border.fromBorderSide(
-                    BorderSide(
-                        color: Colors.transparent,
-                        width: !isHighlighted ? selectedBoarderWidth
-                            - normalBoarderWidth : 0
-                    )
+    return SelectableCalendarCell(
+      width: width,
+      height: height,
+      index: index,
+      isHighlighted: isHighlighted,
+      isActive: isActive,
+      onTapDown: onTapDown,
+      onTapUp: onTapUp,
+      selectedBoarderWidth: selectedBoarderWidth,
+      borderCircular: 0,
+      bgColor: hour.bgColor,
+      // Webビューのスクロールバー非表示
+      child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              for(int i = 0; i < hour.eventList.length; i++) ... {
+                Text(hour.eventList[i].title,
+                  maxLines: 1,
+                  style: TextStyle(
+                      fontSize: calendarFontSize2,
+                      fontWeight: calendarFontWidth2,
+                      height: 1.2,
+                      color: hour.eventList[i].titleColor
+                  ),
                 ),
-              ),
-              child: child),
-        )
+              }
+            ],
+          )
+      ),
     );
   }
 }

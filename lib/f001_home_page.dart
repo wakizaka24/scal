@@ -27,7 +27,7 @@ class HomePage extends HookConsumerWidget {
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
-    double appBarHeight = homeState.appBarHeight;//AppBar().preferredSize.height;
+    double appBarHeight = homeState.appBarHeight;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -60,36 +60,41 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    return Scaffold(
+    var appBar = AppBar(
+      // ナビゲーションによる遷移の場合戻るボタンを表示しない
+      automaticallyImplyLeading: false,
+      title: Consumer(
+          builder: ((context, ref, child) {
+            final homeState = ref.watch(homePageNotifierProvider);
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Hero(tag: 'AppBar1TitleText', child:
+                  Material(
+                    color: Colors.transparent,
+                    child: Text(homeState.appBarTitle,
+                        style: const TextStyle(
+                            height: 1.3,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 21
+                        )
+                    ),
+                  )
+                )
+              ],
+            );
+          })
+      ),
+    );
+
+    var scaffold = Scaffold(
       key: homePageScaffoldKey,
       endDrawer: const EndDrawer(),
+      // ナビゲーションバー
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(homeState.appBarHeight),
-        child: AppBar(
-          title: Consumer(
-              builder: ((context, ref, child) {
-                final homeState = ref.watch(homePageNotifierProvider);
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Hero(tag: 'AppBar1TitleText', child:
-                      Material(
-                        color: Colors.transparent,
-                        child: Text(homeState.appBarTitle,
-                            style: const TextStyle(
-                                height: 1.3,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 21
-                            )
-                        ),
-                      )
-                    )
-                  ],
-                );
-              })
-          ),
-        ),
+        child: appBar,
       ),
       body: PageView(
         // physics: const NeverScrollableScrollPhysics(),
@@ -109,21 +114,38 @@ class HomePage extends HookConsumerWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: FloatingActionButton(
-        heroTag: "calendar_hero_tag",
-        onPressed: () {
-          //homePageScaffoldKey.currentState!.openEndDrawer();
-        },
-        tooltip: 'イベント追加',
-        child: Consumer(
-          builder: ((context, ref, child) {
-            final homeState = ref.watch(homePageNotifierProvider);
+          heroTag: "calendar_hero_tag",
+          onPressed: () {
+            //homePageScaffoldKey.currentState!.openEndDrawer();
             final calendarState = ref.watch(calendarPageNotifierProvider(
                 homeState.homePageIndex));
-            return Icon(calendarState.dayPartActive
-                ? Icons.add : Icons.add_circle_outline);
-          })
-        )
+            double prePage = calendarState.calendarSwitchingController.page!;
+
+            int page = prePage.toInt();
+            if (page.toDouble() == prePage) {
+              page = page == 0 ? 1: 0;
+              calendarState.calendarSwitchingController.animateToPage(
+                  page, duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn);
+            }
+          },
+          tooltip: 'イベント追加',
+          child: Consumer(
+              builder: ((context, ref, child) {
+                final homeState = ref.watch(homePageNotifierProvider);
+                final calendarState = ref.watch(calendarPageNotifierProvider(
+                    homeState.homePageIndex));
+                return Icon(calendarState.cellActive
+                    ? Icons.add : Icons.add_circle_outline);
+              })
+          )
       ),
+    );
+
+    // 右端スワイプでナビゲーションを戻さない
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: scaffold
     );
   }
 }
