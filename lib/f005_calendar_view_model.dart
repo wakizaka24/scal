@@ -12,8 +12,11 @@ class CalendarPageState {
   // Control-Common
   // 擬似無制限中央インデックス
   static const int pseudoUnlimitedCenterIndex = 36001;
+
+  // Control-Month Calendar/Week Calendar
   PageController calendarSwitchingController = PageController(
     initialPage: 0);
+  bool monthCalendarVisible = true;
 
   // Control-Month Calendar
   bool monthCalendarReload = false;
@@ -24,10 +27,6 @@ class CalendarPageState {
   bool weekCalendarReload = false;
   PageController weekCalendarController = PageController(
       initialPage: pseudoUnlimitedCenterIndex);
-  List<PageController> hourCalendarControllers = [
-    PageController(initialPage: pseudoUnlimitedCenterIndex),
-    PageController(initialPage: pseudoUnlimitedCenterIndex),
-    PageController(initialPage: pseudoUnlimitedCenterIndex)];
   PageController daysAndWeekdaysController = PageController(
       initialPage: pseudoUnlimitedCenterIndex);
 
@@ -44,22 +43,17 @@ class CalendarPageState {
   List<List<DayDisplay>> dayLists = [];
 
   // Data-Week Calendar
-  static const int timePartColNum = 6;
   static const int weekdayPartRowNum = 7;
-  /*late */DateTime basisWeekDate = DateTime.now();
-  /*late */int baseAddingHourPart = 0;
-  /*late */int addingHourPart = 0;
-  int preAddingHourPart = 0;
-  int indexAddingHourPart = 0;
+  late DateTime basisWeekDate;
   int addingWeek = 0;
-  /*late */bool selectionAllDay = false;
-  /*late */DateTime selectionDayAndHour = DateTime.now();
+  int preAddingWeek = 0;
+  int indexAddingWeek = 0;
+  late bool selectionAllDay;
+  late DateTime selectionDayAndHour;
   Map<DateTime, List<Event>> allDayEventsMap = {};
   Map<DateTime, List<Event>> hourEventsMap = {};
-  /*late */HourTitleDisplay allDayTitle = HourTitleDisplay(title: '', titleColor: Colors.white);
-  List<List<HourTitleDisplay>> hourTitleLists = [];
   List<List<DayAndWeekdayDisplay>> daysAndWeekdaysList = [];
-  List<List<List<HourDisplay>>> hoursListsList = [];
+  List<List<HourDisplay>> hoursList = [];
 
   // Data-Event List
   String eventListTitle = '';
@@ -80,6 +74,10 @@ class CalendarPageState {
   static CalendarPageState copy(CalendarPageState state) {
     var nState = CalendarPageState();
 
+    // Control-Month Calendar/Week Calendar
+    nState.calendarSwitchingController = state.calendarSwitchingController;
+    nState.monthCalendarVisible = state.monthCalendarVisible;
+
     // Control-Month Calendar
     nState.monthCalendarReload = state.monthCalendarReload;
     nState.monthCalendarController = state.monthCalendarController;
@@ -87,7 +85,6 @@ class CalendarPageState {
     // Control-Week Calendar
     nState.weekCalendarReload = state.weekCalendarReload;
     nState.weekCalendarController = state.weekCalendarController;
-    nState.hourCalendarControllers = state.hourCalendarControllers;
     nState.daysAndWeekdaysController = state.daysAndWeekdaysController;
 
     // Data-Month Calendar/Week Calendar
@@ -103,19 +100,15 @@ class CalendarPageState {
 
     // Data-Week Calendar
     nState.basisWeekDate = state.basisWeekDate;
-    nState.baseAddingHourPart = state.baseAddingHourPart;
-    nState.addingHourPart = state.addingHourPart;
-    nState.preAddingHourPart = state.preAddingHourPart;
-    nState.indexAddingHourPart = state.indexAddingHourPart;
     nState.addingWeek = state.addingWeek;
+    nState.preAddingWeek = state.preAddingWeek;
+    nState.indexAddingWeek = state.indexAddingWeek;
     nState.now = state.now;
     nState.selectionDayAndHour = state.selectionDayAndHour;
     nState.allDayEventsMap = state.allDayEventsMap;
     nState.hourEventsMap = state.hourEventsMap;
-    nState.allDayTitle = state.allDayTitle;
-    nState.hourTitleLists = state.hourTitleLists;
     nState.daysAndWeekdaysList = state.daysAndWeekdaysList;
-    nState.hoursListsList = state.hoursListsList;
+    nState.hoursList = state.hoursList;
 
     // Data-Event List
     nState.eventListTitle = state.eventListTitle;
@@ -245,6 +238,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       : super(state);
 
   initState(VoidCallback afterInit) async {
+    // Data-Month Calendar/Week Calendar
+    state.now = DateTime.now();
+
     // Data-Month Calendar
     state.weekdayList = [
       WeekdayDisplay(title: '日',
@@ -263,7 +259,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           titleColor: Colors.green),
     ];
 
-    state.now = DateTime.now();
     await updateMonthCalendarData();
     state.selectionDay = DateTime(state.now.year, state.now.month,
         state.now.day);
@@ -285,24 +280,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     // Data-Week Calendar
-    state.allDayTitle = HourTitleDisplay(title: '終日',
-        titleColor: Colors.black);
+    await initWeekCalendar();
 
+    afterInit();
+  }
+
+  initWeekCalendar() async {
     state.basisWeekDate = state.selectionDay;
-    state.baseAddingHourPart = (now.hour / CalendarPageState.timePartColNum
-      ).floor();
-    state.addingHourPart = state.baseAddingHourPart;
-    state.now = now;
     await updateWeekCalendarData();
     state.selectionAllDay = false;
     state.selectionDayAndHour = DateTime(state.selectionDay.year,
         state.selectionDay.month, state.selectionDay.day, state.now.hour);
     await setCurrentHour(state.selectionAllDay, state.selectionDayAndHour,
         state.allDayEventsMap, state.hourEventsMap);
-    // final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    // homeNotifier.setCurrentDay(state.selectionDayAndHour, false);
-
-    afterInit();
   }
 
   // MonthCalendar
@@ -448,38 +438,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Week Calendar
 
   onHourCalendarPageChanged(int index) async {
-    const timeColNum = CalendarPageState.timePartColNum;
-    const weekdayRowNum = CalendarPageState.weekdayPartRowNum;
-
-    int addingHourPart = index - CalendarPageState.pseudoUnlimitedCenterIndex
-        + state.indexAddingHourPart;
-    state.preAddingHourPart = addingHourPart;
-
-    int adding = addingHourPart + state.baseAddingHourPart;
-    DateTime currentHour = DateTime(state.basisWeekDate.year,
-        state.basisWeekDate.month, state.basisWeekDate.day
-            - state.selectionDay.weekday % weekdayRowNum
-            + state.addingWeek * weekdayRowNum, state.basisWeekDate.hour
-            + adding * timeColNum);
-    debugPrint('currentHour=$currentHour');
-    if (adding < state.addingHourPart) { // 過去の時間帯へ移動
-      if (currentHour.hour == 24 - timeColNum) { // 日付が跨る
-        var moveHour = - (weekdayRowNum - 1) * (24 / timeColNum).floor();
-        adding += moveHour;
-        state.baseAddingHourPart = -(addingHourPart - adding);
-      }
-    } else if (adding > state.addingHourPart) { // 未来の時間帯へ移動
-      if (currentHour.hour == 0) { // 日付が跨る
-        var moveHour = (weekdayRowNum - 1) * (24 / timeColNum).floor();
-        adding += moveHour;
-        state.baseAddingHourPart = -(addingHourPart - adding);
-      }
-    } else {
-      return;
-    }
-    debugPrint('onHourCalendarPageChanged addingHourPart=$adding');
-
-    state.addingHourPart = adding;
     state.now = DateTime.now();
     await updateWeekCalendarData();
     state.weekCalendarReload = true;
@@ -488,11 +446,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   onWeekCalendarPageChanged(int index) async {
-    int addingWeek = index - CalendarPageState.pseudoUnlimitedCenterIndex;
+    int addingWeek = index - CalendarPageState.pseudoUnlimitedCenterIndex
+      + state.indexAddingWeek;
     debugPrint('onWeekCalendarPageChanged addingWeek=$addingWeek');
 
-    state.indexAddingHourPart = state.preAddingHourPart;
     state.addingWeek = addingWeek;
+    state.preAddingWeek = state.addingWeek;
 
     state.now = DateTime.now();
     await updateWeekCalendarData();
@@ -503,19 +462,17 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateWeekCalendarData() async {
     state.daysAndWeekdaysList = createDayAndWeekdayLists(state.basisWeekDate,
-        state.addingWeek, state.addingHourPart, state.selectionDay);
-    state.hourTitleLists = createHourTitleLists(state.basisWeekDate,
-        state.addingHourPart);
-    state.hoursListsList = createHourListsList(state.basisWeekDate,
-        state.addingWeek, state.addingHourPart, state.selectionDay);
+        state.addingWeek, state.selectionDay);
+    state.hoursList = createHourLists(state.basisWeekDate,
+        state.addingWeek, state.selectionDay);
     var calendars  = await getCalendars();
     var calendarMap = convertCalendarMap(calendars);
-    var startDate = state.hoursListsList.first.first.first.id;
-    var endDate = state.hoursListsList.last.last.last.id;
+    var startDate = state.hoursList.first.first.id;
+    var endDate = state.hoursList.last.last.id;
     var events = await getEventsForWeekCalendar(calendars, startDate, endDate);
     state.allDayEventsMap = createAllDayEventsMap(events);
     state.hourEventsMap = createHourEventsMap(events);
-    state.hoursListsList = addEvents(state.hoursListsList,
+    state.hoursList = addEvents(state.hoursList,
         state.allDayEventsMap, state.hourEventsMap, calendarMap);
   }
 
@@ -532,14 +489,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<List<DayAndWeekdayDisplay>> createDayAndWeekdayLists(DateTime basisDate,
-      int addingWeek, int addingHourPart, DateTime selectionDay) {
-    const timeColNum = CalendarPageState.timePartColNum;
+      int addingWeek, DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.weekdayPartRowNum;
 
     DateTime currentDay = DateTime(basisDate.year, basisDate.month,
         basisDate.day - selectionDay.weekday % weekdayRowNum - weekdayRowNum
-            + addingWeek * weekdayRowNum, basisDate.hour + addingHourPart
-            * timeColNum);
+            + addingWeek * weekdayRowNum, 0);
 
     List<List<DayAndWeekdayDisplay>> dayAndWeekdayLists = [];
     for (int pageIndex = 0; pageIndex < 3; pageIndex++) {
@@ -561,86 +516,51 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return dayAndWeekdayLists;
   }
 
-  List<List<HourTitleDisplay>> createHourTitleLists(DateTime basisDate,
-      int addingHourPart) {
-    const timeColNum = CalendarPageState.timePartColNum;
-    int hour = -timeColNum + addingHourPart * timeColNum;
-    return [
-      for (int hourPart = 0; hourPart < 3; hourPart++) ... {
-        [
-          for (int i = 0; i < timeColNum; i++, hour++) ... {
-            HourTitleDisplay(title: '${hour % 24}:00',
-                titleColor: Colors.black),
-          }
-        ],
-      }
-    ];
-  }
-
-  List<List<List<HourDisplay>>> createHourListsList(DateTime basisDate,
-      int addingWeek, int addingHourPart, DateTime selectionDay) {
-    const timeColNum = CalendarPageState.timePartColNum;
+  List<List<HourDisplay>> createHourLists(DateTime basisDate,
+      int addingWeek, DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.weekdayPartRowNum;
 
     DateTime currentWeek = DateTime(basisDate.year, basisDate.month,
         basisDate.day - selectionDay.weekday % weekdayRowNum + addingWeek
-            * weekdayRowNum, basisDate.hour + addingHourPart * timeColNum);
-
-    //バグ？
+            * weekdayRowNum, 0);
     DateTime prevWeek = DateTime(currentWeek.year, currentWeek.month,
-        currentWeek.day - weekdayRowNum, currentWeek.hour);
+        currentWeek.day - weekdayRowNum, 0);
     DateTime nextWeek = DateTime(currentWeek.year, currentWeek.month,
-        currentWeek.day + weekdayRowNum, currentWeek.hour);
+        currentWeek.day + weekdayRowNum, 0);
 
     // 基準時間
     List<DateTime> weeks = [prevWeek, currentWeek, nextWeek];
 
-    List<List<List<HourDisplay>>> calendarLists = [];
+    List<List<HourDisplay>> calendarLists = [];
     for (var week in weeks) {
-      List<List<HourDisplay>> calendarList = createHourLists(week);
+      List<HourDisplay> calendarList = createHourList(week);
       calendarLists.add(calendarList);
     }
 
     return calendarLists;
   }
 
-  List<List<HourDisplay>> createHourLists(DateTime currentHour) {
-    const timeColNum = CalendarPageState.timePartColNum;
+  List<HourDisplay> createHourList(DateTime week) {
+    const timeColNum = 6;
+    var timeInterval = 24 ~/ timeColNum;
     const weekdayRowNum = CalendarPageState.weekdayPartRowNum;
 
-    int prevHourAdding = currentHour.hour == 0
-        ? -((weekdayRowNum - 1) * 24 + timeColNum) : -timeColNum;
-    int nextHourAdding = currentHour.hour + timeColNum == 24
-        ? (weekdayRowNum - 1) * 24 + timeColNum : timeColNum;
-
-    DateTime prevHour = DateTime(currentHour.year, currentHour.month,
-        currentHour.day, currentHour.hour + prevHourAdding);
-    DateTime nextHour = DateTime(currentHour.year, currentHour.month,
-        currentHour.day, currentHour.hour + nextHourAdding);
-
-    // 基準時間
-    List<DateTime> hours = [prevHour, currentHour, nextHour];
-
-    List<List<HourDisplay>> calendarList = [];
-    for (var hour in hours) {
-      List<HourDisplay> timeList = [];
-      for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
-        for (int colIndex = 0; colIndex < timeColNum + 1; colIndex++) {
-          bool allDay = colIndex == timeColNum;
-          DateTime id = DateTime(hour.year, hour.month, hour.day
-              + rowIndex, allDay ? 0 : hour.hour + colIndex);
-          DateTime now = DateTime(state.now.year, state.now.month,
-              state.now.day);
-          DateTime currentDay = DateTime(id.year, id.month, id.day);
-          Color bgColor = now == currentDay ? todayBgColor
-              : Colors.transparent;
-          timeList.add(HourDisplay(id: id, allDay: allDay, eventList: [],
-              bgColor: bgColor));
-        }
+    List<HourDisplay> wholeTimeList = [];
+    for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
+      for (int colIndex = 0; colIndex < timeColNum + 1; colIndex++) {
+        bool allDay = colIndex == timeColNum;
+        DateTime id = DateTime(week.year, week.month, week.day
+            + rowIndex, allDay ? 0 : week.hour + colIndex * timeInterval);
+        DateTime now = DateTime(state.now.year, state.now.month,
+            state.now.day);
+        DateTime currentDay = DateTime(id.year, id.month, id.day);
+        Color bgColor = now == currentDay ? todayBgColor
+            : Colors.transparent;
+        wholeTimeList.add(HourDisplay(id: id, allDay: allDay, eventList: [],
+            bgColor: bgColor));
       }
-      calendarList.add(timeList);
     }
-    return calendarList;
+    return wholeTimeList;
   }
 
   Map<DateTime, List<Event>> createAllDayEventsMap(List<Event> events) {
@@ -669,6 +589,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         }
         var allHours = CalendarDateUtils().getAllHours(event.start, event.end);
         allHours.fold(eventsMap, (events, day) {
+          // TODO: 四時間ごとにまとめる
           events[day] = events[day] ?? [];
           events[day]!.add(event);
           return events;
@@ -679,36 +600,36 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return eventsMap;
   }
 
-  List<List<List<HourDisplay>>> addEvents(List<List<List<HourDisplay>>>
-  hourListsList, Map<DateTime, List<Event>> allDayEventsMap,
+  List<List<HourDisplay>> addEvents(List<List<HourDisplay>> hourLists,
+      Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap,
       Map<String, Calendar> calendarMap) {
 
-    for (var hourLists in hourListsList) {
-      for (var hourList in hourLists) {
-        for (var hourInfo in hourList) {
 
-          hourInfo.eventList.clear();
+    for (var hourList in hourLists) {
+      for (var hourInfo in hourList) {
 
-          var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
-              : hourEventsMap[hourInfo.id]) ?? [];
+        hourInfo.eventList.clear();
 
-          var dhmStr = DateFormat('dd HH').format(hourInfo.id);
+        var events = (hourInfo.allDay ? allDayEventsMap[hourInfo.id]
+            : hourEventsMap[hourInfo.id]) ?? [];
+
+        // TODO: デバック中
+        var dhmStr = DateFormat('dd HH').format(hourInfo.id);
+        hourInfo.eventList.add(HourEventDisplay(
+            title: dhmStr, titleColor: Colors.black));
+
+        for (var event in events) {
+          var calendar = calendarMap[event.calendarId]!;
           hourInfo.eventList.add(HourEventDisplay(
-              title: dhmStr, titleColor: Colors.black));
-
-          for (var event in events) {
-            var calendar = calendarMap[event.calendarId]!;
-            hourInfo.eventList.add(HourEventDisplay(
-                title: event.title!,
-                titleColor: calendar.isDefault! ? Colors.black
-                    : const Color(0xffaaaaaa)));
-          }
+              title: event.title!,
+              titleColor: calendar.isDefault! ? Colors.black
+                  : const Color(0xffaaaaaa)));
         }
       }
     }
 
-    return hourListsList;
+    return hourLists;
   }
 
   selectHour({int? index}) async {
@@ -720,10 +641,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       state.eventListIndex = null;
     }
 
-    state.selectionAllDay = state.hoursListsList[1][1][state.hourPartIndex]
-        .allDay;
-    state.selectionDayAndHour = state.hoursListsList[1][1][state.hourPartIndex]
-        .id;
+    var hourPart = state.hoursList[1];
+    state.selectionAllDay = hourPart[state.hourPartIndex].allDay;
+    state.selectionDayAndHour = hourPart[state.hourPartIndex].id;
 
     await setCurrentHour(state.selectionAllDay, state.selectionDayAndHour,
         state.allDayEventsMap, state.hourEventsMap);
