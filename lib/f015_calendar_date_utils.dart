@@ -6,7 +6,7 @@ class CalendarDateUtils {
     return _instance;
   }
 
-  List<DateTime> getAllDays(startDate, endDate) {
+  List<DateTime> getAllDays(DateTime startDate, DateTime endDate) {
     var date = DateTime(startDate.year, startDate.month, startDate.day);
     List<DateTime> allDays = [];
     while (!endDate.isBefore(date)) {
@@ -16,13 +16,14 @@ class CalendarDateUtils {
     return allDays;
   }
 
-  List<DateTime> getAllHours(startDate, endDate) {
+  List<DateTime> getAllHours(DateTime startDate, DateTime endDate,
+      int timeInterval) {
     var date = DateTime(startDate.year, startDate.month, startDate.day,
       startDate.hour);
     List<DateTime> allHours = [];
     while (!endDate.isBefore(date)) {
       allHours.add(date);
-      date = date.add(const Duration(hours: 1));
+      date = date.add(Duration(hours: timeInterval));
     }
     return allHours;
   }

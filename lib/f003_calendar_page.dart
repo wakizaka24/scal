@@ -8,19 +8,22 @@ import 'f005_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
+const highlightedWeekColor = Color(0x17DED2BF);
+const highlightedWeekTodayColor = Color(0x52DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
 const double calendarFontSize1 = 13;
-const FontWeight calendarFontWidth1 = FontWeight.w300;//.w500;
+const double calendarFontSize1Down1 = 11.5;
+const FontWeight calendarFontWidth1 = FontWeight.w300;
 const double calendarFontSize2 = 10.2;
-const FontWeight calendarFontWidth2 = FontWeight.w300;//.w600;
+const FontWeight calendarFontWidth2 = FontWeight.w300;
 const double eventListFontSize1 = 13.5;
-const FontWeight eventListFontWidth1 = FontWeight.w300;//.w500;
+const FontWeight eventListFontWidth1 = FontWeight.w300;
 const double eventListFontSize2 = 13;
-const FontWeight eventListFontWidth2 = FontWeight.w300;//.w600;
+const FontWeight eventListFontWidth2 = FontWeight.w300;
 const double eventListFontSize3 = 14;
-const FontWeight eventListFontWidth3 = FontWeight.w300;//.w600;
+const FontWeight eventListFontWidth3 = FontWeight.w300;
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
@@ -388,15 +391,17 @@ class MonthPart extends HookConsumerWidget {
                 isHighlighted: calendarState.dayPartIndex
                     == rowIndex * weekdayPartColumnNum + colIndex,
                 isActive: calendarState.cellActive,
+                isHighlightedWeek: calendarState.dayPartIndex
+                    ~/ weekdayPartColumnNum == rowIndex,
                 onTapDown: (int i) async {
                   // 選択中のセル
                   if (calendarState.dayPartIndex == i) {
                   }
 
-                  calendarNotifier.selectDay(index: i);
-                  calendarNotifier.initWeekCalendar();
+                  await calendarNotifier.selectDay(index: i);
+                  await calendarNotifier.initWeekCalendar();
                   await calendarNotifier.updateSelectionDayOfHome();
-                  calendarNotifier.updateState();
+                  await calendarNotifier.updateState();
                 },
                 onTapUp: (int i) async {
                 },
@@ -455,6 +460,7 @@ class DayPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final bool isActive;
+  final bool isHighlightedWeek;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
   final DayDisplay day;
@@ -465,6 +471,7 @@ class DayPart extends HookConsumerWidget {
     required this.index,
     required this.isHighlighted,
     required this.isActive,
+    required this.isHighlightedWeek,
     required this.onTapDown,
     required this.onTapUp,
     required this.day
@@ -482,16 +489,17 @@ class DayPart extends HookConsumerWidget {
       onTapUp: onTapUp,
       selectedBoarderWidth: selectedBoarderWidth,
       borderCircular: 0,
-      bgColor: day.bgColor,
+      bgColor: isHighlightedWeek ? day.today ? highlightedWeekTodayColor
+        : highlightedWeekColor : day.today ? todayBgColor : Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(day.title,
               style: TextStyle(
-                  fontSize: calendarFontSize1,
-                  fontWeight: calendarFontWidth1,
-                  height: 1,
-                  color: day.titleColor,
+                height: 1,
+                fontSize: calendarFontSize1,
+                fontWeight: calendarFontWidth1,
+                color: day.titleColor,
               )
           ),
           Expanded(child:
@@ -506,9 +514,9 @@ class DayPart extends HookConsumerWidget {
                       Text(day.eventList[i].title,
                         maxLines: 1,
                         style: TextStyle(
+                            height: 1.2,
                             fontSize: calendarFontSize2,
                             fontWeight: calendarFontWidth2,
-                            height: 1.2,
                             color: day.eventList[i].titleColor
                         ),
                       ),
@@ -577,7 +585,7 @@ class EventListPart extends HookConsumerWidget {
                       },
                       emptyMessage: 'イベントがありません',
                     ),
-                  for(int i=0; i < calendarState.eventList.length; i++) ... {
+                  for (int i=0; i < calendarState.eventList.length; i++) ... {
                     EventPart(
                       height: 45,
                       index: i,
@@ -673,15 +681,14 @@ class EventPart extends HookConsumerWidget {
                       padding: const EdgeInsets
                           .symmetric(horizontal: 4,
                           vertical: 0),
-                      child:
-                      Text(event!.title, maxLines: 2,
+                      child: Text(event!.title, maxLines: 2,
                         style: TextStyle(
-                          height: 1.3,
+                            height: 1.3,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
                             color: event!.fontColor
                         )
-                    )
+                      )
                   )
                 ),
               if (event != null && event!.editing)
@@ -798,8 +805,9 @@ class DayAndWeekdayPart extends HookConsumerWidget {
     return Container(
         width: width,
         height: height,
-        decoration: const BoxDecoration(
-          border: Border.fromBorderSide(
+        decoration: BoxDecoration(
+          color: dayAndWeekday.today ? todayBgColor : Colors.transparent,
+          border: const Border.fromBorderSide(
               BorderSide(
                   color: borderColor,
                   width: normalBoarderWidth
@@ -860,14 +868,16 @@ class HoursPart extends HookConsumerWidget {
                 isHighlighted: calendarState.hourPartIndex
                     == rowIndex * hoursPartColNum + colIndex,
                 isActive: calendarState.cellActive,
+                isHighlightedWeek: calendarState.hourPartIndex
+                    % hoursPartRowNum == colIndex,
                 onTapDown: (int i) async {
                   // 選択中のセル
                   if (calendarState.hourPartIndex == i) {
                   }
 
-                  calendarNotifier.selectHour(index: i);
+                  await calendarNotifier.selectHour(index: i);
                   await calendarNotifier.updateSelectionDayOfHome();
-                  calendarNotifier.updateState();
+                  await calendarNotifier.updateState();
                 },
                 onTapUp: (int i) async {
                 },
@@ -887,6 +897,7 @@ class HourPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final bool isActive;
+  final bool isHighlightedWeek;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
   final HourDisplay hour;
@@ -897,6 +908,7 @@ class HourPart extends HookConsumerWidget {
     required this.index,
     required this.isHighlighted,
     required this.isActive,
+    required this.isHighlightedWeek,
     required this.onTapDown,
     required this.onTapUp,
     required this.hour
@@ -905,36 +917,55 @@ class HourPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SelectableCalendarCell(
-      width: width,
-      height: height,
-      index: index,
-      isHighlighted: isHighlighted,
-      isActive: isActive,
-      onTapDown: onTapDown,
-      onTapUp: onTapUp,
-      selectedBoarderWidth: selectedBoarderWidth,
-      borderCircular: 0,
-      bgColor: hour.bgColor,
-      // Web版のスクロールバー非表示
-      child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-          child: ListView(
-            physics: const NeverScrollableScrollPhysics(),
+        width: width,
+        height: height,
+        index: index,
+        isHighlighted: isHighlighted,
+        isActive: isActive,
+        onTapDown: onTapDown,
+        onTapUp: onTapUp,
+        selectedBoarderWidth: selectedBoarderWidth,
+        borderCircular: 0,
+        bgColor: isHighlightedWeek ? hour.today ? highlightedWeekTodayColor
+          : highlightedWeekColor : hour.today ? todayBgColor
+          : Colors.transparent,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for(int i = 0; i < hour.eventList.length; i++) ... {
-                Text(hour.eventList[i].title,
-                  maxLines: 1,
+              Text(hour.title,
                   style: TextStyle(
-                      fontSize: calendarFontSize2,
-                      fontWeight: calendarFontWidth2,
-                      height: 1.2,
-                      color: hour.eventList[i].titleColor
-                  ),
+                  height: 1,
+                  fontSize: !hour.allDay ? calendarFontSize1
+                    : calendarFontSize1Down1,
+                  fontWeight: calendarFontWidth1,
+                  color: hour.titleColor,
+                )
+              ),
+              Expanded(child:
+                // Web版のスクロールバー非表示
+                ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                        scrollbars: false),
+                    child: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        for(int i = 0; i < hour.eventList.length; i++) ... {
+                          Text(hour.eventList[i].title,
+                            maxLines: 1,
+                            style: TextStyle(
+                                height: 1.2,
+                                fontSize: calendarFontSize2,
+                                fontWeight: calendarFontWidth2,
+                                color: hour.eventList[i].titleColor
+                            ),
+                          ),
+                        }
+                      ]
+                    )
                 ),
-              }
-            ],
-          )
-      ),
+              )
+            ]
+        )
     );
   }
 }

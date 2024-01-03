@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'f002_home_view_model.dart';
-import 'f003_calendar_page.dart';
 import 'f008_calendar_repository.dart';
 import 'f015_calendar_date_utils.dart';
 
@@ -135,14 +134,14 @@ class DayDisplay {
   String title;
   Color titleColor;
   List<DayEventDisplay> eventList;
-  Color bgColor;
+  bool today;
 
   DayDisplay({
     required this.id,
     required this.title,
     required this.titleColor,
     required this.eventList,
-    required this.bgColor
+    required this.today
   });
 }
 
@@ -170,24 +169,30 @@ class HourTitleDisplay {
 class DayAndWeekdayDisplay {
   String dayAndWeekTitle;
   Color dayAndWeekTitleColor;
+  bool today;
 
   DayAndWeekdayDisplay({
     required this.dayAndWeekTitle,
-    required this.dayAndWeekTitleColor
+    required this.dayAndWeekTitleColor,
+    required this.today
   });
 }
 
 class HourDisplay {
   bool allDay;
   DateTime id;
+  String title;
+  Color titleColor;
   List<HourEventDisplay> eventList;
-  Color bgColor;
+  bool today;
 
   HourDisplay({
     required this.allDay,
     required this.id,
+    required this.title,
+    required this.titleColor,
     required this.eventList,
-    required this.bgColor
+    required this.today
   });
 }
 
@@ -270,7 +275,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       await selectHour();
       await updateSelectionDayOfHome();
     }
-    updateState();
+    await updateState();
   }
 
   // Month Calendar
@@ -319,8 +324,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.monthCalendarReload = true;
 
     await selectDay();
+    await initWeekCalendar();
     await updateSelectionDayOfHome();
-    updateState();
+    await updateState();
   }
 
   updateMonthCalendarData() async {
@@ -384,8 +390,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
               titleColor: j % columnNum == 0 ? Colors.pink
                   : j % columnNum == columnNum - 1
                   ? Colors.green : Colors.black, eventList: [],
-              bgColor: currentDay == now ? todayBgColor
-                  : Colors.transparent)
+              today: currentDay == now)
         }
       ]);
     }
@@ -398,7 +403,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (events.isNotEmpty) {
       for (int i = 0; i < events.length; i++) {
         var event = events[i];
-        var allDays = CalendarDateUtils().getAllDays(event.start, event.end);
+        var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
         allDays.fold(eventsMap, (events, day) {
           events[day] = events[day] ?? [];
           events[day]!.add(event);
@@ -460,10 +465,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   setHourEventList(bool allDay, DateTime date,
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap) async {
+    var timeInterval = 24 ~/ CalendarPageState.timeColNum;
+    var dateUntil = date.add(Duration(hours:timeInterval));
+    var hourStr = '${date.hour}h〜${dateUntil.hour}h'; // 0h〜4h
     state.eventListTitle = '${DateFormat.MMMEd('ja') // 6月12日(月)
-        .format(date)} ${allDay ? '終日' : DateFormat.Hm('ja') // 0:00
-        .format(date)}';
-
+        .format(date)} ${allDay ? '終日' : hourStr}';
     var eventList = (allDay ? allDayEventsMap[date] : hourEventsMap[date])
         ?? [];
     await setEventList(eventList);
@@ -472,18 +478,21 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   List<DayAndWeekdayDisplay> createDayAndWeekdayList(DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
 
-    DateTime currentDay = DateTime(selectionDay.year, selectionDay.month,
+    DateTime day = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day - selectionDay.weekday % weekdayRowNum, 0);
 
     List<DayAndWeekdayDisplay> dayAndWeekdayList = [];
     for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
-      DateTime day = DateTime(
-          currentDay.year, currentDay.month, currentDay.day + rowIndex);
+      DateTime now = DateTime(state.now.year, state.now.month,
+          state.now.day);
+      DateTime currentDay = DateTime(
+          day.year, day.month, day.day + rowIndex);
       dayAndWeekdayList.add(DayAndWeekdayDisplay(
-          dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(day),
+          dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(currentDay),
           dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
               : rowIndex % weekdayRowNum == weekdayRowNum - 1
-              ? Colors.green : Colors.black
+              ? Colors.green : Colors.black,
+          today: currentDay == now
       ));
     }
 
@@ -507,10 +516,26 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         DateTime now = DateTime(state.now.year, state.now.month,
             state.now.day);
         DateTime currentDay = DateTime(id.year, id.month, id.day);
-        Color bgColor = now == currentDay ? todayBgColor
-            : Colors.transparent;
-        wholeTimeList.add(HourDisplay(id: id, allDay: allDay, eventList: [],
-            bgColor: bgColor));
+
+        var title = '${id.hour}h';
+        if (colIndex == timeColNum) {
+          title = '終日';
+        }
+
+        var titleColor = rowIndex % weekdayRowNum == 0 ? Colors.pink
+            : rowIndex % weekdayRowNum == weekdayRowNum - 1
+            ? Colors.green : Colors.black;
+
+        wholeTimeList.add(
+            HourDisplay(
+                allDay: allDay,
+                id: id,
+                title: title,
+                titleColor: titleColor,
+                eventList: [],
+                today: now == currentDay
+            )
+        );
       }
     }
     return wholeTimeList;
@@ -542,13 +567,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         if (event.allDay!) {
           continue;
         }
-        var allHours = CalendarDateUtils().getAllHours(event.start, event.end);
+        var allHours = CalendarDateUtils().getAllHours(event.start!, event.end!,
+            timeInterval);
         allHours.fold(eventsMap, (events, day) {
           // 数時間ごとにまとめる
           var hour = day.hour;
           hour = hour - hour % timeInterval;
-          events[day] = events[day] ?? [];
-          events[day]!.add(event);
+          var editHour = DateTime(day.year, day.month, day.day, hour);
+          events[editHour] = events[editHour] ?? [];
+          events[editHour]!.add(event);
           return events;
         });
       }
@@ -569,10 +596,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           : hourEventsMap[hourInfo.id]) ?? [];
 
       //var dhmStr = DateFormat('dd HH').format(hourInfo.id);
-      var dhmStr = !hourInfo.allDay ? DateFormat('H:00').format(hourInfo.id)
-        : '終日';
-      hourInfo.eventList.add(HourEventDisplay(
-          title: dhmStr, titleColor: Colors.black));
+      // hourInfo.eventList.add(HourEventDisplay(
+      //     title: dhmStr, titleColor: Colors.black));
 
       for (var event in events) {
         var calendar = calendarMap[event.calendarId]!;
@@ -635,10 +660,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
   }
 
-  selectEventListPart(int index) {
+  selectEventListPart(int index) async {
     state.cellActive = false;
     state.eventListIndex = index;
-    updateState();
+    await updateState();
   }
 
   // Common
