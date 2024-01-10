@@ -335,9 +335,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.calendarMap = convertCalendarMap(calendars);
     var startDate = state.dayLists.first.first.id;
     var endDate = state.dayLists.last.last.id;
-    state.calendarEvents = await getEventsForWeekCalendar(calendars, startDate,
+    state.calendarEvents = await getEvents(calendars, startDate,
         endDate);
-    state.allEventsMap = createEventsMap(state.calendarEvents);
+    state.allEventsMap = createAllEventsMap(state.calendarEvents);
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
         state.allEventsMap, state.calendarMap);
   }
@@ -398,7 +398,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return list;
   }
 
-  Map<DateTime, List<Event>> createEventsMap(List<Event> events) {
+  Map<DateTime, List<Event>> createAllEventsMap(List<Event> events) {
     Map<DateTime, List<Event>> eventsMap = {};
     if (events.isNotEmpty) {
       for (int i = 0; i < events.length; i++) {
@@ -548,10 +548,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       if (!event.allDay!) {
         continue;
       }
-      var dateTime = event.start!;
-      var id = DateTime(dateTime.year, dateTime.month, dateTime.day);
-      eventsMap[id] = eventsMap[id] ?? [];
-      eventsMap[id]!.add(event);
+      var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
+      allDays.fold(eventsMap, (events, day) {
+        events[day] = events[day] ?? [];
+        events[day]!.add(event);
+        return events;
+      });
     }
     //debugPrint('終日ごとのイベント数 ${eventsMap.length}');
     return eventsMap;
@@ -567,6 +569,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         if (event.allDay!) {
           continue;
         }
+        // if (event.title=='てすと') {
+        //   debugPrint('!');
+        // }
         var allHours = CalendarDateUtils().getAllHours(event.start!, event.end!,
             timeInterval);
         allHours.fold(eventsMap, (events, day) {
@@ -686,7 +691,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return calendarMap;
   }
 
-  Future<List<Event>> getEventsForWeekCalendar(List<Calendar> calendars,
+  Future<List<Event>> getEvents(List<Calendar> calendars,
       DateTime startDate, DateTime endDate) async {
     List<Event> events = [];
     if (calendars.isNotEmpty) {

@@ -869,7 +869,7 @@ class HoursPart extends HookConsumerWidget {
                     == rowIndex * hoursPartColNum + colIndex,
                 isActive: calendarState.cellActive,
                 isHighlightedWeek: calendarState.hourPartIndex
-                    % hoursPartRowNum == colIndex,
+                    % hoursPartColNum == colIndex,
                 onTapDown: (int i) async {
                   // 選択中のセル
                   if (calendarState.hourPartIndex == i) {

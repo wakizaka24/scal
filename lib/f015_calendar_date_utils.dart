@@ -18,8 +18,10 @@ class CalendarDateUtils {
 
   List<DateTime> getAllHours(DateTime startDate, DateTime endDate,
       int timeInterval) {
+    var startHour = (startDate.hour ~/ timeInterval) * timeInterval;
     var date = DateTime(startDate.year, startDate.month, startDate.day,
-      startDate.hour);
+        startHour);
+
     List<DateTime> allHours = [];
     while (!endDate.isBefore(date)) {
       allHours.add(date);
