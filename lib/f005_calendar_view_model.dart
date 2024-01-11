@@ -270,6 +270,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.indexAddingMonth = state.preAddingMonth;
     if (index == 0) {
       await selectDay();
+      await initWeekCalendar();
       await updateSelectionDayOfHome();
     } else {
       await selectHour();
@@ -302,7 +303,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         var nowHour = state.now.hour;
         var idHour = id.hour;
 
-        if (nowHour >= idHour && nowHour <= idHour + hoursPartTimeInterval) {
+        if (nowHour >= idHour && nowHour < idHour + hoursPartTimeInterval) {
           state.hourPartIndex = i;
           break;
         }

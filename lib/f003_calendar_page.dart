@@ -8,8 +8,8 @@ import 'f005_calendar_view_model.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
-const highlightedWeekColor = Color(0x17DED2BF);
-const highlightedWeekTodayColor = Color(0x52DED2BF);
+const highlightedLineColor = Color(0x17DED2BF);
+const highlightedLineAndTodayColor = Color(0x52DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.5;
@@ -172,6 +172,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 
     var dayAndWeekdayListPart = DayAndWeekdayListPart(
         hoursPartRowNum: CalendarPageState.hoursPartRowNum,
+        pageIndex: widget.pageIndex,
         hourPartWidth: dayAndWeekdayListPartWidth,
         hourPartHeight: hourPartHeight,
         dayAndWeekdayList: calendarState.dayAndWeekdayList);
@@ -489,8 +490,9 @@ class DayPart extends HookConsumerWidget {
       onTapUp: onTapUp,
       selectedBoarderWidth: selectedBoarderWidth,
       borderCircular: 0,
-      bgColor: isHighlightedWeek ? day.today ? highlightedWeekTodayColor
-        : highlightedWeekColor : day.today ? todayBgColor : Colors.transparent,
+      bgColor: isHighlightedWeek ?
+        day.today ? highlightedLineAndTodayColor : highlightedLineColor :
+        day.today ? todayBgColor : Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -761,6 +763,7 @@ class EventPart extends HookConsumerWidget {
 // Week Calendar
 
 class DayAndWeekdayListPart extends HookConsumerWidget {
+  final int pageIndex;
   final int hoursPartRowNum;
   final double hourPartWidth;
   final double hourPartHeight;
@@ -768,6 +771,7 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 
   const DayAndWeekdayListPart({
     super.key,
+    required this.pageIndex,
     required this.hoursPartRowNum,
     required this.hourPartWidth,
     required this.hourPartHeight,
@@ -776,11 +780,14 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
     return Column(children: [
       for (int rowIndex = 0; rowIndex < hoursPartRowNum; rowIndex++) ... {
         DayAndWeekdayPart(
             width: hourPartWidth,
             height: hourPartHeight,
+            isHighlightedDay: calendarState.hourPartIndex
+                ~/ hoursPartRowNum == rowIndex,
             dayAndWeekday: dayAndWeekdayList[rowIndex]
         ),
       }
@@ -791,12 +798,14 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 class DayAndWeekdayPart extends HookConsumerWidget {
   final double width;
   final double height;
+  final bool isHighlightedDay;
   final DayAndWeekdayDisplay dayAndWeekday;
 
   const DayAndWeekdayPart({
     super.key,
     required this.width,
     required this.height,
+    required this.isHighlightedDay,
     required this.dayAndWeekday
   });
 
@@ -806,7 +815,10 @@ class DayAndWeekdayPart extends HookConsumerWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: dayAndWeekday.today ? todayBgColor : Colors.transparent,
+          color: isHighlightedDay ?
+            dayAndWeekday.today ? highlightedLineAndTodayColor
+                : highlightedLineColor :
+            dayAndWeekday.today ? todayBgColor : Colors.transparent,
           border: const Border.fromBorderSide(
               BorderSide(
                   color: borderColor,
@@ -868,8 +880,10 @@ class HoursPart extends HookConsumerWidget {
                 isHighlighted: calendarState.hourPartIndex
                     == rowIndex * hoursPartColNum + colIndex,
                 isActive: calendarState.cellActive,
-                isHighlightedWeek: calendarState.hourPartIndex
-                    % hoursPartColNum == colIndex,
+                isHighlightedDayAndWeek: calendarState.hourPartIndex
+                    % hoursPartColNum == colIndex
+                  || calendarState.hourPartIndex
+                        ~/ hoursPartRowNum == rowIndex,
                 onTapDown: (int i) async {
                   // 選択中のセル
                   if (calendarState.hourPartIndex == i) {
@@ -897,7 +911,7 @@ class HourPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final bool isActive;
-  final bool isHighlightedWeek;
+  final bool isHighlightedDayAndWeek;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
   final HourDisplay hour;
@@ -908,7 +922,7 @@ class HourPart extends HookConsumerWidget {
     required this.index,
     required this.isHighlighted,
     required this.isActive,
-    required this.isHighlightedWeek,
+    required this.isHighlightedDayAndWeek,
     required this.onTapDown,
     required this.onTapUp,
     required this.hour
@@ -926,9 +940,9 @@ class HourPart extends HookConsumerWidget {
         onTapUp: onTapUp,
         selectedBoarderWidth: selectedBoarderWidth,
         borderCircular: 0,
-        bgColor: isHighlightedWeek ? hour.today ? highlightedWeekTodayColor
-          : highlightedWeekColor : hour.today ? todayBgColor
-          : Colors.transparent,
+        bgColor: isHighlightedDayAndWeek ?
+          hour.today ? highlightedLineAndTodayColor : highlightedLineColor :
+          hour.today ? todayBgColor : Colors.transparent,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
