@@ -117,19 +117,7 @@ class HomePage extends HookConsumerWidget {
           heroTag: "calendar_hero_tag",
           onPressed: () {
             //homePageScaffoldKey.currentState!.openEndDrawer();
-            final calendarState = ref.watch(calendarPageNotifierProvider(
-                homeState.homePageIndex));
-            double prePage = calendarState.calendarSwitchingController.page!;
-
-            int page = prePage.toInt();
-            if (page.toDouble() == prePage) {
-              page = page == 0 ? 1: 0;
-              calendarState.calendarSwitchingController.animateToPage(
-                  page, duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn);
-            }
           },
-          tooltip: 'イベント追加',
           child: Consumer(
               builder: ((context, ref, child) {
                 final homeState = ref.watch(homePageNotifierProvider);

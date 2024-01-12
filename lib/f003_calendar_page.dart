@@ -211,8 +211,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
+        child: Stack(children: [
+          Column(children: [
             Expanded(
                 child: PageView(
                     scrollDirection: Axis.vertical,
@@ -229,10 +229,40 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                 child: EventListPart(pageIndex: widget.pageIndex,
                     unSafeAreaBottomHeight: widget.unSafeAreaBottomHeight)
             )
-          ],
-        ),
-      ),
-    );
+          ]),
+          Column(children: [
+            const Spacer(),
+            Row(children:[const Spacer(),
+              SafeArea(child: ElevatedButton(
+                  onPressed: () {
+                    final calendarState = ref.watch(
+                        calendarPageNotifierProvider(homeState.homePageIndex));
+                    double prePage = calendarState.calendarSwitchingController
+                        .page!;
+
+                    int page = prePage.toInt();
+                    if (page.toDouble() == prePage) {
+                      page = page == 0 ? 1: 0;
+                      calendarState.calendarSwitchingController.animateToPage(
+                          page, duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(32, 32),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    textStyle: const TextStyle(fontSize: 13),
+                    padding: const EdgeInsets.all(0),
+                  ),
+                  child: const Text('週')
+              )),
+              Container(width: 80)
+            ])
+          ])
+      ]),
+    ));
   }
 
   @override
