@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
+import 'f013_common_utils.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -655,6 +656,16 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final context = useContext();
+    final isMounted = useIsMounted();
+    showEventDeletionMessageDialog() {
+      return CommonUtils().showMessageDialog(context, '削除',
+          'イベントを削除しますか?', 'はい', 'いいえ');
+    }
+    showEventDeletedMessageDialog() {
+      return CommonUtils().showMessageDialog(context, '削除', '削除しました');
+    }
+
     return SelectableCalendarCell(
         height: 45,
         index: index,
@@ -753,9 +764,15 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
-              if (event != null && !event!.editing)
+              if (event != null && !event!.editing && !event!.readOnly)
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    var result = await showEventDeletionMessageDialog();
+                    if (result == 'positive') {
+
+                      if (!isMounted()) return;
+                      await showEventDeletedMessageDialog();
+                    }
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),

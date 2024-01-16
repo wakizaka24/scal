@@ -103,6 +103,7 @@ class CalendarPageState {
 class EventDisplay {
   String id;
   bool editing;
+  bool readOnly;
   String head;
   Color lineColor;
   String title;
@@ -111,6 +112,7 @@ class EventDisplay {
   EventDisplay({
     required this.id,
     required this.editing,
+    required this.readOnly,
     required this.head,
     required this.lineColor,
     required this.title,
@@ -638,6 +640,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Event List
 
   setEventList(List<Event> eventList) async {
+    if (state.eventListIndex != null
+        && state.eventListIndex! >= eventList.length) {
+      if (eventList.isNotEmpty) {
+        state.eventListIndex = eventList.length - 1;
+      } else {
+        state.eventListIndex = 0;
+      }
+    }
+
     state.eventList = [];
     for (int i = 0; i < eventList.length; i++) {
       var event = eventList[i];
@@ -645,7 +656,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
       var id = event.eventId!;
-      var editing = calendar.isReadOnly!;
+      var editing = false;
       var head = '${DateFormat.jm('ja').format(event.start!)}\n'
           '${DateFormat.jm('ja').format(event.end!)}';
       if (event.start!.year != event.end!.year
@@ -661,7 +672,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           : const Color(0xffaaaaaa);
 
       state.eventList.add(EventDisplay(id: id, editing: editing,
-          head: head, lineColor: lineColor, title: title, fontColor: fontColor
+          readOnly: calendar.isReadOnly!,
+          head: head, lineColor: lineColor, title: title,
+          fontColor: fontColor
       ));
     }
   }
