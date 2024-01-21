@@ -102,4 +102,9 @@ class CalendarRepository {
 
     return events;
   }
+
+  Future<bool> deleteEvent(String calendarId, String eventId) async {
+    var result =  await _plugin.deleteEvent(calendarId, eventId);
+    return result.isSuccess;
+  }
 }

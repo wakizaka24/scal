@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
-import 'f013_common_utils.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -431,7 +430,8 @@ class MonthPart extends HookConsumerWidget {
                   }
 
                   await calendarNotifier.selectDay(index: i);
-                  await calendarNotifier.initWeekCalendar();
+                  await calendarNotifier.updateWeekCalendarData();
+                  await calendarNotifier.initSelectionWeekCalendar();
                   await calendarNotifier.updateSelectionDayOfHome();
                   await calendarNotifier.updateState();
                 },
@@ -610,6 +610,7 @@ class EventListPart extends HookConsumerWidget {
                 children: [
                   if (calendarState.eventList.isEmpty)
                     EventPart(
+                      pageIndex: pageIndex,
                       height: 45,
                       index: 0,
                       isHighlighted: calendarState.eventListIndex == 0,
@@ -620,6 +621,7 @@ class EventListPart extends HookConsumerWidget {
                     ),
                   for (int i=0; i < calendarState.eventList.length; i++) ... {
                     EventPart(
+                      pageIndex: pageIndex,
                       height: 45,
                       index: i,
                       isHighlighted: calendarState.eventListIndex == i,
@@ -638,6 +640,7 @@ class EventListPart extends HookConsumerWidget {
 }
 
 class EventPart extends HookConsumerWidget {
+  final int pageIndex;
   final double height;
   final int index;
   final bool isHighlighted;
@@ -646,6 +649,7 @@ class EventPart extends HookConsumerWidget {
   final EventDisplay? event;
 
   const EventPart({super.key,
+    required this.pageIndex,
     required this.height,
     required this.index,
     required this.isHighlighted,
@@ -656,15 +660,9 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final context = useContext();
-    final isMounted = useIsMounted();
-    showEventDeletionMessageDialog() {
-      return CommonUtils().showMessageDialog(context, '削除',
-          'イベントを削除しますか?', 'はい', 'いいえ');
-    }
-    showEventDeletedMessageDialog() {
-      return CommonUtils().showMessageDialog(context, '削除', '削除しました');
-    }
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
+        .notifier);
+    final eventDeletionDriving = calendarNotifier.useEventDeletionDriving();
 
     return SelectableCalendarCell(
         height: 45,
@@ -767,12 +765,7 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 TextButton(
                   onPressed: () async {
-                    var result = await showEventDeletionMessageDialog();
-                    if (result == 'positive') {
-
-                      if (!isMounted()) return;
-                      await showEventDeletedMessageDialog();
-                    }
+                    await eventDeletionDriving(event!);
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),

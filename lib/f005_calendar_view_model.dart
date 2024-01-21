@@ -1,10 +1,13 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
+import 'f013_common_utils.dart';
 import 'f015_calendar_date_utils.dart';
 
 class CalendarPageState {
@@ -101,7 +104,8 @@ class CalendarPageState {
 
 // Type-Month Calendar/Week Calendar
 class EventDisplay {
-  String id;
+  String eventId;
+  String calendarId;
   bool editing;
   bool readOnly;
   String head;
@@ -110,7 +114,8 @@ class EventDisplay {
   Color fontColor;
 
   EventDisplay({
-    required this.id,
+    required this.eventId,
+    required this.calendarId,
     required this.editing,
     required this.readOnly,
     required this.head,
@@ -249,7 +254,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     await updateSelectionDayOfHome();
     await setDayEventList(state.selectionDate, state.allEventsMap);
-    await initWeekCalendar();
+    await updateWeekCalendarData();
+    await initSelectionWeekCalendar();
 
     afterInit();
   }
@@ -272,7 +278,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.indexAddingMonth = state.preAddingMonth;
     if (index == 0) {
       await selectDay();
-      await initWeekCalendar();
+      await updateWeekCalendarData();
+      await initSelectionWeekCalendar();
       await updateSelectionDayOfHome();
     } else {
       await selectHour();
@@ -283,9 +290,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Month Calendar
 
-  initWeekCalendar() async {
+  initSelectionWeekCalendar() async {
     // Data-Week Calendar
-    await updateWeekCalendarData();
     state.selectionAllDay = false;
     state.selectionDate = DateTime(state.selectionDate.year,
         state.selectionDate.month, state.selectionDate.day, state.now.hour);
@@ -322,14 +328,20 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
     debugPrint('onCalendarPageChanged addingMonth=$addingMonth');
     state.addingMonth = addingMonth;
+
+    await updateCalendar();
+    await selectDay();
+    await initSelectionWeekCalendar();
+    await updateSelectionDayOfHome();
+    await updateState();
+  }
+
+  updateCalendar() async {
     state.now = DateTime.now();
     await updateMonthCalendarData();
     state.monthCalendarReload = true;
 
-    await selectDay();
-    await initWeekCalendar();
-    await updateSelectionDayOfHome();
-    await updateState();
+    await updateWeekCalendarData();
   }
 
   updateMonthCalendarData() async {
@@ -469,7 +481,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap) async {
     var timeInterval = 24 ~/ CalendarPageState.timeColNum;
-    var dateUntil = date.add(Duration(hours:timeInterval));
+    var dateUntil = date.add(Duration(hours:timeInterval - 1));
     var hourStr = '${date.hour}h〜${dateUntil.hour}h'; // 0h〜4h
     state.eventListTitle = '${DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date)} ${allDay ? '終日' : hourStr}';
@@ -630,7 +642,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
     state.selectionDate = state.hours[state.hourPartIndex].id;
-
     await setHourEventList(state.selectionAllDay, state.selectionDate,
         state.allDayEventsMap, state.hourEventsMap);
 
@@ -638,6 +649,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   // Event List
+
+  updateEventList() async {
+    if (state.calendarSwitchingIndex == 0) {
+      state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
+      await setDayEventList(state.selectionDate, state.allEventsMap);
+    } else {
+      state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
+      state.selectionDate = state.hours[state.hourPartIndex].id;
+      await setHourEventList(state.selectionAllDay, state.selectionDate,
+          state.allDayEventsMap, state.hourEventsMap);
+    }
+  }
 
   setEventList(List<Event> eventList) async {
     if (state.eventListIndex != null
@@ -655,7 +678,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var calendars = await CalendarRepository().getCalendars();
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
-      var id = event.eventId!;
+      var eventId = event.eventId!;
       var editing = false;
       var head = '${DateFormat.jm('ja').format(event.start!)}\n'
           '${DateFormat.jm('ja').format(event.end!)}';
@@ -671,8 +694,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var fontColor = calendar.isDefault! ? Colors.black
           : const Color(0xffaaaaaa);
 
-      state.eventList.add(EventDisplay(id: id, editing: editing,
-          readOnly: calendar.isReadOnly!,
+      state.eventList.add(EventDisplay(eventId: eventId,
+          calendarId: calendar.id!,
+          editing: editing, readOnly: calendar.isReadOnly!,
           head: head, lineColor: lineColor, title: title,
           fontColor: fontColor
       ));
@@ -726,6 +750,35 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   updateState() async {
     state = CalendarPageState.copy(state);
     debugPrint('updateState!!');
+  }
+
+  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
+    final context = useContext();
+    final isMounted = useIsMounted();
+    return (event) async {
+      var result = await CommonUtils().showMessageDialog(context, '削除',
+          'イベントを削除しますか?', 'はい', 'いいえ');
+      if (result != 'positive') {
+        return;
+      }
+
+      if (!await CalendarRepository().deleteEvent(
+          event.calendarId, event.eventId)) {
+        if (!isMounted()) return;
+        // ignore: use_build_context_synchronously
+        await CommonUtils().showMessageDialog(context, '削除',
+            '削除に失敗しました');
+        return;
+      }
+
+      await updateCalendar();
+      await updateEventList();
+      await updateState();
+
+      if (!isMounted()) return;
+      // ignore: use_build_context_synchronously
+      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
+    };
   }
 }
 
