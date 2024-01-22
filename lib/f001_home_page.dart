@@ -18,6 +18,8 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
+        homeState.homePageIndex).notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -115,8 +117,8 @@ class HomePage extends HookConsumerWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: FloatingActionButton(
           heroTag: "calendar_hero_tag",
-          onPressed: () {
-            //homePageScaffoldKey.currentState!.openEndDrawer();
+          onPressed: () async {
+            await calendarNotifier.onPressedAddingButton();
           },
           child: Consumer(
               builder: ((context, ref, child) {

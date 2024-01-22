@@ -425,15 +425,7 @@ class MonthPart extends HookConsumerWidget {
                 isHighlightedWeek: calendarState.dayPartIndex
                     ~/ weekdayPartColumnNum == rowIndex,
                 onTapDown: (int i) async {
-                  // 選択中のセル
-                  if (calendarState.dayPartIndex == i) {
-                  }
-
-                  await calendarNotifier.selectDay(index: i);
-                  await calendarNotifier.updateWeekCalendarData();
-                  await calendarNotifier.initSelectionWeekCalendar();
-                  await calendarNotifier.updateSelectionDayOfHome();
-                  await calendarNotifier.updateState();
+                  await calendarNotifier.onTapDownCalendarDay(i);
                 },
                 onTapUp: (int i) async {
                 },
@@ -732,7 +724,7 @@ class EventPart extends HookConsumerWidget {
                       )
                   )
                 ),
-              if (event != null && event!.editing)
+              if (event != null && event!.editing && !event!.sameCell)
                 TextButton(
                   onPressed: () {
                   },
@@ -742,6 +734,21 @@ class EventPart extends HookConsumerWidget {
                     minimumSize: const Size(52, 32),
                   ),
                   child: const Text('移動',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
+                ),
+              if (event != null && event!.editing && event!.sameCell)
+                TextButton(
+                  onPressed: () {
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('コピー',
                       style: TextStyle(
                           fontSize: 13
                       )
@@ -925,13 +932,7 @@ class HoursPart extends HookConsumerWidget {
                   || calendarState.hourPartIndex
                         ~/ hoursPartRowNum == rowIndex,
                 onTapDown: (int i) async {
-                  // 選択中のセル
-                  if (calendarState.hourPartIndex == i) {
-                  }
-
-                  await calendarNotifier.selectHour(index: i);
-                  await calendarNotifier.updateSelectionDayOfHome();
-                  await calendarNotifier.updateState();
+                  await calendarNotifier.onTapDownCalendarHour(i);
                 },
                 onTapUp: (int i) async {
                 },

@@ -57,6 +57,7 @@ class CalendarPageState {
   String eventListTitle = '';
   List<EventDisplay> eventList = [];
   int? eventListIndex;
+  List<EventDisplay> editingEventList = [];
 
   static CalendarPageState copy(CalendarPageState state) {
     var nState = CalendarPageState();
@@ -97,6 +98,7 @@ class CalendarPageState {
     nState.eventListTitle = state.eventListTitle;
     nState.eventList = state.eventList;
     nState.eventListIndex = state.eventListIndex;
+    nState.editingEventList = state.editingEventList;
 
     return nState;
   }
@@ -107,6 +109,7 @@ class EventDisplay {
   String eventId;
   String calendarId;
   bool editing;
+  bool sameCell;
   bool readOnly;
   String head;
   Color lineColor;
@@ -117,6 +120,7 @@ class EventDisplay {
     required this.eventId,
     required this.calendarId,
     required this.editing,
+    required this.sameCell,
     required this.readOnly,
     required this.head,
     required this.lineColor,
@@ -290,6 +294,35 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Month Calendar
 
+  onTapDownCalendarDay(int index) async {
+    // 選択中のセル
+    if (state.dayPartIndex == index) {
+    }
+
+    await selectDay(index: index);
+    await updateWeekCalendarData();
+    await initSelectionWeekCalendar();
+    await updateSelectionDayOfHome();
+    await updateState();
+  }
+
+  onCalendarPageChanged(int monthIndex) async {
+    int addingMonth = monthIndex - CalendarPageState.pseudoUnlimitedCenterIndex
+        + state.indexAddingMonth;
+    state.preAddingMonth = addingMonth;
+    if (state.addingMonth == addingMonth) {
+      return;
+    }
+    debugPrint('onCalendarPageChanged addingMonth=$addingMonth');
+    state.addingMonth = addingMonth;
+
+    await updateCalendar();
+    await selectDay();
+    await initSelectionWeekCalendar();
+    await updateSelectionDayOfHome();
+    await updateState();
+  }
+
   initSelectionWeekCalendar() async {
     // Data-Week Calendar
     state.selectionAllDay = false;
@@ -317,23 +350,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         }
       }
     }
-  }
-
-  onCalendarPageChanged(int monthIndex) async {
-    int addingMonth = monthIndex - CalendarPageState.pseudoUnlimitedCenterIndex
-      + state.indexAddingMonth;
-    state.preAddingMonth = addingMonth;
-    if (state.addingMonth == addingMonth) {
-      return;
-    }
-    debugPrint('onCalendarPageChanged addingMonth=$addingMonth');
-    state.addingMonth = addingMonth;
-
-    await updateCalendar();
-    await selectDay();
-    await initSelectionWeekCalendar();
-    await updateSelectionDayOfHome();
-    await updateState();
   }
 
   updateCalendar() async {
@@ -467,6 +483,16 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   // Week Calendar
+
+  onTapDownCalendarHour(int index) async {
+    // 選択中のセル
+    if (state.hourPartIndex == index) {
+    }
+
+    await selectHour(index: index);
+    await updateSelectionDayOfHome();
+    await updateState();
+  }
 
   updateWeekCalendarData() async {
     state.dayAndWeekdayList = createDayAndWeekdayList(state.selectionDate);
@@ -650,6 +676,35 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Event List
 
+  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
+    final context = useContext();
+    final isMounted = useIsMounted();
+    return (event) async {
+      var result = await CommonUtils().showMessageDialog(context, '削除',
+          'イベントを削除しますか?', 'はい', 'いいえ');
+      if (result != 'positive') {
+        return;
+      }
+
+      if (!await CalendarRepository().deleteEvent(
+          event.calendarId, event.eventId)) {
+        if (!isMounted()) return;
+        // ignore: use_build_context_synchronously
+        await CommonUtils().showMessageDialog(context, '削除',
+            '削除に失敗しました');
+        return;
+      }
+
+      await updateCalendar();
+      await updateEventList();
+      await updateState();
+
+      if (!isMounted()) return;
+      // ignore: use_build_context_synchronously
+      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
+    };
+  }
+
   updateEventList() async {
     if (state.calendarSwitchingIndex == 0) {
       state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
@@ -672,14 +727,16 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
     }
 
-    state.eventList = [];
+    List<EventDisplay> creatingEventList = [];
     for (int i = 0; i < eventList.length; i++) {
       var event = eventList[i];
       var calendars = await CalendarRepository().getCalendars();
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
       var eventId = event.eventId!;
-      var editing = false;
+      var editing = state.editingEventList
+          .where((editingEvent) => editingEvent.eventId == event.eventId)
+          .firstOrNull != null;
       var head = '${DateFormat.jm('ja').format(event.start!)}\n'
           '${DateFormat.jm('ja').format(event.end!)}';
       if (event.start!.year != event.end!.year
@@ -694,13 +751,20 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var fontColor = calendar.isDefault! ? Colors.black
           : const Color(0xffaaaaaa);
 
-      state.eventList.add(EventDisplay(eventId: eventId,
-          calendarId: calendar.id!,
-          editing: editing, readOnly: calendar.isReadOnly!,
+      creatingEventList.add(EventDisplay(eventId: eventId,
+          calendarId: calendar.id!, editing: editing,
+          sameCell: true, readOnly: calendar.isReadOnly!,
           head: head, lineColor: lineColor, title: title,
           fontColor: fontColor
       ));
     }
+
+    var otherEventList = state.editingEventList
+      .where((event) => creatingEventList
+        .where((ce) => ce.eventId == event.eventId)
+        .firstOrNull == null);
+
+    state.eventList = [...otherEventList, ...creatingEventList];
   }
 
   selectEventListPart(int index) async {
@@ -710,6 +774,26 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   // Common
+
+  onPressedAddingButton() async {
+    if (!state.cellActive) {
+      var event = state.eventList[state.eventListIndex!];
+      if (event.readOnly) {
+        return;
+      }
+      event.editing = true;
+      event.sameCell = true;
+      state.editingEventList.add(
+          EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
+              editing: event.editing, sameCell: false,
+              readOnly: event.readOnly, head: event.head,
+              lineColor: event.lineColor, title: event.title,
+              fontColor: event.fontColor)
+      );
+
+      updateState();
+    }
+  }
 
   Future<List<Calendar>> getCalendars() async {
     List<Calendar> calendars = [];
@@ -750,35 +834,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   updateState() async {
     state = CalendarPageState.copy(state);
     debugPrint('updateState!!');
-  }
-
-  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
-    final context = useContext();
-    final isMounted = useIsMounted();
-    return (event) async {
-      var result = await CommonUtils().showMessageDialog(context, '削除',
-          'イベントを削除しますか?', 'はい', 'いいえ');
-      if (result != 'positive') {
-        return;
-      }
-
-      if (!await CalendarRepository().deleteEvent(
-          event.calendarId, event.eventId)) {
-        if (!isMounted()) return;
-        // ignore: use_build_context_synchronously
-        await CommonUtils().showMessageDialog(context, '削除',
-            '削除に失敗しました');
-        return;
-      }
-
-      await updateCalendar();
-      await updateEventList();
-      await updateState();
-
-      if (!isMounted()) return;
-      // ignore: use_build_context_synchronously
-      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
-    };
   }
 }
 
