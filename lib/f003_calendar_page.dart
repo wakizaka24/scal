@@ -256,7 +256,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                     textStyle: const TextStyle(fontSize: 13),
                     padding: const EdgeInsets.all(0),
                   ),
-                  child: const Text('週')
+                  child: const Text('Weekly')
               )),
               Container(width: 80)
             ])
