@@ -689,24 +689,46 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Event List
 
-  onPressedEventListCancelButton(int index) async {
-    await editingCancel(index);
+  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
+    final context = useContext();
+    final isMounted = useIsMounted();
+    return (event) async {
+      var result = await CommonUtils().showMessageDialog(context, '削除',
+          'イベントを削除しますか?', 'はい', 'いいえ');
+      if (result != 'positive') {
+        return;
+      }
 
-    await updateEventList();
-    await updateState();
+      if (!await calendarRepo.deleteEvent(event.calendarId, event.eventId)) {
+        if (!isMounted()) return;
+        // ignore: use_build_context_synchronously
+        await CommonUtils().showMessageDialog(context, '削除',
+            '削除に失敗しました');
+        return;
+      }
+
+      await updateCalendar();
+      await updateEventList();
+      await updateState();
+
+      if (!isMounted()) return;
+      // ignore: use_build_context_synchronously
+      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
+    };
   }
 
-  editingCancel(int index) async {
+  onPressedEventListFixedButton(int index) async {
     var event = state.eventList[index];
-    int removeIdx = -1;
-    for (int i=0; i < state.editingEventList.length; i++) {
-      if (state.editingEventList[i].eventId == event.eventId) {
-        removeIdx = i;
-        break;
-      }
-    }
+    event.editing = true;
+    event.sameCell = true;
+    state.editingEventList.add(
+        EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
+            editing: true, sameCell: false, readOnly: event.readOnly,
+            head: event.head, lineColor: event.lineColor, title: event.title,
+            fontColor: event.fontColor)
+    );
 
-    state.editingEventList.removeAt(removeIdx);
+    await updateState();
   }
 
   Future<void> Function(int index) useEventCopingDriving() {
@@ -757,49 +779,41 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   Event copyEvent(Event event) {
     return Event(
-      event.calendarId,
-      eventId: null,
-      title: event.title,
-      start: event.start,
-      end: event.end,
-      description: event.description,
-      attendees: event.attendees,
-      recurrenceRule: event.recurrenceRule,
-      reminders: event.reminders,
-      availability: event.availability,
-      location: event.location,
-      url: event.url,
-      allDay: event.allDay,
-      status: event.status
+        event.calendarId,
+        eventId: null,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        description: event.description,
+        attendees: event.attendees,
+        recurrenceRule: event.recurrenceRule,
+        reminders: event.reminders,
+        availability: event.availability,
+        location: event.location,
+        url: event.url,
+        allDay: event.allDay,
+        status: event.status
     );
   }
 
-  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
-    final context = useContext();
-    final isMounted = useIsMounted();
-    return (event) async {
-      var result = await CommonUtils().showMessageDialog(context, '削除',
-          'イベントを削除しますか?', 'はい', 'いいえ');
-      if (result != 'positive') {
-        return;
+  onPressedEventListCancelButton(int index) async {
+    await editingCancel(index);
+
+    await updateEventList();
+    await updateState();
+  }
+
+  editingCancel(int index) async {
+    var event = state.eventList[index];
+    int removeIdx = -1;
+    for (int i=0; i < state.editingEventList.length; i++) {
+      if (state.editingEventList[i].eventId == event.eventId) {
+        removeIdx = i;
+        break;
       }
+    }
 
-      if (!await calendarRepo.deleteEvent(event.calendarId, event.eventId)) {
-        if (!isMounted()) return;
-        // ignore: use_build_context_synchronously
-        await CommonUtils().showMessageDialog(context, '削除',
-            '削除に失敗しました');
-        return;
-      }
-
-      await updateCalendar();
-      await updateEventList();
-      await updateState();
-
-      if (!isMounted()) return;
-      // ignore: use_build_context_synchronously
-      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
-    };
+    state.editingEventList.removeAt(removeIdx);
   }
 
   updateEventList() async {
@@ -873,36 +887,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Common
 
   onPressedAddingButton() async {
-    if (state.eventList.isEmpty) {
-      return;
-    }
-
-    if (!state.cellActive) {
-      var event = state.eventList[state.eventListIndex!];
-      if (event.readOnly) {
-        return;
-      }
-
-      var find = state.editingEventList.where((e2) => e2.eventId == event
-          .eventId).firstOrNull != null;
-      if (find) {
-        await editingCancel(state.eventListIndex!);
-
-        await updateEventList();
-        await updateState();
-      } else {
-        event.editing = true;
-        event.sameCell = true;
-        state.editingEventList.add(
-            EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
-                editing: true, sameCell: false, readOnly: event.readOnly,
-                head: event.head, lineColor: event.lineColor, title: event.title,
-                fontColor: event.fontColor)
-        );
-
-        await updateState();
-      }
-    }
+    // if (state.cellActive) {
+    // } else if (state.eventList.isEmpty) {
+    // } else {
+    //   var event = state.eventList[state.eventListIndex!];
+    // }
   }
 
   Future<List<Calendar>> getCalendars() async {

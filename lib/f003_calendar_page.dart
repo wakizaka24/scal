@@ -790,16 +790,17 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
-              if (event != null && !event!.editing)
+              if (event != null && !event!.editing && !event!.readOnly)
                 TextButton(
                   onPressed: () async {
+                    await calendarNotifier.onPressedEventListFixedButton(index);
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
                     padding: const EdgeInsets.all(0),
                     minimumSize: const Size(52, 32),
                   ),
-                  child: const Text('詳細',
+                  child: const Text('固定',
                       style: TextStyle(
                           fontSize: 13
                       )
