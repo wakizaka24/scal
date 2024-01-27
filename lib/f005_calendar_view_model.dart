@@ -717,6 +717,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     };
   }
 
+  Future<bool> deleteEvent(EventDisplay event) async {
+    return await CalendarRepository().deleteEvent(event.calendarId,
+        event.eventId);
+  }
+
   onPressedEventListFixedButton(int index) async {
     var event = state.eventList[index];
     event.editing = true;
@@ -731,50 +736,32 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateState();
   }
 
-  Future<void> Function(int index) useEventCopingDriving() {
-    final context = useContext();
-    return (index) async {
-      var eventId = state.eventList[index].eventId;
-      Event event = state.eventIdEventMap[eventId]!;
-      var editingEvent = copyEvent(event);
-      if (!await calendarRepo.createOrUpdateEvent(editingEvent)) {
-        // ignore: use_build_context_synchronously
-        await CommonUtils().showMessageDialog(context, 'コピー',
-            'コピーに失敗しました');
-      }
-
-      await updateCalendar();
-      await updateEventList();
-      await updateState();
-    };
+  Future<bool> copyIndexEvent(int index) async {
+    var eventId = state.eventList[index].eventId;
+    Event event = state.eventIdEventMap[eventId]!;
+    var editingEvent = copyEvent(event);
+    return await calendarRepo.createOrUpdateEvent(editingEvent);
   }
 
-  Future<void> Function(int index) useEventMovingDriving() {
-    final context = useContext();
-    return (index) async {
-      var eventId = state.eventList[index].eventId;
-      Event event = state.eventIdEventMap[eventId]!;
+  Future<bool> moveIndexEvent(int index) async {
+    var eventId = state.eventList[index].eventId;
+    Event event = state.eventIdEventMap[eventId]!;
 
-      var period = event.end!.difference(event.start!);
-      if (state.calendarSwitchingIndex == 1) {
-        event.allDay = state.selectionAllDay;
-      }
-      event.start = calendarRepo.convertTZDateTime(state.selectionDate);
-      event.end = calendarRepo.convertTZDateTime(
-          state.selectionDate.add(period));
+    var period = event.end!.difference(event.start!);
 
-      if (!await calendarRepo.createOrUpdateEvent(event)) {
-        // ignore: use_build_context_synchronously
-        await CommonUtils().showMessageDialog(context, '移動',
-            '移動に失敗しました');
-      } else {
-        await editingCancel(index);
-      }
+    if (state.calendarSwitchingIndex == 0) {
+      state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
+    } else {
+      state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
+      state.selectionDate = state.hours[state.hourPartIndex].id;
+      event.allDay = state.selectionAllDay;
+    }
 
-      await updateCalendar();
-      await updateEventList();
-      await updateState();
-    };
+    event.start = calendarRepo.convertTZDateTime(state.selectionDate);
+    event.end = calendarRepo.convertTZDateTime(
+        state.selectionDate.add(period));
+
+    return await calendarRepo.createOrUpdateEvent(event);
   }
 
   Event copyEvent(Event event) {

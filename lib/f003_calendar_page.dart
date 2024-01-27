@@ -5,6 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
+import 'f008_calendar_repository.dart';
+import 'f013_common_utils.dart';
 
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
@@ -654,9 +656,6 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
-    final eventDeletionDriving = calendarNotifier.useEventDeletionDriving();
-    final eventCopingDriving = calendarNotifier.useEventCopingDriving();
-    final eventMovingDriving = calendarNotifier.useEventMovingDriving();
 
     return SelectableCalendarCell(
         height: 45,
@@ -728,7 +727,15 @@ class EventPart extends HookConsumerWidget {
               if (event != null && event!.editing && event!.sameCell)
                 TextButton(
                   onPressed: () async {
-                    await eventCopingDriving(index);
+                    if (!await calendarNotifier.copyIndexEvent(index)) {
+                      // ignore: use_build_context_synchronously
+                      await CommonUtils().showMessageDialog(context, 'コピー',
+                          'コピーに失敗しました');
+                    }
+
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateEventList();
+                    await calendarNotifier.updateState();
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
@@ -744,7 +751,17 @@ class EventPart extends HookConsumerWidget {
               if (event != null && event!.editing && !event!.sameCell)
                 TextButton(
                   onPressed: () async {
-                    await eventMovingDriving(index);
+                    if (!await calendarNotifier.moveIndexEvent(index)) {
+                      // ignore: use_build_context_synchronously
+                      await CommonUtils().showMessageDialog(context, '移動',
+                          '移動に失敗しました');
+                    } else {
+                      await calendarNotifier.editingCancel(index);
+                    }
+
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateEventList();
+                    await calendarNotifier.updateState();
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
@@ -777,7 +794,26 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 TextButton(
                   onPressed: () async {
-                    await eventDeletionDriving(event!);
+                    var result = await CommonUtils().showMessageDialog(
+                        context, '削除', 'イベントを削除しますか?', 'はい', 'いいえ');
+                    if (result != 'positive') {
+                      return;
+                    }
+
+                    if (!await calendarNotifier.deleteEvent(event!)) {
+                      // ignore: use_build_context_synchronously
+                      await CommonUtils().showMessageDialog(context, '削除',
+                          '削除に失敗しました');
+                      return;
+                    }
+
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateEventList();
+                    await calendarNotifier.updateState();
+
+                    // ignore: use_build_context_synchronously
+                    await CommonUtils().showMessageDialog(
+                        context, '削除', '削除しました');
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
