@@ -234,7 +234,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
             const Spacer(),
             Row(children:[const Spacer(),
               SafeArea(child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final calendarState = ref.watch(
                         calendarPageNotifierProvider(homeState.homePageIndex));
                     double prePage = calendarState.calendarSwitchingController
@@ -243,9 +243,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                     int page = prePage.toInt();
                     if (page.toDouble() == prePage) {
                       page = page == 0 ? 1: 0;
-                      calendarState.calendarSwitchingController.animateToPage(
-                          page, duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeIn);
+                      await calendarState.calendarSwitchingController
+                          .animateToPage(page, duration: const Duration(
+                          milliseconds: 300), curve: Curves.easeIn);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -655,6 +655,8 @@ class EventPart extends HookConsumerWidget {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
     final eventDeletionDriving = calendarNotifier.useEventDeletionDriving();
+    final eventCopingDriving = calendarNotifier.useEventCopingDriving();
+    final eventMovingDriving = calendarNotifier.useEventMovingDriving();
 
     return SelectableCalendarCell(
         height: 45,
@@ -724,24 +726,10 @@ class EventPart extends HookConsumerWidget {
                       )
                   )
                 ),
-              if (event != null && event!.editing && !event!.sameCell)
-                TextButton(
-                  onPressed: () {
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('移動',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
-                ),
               if (event != null && event!.editing && event!.sameCell)
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await eventCopingDriving(index);
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
@@ -754,9 +742,27 @@ class EventPart extends HookConsumerWidget {
                       )
                   ),
                 ),
+              if (event != null && event!.editing && !event!.sameCell)
+                TextButton(
+                  onPressed: () async {
+                    await eventMovingDriving(index);
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 15),
+                    padding: const EdgeInsets.all(0),
+                    minimumSize: const Size(52, 32),
+                  ),
+                  child: const Text('移動',
+                      style: TextStyle(
+                          fontSize: 13
+                      )
+                  ),
+                ),
               if (event != null && event!.editing)
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await calendarNotifier
+                        .onPressedEventListCancelButton(index);
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
@@ -787,7 +793,7 @@ class EventPart extends HookConsumerWidget {
                 ),
               if (event != null && !event!.editing)
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),

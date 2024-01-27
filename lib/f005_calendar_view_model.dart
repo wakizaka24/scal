@@ -28,6 +28,7 @@ class CalendarPageState {
   late DateTime now;
   Map<String, Calendar> calendarMap = {};
   List<Event> calendarEvents = [];
+  Map<String, Event> eventIdEventMap = {};
   bool cellActive = true;
   late DateTime selectionDate;
   int calendarSwitchingIndex = 0;
@@ -38,7 +39,7 @@ class CalendarPageState {
   int addingMonth = 0;
   int preAddingMonth = 0;
   int indexAddingMonth = 0;
-  Map<DateTime, List<Event>> allEventsMap = {};
+  Map<DateTime, List<Event>> dayEventsMap = {};
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
   int dayPartIndex = 0;
@@ -73,6 +74,7 @@ class CalendarPageState {
     nState.now = state.now;
     nState.calendarMap = state.calendarMap;
     nState.calendarEvents = state.calendarEvents;
+    nState.eventIdEventMap = state.eventIdEventMap;
     nState.cellActive = state.cellActive;
     nState.selectionDate = state.selectionDate;
     nState.calendarSwitchingIndex = state.calendarSwitchingIndex;
@@ -82,12 +84,13 @@ class CalendarPageState {
     nState.addingMonth = state.addingMonth;
     nState.preAddingMonth = state.preAddingMonth;
     nState.indexAddingMonth = state.indexAddingMonth;
-    nState.allEventsMap = state.allEventsMap;
+    nState.dayEventsMap = state.dayEventsMap;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
     nState.dayPartIndex = state.dayPartIndex;
 
     // Data-Week Calendar
+    nState.selectionAllDay = state.selectionAllDay;
     nState.allDayEventsMap = state.allDayEventsMap;
     nState.hourEventsMap = state.hourEventsMap;
     nState.dayAndWeekdayList = state.dayAndWeekdayList;
@@ -219,6 +222,7 @@ class HourEventDisplay {
 
 class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   final Ref ref;
+  CalendarRepository calendarRepo = CalendarRepository();
 
   CalendarPageNotifier(this.ref, CalendarPageState state)
       : super(state);
@@ -257,7 +261,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     selectDayPartIndex(now);
 
     await updateSelectionDayOfHome();
-    await setDayEventList(state.selectionDate, state.allEventsMap);
+    await setDayEventList(state.selectionDate, state.dayEventsMap);
     await updateWeekCalendarData();
     await initSelectionWeekCalendar();
 
@@ -368,9 +372,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var endDate = state.dayLists.last.last.id;
     state.calendarEvents = await getEvents(calendars, startDate,
         endDate);
-    state.allEventsMap = createAllEventsMap(state.calendarEvents);
+    state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
+    state.dayEventsMap = createDayEventsMap(state.calendarEvents);
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
-        state.allEventsMap, state.calendarMap);
+        state.dayEventsMap, state.calendarMap);
   }
 
   setDayEventList(DateTime date, Map<DateTime, List<Event>> eventsMap) async {
@@ -429,20 +434,28 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return list;
   }
 
-  Map<DateTime, List<Event>> createAllEventsMap(List<Event> events) {
-    Map<DateTime, List<Event>> eventsMap = {};
-    if (events.isNotEmpty) {
-      for (int i = 0; i < events.length; i++) {
-        var event = events[i];
-        var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
-        allDays.fold(eventsMap, (events, day) {
-          events[day] = events[day] ?? [];
-          events[day]!.add(event);
-          return events;
-        });
-      }
-      // debugPrint('日付ごとのイベント数 ${eventsMap.length}');
+  Map<String, Event> createEventIdEventMap(List<Event> events) {
+    Map<String, Event> eventsMap = {};
+    for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+      eventsMap[event.eventId!] = event;
     }
+    return eventsMap;
+  }
+
+  Map<DateTime, List<Event>> createDayEventsMap(List<Event> events) {
+    Map<DateTime, List<Event>> eventsMap = {};
+    for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+      var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
+      allDays.fold(eventsMap, (events, day) {
+        events[day] = events[day] ?? [];
+        events[day]!.add(event);
+        return events;
+      });
+    }
+    // debugPrint('日付ごとのイベント数 ${eventsMap.length}');
+
     return eventsMap;
   }
 
@@ -479,7 +492,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
-    await setDayEventList(state.selectionDate, state.allEventsMap);
+    await setDayEventList(state.selectionDate, state.dayEventsMap);
   }
 
   // Week Calendar
@@ -676,6 +689,91 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Event List
 
+  onPressedEventListCancelButton(int index) async {
+    await editingCancel(index);
+  }
+
+  editingCancel(int index) async {
+    var event = state.eventList[index];
+    int removeIdx = -1;
+    for (int i=0; i < state.editingEventList.length; i++) {
+      if (state.editingEventList[i].eventId == event.eventId) {
+        removeIdx = i;
+        break;
+      }
+    }
+
+    state.editingEventList.removeAt(removeIdx);
+
+    await updateEventList();
+    await updateState();
+  }
+
+  Future<void> Function(int index) useEventCopingDriving() {
+    final context = useContext();
+    return (index) async {
+      var eventId = state.eventList[index].eventId;
+      Event event = state.eventIdEventMap[eventId]!;
+      var editingEvent = copyEvent(event);
+      if (!await calendarRepo.createOrUpdateEvent(editingEvent)) {
+        // ignore: use_build_context_synchronously
+        await CommonUtils().showMessageDialog(context, 'コピー',
+            'コピーに失敗しました');
+      }
+
+      await updateCalendar();
+      await updateEventList();
+      await updateState();
+    };
+  }
+
+  Future<void> Function(int index) useEventMovingDriving() {
+    final context = useContext();
+    return (index) async {
+      var eventId = state.eventList[index].eventId;
+      Event event = state.eventIdEventMap[eventId]!;
+      var period = event.end!.difference(event.start!);
+
+      if (state.calendarSwitchingIndex == 1) {
+        event.allDay = state.selectionAllDay;
+      }
+      event.start = calendarRepo.convertTZDateTime(state.selectionDate);
+      event.end = calendarRepo.convertTZDateTime(
+          state.selectionDate.add(period));
+
+      if (!await calendarRepo.createOrUpdateEvent(event)) {
+        // ignore: use_build_context_synchronously
+        await CommonUtils().showMessageDialog(context, '移動',
+            '移動に失敗しました');
+      } else {
+        await editingCancel(index);
+      }
+
+      await updateCalendar();
+      await updateEventList();
+      await updateState();
+    };
+  }
+
+  Event copyEvent(Event event) {
+    return Event(
+      event.calendarId,
+      eventId: null,
+      title: event.title,
+      start: event.start,
+      end: event.end,
+      description: event.description,
+      attendees: event.attendees,
+      recurrenceRule: event.recurrenceRule,
+      reminders: event.reminders,
+      availability: event.availability,
+      location: event.location,
+      url: event.url,
+      allDay: event.allDay,
+      status: event.status
+    );
+  }
+
   Future<void> Function(EventDisplay event) useEventDeletionDriving() {
     final context = useContext();
     final isMounted = useIsMounted();
@@ -686,8 +784,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         return;
       }
 
-      if (!await CalendarRepository().deleteEvent(
-          event.calendarId, event.eventId)) {
+      if (!await calendarRepo.deleteEvent(event.calendarId, event.eventId)) {
         if (!isMounted()) return;
         // ignore: use_build_context_synchronously
         await CommonUtils().showMessageDialog(context, '削除',
@@ -708,7 +805,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   updateEventList() async {
     if (state.calendarSwitchingIndex == 0) {
       state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
-      await setDayEventList(state.selectionDate, state.allEventsMap);
+      await setDayEventList(state.selectionDate, state.dayEventsMap);
     } else {
       state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
       state.selectionDate = state.hours[state.hourPartIndex].id;
@@ -730,7 +827,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     List<EventDisplay> creatingEventList = [];
     for (int i = 0; i < eventList.length; i++) {
       var event = eventList[i];
-      var calendars = await CalendarRepository().getCalendars();
+      var calendars = await calendarRepo.getCalendars();
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
       var eventId = event.eventId!;
@@ -776,29 +873,39 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Common
 
   onPressedAddingButton() async {
+    if (state.eventList.isEmpty) {
+      return;
+    }
+
     if (!state.cellActive) {
       var event = state.eventList[state.eventListIndex!];
       if (event.readOnly) {
         return;
       }
-      event.editing = true;
-      event.sameCell = true;
-      state.editingEventList.add(
-          EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
-              editing: event.editing, sameCell: false,
-              readOnly: event.readOnly, head: event.head,
-              lineColor: event.lineColor, title: event.title,
-              fontColor: event.fontColor)
-      );
 
-      updateState();
+      var find = state.editingEventList.where((e2) => e2.eventId == event
+          .eventId).firstOrNull != null;
+      if (find) {
+        await editingCancel(state.eventListIndex!);
+      } else {
+        event.editing = true;
+        event.sameCell = true;
+        state.editingEventList.add(
+            EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
+                editing: true, sameCell: false, readOnly: event.readOnly,
+                head: event.head, lineColor: event.lineColor, title: event.title,
+                fontColor: event.fontColor)
+        );
+
+        await updateState();
+      }
     }
   }
 
   Future<List<Calendar>> getCalendars() async {
     List<Calendar> calendars = [];
-    if (await CalendarRepository().hasPermissions()) {
-      calendars = await CalendarRepository().getCalendars();
+    if (await calendarRepo.hasPermissions()) {
+      calendars = await calendarRepo.getCalendars();
       // debugPrint('カレンダー数 ${calendars.length}');
     }
     return calendars;
@@ -819,8 +926,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (calendars.isNotEmpty) {
       for (int i = 0; i < calendars.length; i++) {
         var calendar = calendars[i];
-        events.addAll(await CalendarRepository()
-            .getEvents(calendar.id!, startDate, endDate));
+        events.addAll(await calendarRepo.getEvents(calendar.id!,
+            startDate, endDate));
       }
     }
     return events;

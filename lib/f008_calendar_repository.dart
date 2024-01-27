@@ -76,10 +76,10 @@ class CalendarRepository {
 
       // ロケーションを日時に適用する。
       if (event.start != null) {
-        event.start = TZDateTime.from(event.start!, _location);
+        event.start = convertTZDateTime(event.start!);
       }
       if (events[i].end != null) {
-        event.end = TZDateTime.from(event.end!, _location);
+        event.end = convertTZDateTime(event.end!);
       }
 
       // if (i == 0) {
@@ -101,6 +101,15 @@ class CalendarRepository {
     }
 
     return events;
+  }
+
+  TZDateTime convertTZDateTime(date) {
+    return TZDateTime.from(date, _location);
+  }
+
+  Future<bool> createOrUpdateEvent(Event event) async {
+    var result = await _plugin.createOrUpdateEvent(event);
+    return result?.isSuccess ?? false;
   }
 
   Future<bool> deleteEvent(String calendarId, String eventId) async {
