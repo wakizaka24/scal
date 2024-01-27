@@ -713,8 +713,7 @@ class EventPart extends HookConsumerWidget {
               if (event != null)
                 Expanded(child:
                   Container(
-                      padding: const EdgeInsets
-                          .symmetric(horizontal: 4,
+                      padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
                       child: Text(event!.title, maxLines: 2,
                         style: TextStyle(

@@ -691,6 +691,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   onPressedEventListCancelButton(int index) async {
     await editingCancel(index);
+
+    await updateEventList();
+    await updateState();
   }
 
   editingCancel(int index) async {
@@ -704,9 +707,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     state.editingEventList.removeAt(removeIdx);
-
-    await updateEventList();
-    await updateState();
   }
 
   Future<void> Function(int index) useEventCopingDriving() {
@@ -732,8 +732,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return (index) async {
       var eventId = state.eventList[index].eventId;
       Event event = state.eventIdEventMap[eventId]!;
-      var period = event.end!.difference(event.start!);
 
+      var period = event.end!.difference(event.start!);
       if (state.calendarSwitchingIndex == 1) {
         event.allDay = state.selectionAllDay;
       }
@@ -887,6 +887,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           .eventId).firstOrNull != null;
       if (find) {
         await editingCancel(state.eventListIndex!);
+
+        await updateEventList();
+        await updateState();
       } else {
         event.editing = true;
         event.sameCell = true;
