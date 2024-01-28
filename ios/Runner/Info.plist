@@ -44,5 +44,7 @@
 	<string>false</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>カレンダーの表示と編集を行うためカレンダー機能にアクセスします。</string>
 </dict>
 </plist>
