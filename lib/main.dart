@@ -35,8 +35,17 @@ class SCalApp extends StatelessWidget {
             Locale('ja'),
           ],
           theme: ThemeData(
-            primarySwatch: Colors.green,
-          ),
+            useMaterial3: false,
+            primarySwatch: Colors.blue,
+          )
+          /*ThemeData.light().copyWith(
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.greenAccent,
+              // shadowColor: Colors.greenAccent,
+            ),
+            scaffoldBackgroundColor: Colors.white,
+          )*/,
           title: 'SCal',
           home: const HomePage(),
       )

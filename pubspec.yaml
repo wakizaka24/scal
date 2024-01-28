@@ -41,7 +41,7 @@ dependencies:
     sdk: flutter
   # ローカライゼーション
   intl: ^0.18.1
-  # 変数保存
+  # データ保存
   shared_preferences: ^2.2.2
   # WidgetとStateNotifierの分離
   hooks_riverpod: ^2.4.9
