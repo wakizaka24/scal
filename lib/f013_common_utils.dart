@@ -23,7 +23,9 @@ class CommonUtils {
                   visible: negativeTitle != null,
                   child: ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context, 'negative');
+                      if (context.mounted) {
+                        Navigator.pop(context, 'negative');
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: const TextStyle(fontSize: 13),
@@ -34,7 +36,9 @@ class CommonUtils {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context, 'positive');
+                      if (context.mounted) {
+                        Navigator.pop(context, 'positive');
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: const TextStyle(fontSize: 13),

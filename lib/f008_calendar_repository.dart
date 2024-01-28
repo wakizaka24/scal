@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:device_calendar/device_calendar.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 class CalendarRepository {

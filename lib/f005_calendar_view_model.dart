@@ -1,13 +1,10 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
-import 'f013_common_utils.dart';
 import 'f015_calendar_date_utils.dart';
 
 class CalendarPageState {
@@ -438,7 +435,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     Map<String, Event> eventsMap = {};
     for (int i = 0; i < events.length; i++) {
       var event = events[i];
-      eventsMap[event.eventId!] = event;
+      if (eventsMap[event.eventId!] == null) {
+        eventsMap[event.eventId!] = event;
+      }
     }
     return eventsMap;
   }
@@ -689,34 +688,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Event List
 
-  Future<void> Function(EventDisplay event) useEventDeletionDriving() {
-    final context = useContext();
-    final isMounted = useIsMounted();
-    return (event) async {
-      var result = await CommonUtils().showMessageDialog(context, '削除',
-          'イベントを削除しますか?', 'はい', 'いいえ');
-      if (result != 'positive') {
-        return;
-      }
-
-      if (!await calendarRepo.deleteEvent(event.calendarId, event.eventId)) {
-        if (!isMounted()) return;
-        // ignore: use_build_context_synchronously
-        await CommonUtils().showMessageDialog(context, '削除',
-            '削除に失敗しました');
-        return;
-      }
-
-      await updateCalendar();
-      await updateEventList();
-      await updateState();
-
-      if (!isMounted()) return;
-      // ignore: use_build_context_synchronously
-      await CommonUtils().showMessageDialog(context, '削除', '削除しました');
-    };
-  }
-
   Future<bool> deleteEvent(EventDisplay event) async {
     return await CalendarRepository().deleteEvent(event.calendarId,
         event.eventId);
@@ -739,6 +710,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   Future<bool> copyIndexEvent(int index) async {
     var eventId = state.eventList[index].eventId;
     Event event = state.eventIdEventMap[eventId]!;
+
     var editingEvent = copyEvent(event);
     return await calendarRepo.createOrUpdateEvent(editingEvent);
   }
@@ -747,7 +719,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var eventId = state.eventList[index].eventId;
     Event event = state.eventIdEventMap[eventId]!;
 
-    var period = event.end!.difference(event.start!);
+    var endPeriod = event.end!.difference(event.start!);
+    Duration? repeatEndPeriod;
+    if (event.recurrenceRule?.endDate != null) {
+      repeatEndPeriod = event.recurrenceRule!.endDate!
+          .difference(event.start!);
+    }
 
     if (state.calendarSwitchingIndex == 0) {
       state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
@@ -759,7 +736,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     event.start = calendarRepo.convertTZDateTime(state.selectionDate);
     event.end = calendarRepo.convertTZDateTime(
-        state.selectionDate.add(period));
+        state.selectionDate.add(endPeriod));
+    if (repeatEndPeriod != null) {
+      event.recurrenceRule!.endDate = calendarRepo.convertTZDateTime(
+          state.selectionDate.add(repeatEndPeriod));
+    }
 
     return await calendarRepo.createOrUpdateEvent(event);
   }

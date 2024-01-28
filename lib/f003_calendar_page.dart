@@ -656,6 +656,7 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
+    final isMounted = useIsMounted();
 
     return SelectableCalendarCell(
         height: 45,
@@ -728,9 +729,10 @@ class EventPart extends HookConsumerWidget {
                 TextButton(
                   onPressed: () async {
                     if (!await calendarNotifier.copyIndexEvent(index)) {
-                      // ignore: use_build_context_synchronously
-                      await CommonUtils().showMessageDialog(context, 'コピー',
-                          'コピーに失敗しました');
+                      if (context.mounted) {
+                        await CommonUtils().showMessageDialog(context, 'コピー',
+                            'コピーに失敗しました');
+                      }
                     }
 
                     await calendarNotifier.updateCalendar();
@@ -752,9 +754,10 @@ class EventPart extends HookConsumerWidget {
                 TextButton(
                   onPressed: () async {
                     if (!await calendarNotifier.moveIndexEvent(index)) {
-                      // ignore: use_build_context_synchronously
-                      await CommonUtils().showMessageDialog(context, '移動',
-                          '移動に失敗しました');
+                      if (context.mounted) {
+                        await CommonUtils().showMessageDialog(context, '移動',
+                            '移動に失敗しました');
+                      }
                     } else {
                       await calendarNotifier.editingCancel(index);
                     }
@@ -801,19 +804,16 @@ class EventPart extends HookConsumerWidget {
                     }
 
                     if (!await calendarNotifier.deleteEvent(event!)) {
-                      // ignore: use_build_context_synchronously
-                      await CommonUtils().showMessageDialog(context, '削除',
-                          '削除に失敗しました');
+                      if (context.mounted) {
+                        await CommonUtils().showMessageDialog(context, '削除',
+                            '削除に失敗しました');
+                      }
                       return;
                     }
 
                     await calendarNotifier.updateCalendar();
                     await calendarNotifier.updateEventList();
                     await calendarNotifier.updateState();
-
-                    // ignore: use_build_context_synchronously
-                    await CommonUtils().showMessageDialog(
-                        context, '削除', '削除しました');
                   },
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontSize: 15),
