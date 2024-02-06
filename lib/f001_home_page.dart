@@ -12,7 +12,7 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
 // アプリバーの高さ
-const double appBarHeight = 39;
+const double appBarHeight = 35;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -31,6 +31,8 @@ class HomePage extends HookConsumerWidget {
     double unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
+    // 画面の高さ
+    double deviceWidth = MediaQuery.of(context).size.width;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -63,61 +65,100 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    var appBar = AppBar(
-      // ナビゲーションによる遷移の場合戻るボタンを表示しない
-      automaticallyImplyLeading: false,
-      title: Consumer(
-          builder: ((context, ref, child) {
-            final homeState = ref.watch(homePageNotifierProvider);
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Hero(tag: 'AppBar1TitleText', child:
-                  Material(
-                    color: Colors.transparent,
-                    child: Text(homeState.appBarTitle,
-                        style: const TextStyle(
-                            height: 1.3,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 21
-                        )
-                    ),
+    // var appBar = AppBar(
+    //   // ナビゲーションによる遷移の場合戻るボタンを表示しない
+    //   automaticallyImplyLeading: false,
+    //   title: Consumer(
+    //       builder: ((context, ref, child) {
+    //         final homeState = ref.watch(homePageNotifierProvider);
+    //         return Row(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: [
+    //             Hero(tag: 'AppBar1TitleText', child:
+    //               Material(
+    //                 color: Colors.transparent,
+    //                 child: Text(homeState.appBarTitle,
+    //                     style: const TextStyle(
+    //                         height: 1.3,
+    //                         color: Colors.white,
+    //                         fontWeight: FontWeight.w500,
+    //                         fontSize: 21
+    //                     )
+    //                 ),
+    //               )
+    //             )
+    //           ],
+    //         );
+    //       })
+    //   ),
+    // );
+
+    var appBarAndCalendars = SafeArea(bottom: false,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: deviceWidth, height: appBarHeight,
+                child: Consumer(
+                    builder: ((context, ref, child) {
+                      final homeState = ref.watch(
+                          homePageNotifierProvider);
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(width: 8),
+                          Text(homeState.appBarTitle,
+                              style: const TextStyle(
+                                  height: 1.3,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 21
+                              )
+                          )
+                        ],
+                      );
+                    })
+                ),
+              ),
+              Expanded(
+                  child: PageView(
+                    // physics: const NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical, // 縦
+                    controller: homeState.homePageController,
+                    pageSnapping: true, // ページごとにスクロールを止める
+                    onPageChanged: (index) {
+                    },
+                    children: <Widget>[
+                      CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+                          unSafeAreaBottomHeight: unSafeAreaBottomHeight,
+                          pageIndex: 0),
+                      CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
+                          unSafeAreaBottomHeight: unSafeAreaBottomHeight,
+                          pageIndex: 1),
+                    ],
                   )
-                )
-              ],
-            );
-          })
-      ),
+              )
+            ]
+        )
     );
 
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
       endDrawer: const EndDrawer(),
-      // ナビゲーションバー
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(appBarHeight),
-        child: appBar,
-      ),
-      body: PageView(
-        // physics: const NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.vertical, // 縦
-        controller: homeState.homePageController,
-        pageSnapping: true, // ページごとにスクロールを止める
-        onPageChanged: (index) {
-        },
-        children: <Widget>[
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
-              unSafeAreaBottomHeight: unSafeAreaBottomHeight,
-              pageIndex: 0),
-          CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
-              unSafeAreaBottomHeight: unSafeAreaBottomHeight,
-              pageIndex: 1),
-        ],
+      // // ナビゲーションバー
+      // appBar: PreferredSize(
+      //   preferredSize: const Size.fromHeight(appBarHeight),
+      //   child: appBar,
+      // ),
+      body: Stack(children:
+          [
+            //Container(color: Colors.blue),
+            Image.asset('images/IMG_3173_3.jpeg'),
+            appBarAndCalendars
+          ]
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: FloatingActionButton(
-          heroTag: "calendar_hero_tag",
+          heroTag: 'calendar_hero_tag',
           onPressed: () async {
             await calendarNotifier.onPressedAddingButton();
           },
