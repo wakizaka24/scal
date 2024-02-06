@@ -728,7 +728,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     if (state.calendarSwitchingIndex == 0) {
       state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
-    } else {
+    } else if (state.calendarSwitchingIndex == 1) {
       state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
       state.selectionDate = state.hours[state.hourPartIndex].id;
       event.allDay = state.selectionAllDay;
@@ -788,7 +788,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.calendarSwitchingIndex == 0) {
       state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
       await setDayEventList(state.selectionDate, state.dayEventsMap);
-    } else {
+    } else if (state.calendarSwitchingIndex == 1) {
       state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
       state.selectionDate = state.hours[state.hourPartIndex].id;
       await setHourEventList(state.selectionAllDay, state.selectionDate,
@@ -830,9 +830,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var fontColor = calendar.isDefault! ? Colors.black
           : const Color(0xffaaaaaa);
 
+      var sameCell = true;
+      if (state.calendarSwitchingIndex == 0) {
+        var eventDay = DateTime(event.start!.year,
+            event.start!.month, event.start!.day);
+        sameCell = eventDay == state.selectionDate;
+      } else if (state.calendarSwitchingIndex == 1) {
+        var eventHour = DateTime(event.start!.year,
+            event.start!.month, event.start!.day,
+            event.start!.hour);
+        sameCell = eventHour == state.selectionDate
+          && event.allDay == state.selectionAllDay;
+      }
+
       creatingEventList.add(EventDisplay(eventId: eventId,
           calendarId: calendar.id!, editing: editing,
-          sameCell: true, readOnly: calendar.isReadOnly!,
+          sameCell: sameCell, readOnly: calendar.isReadOnly!,
           head: head, lineColor: lineColor, title: title,
           fontColor: fontColor
       ));
@@ -840,8 +853,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     var otherEventList = state.editingEventList
       .where((event) => creatingEventList
-        .where((ce) => ce.eventId == event.eventId)
-        .firstOrNull == null);
+        .where((ce) => ce.eventId == event.eventId
+    ).firstOrNull == null);
 
     state.eventList = [...otherEventList, ...creatingEventList];
   }
