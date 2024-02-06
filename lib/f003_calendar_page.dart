@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
-import 'f008_calendar_repository.dart';
 import 'f013_common_utils.dart';
 
 const borderColor = Color(0xCCDED2BF);
@@ -69,7 +69,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     double deviceHeight = MediaQuery.of(context).size.height;
     // アプリバーの高さ
     //double appBarHeight = AppBar().preferredSize.height;
-    double appBarHeight = homeState.appBarHeight;
     // イベント一覧のアスペクト比
     double eventListAspectRate = 1.41421356237;
     // イベント一覧の高さ
@@ -278,11 +277,11 @@ class CustomScrollPhysics extends ScrollPhysics {
   final double damping; // 0.85
 
   const CustomScrollPhysics({
-    ScrollPhysics? parent,
+    super.parent,
     required this.mass,
     required this.stiffness,
     required this.damping,
-  }) : super(parent: parent);
+  });
 
   @override
   CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -656,7 +655,6 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
-    final isMounted = useIsMounted();
 
     return SelectableCalendarCell(
         height: 45,

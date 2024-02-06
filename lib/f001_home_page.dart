@@ -11,6 +11,9 @@ import 'f005_calendar_view_model.dart';
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
+// アプリバーの高さ
+const double appBarHeight = 39;
+
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
@@ -28,8 +31,6 @@ class HomePage extends HookConsumerWidget {
     double unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
-    // アプリバーの高さ
-    double appBarHeight = homeState.appBarHeight;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -95,7 +96,7 @@ class HomePage extends HookConsumerWidget {
       endDrawer: const EndDrawer(),
       // ナビゲーションバー
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(homeState.appBarHeight),
+        preferredSize: const Size.fromHeight(appBarHeight),
         child: appBar,
       ),
       body: PageView(
@@ -133,9 +134,9 @@ class HomePage extends HookConsumerWidget {
     );
 
     // 右端スワイプでナビゲーションを戻さない
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: scaffold
+    return PopScope(
+        canPop: false,
+        child: scaffold
     );
   }
 }

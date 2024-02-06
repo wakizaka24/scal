@@ -14,41 +14,41 @@ class CommonUtils {
     return await showDialog<String>(
         context: context,
         builder: (_) {
-          return WillPopScope(
-            child: AlertDialog(
-              title: Text(title),
-              content: Text(message),
-              actions: <Widget>[
-                Visibility(
-                  visible: negativeTitle != null,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (context.mounted) {
-                        Navigator.pop(context, 'negative');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      textStyle: const TextStyle(fontSize: 13),
-                      padding: const EdgeInsets.all(0),
+          return PopScope(
+              canPop: false,
+              child: AlertDialog(
+                title: Text(title),
+                content: Text(message),
+                actions: <Widget>[
+                  Visibility(
+                    visible: negativeTitle != null,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (context.mounted) {
+                          Navigator.pop(context, 'negative');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 13),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: Text(negativeTitle ?? ""),
                     ),
-                    child: Text(negativeTitle ?? ""),
                   ),
-                ),
-                ElevatedButton(
-                    onPressed: () async {
-                      if (context.mounted) {
-                        Navigator.pop(context, 'positive');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      textStyle: const TextStyle(fontSize: 13),
-                      padding: const EdgeInsets.all(0),
-                    ),
-                    child: Text(positiveTitle)
-                )
-              ],
-            ),
-            onWillPop: () async => false,
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (context.mounted) {
+                          Navigator.pop(context, 'positive');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 13),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: Text(positiveTitle)
+                  )
+                ],
+              )
           );
         });
   }

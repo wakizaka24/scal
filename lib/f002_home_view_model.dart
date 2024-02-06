@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 class HomePageState {
   // UI
-  double appBarHeight = 39;
   PageController homePageController = PageController(initialPage: 1);
 
   // Data
@@ -15,7 +14,6 @@ class HomePageState {
     var nState = HomePageState();
 
     // UI
-    nState.appBarHeight = state.appBarHeight;
     nState.homePageController = state.homePageController;
 
     // Data
