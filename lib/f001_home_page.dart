@@ -12,7 +12,7 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
 // アプリバーの高さ
-const double appBarHeight = 35;
+const double appBarHeight = 29;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -65,34 +65,6 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    // var appBar = AppBar(
-    //   // ナビゲーションによる遷移の場合戻るボタンを表示しない
-    //   automaticallyImplyLeading: false,
-    //   title: Consumer(
-    //       builder: ((context, ref, child) {
-    //         final homeState = ref.watch(homePageNotifierProvider);
-    //         return Row(
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Hero(tag: 'AppBar1TitleText', child:
-    //               Material(
-    //                 color: Colors.transparent,
-    //                 child: Text(homeState.appBarTitle,
-    //                     style: const TextStyle(
-    //                         height: 1.3,
-    //                         color: Colors.white,
-    //                         fontWeight: FontWeight.w500,
-    //                         fontSize: 21
-    //                     )
-    //                 ),
-    //               )
-    //             )
-    //           ],
-    //         );
-    //       })
-    //   ),
-    // );
-
     var appBarAndCalendars = SafeArea(bottom: false,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +85,40 @@ class HomePage extends HookConsumerWidget {
                                   fontWeight: FontWeight.w500,
                                   fontSize: 21
                               )
-                          )
+                          ),
+                          const Spacer(),
+                          SizedBox(width: 40, height: 29, child:
+                            TextButton(
+                              onPressed: () {
+                                homePageScaffoldKey.currentState!.openEndDrawer();
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                textStyle: const TextStyle(fontSize: 15),
+                                padding: const EdgeInsets.all(0),
+                              ),
+                              child: const Text('設定'),
+                            )
+                          ),
+                          SizedBox(width: 29, height: 29,
+                              child: Material(
+                                color: Colors.transparent,
+                                shape: const CircleBorder(),
+                                clipBehavior: Clip.hardEdge,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.check),
+                                    onPressed: () {
+                                      homePageScaffoldKey.currentState!
+                                          .openEndDrawer();
+                                    },
+                                    color: Colors.white,
+                                    padding: const EdgeInsets.all(0),
+                                    highlightColor: Colors.red,
+                                  )
+                              )
+                          ),
+
+                          Container(width: 8)
                         ],
                       );
                     })
@@ -144,18 +149,14 @@ class HomePage extends HookConsumerWidget {
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
       endDrawer: const EndDrawer(),
-      // // ナビゲーションバー
-      // appBar: PreferredSize(
-      //   preferredSize: const Size.fromHeight(appBarHeight),
-      //   child: appBar,
-      // ),
-      body: Stack(children:
-          [
-            //Container(color: Colors.blue),
-            Image.asset('images/IMG_3173_3.jpeg'),
-            appBarAndCalendars
-          ]
-      ),
+      body: Stack(children: [
+        SizedBox(width: deviceWidth, height: unSafeAreaTopHeight + appBarHeight,
+            child:
+            Container(color: Colors.blue)
+            // Image.asset('images/IMG_3173_3.jpeg')
+        ),
+        appBarAndCalendars
+      ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: FloatingActionButton(
           heroTag: 'calendar_hero_tag',

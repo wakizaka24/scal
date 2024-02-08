@@ -724,122 +724,129 @@ class EventPart extends HookConsumerWidget {
                   )
                 ),
               if (event != null && event!.editing && event!.sameCell)
-                TextButton(
-                  onPressed: () async {
-                    if (!await calendarNotifier.copyIndexEvent(index)) {
-                      if (context.mounted) {
-                        await CommonUtils().showMessageDialog(context, 'コピー',
-                            'コピーに失敗しました');
-                      }
-                    }
+                SizedBox(width: 41, height: 32,
+                    child: TextButton(
+                      onPressed: () async {
+                        if (!await calendarNotifier.copyIndexEvent(index)) {
+                          if (context.mounted) {
+                            await CommonUtils().showMessageDialog(context,
+                                'コピー', 'コピーに失敗しました');
+                          }
+                        }
 
-                    await calendarNotifier.updateCalendar();
-                    await calendarNotifier.updateEventList();
-                    await calendarNotifier.updateState();
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('コピー',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
+                        await calendarNotifier.updateCalendar();
+                        await calendarNotifier.updateEventList();
+                        await calendarNotifier.updateState();
+                      },
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: const Text('コピー',
+                          style: TextStyle(
+                              fontSize: 13
+                          )
+                      ),
+                    )
                 ),
               if (event != null && event!.editing && !event!.sameCell)
-                TextButton(
-                  onPressed: () async {
-                    if (!await calendarNotifier.moveIndexEvent(index)) {
-                      if (context.mounted) {
-                        await CommonUtils().showMessageDialog(context, '移動',
-                            '移動に失敗しました');
-                      }
-                    } else {
-                      await calendarNotifier.editingCancel(index);
-                    }
+                SizedBox(width: 41, height: 32,
+                    child: TextButton(
+                      onPressed: () async {
+                        if (!await calendarNotifier.moveIndexEvent(index)) {
+                          if (context.mounted) {
+                            await CommonUtils().showMessageDialog(context,
+                                '移動', '移動に失敗しました');
+                          }
+                        } else {
+                          await calendarNotifier.editingCancel(index);
+                        }
 
-                    await calendarNotifier.updateCalendar();
-                    await calendarNotifier.updateEventList();
-                    await calendarNotifier.updateState();
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('移動',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
+                        await calendarNotifier.updateCalendar();
+                        await calendarNotifier.updateEventList();
+                        await calendarNotifier.updateState();
+                      },
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: const Text('移動',
+                          style: TextStyle(
+                              fontSize: 13
+                          )
+                      ),
+                    )
                 ),
               if (event != null && event!.editing)
-                TextButton(
-                  onPressed: () async {
-                    await calendarNotifier
-                        .onPressedEventListCancelButton(index);
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('取消',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
+                SizedBox(width: 41, height: 32,
+                    child: TextButton(
+                      onPressed: () async {
+                        await calendarNotifier
+                            .onPressedEventListCancelButton(index);
+                      },
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: const Text('取消',
+                          style: TextStyle(
+                              fontSize: 13
+                          )
+                      ),
+                    )
                 ),
               if (event != null && !event!.editing && !event!.readOnly)
-                TextButton(
-                  onPressed: () async {
-                    var result = await CommonUtils().showMessageDialog(
-                        context, '削除', 'イベントを削除しますか?', 'はい', 'いいえ');
-                    if (result != 'positive') {
-                      return;
-                    }
+                SizedBox(width: 41, height: 32,
+                    child: TextButton(
+                      onPressed: () async {
+                        var result = await CommonUtils().showMessageDialog(
+                            context, '削除', 'イベントを削除しますか?', 'はい',
+                            'いいえ');
+                        if (result != 'positive') {
+                          return;
+                        }
 
-                    if (!await calendarNotifier.deleteEvent(event!)) {
-                      if (context.mounted) {
-                        await CommonUtils().showMessageDialog(context, '削除',
-                            '削除に失敗しました');
-                      }
-                      return;
-                    }
+                        if (!await calendarNotifier.deleteEvent(event!)) {
+                          if (context.mounted) {
+                            await CommonUtils().showMessageDialog(context,
+                                '削除', '削除に失敗しました');
+                          }
+                          return;
+                        }
 
-                    await calendarNotifier.updateCalendar();
-                    await calendarNotifier.updateEventList();
-                    await calendarNotifier.updateState();
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('削除',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
+                        await calendarNotifier.updateCalendar();
+                        await calendarNotifier.updateEventList();
+                        await calendarNotifier.updateState();
+                      },
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: const Text('削除',
+                          style: TextStyle(
+                              fontSize: 13
+                          )
+                      ),
+                    )
                 ),
               if (event != null && !event!.editing && !event!.readOnly)
-                TextButton(
-                  onPressed: () async {
-                    await calendarNotifier.onPressedEventListFixedButton(index);
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 15),
-                    padding: const EdgeInsets.all(0),
-                    minimumSize: const Size(52, 32),
-                  ),
-                  child: const Text('固定',
-                      style: TextStyle(
-                          fontSize: 13
-                      )
-                  ),
-                ),
+                SizedBox(width: 41, height: 32,
+                    child: TextButton(
+                      onPressed: () async {
+                        await calendarNotifier.onPressedEventListFixedButton(
+                            index);
+                      },
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: const Text('固定',
+                          style: TextStyle(
+                              fontSize: 13
+                          )
+                      ),
+                    )
+              )
             ],
           )
         )
