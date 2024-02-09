@@ -87,37 +87,23 @@ class HomePage extends HookConsumerWidget {
                               )
                           ),
                           const Spacer(),
-                          SizedBox(width: 40, height: 29, child:
-                            TextButton(
-                              onPressed: () {
-                                homePageScaffoldKey.currentState!.openEndDrawer();
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                textStyle: const TextStyle(fontSize: 15),
-                                padding: const EdgeInsets.all(0),
-                              ),
-                              child: const Text('設定'),
-                            )
-                          ),
-                          SizedBox(width: 29, height: 29,
-                              child: Material(
-                                color: Colors.transparent,
-                                shape: const CircleBorder(),
-                                clipBehavior: Clip.hardEdge,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.check),
-                                    onPressed: () {
-                                      homePageScaffoldKey.currentState!
-                                          .openEndDrawer();
-                                    },
-                                    color: Colors.white,
-                                    padding: const EdgeInsets.all(0),
-                                    highlightColor: Colors.red,
-                                  )
+                          SizedBox(width: appBarHeight, height: appBarHeight,
+                              child: TextButton(
+                                onPressed: () {
+                                  homePageScaffoldKey.currentState!
+                                      .openEndDrawer();
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  textStyle: const TextStyle(fontSize: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  padding: const EdgeInsets.all(0),
+                                ),
+                                child: const Icon(Icons.check),
                               )
                           ),
-
                           Container(width: 8)
                         ],
                       );
@@ -151,10 +137,9 @@ class HomePage extends HookConsumerWidget {
       endDrawer: const EndDrawer(),
       body: Stack(children: [
         SizedBox(width: deviceWidth, height: unSafeAreaTopHeight + appBarHeight,
-            child:
-            Container(color: Colors.blue)
-            // Image.asset('images/IMG_3173_3.jpeg')
+            child: Container(color: Colors.blue)
         ),
+        Image.asset('images/IMG_3173_3.jpeg'),
         appBarAndCalendars
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,

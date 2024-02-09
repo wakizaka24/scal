@@ -14,7 +14,7 @@ const highlightedLineColor = Color(0x17DED2BF);
 const highlightedLineAndTodayColor = Color(0x52DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
-const double normalBoarderWidth = 0.5;
+const double normalBoarderWidth = 0.1;
 const double calendarFontSize1 = 13;
 const double calendarFontSize1Down1 = 11.5;
 const FontWeight calendarFontWidth1 = FontWeight.w300;
@@ -257,9 +257,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                     textStyle: const TextStyle(fontSize: 13),
                     padding: const EdgeInsets.all(0),
                   ),
-                  child: const Text('Weekly')
+                  child: Text(calendarNotifier
+                      .getCalendarSwitchingButtonTitle())
               )),
-              Container(width: 80)
+              Container(width: 76)
             ])
           ])
       ]),
@@ -537,7 +538,7 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(day.eventList[i].title,
+                      Text(day.eventList[i].title.replaceAll(' ', '\u00a0'),
                         maxLines: 1,
                         style: TextStyle(
                             height: 1.2,
@@ -713,13 +714,13 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(event!.title, maxLines: 2,
-                        style: TextStyle(
-                            height: 1.3,
-                            fontSize: eventListFontSize3,
-                            fontWeight: eventListFontWidth3,
-                            color: event!.fontColor
-                        )
+                      child: Text(event!.title.replaceAll(' ', '\u00a0'),
+                          maxLines: 2, style: TextStyle(
+                              height: 1.3,
+                              fontSize: eventListFontSize3,
+                              fontWeight: eventListFontWidth3,
+                              color: event!.fontColor
+                          )
                       )
                   )
                 ),
@@ -1052,7 +1053,8 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(hour.eventList[i].title,
+                          Text(hour.eventList[i].title
+                              .replaceAll(' ', '\u00a0'),
                             maxLines: 1,
                             style: TextStyle(
                                 height: 1.2,

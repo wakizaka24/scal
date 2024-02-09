@@ -36,7 +36,7 @@ class SCalApp extends StatelessWidget {
           ],
           theme: ThemeData(
             useMaterial3: false,
-            primarySwatch: Colors.blue,
+            primarySwatch: Colors.grey,
           )
           /*ThemeData.light().copyWith(
             appBarTheme: const AppBarTheme(

@@ -26,6 +26,7 @@ class CalendarPageState {
   Map<String, Calendar> calendarMap = {};
   List<Event> calendarEvents = [];
   Map<String, Event> eventIdEventMap = {};
+  Map<String, DateTime> eventIdStartDateMap = {};
   bool cellActive = true;
   late DateTime selectionDate;
   int calendarSwitchingIndex = 0;
@@ -72,6 +73,7 @@ class CalendarPageState {
     nState.calendarMap = state.calendarMap;
     nState.calendarEvents = state.calendarEvents;
     nState.eventIdEventMap = state.eventIdEventMap;
+    nState.eventIdStartDateMap = state.eventIdStartDateMap;
     nState.cellActive = state.cellActive;
     nState.selectionDate = state.selectionDate;
     nState.calendarSwitchingIndex = state.calendarSwitchingIndex;
@@ -293,6 +295,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateState();
   }
 
+  String getCalendarSwitchingButtonTitle() {
+    return state.calendarSwitchingIndex == 0 ?
+        "Weekly" : state.calendarSwitchingIndex == 1
+        ? "Monthly" : "";
+  }
+
   // Month Calendar
 
   onTapDownCalendarDay(int index) async {
@@ -370,6 +378,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.calendarEvents = await getEvents(calendars, startDate,
         endDate);
     state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
+    state.eventIdStartDateMap = createEventIdStartDateMap(state.calendarEvents);
     state.dayEventsMap = createDayEventsMap(state.calendarEvents);
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
         state.dayEventsMap, state.calendarMap);
@@ -437,6 +446,17 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var event = events[i];
       if (eventsMap[event.eventId!] == null) {
         eventsMap[event.eventId!] = event;
+      }
+    }
+    return eventsMap;
+  }
+
+  Map<String, DateTime> createEventIdStartDateMap(List<Event> events) {
+    Map<String, DateTime> eventsMap = {};
+    for (int i = 0; i < events.length; i++) {
+      var event = events[i];
+      if (eventsMap[event.eventId!] == null) {
+        eventsMap[event.eventId!] = event.start!;
       }
     }
     return eventsMap;
@@ -831,14 +851,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           : const Color(0xffaaaaaa);
 
       var sameCell = true;
+      var startDate = state.eventIdStartDateMap[event.eventId!]!;
       if (state.calendarSwitchingIndex == 0) {
-        var eventDay = DateTime(event.start!.year,
-            event.start!.month, event.start!.day);
+        var eventDay = DateTime(startDate.year, startDate.month, startDate.day);
         sameCell = eventDay == state.selectionDate;
       } else if (state.calendarSwitchingIndex == 1) {
-        var eventHour = DateTime(event.start!.year,
-            event.start!.month, event.start!.day,
-            event.start!.hour);
+        var eventHour = DateTime(startDate.year, startDate.month, startDate.day,
+            startDate.hour);
         sameCell = eventHour == state.selectionDate
           && event.allDay == state.selectionAllDay;
       }
