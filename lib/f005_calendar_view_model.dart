@@ -28,7 +28,6 @@ class CalendarPageState {
   Map<String, Event> eventIdEventMap = {};
   Map<String, DateTime> eventIdStartDateMap = {};
   bool cellActive = true;
-  late DateTime selectionDate;
   int calendarSwitchingIndex = 0;
 
   // Data-Month Calendar
@@ -40,6 +39,7 @@ class CalendarPageState {
   Map<DateTime, List<Event>> dayEventsMap = {};
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
+  late DateTime selectionDate;
   int dayPartIndex = 0;
 
   // Data-Week Calendar
@@ -50,6 +50,7 @@ class CalendarPageState {
   Map<DateTime, List<Event>> hourEventsMap = {};
   List<DayAndWeekdayDisplay> dayAndWeekdayList = [];
   List<HourDisplay> hours = [];
+  late DateTime selectionHour;
   int hourPartIndex = 0;
 
   // Data-Event List
@@ -75,7 +76,6 @@ class CalendarPageState {
     nState.eventIdEventMap = state.eventIdEventMap;
     nState.eventIdStartDateMap = state.eventIdStartDateMap;
     nState.cellActive = state.cellActive;
-    nState.selectionDate = state.selectionDate;
     nState.calendarSwitchingIndex = state.calendarSwitchingIndex;
 
     // Data-Month Calendar
@@ -86,6 +86,7 @@ class CalendarPageState {
     nState.dayEventsMap = state.dayEventsMap;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
+    nState.selectionDate = state.selectionDate;
     nState.dayPartIndex = state.dayPartIndex;
 
     // Data-Week Calendar
@@ -94,6 +95,7 @@ class CalendarPageState {
     nState.hourEventsMap = state.hourEventsMap;
     nState.dayAndWeekdayList = state.dayAndWeekdayList;
     nState.hours = state.hours;
+    nState.selectionHour = state.selectionHour;
     nState.hourPartIndex = state.hourPartIndex;
 
     // Data-Event List
@@ -335,7 +337,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   initSelectionWeekCalendar() async {
     // Data-Week Calendar
     state.selectionAllDay = false;
-    state.selectionDate = DateTime(state.selectionDate.year,
+    state.selectionHour = DateTime(state.selectionDate.year,
         state.selectionDate.month, state.selectionDate.day, state.now.hour);
 
     // UI-Week Calendar
@@ -346,9 +348,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.hourPartIndex = 0;
     for (int i=0; i < state.hours.length; i++) {
       var id = state.hours[i].id;
-      if (id.year == state.selectionDate.year
-          && id.month == state.selectionDate.month
-          && id.day == state.selectionDate.day) {
+      if (id.year == state.selectionHour.year
+          && id.month == state.selectionHour.month
+          && id.day == state.selectionHour.day) {
 
         var nowHour = state.now.hour;
         var idHour = id.hour;
@@ -699,18 +701,50 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
-    state.selectionDate = state.hours[state.hourPartIndex].id;
-    await setHourEventList(state.selectionAllDay, state.selectionDate,
+    state.selectionHour = state.hours[state.hourPartIndex].id;
+    await setHourEventList(state.selectionAllDay, state.selectionHour,
         state.allDayEventsMap, state.hourEventsMap);
 
-    selectDayPartIndex(state.selectionDate);
+    selectDayPartIndex(state.selectionHour);
   }
 
   // Event List
 
   Future<bool> deleteEvent(EventDisplay event) async {
-    return await CalendarRepository().deleteEvent(event.calendarId,
-        event.eventId);
+    if (event.sameCell) {
+      return await CalendarRepository().deleteEvent(event.calendarId,
+          event.eventId);
+    } else {
+      return await deleteAfterEvent(event.eventId);
+    }
+  }
+
+  Future<bool> deleteAfterEvent(String eventId) async {
+    var timeInterval = 24 ~/ CalendarPageState.timeColNum;
+    Event event = state.eventIdEventMap[eventId]!;
+
+    var deletionDate = state.selectionHour;
+    if (state.calendarSwitchingIndex == 0) {
+      deletionDate = deletionDate.add(const Duration(days: -1));
+    } else if (state.calendarSwitchingIndex == 1) {
+      deletionDate = deletionDate.add(Duration(hours: -timeInterval));
+    }
+
+    var deletionTZDate = calendarRepo.convertTZDateTime(deletionDate);
+
+    if (event.end!.isAfter(deletionTZDate)) {
+      event.end = deletionTZDate;
+    }
+
+    var repetitionEndDate = event.recurrenceRule?.endDate;
+    if (repetitionEndDate != null) {
+      if (repetitionEndDate.isAfter(deletionDate)) {
+        event.recurrenceRule?.endDate
+          = calendarRepo.convertTZDateTime(deletionDate);
+      }
+    }
+
+    return await calendarRepo.createOrUpdateEvent(event);
   }
 
   onPressedEventListFixedButton(int index) async {
@@ -746,20 +780,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           .difference(event.start!);
     }
 
+    DateTime selectionDate;
     if (state.calendarSwitchingIndex == 0) {
-      state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
+      selectionDate = state.selectionDate;
     } else if (state.calendarSwitchingIndex == 1) {
-      state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
-      state.selectionDate = state.hours[state.hourPartIndex].id;
+      selectionDate = state.selectionHour;
       event.allDay = state.selectionAllDay;
+    } else {
+      return false;
     }
 
-    event.start = calendarRepo.convertTZDateTime(state.selectionDate);
+    event.start = calendarRepo.convertTZDateTime(selectionDate);
     event.end = calendarRepo.convertTZDateTime(
-        state.selectionDate.add(endPeriod));
+        selectionDate.add(endPeriod));
     if (repeatEndPeriod != null) {
       event.recurrenceRule!.endDate = calendarRepo.convertTZDateTime(
-          state.selectionDate.add(repeatEndPeriod));
+          selectionDate.add(repeatEndPeriod));
     }
 
     return await calendarRepo.createOrUpdateEvent(event);
@@ -806,12 +842,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateEventList() async {
     if (state.calendarSwitchingIndex == 0) {
-      state.selectionDate = state.dayLists[1][state.dayPartIndex].id;
       await setDayEventList(state.selectionDate, state.dayEventsMap);
     } else if (state.calendarSwitchingIndex == 1) {
-      state.selectionAllDay = state.hours[state.hourPartIndex].allDay;
-      state.selectionDate = state.hours[state.hourPartIndex].id;
-      await setHourEventList(state.selectionAllDay, state.selectionDate,
+      await setHourEventList(state.selectionAllDay, state.selectionHour,
           state.allDayEventsMap, state.hourEventsMap);
     }
   }
@@ -858,7 +891,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       } else if (state.calendarSwitchingIndex == 1) {
         var eventHour = DateTime(startDate.year, startDate.month, startDate.day,
             startDate.hour);
-        sameCell = eventHour == state.selectionDate
+        sameCell = eventHour == state.selectionHour
           && event.allDay == state.selectionAllDay;
       }
 

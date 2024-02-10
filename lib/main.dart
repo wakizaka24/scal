@@ -6,15 +6,21 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 
 void main() {
-  // 横向き無効
+  // 縦向き
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
-    // 縦向き
     DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]).then((_) {
-    runApp(const SCalApp());
-  });
+  ]);
+
+  // ステータスバーのフォントカラーを白にする。
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark, // iOS
+      statusBarIconBrightness: Brightness.dark, // Android
+    )
+  );
+
+  runApp(const SCalApp());
 }
 
 class SCalApp extends StatelessWidget {
