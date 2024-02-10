@@ -23,6 +23,30 @@ class SCalApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var baseThemeData = ThemeData(
+      useMaterial3: false,
+      primarySwatch: Colors.grey,
+        colorScheme: ColorScheme.fromSwatch(
+          // brightness: Brightness.dark,
+          primarySwatch: Colors.purple,
+          accentColor: Colors.blue,
+          cardColor: Colors.white,
+          backgroundColor: Colors.white
+        )
+    );
+
+    // var darkThemeData = ThemeData(
+    //     useMaterial3: false,
+    //     primarySwatch: Colors.grey,
+    //     colorScheme: ColorScheme.fromSwatch(
+    //         brightness: Brightness.dark,
+    //         primarySwatch: Colors.purple,
+    //         accentColor: Colors.blue,
+    //         cardColor: Colors.white,
+    //         backgroundColor: Colors.white
+    //     )
+    // );
+
     return ProviderScope(
         child: MaterialApp(
           localizationsDelegates: const [
@@ -34,18 +58,8 @@ class SCalApp extends StatelessWidget {
             Locale('en'),
             Locale('ja'),
           ],
-          theme: ThemeData(
-            useMaterial3: false,
-            primarySwatch: Colors.grey,
-          )
-          /*ThemeData.light().copyWith(
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.greenAccent,
-              // shadowColor: Colors.greenAccent,
-            ),
-            scaffoldBackgroundColor: Colors.white,
-          )*/,
+          theme: baseThemeData,
+          // darkTheme: darkThemeData,
           title: 'SCal',
           home: const HomePage(),
       )

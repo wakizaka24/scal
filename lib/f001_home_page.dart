@@ -19,6 +19,7 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(
@@ -137,9 +138,9 @@ class HomePage extends HookConsumerWidget {
       endDrawer: const EndDrawer(),
       body: Stack(children: [
         SizedBox(width: deviceWidth, height: unSafeAreaTopHeight + appBarHeight,
-            child: Container(color: Colors.blue)
+            child: Container(color: theme.primaryColor)
         ),
-        Image.asset('images/IMG_3173_3.jpeg'),
+        // Image.asset('images/IMG_3173_3.jpeg'),
         appBarAndCalendars
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
@@ -154,7 +155,8 @@ class HomePage extends HookConsumerWidget {
                 final calendarState = ref.watch(calendarPageNotifierProvider(
                     homeState.homePageIndex));
                 return Icon(calendarState.cellActive
-                    ? Icons.add : Icons.add_circle_outline);
+                    ? Icons.add : Icons.add_circle_outline,
+                    color: Colors.white);
               })
           )
       ),

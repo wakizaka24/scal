@@ -11,7 +11,7 @@ import 'f013_common_utils.dart';
 const borderColor = Color(0xCCDED2BF);
 const todayBgColor = Color(0x33DED2BF);
 const highlightedLineColor = Color(0x17DED2BF);
-const highlightedLineAndTodayColor = Color(0x52DED2BF);
+const highlightedLineAndTodayBgColor = Color(0x52DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.1;
@@ -258,7 +258,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                     padding: const EdgeInsets.all(0),
                   ),
                   child: Text(calendarNotifier
-                      .getCalendarSwitchingButtonTitle())
+                      .getCalendarSwitchingButtonTitle(),
+                      style: const TextStyle(color: Colors.white)
+                  )
               )),
               Container(width: 76)
             ])
@@ -516,7 +518,7 @@ class DayPart extends HookConsumerWidget {
       selectedBoarderWidth: selectedBoarderWidth,
       borderCircular: 0,
       bgColor: isHighlightedWeek ?
-        day.today ? highlightedLineAndTodayColor : highlightedLineColor :
+        day.today ? highlightedLineAndTodayBgColor : highlightedLineColor :
         day.today ? todayBgColor : Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -911,7 +913,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
         height: height,
         decoration: BoxDecoration(
           color: isHighlightedDay ?
-            dayAndWeekday.today ? highlightedLineAndTodayColor
+            dayAndWeekday.today ? highlightedLineAndTodayBgColor
                 : highlightedLineColor :
             dayAndWeekday.today ? todayBgColor : Colors.transparent,
           border: const Border.fromBorderSide(
@@ -1030,7 +1032,7 @@ class HourPart extends HookConsumerWidget {
         selectedBoarderWidth: selectedBoarderWidth,
         borderCircular: 0,
         bgColor: isHighlightedDayAndWeek ?
-          hour.today ? highlightedLineAndTodayColor : highlightedLineColor :
+          hour.today ? highlightedLineAndTodayBgColor : highlightedLineColor :
           hour.today ? todayBgColor : Colors.transparent,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
