@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:scal/f016_ui_define.dart';
 
 enum EndDrawerMenuType {
   test1(title: 'テスト1'),
@@ -55,7 +56,8 @@ class EndDrawer extends HookConsumerWidget {
                                   ),
                                   padding: const EdgeInsets.all(0),
                                 ),
-                                child: const Icon(Icons.check),
+                                child: Icon(Icons.check,
+                                    color: normalTextColor),
                               )
                           )
                       ),

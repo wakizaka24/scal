@@ -2,6 +2,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:scal/f016_ui_define.dart';
 
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
@@ -237,15 +238,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       WeekdayDisplay(title: '日',
           titleColor: Colors.pink),
       WeekdayDisplay(title: '月',
-          titleColor: Colors.black),
+          titleColor: normalTextColor),
       WeekdayDisplay(title: '火',
-          titleColor: Colors.black),
+          titleColor: normalTextColor),
       WeekdayDisplay(title: '水',
-          titleColor: Colors.black),
+          titleColor: normalTextColor),
       WeekdayDisplay(title: '木',
-          titleColor: Colors.black),
+          titleColor: normalTextColor),
       WeekdayDisplay(title: '金',
-          titleColor: Colors.black),
+          titleColor: normalTextColor),
       WeekdayDisplay(title: '土',
           titleColor: Colors.green),
     ];
@@ -433,7 +434,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           DayDisplay(id: currentDay, title: currentDay.day.toString(),
               titleColor: j % columnNum == 0 ? Colors.pink
                   : j % columnNum == columnNum - 1
-                  ? Colors.green : Colors.black, eventList: [],
+                  ? Colors.green : normalTextColor, eventList: [],
               today: currentDay == now)
         }
       ]);
@@ -493,8 +494,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           var calendar = calendarMap[event.calendarId]!;
           dayInfo.eventList.add(DayEventDisplay(
               title: events[i].title!,
-              titleColor: calendar.isDefault! ? Colors.black
-                  : const Color(0xffaaaaaa)));
+              titleColor: calendar.isDefault! ? normalTextColor
+                  : disabledTextColor));
         }
       }
     }
@@ -566,7 +567,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(currentDay),
           dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
               : rowIndex % weekdayRowNum == weekdayRowNum - 1
-              ? Colors.green : Colors.black,
+              ? Colors.green : normalTextColor,
           today: currentDay == now
       ));
     }
@@ -599,7 +600,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
         var titleColor = rowIndex % weekdayRowNum == 0 ? Colors.pink
             : rowIndex % weekdayRowNum == weekdayRowNum - 1
-            ? Colors.green : Colors.black;
+            ? Colors.green : normalTextColor;
 
         wholeTimeList.add(
             HourDisplay(
@@ -677,14 +678,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
       //var dhmStr = DateFormat('dd HH').format(hourInfo.id);
       // hourInfo.eventList.add(HourEventDisplay(
-      //     title: dhmStr, titleColor: Colors.black));
+      //     title: dhmStr, titleColor: normalTextColor));
 
       for (var event in events) {
         var calendar = calendarMap[event.calendarId]!;
         hourInfo.eventList.add(HourEventDisplay(
             title: event.title!,
-            titleColor: calendar.isDefault! ? Colors.black
-                : const Color(0xffaaaaaa)));
+            titleColor: calendar.isDefault! ? normalTextColor
+                : disabledTextColor));
       }
     }
 
@@ -880,8 +881,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
       var lineColor = Color(calendar.color!);
       var title = event.title!;
-      var fontColor = calendar.isDefault! ? Colors.black
-          : const Color(0xffaaaaaa);
+      var fontColor = calendar.isDefault! ? normalTextColor
+          : disabledTextColor;
 
       var sameCell = true;
       var startDate = state.eventIdStartDateMap[event.eventId!]!;

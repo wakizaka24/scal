@@ -7,25 +7,7 @@ import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_common_utils.dart';
-
-const borderColor = Color(0xCCDED2BF);
-const todayBgColor = Color(0x33DED2BF);
-const highlightedLineColor = Color(0x17DED2BF);
-const highlightedLineAndTodayBgColor = Color(0x52DED2BF);
-const double selectedBoarderWidth = 2;
-const double eventSelectedBoarderWidth = 2;
-const double normalBoarderWidth = 0.1;
-const double calendarFontSize1 = 13;
-const double calendarFontSize1Down1 = 11.5;
-const FontWeight calendarFontWidth1 = FontWeight.w300;
-const double calendarFontSize2 = 10.2;
-const FontWeight calendarFontWidth2 = FontWeight.w300;
-const double eventListFontSize1 = 13.5;
-const FontWeight eventListFontWidth1 = FontWeight.w300;
-const double eventListFontSize2 = 13;
-const FontWeight eventListFontWidth2 = FontWeight.w300;
-const double eventListFontSize3 = 14;
-const FontWeight eventListFontWidth3 = FontWeight.w300;
+import 'f016_ui_define.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
@@ -259,7 +241,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                   ),
                   child: Text(calendarNotifier
                       .getCalendarSwitchingButtonTitle(),
-                      style: const TextStyle(color: Colors.white)
+                      style: TextStyle(color: cardTextColor)
                   )
               )),
               Container(width: 76)
@@ -584,15 +566,15 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: borderColor,
+                  color: eventListTitleBgColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                             height: 1.3,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWidth1,
-                            color: Colors.black
+                            color: normalTextColor
                         )
                       ),
                     ],
@@ -682,10 +664,10 @@ class EventPart extends HookConsumerWidget {
                           vertical: 0),
                       child: Text(emptyMessage!,
                           maxLines: 2,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
-                            color: Colors.black
+                            color: normalTextColor
                           )
                       )
                   )
