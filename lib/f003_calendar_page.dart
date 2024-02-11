@@ -654,8 +654,8 @@ class EventPart extends HookConsumerWidget {
         },
         child: Container(
             padding: const EdgeInsets.all(selectedBoarderWidth),
-          child: Row(
-            children: [
+            child: Row(
+              children: [
               if (emptyMessage != null)
                 Expanded(child:
                   Container(
@@ -833,7 +833,7 @@ class EventPart extends HookConsumerWidget {
                     )
               )
             ],
-          )
+            )
         )
     );
   }

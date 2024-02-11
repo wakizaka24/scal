@@ -9,7 +9,7 @@ class CalendarDateUtils {
   List<DateTime> getAllDays(DateTime startDate, DateTime endDate) {
     var date = DateTime(startDate.year, startDate.month, startDate.day);
     List<DateTime> allDays = [];
-    while (!endDate.isBefore(date)) {
+    while (!endDate.isBefore(date) && !endDate.isAtSameMomentAs(date)) {
       allDays.add(date);
       date = date.add(const Duration(days: 1));
     }
@@ -23,7 +23,7 @@ class CalendarDateUtils {
         startHour);
 
     List<DateTime> allHours = [];
-    while (!endDate.isBefore(date)) {
+    while (!endDate.isBefore(date) && !endDate.isAtSameMomentAs(date)) {
       allHours.add(date);
       date = date.add(Duration(hours: timeInterval));
     }

@@ -51,27 +51,38 @@ const FontWeight eventListFontWidth3 = FontWeight.w300;
 // var eventListTitleBgColor = const Color(0xCCDED2BF);
 // var cardTextColor = Colors.black;
 // var baseThemeData = ThemeData(
-//     useMaterial3: true,
 //     colorScheme: ColorScheme.fromSwatch(
-//       // brightness: Brightness.dark,
-//       primarySwatch: Colors.blue,
-//       accentColor: Colors.blue,
-//       cardColor: Colors.grey,
-//       // backgroundColor: Colors.white
+//         // brightness: Brightness.dark,
+//         primarySwatch: Colors.blue,
+//         accentColor: Colors.blue,
+//         cardColor: Colors.grey,
+//         // backgroundColor: Colors.white
 //     )
 // );
 
-var normalTextColor = Colors.white54;
-var disabledTextColor = Colors.white30;
-var eventListTitleBgColor = const Color(0x55DED2BF);
-var cardTextColor = Colors.white;
+var normalTextColor = Colors.black;
+var disabledTextColor = Colors.black54;
+var eventListTitleBgColor = const Color(0xCCDED2BF);
+var cardTextColor = Colors.black;
 var baseThemeData = ThemeData(
-    useMaterial3: true,
     colorScheme: ColorScheme.fromSwatch(
-      brightness: Brightness.dark,
-      primarySwatch: Colors.blue,
-      accentColor: Colors.blue,
-      cardColor: Colors.black,
-      backgroundColor: Colors.indigo
+        primarySwatch: Colors.blue,
+        accentColor: Colors.blue,
+        cardColor: Colors.grey,
+        backgroundColor: Colors.white
     )
 );
+
+// var normalTextColor = Colors.white54;
+// var disabledTextColor = Colors.white30;
+// var eventListTitleBgColor = const Color(0x55DED2BF);
+// var cardTextColor = Colors.white;
+// var baseThemeData = ThemeData(
+//     colorScheme: ColorScheme.fromSwatch(
+//         brightness: Brightness.dark,
+//         primarySwatch: Colors.blue,
+//         accentColor: Colors.blue,
+//         cardColor: Colors.black,
+//         backgroundColor: Colors.indigo
+//     )
+// );

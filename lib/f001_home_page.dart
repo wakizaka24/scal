@@ -133,6 +133,23 @@ class HomePage extends HookConsumerWidget {
         )
     );
 
+    var floatingActionButton = FloatingActionButton(
+        heroTag: 'calendar_hero_tag',
+        onPressed: () async {
+          await calendarNotifier.onPressedAddingButton();
+        },
+        child: Consumer(
+            builder: ((context, ref, child) {
+              final homeState = ref.watch(homePageNotifierProvider);
+              final calendarState = ref.watch(calendarPageNotifierProvider(
+                  homeState.homePageIndex));
+              return Icon(calendarState.cellActive
+                  ? Icons.add : Icons.add_circle_outline,
+                  color: Colors.white);
+            })
+        )
+    );
+
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
       endDrawer: const EndDrawer(),
@@ -141,25 +158,20 @@ class HomePage extends HookConsumerWidget {
             child: Container(color: theme.primaryColor)
         ),
         // Image.asset('images/IMG_3173_3.jpeg'),
-        appBarAndCalendars
-      ]),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
-      floatingActionButton: FloatingActionButton(
-          heroTag: 'calendar_hero_tag',
-          onPressed: () async {
-            await calendarNotifier.onPressedAddingButton();
-          },
-          child: Consumer(
-              builder: ((context, ref, child) {
-                final homeState = ref.watch(homePageNotifierProvider);
-                final calendarState = ref.watch(calendarPageNotifierProvider(
-                    homeState.homePageIndex));
-                return Icon(calendarState.cellActive
-                    ? Icons.add : Icons.add_circle_outline,
-                    color: Colors.white);
-              })
-          )
-      ),
+        appBarAndCalendars,
+        SafeArea(child: Column(
+            children: [
+              const Spacer(),
+              Row(children: [
+                const Spacer(),
+                floatingActionButton,
+                Container(width: 10)
+              ])
+            ]
+        )),
+        // Visibility(visible: homeState.uICover,
+        //     child: Container(color: Colors.black.withAlpha(100)))
+      ])
     );
 
     // 右端スワイプでナビゲーションを戻さない

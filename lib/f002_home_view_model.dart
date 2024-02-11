@@ -3,22 +3,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class HomePageState {
-  // UI
+  // Control
   PageController homePageController = PageController(initialPage: 1);
 
   // Data
   int homePageIndex = 1;
   String appBarTitle = '';
+  // bool uICover = false;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
 
-    // UI
+    // Control
     nState.homePageController = state.homePageController;
 
     // Data
     nState.homePageIndex = state.homePageIndex;
     nState.appBarTitle = state.appBarTitle;
+    // nState.uICover = state.uICover;
 
     return nState;
   }
@@ -45,6 +47,11 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
       updateState();
     }
   }
+
+  // setUICover(bool cover) async {
+  //   state.uICover = cover;
+  //   await updateState();
+  // }
 
   updateState() async {
     state = HomePageState.copy(state);

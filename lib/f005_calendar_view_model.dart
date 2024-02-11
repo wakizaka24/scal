@@ -712,7 +712,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Event List
 
   Future<bool> deleteEvent(EventDisplay event) async {
-    if (event.sameCell) {
+    var recurrenceRule = state.eventIdEventMap[event.eventId]!
+        .recurrenceRule;
+    if (event.sameCell || recurrenceRule != null) {
       return await CalendarRepository().deleteEvent(event.calendarId,
           event.eventId);
     } else {
@@ -721,14 +723,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   Future<bool> deleteAfterEvent(String eventId) async {
-    var timeInterval = 24 ~/ CalendarPageState.timeColNum;
     Event event = state.eventIdEventMap[eventId]!;
 
-    var deletionDate = state.selectionHour;
+    DateTime? deletionDate;
     if (state.calendarSwitchingIndex == 0) {
-      deletionDate = deletionDate.add(const Duration(days: -1));
+      deletionDate = state.selectionDate;
     } else if (state.calendarSwitchingIndex == 1) {
-      deletionDate = deletionDate.add(Duration(hours: -timeInterval));
+      deletionDate = state.selectionHour;
+    } else {
+      return false;
     }
 
     var deletionTZDate = calendarRepo.convertTZDateTime(deletionDate);
@@ -737,21 +740,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       event.end = deletionTZDate;
     }
 
-    var repetitionEndDate = event.recurrenceRule?.endDate;
-    if (repetitionEndDate != null) {
-      if (repetitionEndDate.isAfter(deletionDate)) {
-        event.recurrenceRule?.endDate
-          = calendarRepo.convertTZDateTime(deletionDate);
-      }
-    }
-
     return await calendarRepo.createOrUpdateEvent(event);
   }
 
   onPressedEventListFixedButton(int index) async {
     var event = state.eventList[index];
     event.editing = true;
-    event.sameCell = true;
+    event.sameCell = await getSameCell(eventId: event.eventId);
     state.editingEventList.add(
         EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
             editing: true, sameCell: false, readOnly: event.readOnly,
@@ -760,6 +755,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     );
 
     await updateState();
+  }
+
+  getSameCell({String? eventId, bool? allDay}) async {
+    var mapAllDay = allDay ?? state.eventIdEventMap[eventId]!.allDay;
+    var startDate = state.eventIdStartDateMap[eventId]!;
+    var sameCell = true;
+    if (state.calendarSwitchingIndex == 0) {
+      var eventDay = DateTime(startDate.year, startDate.month, startDate.day);
+      sameCell = eventDay == state.selectionDate;
+    } else if (state.calendarSwitchingIndex == 1) {
+      var eventHour = DateTime(startDate.year, startDate.month, startDate.day,
+          startDate.hour);
+      sameCell = eventHour == state.selectionHour
+          && mapAllDay == state.selectionAllDay;
+    }
+    return sameCell;
   }
 
   Future<bool> copyIndexEvent(int index) async {
@@ -872,9 +883,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           .firstOrNull != null;
       var head = '${DateFormat.jm('ja').format(event.start!)}\n'
           '${DateFormat.jm('ja').format(event.end!)}';
-      if (event.start!.year != event.end!.year
-          || event.start!.month != event.end!.month
-          || event.start!.day != event.end!.day) {
+      if (event.end!.difference(event.start!).inHours > 24) {
         head = '連日';
       } else if (event.allDay!) {
         head = '終日';
@@ -883,18 +892,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var title = event.title!;
       var fontColor = calendar.isDefault! ? normalTextColor
           : disabledTextColor;
-
-      var sameCell = true;
-      var startDate = state.eventIdStartDateMap[event.eventId!]!;
-      if (state.calendarSwitchingIndex == 0) {
-        var eventDay = DateTime(startDate.year, startDate.month, startDate.day);
-        sameCell = eventDay == state.selectionDate;
-      } else if (state.calendarSwitchingIndex == 1) {
-        var eventHour = DateTime(startDate.year, startDate.month, startDate.day,
-            startDate.hour);
-        sameCell = eventHour == state.selectionHour
-          && event.allDay == state.selectionAllDay;
-      }
+      var sameCell = await getSameCell(eventId: event.eventId,
+          allDay: event.allDay);;
 
       creatingEventList.add(EventDisplay(eventId: eventId,
           calendarId: calendar.id!, editing: editing,
