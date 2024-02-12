@@ -105,6 +105,23 @@ class HomePage extends HookConsumerWidget {
             SizedBox(width: appBarHeight, height: appBarHeight,
                 child: TextButton(
                   onPressed: () {
+                    calendarNotifier.onTapTodayButton();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(appBarHeight / 2),
+                    ),
+                    padding: const EdgeInsets.all(0),
+                  ),
+                  child: const Icon(Icons.check),
+                )
+            ),
+            Container(width: 8),
+            SizedBox(width: appBarHeight, height: appBarHeight,
+                child: TextButton(
+                  onPressed: () {
                     homePageScaffoldKey.currentState!
                         .openEndDrawer();
                   },

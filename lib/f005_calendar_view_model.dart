@@ -306,6 +306,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Month Calendar
 
+  onTapTodayButton() async {
+    var page = state.monthCalendarController.page!.toInt();
+    state.monthCalendarController.animateToPage(
+        page + 3,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn);
+  }
+
   onTapDownCalendarDay(int index) async {
     // 選択中のセル
     if (state.dayPartIndex == index) {
