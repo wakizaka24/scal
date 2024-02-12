@@ -66,50 +66,70 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    var appBarAndCalendars = SafeArea(bottom: false,
+    var appTitle = Column(children: [
+      SizedBox(width: deviceWidth, height: unSafeAreaTopHeight - 10
+      ),
+      SizedBox(width: deviceWidth, height: appBarHeight + 10,
+        child: Consumer(
+            builder: ((context, ref, child) {
+              final homeState = ref.watch(
+                  homePageNotifierProvider);
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(width: 8),
+                  Text(homeState.appBarTitle,
+                      style: const TextStyle(
+                          height: 1.3,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 24 /* + 8*/
+                      )
+                  ),
+                  const Spacer(),
+                ],
+              );
+            })
+        ),
+      ),
+    ]);
+
+    var appBar = Column(children: [
+      SizedBox(width: deviceWidth, height: unSafeAreaTopHeight
+      ),
+      SizedBox(width: deviceWidth, height: appBarHeight,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Spacer(),
+            SizedBox(width: appBarHeight, height: appBarHeight,
+                child: TextButton(
+                  onPressed: () {
+                    homePageScaffoldKey.currentState!
+                        .openEndDrawer();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(appBarHeight / 2),
+                    ),
+                    padding: const EdgeInsets.all(0),
+                  ),
+                  child: const Icon(Icons.check),
+                )
+            ),
+            Container(width: 8)
+          ],
+        ),
+      ),
+    ]);
+
+    var calendars = SafeArea(bottom: false,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: deviceWidth, height: appBarHeight,
-                child: Consumer(
-                    builder: ((context, ref, child) {
-                      final homeState = ref.watch(
-                          homePageNotifierProvider);
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(width: 8),
-                          Text(homeState.appBarTitle,
-                              style: const TextStyle(
-                                  height: 1.3,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 21
-                              )
-                          ),
-                          const Spacer(),
-                          SizedBox(width: appBarHeight, height: appBarHeight,
-                              child: TextButton(
-                                onPressed: () {
-                                  homePageScaffoldKey.currentState!
-                                      .openEndDrawer();
-                                },
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  textStyle: const TextStyle(fontSize: 15),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  padding: const EdgeInsets.all(0),
-                                ),
-                                child: const Icon(Icons.check),
-                              )
-                          ),
-                          Container(width: 8)
-                        ],
-                      );
-                    })
-                ),
+              SizedBox(width: deviceWidth, height: appBarHeight
               ),
               Expanded(
                   child: PageView(
@@ -158,7 +178,9 @@ class HomePage extends HookConsumerWidget {
             child: Container(color: theme.primaryColor)
         ),
         // Image.asset('images/IMG_3173_3.jpeg'),
-        appBarAndCalendars,
+        appTitle,
+        appBar,
+        calendars,
         SafeArea(child: Column(
             children: [
               const Spacer(),

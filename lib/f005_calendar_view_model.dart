@@ -120,6 +120,7 @@ class EventDisplay {
   Color lineColor;
   String title;
   Color fontColor;
+  Event? event;
 
   EventDisplay({
     required this.eventId,
@@ -130,7 +131,8 @@ class EventDisplay {
     required this.head,
     required this.lineColor,
     required this.title,
-    required this.fontColor
+    required this.fontColor,
+    this.event
   });
 }
 
@@ -290,10 +292,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       await selectDay();
       await updateWeekCalendarData();
       await initSelectionWeekCalendar();
-      await updateSelectionDayOfHome();
     } else {
       await selectHour();
-      await updateSelectionDayOfHome();
     }
     await updateState();
   }
@@ -525,7 +525,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     await selectHour(index: index);
-    await updateSelectionDayOfHome();
     await updateState();
   }
 
@@ -744,14 +743,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   onPressedEventListFixedButton(int index) async {
-    var event = state.eventList[index];
-    event.editing = true;
-    event.sameCell = await getSameCell(eventId: event.eventId);
+    var ed = state.eventList[index];
+    var event = state.eventIdEventMap[ed.eventId];
+    ed.editing = true;
+    ed.sameCell = await getSameCell(eventId: ed.eventId);
     state.editingEventList.add(
-        EventDisplay(eventId: event.eventId, calendarId: event.calendarId,
-            editing: true, sameCell: false, readOnly: event.readOnly,
-            head: event.head, lineColor: event.lineColor, title: event.title,
-            fontColor: event.fontColor)
+        EventDisplay(eventId: ed.eventId, calendarId: ed.calendarId,
+            editing: true, sameCell: false, readOnly: ed.readOnly,
+            head: ed.head, lineColor: ed.lineColor, title: ed.title,
+            fontColor: ed.fontColor, event: event)
     );
 
     await updateState();
@@ -774,16 +774,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   Future<bool> copyIndexEvent(int index) async {
-    var eventId = state.eventList[index].eventId;
-    Event event = state.eventIdEventMap[eventId]!;
+    Event event = state.eventList[index].event!;
 
     var editingEvent = copyEvent(event);
     return await calendarRepo.createOrUpdateEvent(editingEvent);
   }
 
   Future<bool> moveIndexEvent(int index) async {
-    var eventId = state.eventList[index].eventId;
-    Event event = state.eventIdEventMap[eventId]!;
+    Event event = state.eventList[index].event!;
 
     var endPeriod = event.end!.difference(event.start!);
     Duration? repeatEndPeriod;
@@ -893,13 +891,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var fontColor = calendar.isDefault! ? normalTextColor
           : disabledTextColor;
       var sameCell = await getSameCell(eventId: event.eventId,
-          allDay: event.allDay);;
+          allDay: event.allDay);
 
       creatingEventList.add(EventDisplay(eventId: eventId,
           calendarId: calendar.id!, editing: editing,
           sameCell: sameCell, readOnly: calendar.isReadOnly!,
           head: head, lineColor: lineColor, title: title,
-          fontColor: fontColor
+          fontColor: fontColor, event: event
       ));
     }
 
@@ -960,7 +958,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateSelectionDayOfHome() async {
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    homeNotifier.setAppBarTitle(state.selectionDate, true);
+    homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
   }
 
   updateState() async {
