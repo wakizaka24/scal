@@ -750,7 +750,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return await calendarRepo.createOrUpdateEvent(event);
   }
 
-  onPressedEventListFixedButton(int index) async {
+  fixedEvent(int index) async {
     var ed = state.eventList[index];
     var event = state.eventIdEventMap[ed.eventId];
     ed.editing = true;
@@ -761,8 +761,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             head: ed.head, lineColor: ed.lineColor, title: ed.title,
             fontColor: ed.fontColor, event: event)
     );
-
-    await updateState();
   }
 
   getSameCell({String? eventId, bool? allDay}) async {
@@ -799,14 +797,23 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     DateTime selectionDate;
+    int timeInterval;
     if (state.calendarSwitchingIndex == 0) {
       selectionDate = state.selectionDate;
+
+      timeInterval = 24;
     } else if (state.calendarSwitchingIndex == 1) {
       selectionDate = state.selectionHour;
       event.allDay = state.selectionAllDay;
+
+      timeInterval = 24 ~/ CalendarPageState.timeColNum;
     } else {
       return false;
     }
+
+    var addingHours = event.start!.difference(selectionDate).inHours
+      % timeInterval;
+    selectionDate = selectionDate.add(Duration(hours: addingHours));
 
     event.start = calendarRepo.convertTZDateTime(selectionDate);
     event.end = calendarRepo.convertTZDateTime(
@@ -836,13 +843,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         allDay: event.allDay,
         status: event.status
     );
-  }
-
-  onPressedEventListCancelButton(int index) async {
-    await editingCancel(index);
-
-    await updateEventList();
-    await updateState();
   }
 
   editingCancel(int index) async {
@@ -918,9 +918,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   selectEventListPart(int index) async {
+    if (!state.cellActive
+        && state.eventListIndex == index) {
+      return;
+    }
+
     state.cellActive = false;
     state.eventListIndex = index;
-    await updateState();
   }
 
   // Common

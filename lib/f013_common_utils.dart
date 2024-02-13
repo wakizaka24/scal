@@ -15,7 +15,7 @@ class CommonUtils {
       [String positiveTitle = 'OK', String? negativeTitle]) async {
 
     return await showDialog<String>(
-        barrierColor: Colors.black12,
+        // barrierColor: Colors.black12,
         context: context,
         builder: (_) {
           return PopScope(

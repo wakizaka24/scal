@@ -593,7 +593,9 @@ class EventListPart extends HookConsumerWidget {
                       index: 0,
                       isHighlighted: calendarState.eventListIndex == 0,
                       onTapDown: (int i) async {
-                        calendarNotifier.selectEventListPart(0);
+                        await calendarNotifier.selectEventListPart(0);
+
+                        await calendarNotifier.updateState();
                       },
                       emptyMessage: 'イベントがありません',
                     ),
@@ -604,7 +606,9 @@ class EventListPart extends HookConsumerWidget {
                       index: i,
                       isHighlighted: calendarState.eventListIndex == i,
                       onTapDown: (int i) async {
-                        calendarNotifier.selectEventListPart(i);
+                        await calendarNotifier.selectEventListPart(i);
+
+                        await calendarNotifier.updateState();
                       },
                       event: calendarState.eventList[i],
                     )
@@ -712,6 +716,8 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 41, height: 32,
                     child: TextButton(
                       onPressed: () async {
+                        await calendarNotifier.selectEventListPart(index);
+
                         if (!await calendarNotifier.copyIndexEvent(index)) {
                           if (context.mounted) {
                             await CommonUtils().showMessageDialog(context,
@@ -724,8 +730,8 @@ class EventPart extends HookConsumerWidget {
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        padding: const EdgeInsets.all(0),
+                          textStyle: const TextStyle(fontSize: 15),
+                          padding: const EdgeInsets.all(0)
                       ),
                       child: const Text('コピー',
                           style: TextStyle(
@@ -738,6 +744,8 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 41, height: 32,
                     child: TextButton(
                       onPressed: () async {
+                        await calendarNotifier.selectEventListPart(index);
+
                         if (!await calendarNotifier.moveIndexEvent(index)) {
                           if (context.mounted) {
                             await CommonUtils().showMessageDialog(context,
@@ -752,8 +760,8 @@ class EventPart extends HookConsumerWidget {
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        padding: const EdgeInsets.all(0),
+                          textStyle: const TextStyle(fontSize: 15),
+                          padding: const EdgeInsets.all(0)
                       ),
                       child: const Text('移動',
                           style: TextStyle(
@@ -766,12 +774,14 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 41, height: 32,
                     child: TextButton(
                       onPressed: () async {
-                        await calendarNotifier
-                            .onPressedEventListCancelButton(index);
+                        await calendarNotifier.selectEventListPart(index);
+                        await calendarNotifier.editingCancel(index);
+                        await calendarNotifier.updateEventList();
+                        await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        padding: const EdgeInsets.all(0),
+                          textStyle: const TextStyle(fontSize: 15),
+                          padding: const EdgeInsets.all(0)
                       ),
                       child: const Text('取消',
                           style: TextStyle(
@@ -784,11 +794,19 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 41, height: 32,
                     child: TextButton(
                       onPressed: () async {
-                        var result = await CommonUtils().showMessageDialog(
-                            context, '削除', 'イベントを削除しますか?', 'はい',
-                            'いいえ');
-                        if (result != 'positive') {
-                          return;
+                        // await Future.delayed(const Duration(
+                        // milliseconds: 500));
+
+                        await calendarNotifier.selectEventListPart(index);
+                        await calendarNotifier.updateState();
+
+                        if (context.mounted) {
+                          var result = await CommonUtils().showMessageDialog(
+                              context, '削除', 'イベントを削除しますか?', 'はい',
+                              'いいえ');
+                          if (result != 'positive') {
+                            return;
+                          }
                         }
 
                         if (!await calendarNotifier.deleteEvent(event!)) {
@@ -804,8 +822,9 @@ class EventPart extends HookConsumerWidget {
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        padding: const EdgeInsets.all(0),
+                          textStyle: const TextStyle(fontSize: 15),
+                          padding: const EdgeInsets.all(0),
+                          // splashFactory: NoSplash.splashFactory
                       ),
                       child: const Text('削除',
                           style: TextStyle(
@@ -818,12 +837,14 @@ class EventPart extends HookConsumerWidget {
                 SizedBox(width: 41, height: 32,
                     child: TextButton(
                       onPressed: () async {
-                        await calendarNotifier.onPressedEventListFixedButton(
+                        await calendarNotifier.selectEventListPart(index);
+                        await calendarNotifier.fixedEvent(
                             index);
+                        await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        padding: const EdgeInsets.all(0),
+                          textStyle: const TextStyle(fontSize: 15),
+                          padding: const EdgeInsets.all(0)
                       ),
                       child: const Text('固定',
                           style: TextStyle(
