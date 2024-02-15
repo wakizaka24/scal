@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'f016_ui_define.dart';
 
-class CommonUtils {
-  static final CommonUtils _instance = CommonUtils._internal();
-  CommonUtils._internal();
+class UIUtils {
+  static final UIUtils _instance = UIUtils._internal();
+  UIUtils._internal();
 
-  factory CommonUtils() {
+  factory UIUtils() {
     return _instance;
   }
 

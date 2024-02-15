@@ -1,8 +1,8 @@
-class CalendarDateUtils {
-  static final CalendarDateUtils _instance = CalendarDateUtils._internal();
-  CalendarDateUtils._internal();
+class CalendarUtils {
+  static final CalendarUtils _instance = CalendarUtils._internal();
+  CalendarUtils._internal();
 
-  factory CalendarDateUtils() {
+  factory CalendarUtils() {
     return _instance;
   }
 
@@ -28,5 +28,10 @@ class CalendarDateUtils {
       date = date.add(Duration(hours: timeInterval));
     }
     return allHours;
+  }
+
+  String convertCharWrapString(String str) {
+    return str.replaceAll(' ', '\u00a0') // 改行しないスペースに変換
+        .replaceAll('\'', '\u200b\''); // 'の前に改行可能なゼロ幅スペースを追加する
   }
 }

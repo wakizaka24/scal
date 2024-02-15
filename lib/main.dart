@@ -43,7 +43,7 @@ class SCalApp extends StatelessWidget {
           ],
           theme: baseThemeData,
           // darkTheme: darkThemeData,
-          title: 'SCal',
+          title: 'Alpha',
           home: const HomePage(),
       )
     );

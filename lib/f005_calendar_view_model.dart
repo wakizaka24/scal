@@ -6,7 +6,7 @@ import 'package:scal/f016_ui_define.dart';
 
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
-import 'f015_calendar_date_utils.dart';
+import 'f015_calendar_utils.dart';
 
 class CalendarPageState {
   // Control-Common
@@ -477,7 +477,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     Map<DateTime, List<Event>> eventsMap = {};
     for (int i = 0; i < events.length; i++) {
       var event = events[i];
-      var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
+      var allDays = CalendarUtils().getAllDays(event.start!, event.end!);
       allDays.fold(eventsMap, (events, day) {
         events[day] = events[day] ?? [];
         events[day]!.add(event);
@@ -501,7 +501,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           var event = events[i];
           var calendar = calendarMap[event.calendarId]!;
           dayInfo.eventList.add(DayEventDisplay(
-              title: events[i].title!,
+              title: CalendarUtils().convertCharWrapString(events[i].title!),
               titleColor: calendar.isDefault! ? normalTextColor
                   : disabledTextColor));
         }
@@ -631,7 +631,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       if (!event.allDay!) {
         continue;
       }
-      var allDays = CalendarDateUtils().getAllDays(event.start!, event.end!);
+      var allDays = CalendarUtils().getAllDays(event.start!, event.end!);
       allDays.fold(eventsMap, (events, day) {
         events[day] = events[day] ?? [];
         events[day]!.add(event);
@@ -655,7 +655,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         // if (event.title=='てすと') {
         //   debugPrint('!');
         // }
-        var allHours = CalendarDateUtils().getAllHours(event.start!, event.end!,
+        var allHours = CalendarUtils().getAllHours(event.start!, event.end!,
             timeInterval);
         allHours.fold(eventsMap, (events, day) {
           // 数時間ごとにまとめる

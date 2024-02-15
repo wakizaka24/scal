@@ -6,17 +6,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
-import 'f013_common_utils.dart';
+import 'f013_ui_utils.dart';
 import 'f016_ui_define.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final int pageIndex;
-  final double unSafeAreaTopHeight;
-  final double unSafeAreaBottomHeight;
+  final double unsafeAreaTopHeight;
+  final double unsafeAreaBottomHeight;
 
   const CalendarPage({super.key,
-    required this.unSafeAreaTopHeight,
-    required this.unSafeAreaBottomHeight,
+    required this.unsafeAreaTopHeight,
+    required this.unsafeAreaBottomHeight,
     required this.pageIndex});
 
   @override
@@ -66,7 +66,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     }
     // 月部分の高さ
     double monthPartHeight = deviceHeight - appBarHeight - weekdayPartHeight
-        - eventListHeight - widget.unSafeAreaTopHeight;
+        - eventListHeight - widget.unsafeAreaTopHeight;
     // 週部分の幅
     double weekdayPartWidth = deviceWidth / CalendarPageState
         .weekdayPartColNum;
@@ -78,7 +78,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     }
     // 週部分の高さ
     double weekPartHeight = deviceHeight - appBarHeight - eventListHeight
-        - widget.unSafeAreaTopHeight;
+        - widget.unsafeAreaTopHeight;
 
     useEffect(() {
       debugPrint('child useEffect');
@@ -191,64 +191,63 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         ]
     );
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Stack(children: [
-          Column(children: [
-            Expanded(
-                child: PageView(
-                    scrollDirection: Axis.vertical,
-                    controller: calendarState.calendarSwitchingController,
-                    physics: const CustomScrollPhysics(mass: 75,
-                        stiffness: 100, damping: 0.85),
-                    onPageChanged: (int index) {
-                    },
-                    children: [monthCalendar, weekCalendar]
-                )
-            ),
-            AspectRatio(
-                aspectRatio: eventListAspectRate,
-                child: EventListPart(pageIndex: widget.pageIndex,
-                    unSafeAreaBottomHeight: widget.unSafeAreaBottomHeight)
-            )
-          ]),
-          Column(children: [
-            const Spacer(),
-            Row(children:[const Spacer(),
-              SafeArea(child: ElevatedButton(
-                  onPressed: () async {
-                    final calendarState = ref.watch(
-                        calendarPageNotifierProvider(homeState.homePageIndex));
-                    double prePage = calendarState.calendarSwitchingController
-                        .page!;
-
-                    int page = prePage.toInt();
-                    if (page.toDouble() == prePage) {
-                      page = page == 0 ? 1: 0;
-                      await calendarState.calendarSwitchingController
-                          .animateToPage(page, duration: const Duration(
-                          milliseconds: 300), curve: Curves.easeIn);
-                    }
+    return SafeArea(
+      bottom: false,
+      child: Stack(children: [
+        Column(children: [
+          Expanded(
+              child: PageView(
+                  scrollDirection: Axis.vertical,
+                  controller: calendarState.calendarSwitchingController,
+                  physics: const CustomScrollPhysics(mass: 75,
+                      stiffness: 100, damping: 0.85),
+                  onPageChanged: (int index) {
                   },
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(32, 32),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    textStyle: const TextStyle(fontSize: 13),
-                    padding: const EdgeInsets.all(0),
+                  children: [monthCalendar, weekCalendar]
+              )
+          ),
+          AspectRatio(
+              aspectRatio: eventListAspectRate,
+              child: EventListPart(pageIndex: widget.pageIndex,
+                  unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight)
+          )
+        ]),
+        Column(children: [
+          const Spacer(),
+          Row(children:[const Spacer(),
+            SafeArea(child: ElevatedButton(
+                onPressed: () async {
+                  final calendarState = ref.watch(
+                      calendarPageNotifierProvider(homeState.homePageIndex));
+                  double prePage = calendarState.calendarSwitchingController
+                      .page!;
+
+                  int page = prePage.toInt();
+                  if (page.toDouble() == prePage) {
+                    page = page == 0 ? 1: 0;
+                    await calendarState.calendarSwitchingController
+                        .animateToPage(page, duration: const Duration(
+                        milliseconds: 300), curve: Curves.easeIn);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(32, 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(calendarNotifier
-                      .getCalendarSwitchingButtonTitle(),
-                      style: TextStyle(color: cardTextColor)
-                  )
-              )),
-              Container(width: 76)
-            ])
+                  textStyle: const TextStyle(fontSize: 13),
+                  padding: const EdgeInsets.all(0),
+                ),
+                child: Text(calendarNotifier
+                    .getCalendarSwitchingButtonTitle(),
+                    style: TextStyle(color: cardTextColor)
+                )
+            )),
+            Container(width: 76)
           ])
+        ])
       ]),
-    ));
+    );
   }
 
   @override
@@ -522,7 +521,8 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(day.eventList[i].title.replaceAll(' ', '\u00a0'),
+                      Text(
+                        day.eventList[i].title,
                         maxLines: 1,
                         style: TextStyle(
                             height: 1.2,
@@ -546,12 +546,12 @@ class DayPart extends HookConsumerWidget {
 
 class EventListPart extends HookConsumerWidget {
   final int pageIndex;
-  final double unSafeAreaBottomHeight;
+  final double unsafeAreaBottomHeight;
 
   const EventListPart({
     super.key,
     required this.pageIndex,
-    required this.unSafeAreaBottomHeight,
+    required this.unsafeAreaBottomHeight,
   });
 
   @override
@@ -584,7 +584,7 @@ class EventListPart extends HookConsumerWidget {
           Expanded(child:
             ListView(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 56
-                    + unSafeAreaBottomHeight),
+                    + unsafeAreaBottomHeight),
                 children: [
                   if (calendarState.eventList.isEmpty)
                     EventPart(
@@ -702,7 +702,7 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(event!.title.replaceAll(' ', '\u00a0'),
+                      child: Text(event!.title,
                           maxLines: 2, style: TextStyle(
                               height: 1.3,
                               fontSize: eventListFontSize3,
@@ -720,7 +720,7 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.copyIndexEvent(index)) {
                           if (context.mounted) {
-                            await CommonUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context,
                                 'コピー', 'コピーに失敗しました');
                           }
                         }
@@ -748,7 +748,7 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.moveIndexEvent(index)) {
                           if (context.mounted) {
-                            await CommonUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context,
                                 '移動', '移動に失敗しました');
                           }
                         } else {
@@ -801,7 +801,7 @@ class EventPart extends HookConsumerWidget {
                         await calendarNotifier.updateState();
 
                         if (context.mounted) {
-                          var result = await CommonUtils().showMessageDialog(
+                          var result = await UIUtils().showMessageDialog(
                               context, '削除', 'イベントを削除しますか?', 'はい',
                               'いいえ');
                           if (result != 'positive') {
@@ -811,7 +811,7 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.deleteEvent(event!)) {
                           if (context.mounted) {
-                            await CommonUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context,
                                 '削除', '削除に失敗しました');
                           }
                           return;
@@ -1058,8 +1058,7 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(hour.eventList[i].title
-                              .replaceAll(' ', '\u00a0'),
+                          Text(hour.eventList[i].title,
                             maxLines: 1,
                             style: TextStyle(
                                 height: 1.2,

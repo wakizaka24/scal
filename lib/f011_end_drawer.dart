@@ -14,11 +14,15 @@ enum EndDrawerMenuType {
 }
 
 class EndDrawer extends HookConsumerWidget {
-  const EndDrawer({super.key});
+  final double unsafeAreaTopHeight;
+
+  const EndDrawer({super.key,
+    required this.unsafeAreaTopHeight
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
@@ -28,46 +32,45 @@ class EndDrawer extends HookConsumerWidget {
       ],
     );
 
-    return SafeArea(
-        bottom: false,
-        child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16)),
-            child: Drawer(
-                // backgroundColor: theme.colorScheme.background,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
+    const double buttonWidth = 29;
+    var drawer = Drawer(
+        backgroundColor: theme.colorScheme.background,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  child: SizedBox(width: buttonWidth, height: buttonWidth,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: normalTextColor,
+                          textStyle: const TextStyle(fontSize: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                buttonWidth / 2),
                           ),
-                          child: SizedBox(width: 29, height: 29,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.black,
-                                  textStyle: const TextStyle(fontSize: 15),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  padding: const EdgeInsets.all(0),
-                                ),
-                                child: Icon(Icons.check,
-                                    color: normalTextColor),
-                              )
-                          )
-                      ),
-                      Expanded(
-                          child: menuList
-                      ),
-                    ]
-                )
-            )
+                          padding: const EdgeInsets.all(0),
+                        ),
+                        child: Icon(Icons.check,
+                            color: normalTextColor),
+                      )
+                  )
+              ),
+              Expanded(
+                  child: menuList
+              ),
+            ]
         )
     );
+
+    return Column(children: [
+      SizedBox(height: unsafeAreaTopHeight),
+    Expanded(child: drawer)]);
   }
 }

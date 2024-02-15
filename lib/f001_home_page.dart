@@ -12,7 +12,7 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
 // アプリバーの高さ
-const double appBarHeight = 29;
+const double appBarHeight = 39;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -27,9 +27,12 @@ class HomePage extends HookConsumerWidget {
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
-    double unSafeAreaTopHeight = MediaQuery.of(context).padding.top;
+    double unsafeAreaTopHeight = MediaQuery.of(context).padding.top - 21;
+    if (unsafeAreaTopHeight < 10) {
+      unsafeAreaTopHeight = 10;
+    }
     // アンセーフエリア下の高さ
-    double unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
+    double unsafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // 画面の高さ
@@ -45,7 +48,7 @@ class HomePage extends HookConsumerWidget {
       homeState.homePageController.addListener(() async {
         double offset = homeState.homePageController.offset;
         double contentHeight = deviceHeight - appBarHeight
-            - unSafeAreaTopHeight;
+            - unsafeAreaTopHeight;
         var index = homeState.homePageIndex;
         if (offset <= 0) {
           index = 0;
@@ -67,9 +70,9 @@ class HomePage extends HookConsumerWidget {
     }, const []);
 
     var appTitle = Column(children: [
-      SizedBox(width: deviceWidth, height: unSafeAreaTopHeight - 10
+      SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
       ),
-      SizedBox(width: deviceWidth, height: appBarHeight + 10,
+      SizedBox(width: deviceWidth, height: appBarHeight,
         child: Consumer(
             builder: ((context, ref, child) {
               final homeState = ref.watch(
@@ -83,7 +86,7 @@ class HomePage extends HookConsumerWidget {
                           height: 1.3,
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
-                          fontSize: 24 /* + 8*/
+                          fontSize: 24
                       )
                   ),
                   const Spacer(),
@@ -95,7 +98,7 @@ class HomePage extends HookConsumerWidget {
     ]);
 
     var appBar = Column(children: [
-      SizedBox(width: deviceWidth, height: unSafeAreaTopHeight
+      SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
       ),
       SizedBox(width: deviceWidth, height: appBarHeight,
         child: Row(
@@ -118,7 +121,6 @@ class HomePage extends HookConsumerWidget {
                   child: const Icon(Icons.check),
                 )
             ),
-            Container(width: 8),
             SizedBox(width: appBarHeight, height: appBarHeight,
                 child: TextButton(
                   onPressed: () {
@@ -142,32 +144,31 @@ class HomePage extends HookConsumerWidget {
       ),
     ]);
 
-    var calendars = SafeArea(bottom: false,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(width: deviceWidth, height: appBarHeight
-              ),
-              Expanded(
-                  child: PageView(
-                    // physics: const NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical, // 縦
-                    controller: homeState.homePageController,
-                    pageSnapping: true, // ページごとにスクロールを止める
-                    onPageChanged: (index) {
-                    },
-                    children: <Widget>[
-                      CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
-                          unSafeAreaBottomHeight: unSafeAreaBottomHeight,
-                          pageIndex: 0),
-                      CalendarPage(unSafeAreaTopHeight: unSafeAreaTopHeight,
-                          unSafeAreaBottomHeight: unSafeAreaBottomHeight,
-                          pageIndex: 1),
-                    ],
-                  )
+    var calendars = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
+              + appBarHeight
+          ),
+          Expanded(
+              child: PageView(
+                // physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.vertical, // 縦
+                controller: homeState.homePageController,
+                pageSnapping: true, // ページごとにスクロールを止める
+                onPageChanged: (index) {
+                },
+                children: <Widget>[
+                  CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
+                      unsafeAreaBottomHeight: unsafeAreaBottomHeight,
+                      pageIndex: 0),
+                  CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
+                      unsafeAreaBottomHeight: unsafeAreaBottomHeight,
+                      pageIndex: 1),
+                ],
               )
-            ]
-        )
+          )
+        ]
     );
 
     var floatingActionButton = FloatingActionButton(
@@ -189,9 +190,9 @@ class HomePage extends HookConsumerWidget {
 
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
-      endDrawer: const EndDrawer(),
+      endDrawer: EndDrawer(unsafeAreaTopHeight: unsafeAreaTopHeight),
       body: Stack(children: [
-        SizedBox(width: deviceWidth, height: unSafeAreaTopHeight + appBarHeight,
+        SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
             child: Container(color: theme.primaryColor)
         ),
         // Image.asset('images/IMG_3173_3.jpeg'),
@@ -216,7 +217,11 @@ class HomePage extends HookConsumerWidget {
     // 右端スワイプでナビゲーションを戻さない
     return PopScope(
         canPop: false,
-        child: scaffold
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: scaffold
+        )
     );
   }
 }
