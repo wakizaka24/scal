@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class CalendarUtils {
   static final CalendarUtils _instance = CalendarUtils._internal();
   CalendarUtils._internal();
@@ -31,7 +33,18 @@ class CalendarUtils {
   }
 
   String convertCharWrapString(String str) {
-    return str.replaceAll(' ', '\u00a0') // 改行しないスペースに変換
-        .replaceAll('\'', '\u200b\''); // 'の前に改行可能なゼロ幅スペースを追加する
+    var replaceStr = str
+        .replaceAll(' ', '\u00a0') // 改行しないスペースに変換
+        // 改行できなくなる文字の前にゼロ幅スペースを追加する
+        .replaceAll('\'', '\u200b\'') // '
+        .replaceAll('’', '\u200b’') // ’
+        .replaceAll('‘', '\u200b‘') // ‘
+        ;
+
+    if (replaceStr.contains('脇坂')) {
+      debugPrint(replaceStr);
+    }
+
+    return replaceStr;
   }
 }

@@ -7,6 +7,7 @@ import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
+import 'f015_calendar_utils.dart';
 import 'f016_ui_define.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
@@ -521,8 +522,8 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(
-                        day.eventList[i].title,
+                      Text(CalendarUtils().convertCharWrapString(
+                        day.eventList[i].title),
                         maxLines: 1,
                         style: TextStyle(
                             height: 1.2,
@@ -702,7 +703,8 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(event!.title,
+                      child: Text(CalendarUtils().convertCharWrapString(
+                          event!.title),
                           maxLines: 2, style: TextStyle(
                               height: 1.3,
                               fontSize: eventListFontSize3,
@@ -1058,7 +1060,8 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(hour.eventList[i].title,
+                          Text(CalendarUtils().convertCharWrapString(
+                              hour.eventList[i].title),
                             maxLines: 1,
                             style: TextStyle(
                                 height: 1.2,

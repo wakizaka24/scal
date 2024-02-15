@@ -311,7 +311,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.monthCalendarController.animateToPage(
         page + 3,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn);
+        curve: Curves.linear);
   }
 
   onTapDownCalendarDay(int index) async {
@@ -501,7 +501,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           var event = events[i];
           var calendar = calendarMap[event.calendarId]!;
           dayInfo.eventList.add(DayEventDisplay(
-              title: CalendarUtils().convertCharWrapString(events[i].title!),
+              title: events[i].title!,
               titleColor: calendar.isDefault! ? normalTextColor
                   : disabledTextColor));
         }
