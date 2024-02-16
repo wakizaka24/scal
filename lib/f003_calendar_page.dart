@@ -198,10 +198,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         Column(children: [
           Expanded(
               child: PageView(
-                  scrollDirection: Axis.vertical,
                   controller: calendarState.calendarSwitchingController,
-                  physics: const CustomScrollPhysics(mass: 75,
-                      stiffness: 100, damping: 0.85),
+                // physics: const CustomScrollPhysics(mass: 75,
+                //     stiffness: 100, damping: 0.85),
+                  physics: const NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.vertical,
                   onPageChanged: (int index) {
                   },
                   children: [monthCalendar, weekCalendar]

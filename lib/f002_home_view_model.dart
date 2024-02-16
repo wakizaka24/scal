@@ -4,10 +4,10 @@ import 'package:intl/intl.dart';
 
 class HomePageState {
   // Control
-  PageController homePageController = PageController(initialPage: 1);
+  PageController homePageController = PageController(initialPage: 0);
 
   // Data
-  int homePageIndex = 1;
+  int homePageIndex = 0;
   String appBarTitle = '';
   // bool uICover = false;
 

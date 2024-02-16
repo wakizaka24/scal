@@ -152,9 +152,9 @@ class HomePage extends HookConsumerWidget {
           ),
           Expanded(
               child: PageView(
+                controller: homeState.homePageController,
                 // physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical, // 縦
-                controller: homeState.homePageController,
                 pageSnapping: true, // ページごとにスクロールを止める
                 onPageChanged: (index) {
                 },
