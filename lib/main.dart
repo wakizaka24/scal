@@ -21,6 +21,11 @@ void main() {
     )
   );
 
+  // MediaQuery.removePadding removeTopと
+  // 併用でセーフエリアのボタンを有効にする。
+  SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky);
+
   runApp(const SCalApp());
 }
 

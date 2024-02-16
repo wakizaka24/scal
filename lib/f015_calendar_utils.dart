@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 
 class CalendarUtils {
   static final CalendarUtils _instance = CalendarUtils._internal();
@@ -41,9 +41,9 @@ class CalendarUtils {
         .replaceAll('‘', '\u200b‘') // ‘
         ;
 
-    if (replaceStr.contains('脇坂')) {
-      debugPrint(replaceStr);
-    }
+    // if (replaceStr.contains('')) {
+    //   debugPrint(replaceStr);
+    // }
 
     return replaceStr;
   }
