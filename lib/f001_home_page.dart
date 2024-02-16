@@ -47,12 +47,12 @@ class HomePage extends HookConsumerWidget {
 
       homeState.homePageController.addListener(() async {
         double offset = homeState.homePageController.offset;
-        // double contentHeight = deviceHeight - appBarHeight
-        //     - unsafeAreaTopHeight;
+        double contentHeight = deviceHeight - appBarHeight
+            - unsafeAreaTopHeight;
         var index = homeState.homePageIndex;
         if (offset <= 0) {
           index = 0;
-        } else if (offset >= /*contentHeight*/deviceWidth) {
+        } else if (offset >= contentHeight) {
           index = 1;
         }
         if (index != homeState.homePageIndex) {
@@ -153,7 +153,7 @@ class HomePage extends HookConsumerWidget {
           Expanded(
               child: PageView(
                 // physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal, // 横
+                scrollDirection: Axis.vertical, // 縦
                 controller: homeState.homePageController,
                 pageSnapping: true, // ページごとにスクロールを止める
                 onPageChanged: (index) {
