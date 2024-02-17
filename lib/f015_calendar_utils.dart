@@ -33,18 +33,10 @@ class CalendarUtils {
   }
 
   String convertCharWrapString(String str) {
-    var replaceStr = str
-        .replaceAll(' ', '\u00a0') // 改行しないスペースに変換
-        // 改行できなくなる文字の前にゼロ幅スペースを追加する
-        .replaceAll('\'', '\u200b\'') // '
-        .replaceAll('’', '\u200b’') // ’
-        .replaceAll('‘', '\u200b‘') // ‘
-        ;
-
-    // if (replaceStr.contains('')) {
-    //   debugPrint(replaceStr);
-    // }
-
-    return replaceStr;
+    var charWrapStr = '';
+    for (int i = 0; i < str.length; i++) {
+      charWrapStr += '${str[i]}\u200b';
+    }
+    return charWrapStr;
   }
 }
