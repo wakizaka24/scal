@@ -33,18 +33,23 @@ class CalendarUtils {
   }
 
   String convertCharWrapString(String str) {
-    if (str.contains('脇坂')) {
-      var _ = 0;
-    }
+    // if (str.contains('')) {
+    //   var _ = 0;
+    // }
 
     var asciiOtherReg = r'[^ -~]+';
+    var asciiReg = r'[ -~]+';
     String charWrapStr;
     if (RegExp(asciiOtherReg).hasMatch(str)) {
       charWrapStr = '';
       for (int i = 0; i < str.length; i++) {
         var char = str[i];
-        // 改行可能な0文字のスペース
-        charWrapStr += '\ufeff$char';
+        if (RegExp(asciiReg).hasMatch(char)) {
+          // 改行可能な0文字のスペース
+          charWrapStr += '\u200b$char';
+        } else {
+          charWrapStr += char;
+        }
       }
     } else {
       charWrapStr = str;
