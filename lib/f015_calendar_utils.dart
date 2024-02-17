@@ -37,14 +37,14 @@ class CalendarUtils {
     //   var _ = 0;
     // }
 
-    var asciiOtherReg = r'[^ -~]+';
-    var asciiReg = r'[ -~]+';
+    var otherReg = '[^ -~\'’‘]+';
+    var targetReg = '[ -~\'’‘]+';
     String charWrapStr;
-    if (RegExp(asciiOtherReg).hasMatch(str)) {
+    if (RegExp(otherReg).hasMatch(str)) {
       charWrapStr = '';
       for (int i = 0; i < str.length; i++) {
         var char = str[i];
-        if (RegExp(asciiReg).hasMatch(char)) {
+        if (RegExp(targetReg).hasMatch(char)) {
           // 改行可能な0文字のスペース
           charWrapStr += '\u200b$char';
         } else {
