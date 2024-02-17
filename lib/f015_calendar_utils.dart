@@ -44,6 +44,7 @@ class CalendarUtils {
           || RegExp(asciiReg).hasMatch(char)
               && !RegExp(asciiReg).hasMatch(preChar)
       )) {
+        // 改行可能な0文字のスペース
         charWrapStr += '\u200b$char';
       } else {
         charWrapStr += char;
