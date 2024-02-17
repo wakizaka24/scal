@@ -315,10 +315,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   onTapDownCalendarDay(int index) async {
-    // 選択中のセル
-    if (state.dayPartIndex == index) {
-    }
-
     await selectDay(index: index);
     await updateWeekCalendarData();
     await initSelectionWeekCalendar();
@@ -338,6 +334,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     await updateCalendar();
     await selectDay();
+    await updateWeekCalendarData();
     await initSelectionWeekCalendar();
     await updateSelectionDayOfHome();
     await updateState();
@@ -528,10 +525,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Week Calendar
 
   onTapDownCalendarHour(int index) async {
-    // 選択中のセル
-    if (state.hourPartIndex == index) {
-    }
-
     await selectHour(index: index);
     await updateState();
   }
