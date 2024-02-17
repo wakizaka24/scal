@@ -33,10 +33,29 @@ class CalendarUtils {
   }
 
   String convertCharWrapString(String str) {
+    var asciiReg = r'[ -~]+';
     var charWrapStr = '';
+    String? preChar;
     for (int i = 0; i < str.length; i++) {
-      charWrapStr += '${str[i]}\u200b';
+      var char = str[i];
+      if (preChar != null && (
+          RegExp(asciiReg).hasMatch(preChar)
+              && !RegExp(asciiReg).hasMatch(char)
+          || RegExp(asciiReg).hasMatch(char)
+              && !RegExp(asciiReg).hasMatch(preChar)
+      )) {
+        charWrapStr += '\u200b$char';
+      } else {
+        charWrapStr += char;
+      }
+      preChar = char;
     }
+
+    // 改行しないスペースに変換
+    charWrapStr = charWrapStr.replaceAll(' ', '\u00a0')
+    // -の前後に改行禁止文字を追加
+        .replaceAll('-', '\ufeff-\ufeff');
+
     return charWrapStr;
   }
 }
