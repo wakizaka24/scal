@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'f016_ui_define.dart';
+import 'f016_color_config.dart';
 
 class UIUtils {
   static final UIUtils _instance = UIUtils._internal();
@@ -11,11 +12,11 @@ class UIUtils {
   }
 
   Future<String?> showMessageDialog(
-      BuildContext context, String title, String message,
+      BuildContext context, WidgetRef ref, String title, String message,
       [String positiveTitle = 'OK', String? negativeTitle]) async {
+    final designConfigState = ref.read(designConfigNotifierProvider);
 
     return await showDialog<String>(
-        // barrierColor: Colors.black12,
         context: context,
         builder: (_) {
           return PopScope(
@@ -44,7 +45,8 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(negativeTitle ?? "",
-                          style: TextStyle(color: cardTextColor)),
+                          style: TextStyle(color: designConfigState.colorConfig
+                              .cardTextColor)),
                     ),
                   ),
                   ElevatedButton(
@@ -58,7 +60,8 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(positiveTitle,
-                          style: TextStyle(color: cardTextColor))
+                          style: TextStyle(color: designConfigState.colorConfig
+                              .cardTextColor))
                   )
                 ],
               )

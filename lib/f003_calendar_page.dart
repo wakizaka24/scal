@@ -8,12 +8,12 @@ import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
 import 'f015_calendar_utils.dart';
-import 'f016_ui_define.dart';
+import 'f016_color_config.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
-  final int pageIndex;
   final double unsafeAreaTopHeight;
   final double unsafeAreaBottomHeight;
+  final int pageIndex;
 
   const CalendarPage({super.key,
     required this.unsafeAreaTopHeight,
@@ -44,6 +44,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(
         widget.pageIndex).notifier);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
     // Month Calendar/Week Calendar
     // 画面の幅
@@ -85,7 +86,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       debugPrint('child useEffect');
 
       // Pageの初期化処理
-      calendarNotifier.initState(() {
+      calendarNotifier.initState(afterInit: () {
         homeNotifier.updateState();
       });
 
@@ -242,7 +243,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                 ),
                 child: Text(calendarNotifier
                     .getCalendarSwitchingButtonTitle(),
-                    style: TextStyle(color: cardTextColor)
+                    style: TextStyle(color: designConfigState.colorConfig
+                        .cardTextColor)
                 )
             )),
             Container(width: 76)
@@ -561,6 +563,7 @@ class EventListPart extends HookConsumerWidget {
     final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
     return Column(
         children: [
@@ -568,7 +571,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: eventListTitleBgColor,
+                  color: designConfigState.colorConfig.eventListTitleBgColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -576,7 +579,7 @@ class EventListPart extends HookConsumerWidget {
                             height: 1.3,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWidth1,
-                            color: normalTextColor
+                            color: designConfigState.colorConfig.normalTextColor
                         )
                       ),
                     ],
@@ -646,6 +649,7 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
     return SelectableCalendarCell(
         height: 45,
@@ -673,7 +677,7 @@ class EventPart extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
-                            color: normalTextColor
+                            color: designConfigState.colorConfig.normalTextColor
                           )
                       )
                   )
@@ -723,13 +727,12 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.copyIndexEvent(index)) {
                           if (context.mounted) {
-                            await UIUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context, ref,
                                 'コピー', 'コピーに失敗しました');
                           }
                         }
 
                         await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateEventList();
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
@@ -751,7 +754,7 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.moveIndexEvent(index)) {
                           if (context.mounted) {
-                            await UIUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context, ref,
                                 '移動', '移動に失敗しました');
                           }
                         } else {
@@ -759,7 +762,6 @@ class EventPart extends HookConsumerWidget {
                         }
 
                         await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateEventList();
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
@@ -805,7 +807,7 @@ class EventPart extends HookConsumerWidget {
 
                         if (context.mounted) {
                           var result = await UIUtils().showMessageDialog(
-                              context, '削除', 'イベントを削除しますか?', 'はい',
+                              context, ref, '削除', 'イベントを削除しますか?', 'はい',
                               'いいえ');
                           if (result != 'positive') {
                             return;
@@ -814,14 +816,13 @@ class EventPart extends HookConsumerWidget {
 
                         if (!await calendarNotifier.deleteEvent(event!)) {
                           if (context.mounted) {
-                            await UIUtils().showMessageDialog(context,
+                            await UIUtils().showMessageDialog(context, ref,
                                 '削除', '削除に失敗しました');
                           }
                           return;
                         }
 
                         await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateEventList();
                         await calendarNotifier.updateState();
                       },
                       style: TextButton.styleFrom(

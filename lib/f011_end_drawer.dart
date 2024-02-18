@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f016_ui_define.dart';
+import 'package:scal/f016_color_config.dart';
 
 enum EndDrawerMenuType {
   test1(title: 'テスト1'),
@@ -23,6 +23,7 @@ class EndDrawer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final designConfigState = ref.read(designConfigNotifierProvider);
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
@@ -49,7 +50,8 @@ class EndDrawer extends HookConsumerWidget {
                           Navigator.pop(context);
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: normalTextColor,
+                          foregroundColor: designConfigState.colorConfig
+                              .normalTextColor,
                           textStyle: const TextStyle(fontSize: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -58,7 +60,8 @@ class EndDrawer extends HookConsumerWidget {
                           padding: const EdgeInsets.all(0),
                         ),
                         child: Icon(Icons.check,
-                            color: normalTextColor),
+                            color: designConfigState.colorConfig
+                                .normalTextColor),
                       )
                   )
               ),
@@ -71,6 +74,7 @@ class EndDrawer extends HookConsumerWidget {
 
     return Column(children: [
       SizedBox(height: unsafeAreaTopHeight),
-    Expanded(child: drawer)]);
+      Expanded(child: drawer)
+    ]);
   }
 }

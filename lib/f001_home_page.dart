@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:scal/f017_event_detail_page.dart';
 
 import 'f002_home_view_model.dart';
 import 'f011_end_drawer.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
+import 'f016_color_config.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
 
 // アプリバーの高さ
 const double appBarHeight = 39;
+// カレンダーの数
+const calendarNum = 2;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -22,8 +26,14 @@ class HomePage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
-        homeState.homePageIndex).notifier);
+    List<CalendarPageNotifier> calendarNotifiers = [];
+    for (int i=0; i < calendarNum; i++) {
+      calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
+          .notifier));
+    }
+    final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
+    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+        .notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -33,10 +43,10 @@ class HomePage extends HookConsumerWidget {
     }
     // アンセーフエリア下の高さ
     double unsafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
+    // 画面の幅
+    double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
-    // 画面の高さ
-    double deviceWidth = MediaQuery.of(context).size.width;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -107,8 +117,13 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
             SizedBox(width: appBarHeight, height: appBarHeight,
                 child: TextButton(
-                  onPressed: () {
-                    calendarNotifier.onTapTodayButton();
+                  onPressed: () async {
+                    await colorConfigNotifier.updateTest();
+                    for (var i=0; i < calendarNum; i++) {
+                      await calendarNotifiers[i].initState();
+                      await calendarNotifiers[i].updateCalendar();
+                      await calendarNotifiers[i].updateState();
+                    }
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -123,7 +138,23 @@ class HomePage extends HookConsumerWidget {
             ),
             SizedBox(width: appBarHeight, height: appBarHeight,
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await calendarNotifier.onTapTodayButton();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(appBarHeight / 2),
+                    ),
+                    padding: const EdgeInsets.all(0),
+                  ),
+                  child: const Icon(Icons.check),
+                )
+            ),
+            SizedBox(width: appBarHeight, height: appBarHeight,
+                child: TextButton(
+                  onPressed: () async {
                     homePageScaffoldKey.currentState!
                         .openEndDrawer();
                   },
@@ -159,12 +190,11 @@ class HomePage extends HookConsumerWidget {
                 onPageChanged: (index) {
                 },
                 children: <Widget>[
-                  CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
-                      unsafeAreaBottomHeight: unsafeAreaBottomHeight,
-                      pageIndex: 0),
-                  CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
-                      unsafeAreaBottomHeight: unsafeAreaBottomHeight,
-                      pageIndex: 1),
+                  for (var i=0; i<calendarNum; i++) ... {
+                    CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
+                        unsafeAreaBottomHeight: unsafeAreaBottomHeight,
+                        pageIndex: i),
+                  }
                 ],
               )
           )
@@ -174,7 +204,23 @@ class HomePage extends HookConsumerWidget {
     var floatingActionButton = FloatingActionButton(
         heroTag: 'calendar_hero_tag',
         onPressed: () async {
-          await calendarNotifier.onPressedAddingButton();
+          var _ = await calendarNotifier.getSelectionEvent();
+
+          if (!context.mounted) {
+            return;
+          }
+
+          await Navigator.push(context,
+            PageRouteBuilder(
+                opaque: false,
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) {
+                  return EventDetailPage(
+                      unsafeAreaTopHeight: unsafeAreaTopHeight);
+                  },
+                transitionDuration: const Duration(seconds: 0)
+            )
+          );
         },
         child: Consumer(
             builder: ((context, ref, child) {
