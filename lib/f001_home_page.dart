@@ -119,11 +119,13 @@ class HomePage extends HookConsumerWidget {
                 child: TextButton(
                   onPressed: () async {
                     await colorConfigNotifier.updateTest();
+                    // TODO: データに色を持たせないようにすれば、カレンダー情報の更新が不要
+                    // TODO: また、固定中に色を変更した時に切り替わらない問題も対処する
                     for (var i=0; i < calendarNum; i++) {
                       await calendarNotifiers[i].initState();
                       await calendarNotifiers[i].updateCalendar();
-                      await calendarNotifiers[i].updateState();
                     }
+                    await colorConfigNotifier.updateState();
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
