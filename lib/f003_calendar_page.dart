@@ -41,7 +41,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     final homeState = ref.watch(homePageNotifierProvider);
     final calendarState = ref.watch(calendarPageNotifierProvider(
         widget.pageIndex));
-    final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(
         widget.pageIndex).notifier);
     final designConfigState = ref.watch(designConfigNotifierProvider);
@@ -86,9 +85,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       debugPrint('child useEffect');
 
       // Pageの初期化処理
-      calendarNotifier.initState(afterInit: () {
-        homeNotifier.updateState();
-      });
+      calendarNotifier.initState();
 
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('child addPostFrameCallback');
@@ -323,7 +320,9 @@ class SelectableCalendarCell extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
 
+    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
     var border1 = BorderSide(
         color: !isHighlighted || !isActive ? borderColor
             : theme.colorScheme.secondaryContainer,
@@ -475,10 +474,13 @@ class WeekdayPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var border = const BorderSide(
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
+
+    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
+    var border = BorderSide(
         color: borderColor, width: normalBoarderWidth
     );
-    var wideBorder = const BorderSide(
+    var wideBorder = BorderSide(
         color: borderColor, width: normalBoarderWidth * 2
     );
     return Container(
@@ -534,6 +536,13 @@ class DayPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
+    var todayBgColor = borderColor.withAlpha(50);
+    var highlightedLineAndTodayBgColor = borderColor.withAlpha(80);
+    var highlightedLineColor = borderColor.withAlpha(30);
+
+
     return SelectableCalendarCell(
       width: width,
       height: height,
@@ -609,7 +618,7 @@ class EventListPart extends HookConsumerWidget {
     final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
-    final designConfigState = ref.watch(designConfigNotifierProvider);
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
 
     return Column(
         children: [
@@ -617,7 +626,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: designConfigState.colorConfig.eventListTitleBgColor,
+                  color: colorConfigState.colorConfig.eventListTitleBgColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -625,7 +634,7 @@ class EventListPart extends HookConsumerWidget {
                             height: 1.3,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWidth1,
-                            color: designConfigState.colorConfig.normalTextColor
+                            color: colorConfigState.colorConfig.normalTextColor
                         )
                       ),
                     ],
@@ -711,7 +720,7 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
         .notifier);
-    final designConfigState = ref.watch(designConfigNotifierProvider);
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
 
     return SelectableCalendarCell(
         height: 45,
@@ -743,7 +752,7 @@ class EventPart extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
-                            color: designConfigState.colorConfig.normalTextColor
+                            color: colorConfigState.colorConfig.normalTextColor
                           )
                       )
                   )
@@ -993,11 +1002,18 @@ class DayAndWeekdayPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var border = const BorderSide(
-        color: borderColor, width: normalBoarderWidth
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
+    var todayBgColor = colorConfig
+        .eventListTitleBgColor.withAlpha(50);
+    var highlightedLineAndTodayBgColor = colorConfig
+        .eventListTitleBgColor.withAlpha(80);
+    var highlightedLineColor = colorConfig
+        .eventListTitleBgColor.withAlpha(30);
+    var border = BorderSide(
+        color: colorConfig.eventListTitleBgColor, width: normalBoarderWidth
     );
-    var wideBorder = const BorderSide(
-        color: borderColor, width: normalBoarderWidth * 2
+    var wideBorder = BorderSide(
+        color: colorConfig.eventListTitleBgColor, width: normalBoarderWidth * 2
     );
 
     return Container(
@@ -1125,6 +1141,13 @@ class HourPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
+    var todayBgColor = colorConfig
+        .eventListTitleBgColor.withAlpha(50);
+    var highlightedLineAndTodayBgColor = colorConfig
+        .eventListTitleBgColor.withAlpha(80);
+    var highlightedLineColor = colorConfig
+        .eventListTitleBgColor.withAlpha(30);
     return SelectableCalendarCell(
         width: width,
         height: height,

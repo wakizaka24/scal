@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const borderColor = Color(0xCCDED2BF);
-const todayBgColor = Color(0x33DED2BF);
-const highlightedLineColor = Color(0x17DED2BF);
-const highlightedLineAndTodayBgColor = Color(0x52DED2BF);
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
-const double normalBoarderWidth = 0.1;
+const double normalBoarderWidth = 0.2;
 const double calendarFontSize1 = 13;
 const double calendarFontSize1Down1 = 11.5;
 const FontWeight calendarFontWidth1 = FontWeight.w300;
@@ -54,7 +50,7 @@ enum ColorConfig {
         null/*Colors.white*/, // backgroundColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
-        Color(0xCCDED2BF), // eventListTitleBgColor
+        Colors.black54, // eventListTitleBgColor
         Colors.black// cardTextColor
     ),
     normal03OfMaterial3(
@@ -75,10 +71,10 @@ enum ColorConfig {
         Colors.blue, // primarySwatch
         Colors.blue, // accentColor
         Colors.black, // cardColor
-        null/*Colors.indigo*/, // backgroundColor
+        null, // backgroundColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
-        Color(0x55DED2BF), // eventListTitleBgColor
+        Colors.black54, // eventListTitleBgColor
         Colors.white// cardTextColor
     );
 
@@ -108,7 +104,7 @@ enum ColorConfig {
 }
 
 class DesignConfigState {
-    ColorConfig colorConfig = ColorConfig.normal03OfMaterial3;
+    ColorConfig colorConfig = ColorConfig.normal02OfMaterial3;
 
     static DesignConfigState copy(DesignConfigState state) {
         var nState = DesignConfigState();
@@ -119,10 +115,14 @@ class DesignConfigState {
 
 class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     final Ref ref;
-    DesignConfigNotifier(this.ref, DesignConfigState state)
-        : super(state);
+    DesignConfigNotifier(this.ref, DesignConfigState state) : super(state);
 
-    initState() async {
+    initState(Brightness brightness) async {
+        if (brightness == Brightness.light) {
+            state.colorConfig = ColorConfig.normal03OfMaterial3;
+        } else if (brightness == Brightness.dark) {
+            state.colorConfig = ColorConfig.dark02OfMaterial3;
+        }
     }
 
     switchColorConfig() async {

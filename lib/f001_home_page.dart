@@ -25,6 +25,8 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final homeState = ref.watch(homePageNotifierProvider);
+    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+        .notifier);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     List<CalendarPageNotifier> calendarNotifiers = [];
     for (int i=0; i < calendarNum; i++) {
@@ -32,8 +34,6 @@ class HomePage extends HookConsumerWidget {
           .notifier));
     }
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
-    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
-        .notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -50,6 +50,7 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(() {
       debugPrint('parent useEffect');
+
       // Pageの初期化処理
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('parent addPostFrameCallback');
@@ -119,11 +120,10 @@ class HomePage extends HookConsumerWidget {
                 child: TextButton(
                   onPressed: () async {
                     await colorConfigNotifier.switchColorConfig();
-                    // TODO: データに色を持たせないようにすれば、カレンダー情報の更新が不要
-                    // TODO: また、固定中に色を変更した時に切り替わらない問題も対処する
                     for (var i=0; i < calendarNum; i++) {
                       await calendarNotifiers[i].initState();
-                      await calendarNotifiers[i].updateCalendar();
+                      await calendarNotifiers[i].updateCalendar(
+                          dataExclusion: true);
                     }
                     await colorConfigNotifier.updateState();
                   },
@@ -186,13 +186,13 @@ class HomePage extends HookConsumerWidget {
           Expanded(
               child: PageView(
                 controller: homeState.homePageController,
-                // physics: const NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical, // 縦
                 pageSnapping: true, // ページごとにスクロールを止める
                 onPageChanged: (index) {
                 },
                 children: <Widget>[
-                  for (var i=0; i<calendarNum; i++) ... {
+                  for (var i=0; i < calendarNum; i++) ... {
                     CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                         unsafeAreaBottomHeight: unsafeAreaBottomHeight,
                         pageIndex: i),

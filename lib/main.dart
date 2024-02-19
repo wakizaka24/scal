@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
@@ -29,6 +31,8 @@ void main() {
   runApp(const SCalApp());
 }
 
+var colorConfigInitialized = false;
+
 class SCalApp extends StatelessWidget {
   const SCalApp({super.key});
 
@@ -38,8 +42,17 @@ class SCalApp extends StatelessWidget {
     return ProviderScope(
         child: Consumer(
             builder: ((context, ref, child) {
-              final colorConfig = ref.watch(designConfigNotifierProvider)
-                  .colorConfig;
+              final colorConfigState = ref.watch(designConfigNotifierProvider);
+              final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+                  .notifier);
+
+              if (!colorConfigInitialized) {
+                colorConfigInitialized = true;
+                final Brightness brightness = MediaQuery.platformBrightnessOf(
+                    context);
+                colorConfigNotifier.initState(brightness);
+              }
+
               return MaterialApp(
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
@@ -51,13 +64,14 @@ class SCalApp extends StatelessWidget {
                   Locale('ja'),
                 ],
                 theme: ThemeData(
-                    useMaterial3: colorConfig.useMaterial3,
+                    useMaterial3: colorConfigState.colorConfig.useMaterial3,
                     colorScheme: ColorScheme.fromSwatch(
-                      brightness: colorConfig.brightness,
-                      primarySwatch: colorConfig.primarySwatch,
-                      accentColor: colorConfig.accentColor,
-                      cardColor: colorConfig.cardColor,
-                      backgroundColor: colorConfig.backgroundColor
+                      brightness: colorConfigState.colorConfig.brightness,
+                      primarySwatch: colorConfigState.colorConfig.primarySwatch,
+                      accentColor: colorConfigState.colorConfig.accentColor,
+                      cardColor: colorConfigState.colorConfig.cardColor,
+                      backgroundColor: colorConfigState.colorConfig
+                          .backgroundColor
                     )
                 ),
                 title: 'Alpha',

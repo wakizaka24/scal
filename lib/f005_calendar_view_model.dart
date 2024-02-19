@@ -233,7 +233,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   CalendarPageNotifier(this.ref, CalendarPageState state)
       : super(state);
 
-  initState({VoidCallback? afterInit}) async {
+  initState() async {
     if (state.initialized) {
       return;
     }
@@ -243,7 +243,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.now = DateTime.now();
 
     // Data-Month Calendar
-    await updateMonthCalendarData();
+    await updateMonthCalendarState();
     state.selectionDate = DateTime(state.now.year, state.now.month,
         state.now.day);
 
@@ -256,12 +256,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     await updateSelectionDayOfHome();
     await setDayEventList(state.selectionDate, state.dayEventsMap);
-    await updateWeekCalendarData();
+    await updateWeekCalendarState();
     await initSelectionWeekCalendar();
-
-    if (afterInit != null) {
-      afterInit();
-    }
   }
 
   // Month Calendar/Week Calendar
@@ -282,7 +278,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.indexAddingMonth = state.preAddingMonth;
     if (index == 0) {
       await selectDay();
-      await updateWeekCalendarData();
+      await updateWeekCalendarState();
       await initSelectionWeekCalendar();
     } else {
       await selectHour();
@@ -308,7 +304,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   onTapDownCalendarDay(int index) async {
     await selectDay(index: index);
-    await updateWeekCalendarData();
+    await updateWeekCalendarState();
     await initSelectionWeekCalendar();
     await updateSelectionDayOfHome();
     await updateState();
@@ -325,9 +321,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.addingMonth = addingMonth;
 
     state.now = DateTime.now();
-    await updateMonthCalendarData();
+    await updateMonthCalendarState();
     await selectDay();
-    await updateWeekCalendarData();
+    await updateWeekCalendarState();
     await initSelectionWeekCalendar();
     await updateSelectionDayOfHome();
     state.monthCalendarReload = true;
@@ -363,31 +359,36 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
   }
 
-  updateCalendar() async {
-    state.now = DateTime.now();
-    await updateMonthCalendarData();
-    await updateWeekCalendarData();
+  updateCalendar({bool dataExclusion = false}) async {
+    if (!dataExclusion) {
+      state.now = DateTime.now();
+    }
+    await updateMonthCalendarState(dataExclusion: dataExclusion);
+    await updateWeekCalendarState();
     await updateEventList();
     state.monthCalendarReload = true;
   }
 
-  updateCalendarData() async {
-
-  }
-
-  updateMonthCalendarData() async {
+  updateMonthCalendarState({bool dataExclusion = false}) async {
     state.weekdayList = createWeekdayList();
     state.dayLists = createDayLists(state.basisMonthDate, state.addingMonth);
 
-    var calendars  = await getCalendars();
-    state.calendarMap = convertCalendarMap(calendars);
-    var startDate = state.dayLists.first.first.id;
-    var endDate = state.dayLists.last.last.id;
-    state.calendarEvents = await getEvents(calendars, startDate,
-        endDate);
-    state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
-    state.eventIdStartDateMap = createEventIdStartDateMap(state.calendarEvents);
-    state.dayEventsMap = createDayEventsMap(state.calendarEvents);
+    if (!dataExclusion) {
+      var calendars = await getCalendars();
+      state.calendarMap = convertCalendarMap(calendars);
+
+      var startDate = state.dayLists.first.first.id;
+      var endDate = state.dayLists.last.last.id;
+      state.calendarEvents = await getEvents(calendars, startDate,
+          endDate);
+      state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
+      state.eventIdStartDateMap =
+          createEventIdStartDateMap(state.calendarEvents);
+      state.dayEventsMap = createDayEventsMap(state.calendarEvents);
+
+      state.allDayEventsMap = createAllDayEventsMap(state.calendarEvents);
+      state.hourEventsMap = createHourEventsMap(state.calendarEvents);
+    }
 
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
         state.dayEventsMap, state.calendarMap);
@@ -557,13 +558,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateState();
   }
 
-  updateWeekCalendarData() async {
+  updateWeekCalendarState() async {
     state.dayAndWeekdayList = createDayAndWeekdayList(state.selectionDate);
     state.hours = createHourList(state.selectionDate);
-
-    state.allDayEventsMap = createAllDayEventsMap(state.calendarEvents);
-    state.hourEventsMap = createHourEventsMap(state.calendarEvents);
-
     state.hours = addEvents(state.hours, state.allDayEventsMap,
         state.hourEventsMap, state.calendarMap);
   }
@@ -907,10 +904,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
     }
 
+    var calendars = await calendarRepo.getCalendars();
+
+    for (int i = 0; i < state.editingEventList.length; i++) {
+      var event = state.editingEventList[i];
+      var calendar = calendars.firstWhere((calendar) =>
+      calendar.id == event.calendarId);
+
+      event.lineColor = Color(calendar.color!);
+      event.fontColor = calendar.isDefault!
+          ? designConfigState.colorConfig.normalTextColor
+          : designConfigState.colorConfig.disabledTextColor;
+    }
+
     List<EventDisplay> creatingEventList = [];
     for (int i = 0; i < eventList.length; i++) {
       var event = eventList[i];
-      var calendars = await calendarRepo.getCalendars();
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
       var eventId = event.eventId!;
