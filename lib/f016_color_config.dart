@@ -125,7 +125,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     initState() async {
     }
 
-    updateTest() async {
+    switchColorConfig() async {
         var index = (state.colorConfig.index + 1) % ColorConfig.values.length;
         state.colorConfig = ColorConfig.values[index];
     }

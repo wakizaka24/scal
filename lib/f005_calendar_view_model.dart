@@ -371,9 +371,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.monthCalendarReload = true;
   }
 
+  updateCalendarData() async {
+
+  }
+
   updateMonthCalendarData() async {
     state.weekdayList = createWeekdayList();
     state.dayLists = createDayLists(state.basisMonthDate, state.addingMonth);
+
     var calendars  = await getCalendars();
     state.calendarMap = convertCalendarMap(calendars);
     var startDate = state.dayLists.first.first.id;
@@ -383,6 +388,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
     state.eventIdStartDateMap = createEventIdStartDateMap(state.calendarEvents);
     state.dayEventsMap = createDayEventsMap(state.calendarEvents);
+
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
         state.dayEventsMap, state.calendarMap);
   }
@@ -554,8 +560,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   updateWeekCalendarData() async {
     state.dayAndWeekdayList = createDayAndWeekdayList(state.selectionDate);
     state.hours = createHourList(state.selectionDate);
+
     state.allDayEventsMap = createAllDayEventsMap(state.calendarEvents);
     state.hourEventsMap = createHourEventsMap(state.calendarEvents);
+
     state.hours = addEvents(state.hours, state.allDayEventsMap,
         state.hourEventsMap, state.calendarMap);
   }

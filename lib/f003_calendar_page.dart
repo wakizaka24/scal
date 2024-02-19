@@ -296,6 +296,10 @@ class SelectableCalendarCell extends HookConsumerWidget {
   final double borderCircular;
   final double selectedBoarderWidth;
   final Color bgColor;
+  final bool topBorderWide;
+  final bool rightBorderWide;
+  final bool bottomBorderWide;
+  final bool leftBorderWide;
   final Widget child;
 
   const SelectableCalendarCell({super.key,
@@ -309,12 +313,40 @@ class SelectableCalendarCell extends HookConsumerWidget {
     required this.borderCircular,
     required this.selectedBoarderWidth,
     required this.bgColor,
+    required this.topBorderWide,
+    required this.rightBorderWide,
+    required this.bottomBorderWide,
+    required this.leftBorderWide,
     required this.child
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+
+    var border1 = BorderSide(
+        color: !isHighlighted || !isActive ? borderColor
+            : theme.colorScheme.secondaryContainer,
+        width: !isHighlighted ? normalBoarderWidth
+            : selectedBoarderWidth
+    );
+    var wideBorder1 = BorderSide(
+        color: !isHighlighted || !isActive ? borderColor
+            : theme.colorScheme.secondaryContainer,
+        width: !isHighlighted ? normalBoarderWidth * 2
+            : selectedBoarderWidth
+    );
+
+    var border2 = BorderSide(
+        color: Colors.transparent,
+        width: !isHighlighted ? selectedBoarderWidth
+            - normalBoarderWidth : 0
+    );
+    var wideBorder2 = BorderSide(
+        color: Colors.transparent,
+        width: !isHighlighted ? selectedBoarderWidth
+            - normalBoarderWidth * 2 : 0
+    );
 
     return GestureDetector(
         onTapDown: (TapDownDetails details) => onTapDown(index),
@@ -327,25 +359,22 @@ class SelectableCalendarCell extends HookConsumerWidget {
             color: bgColor,
             borderRadius: BorderRadius.circular(isHighlighted
                 ? borderCircular : 0),
-            border: Border.fromBorderSide(
-                BorderSide(
-                    color: !isHighlighted || !isActive ? borderColor
-                        : theme.colorScheme.secondaryContainer,
-                    width: !isHighlighted ? normalBoarderWidth
-                        : selectedBoarderWidth
-                )
+            border: Border(
+                top: !topBorderWide ? border1 : wideBorder1,
+                right: !rightBorderWide ? border1 : wideBorder1,
+                bottom: !bottomBorderWide ? border1 : wideBorder1,
+                left: !leftBorderWide ? border1 : wideBorder1
             ),
           ),
           child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(isHighlighted ?
                 borderCircular : 0),
-                border: Border.fromBorderSide(
-                    BorderSide(
-                        color: Colors.transparent,
-                        width: !isHighlighted ? selectedBoarderWidth
-                            - normalBoarderWidth : 0
-                    )
+                border: Border(
+                    top: !topBorderWide ? border2 : wideBorder2,
+                    right: !rightBorderWide ? border2 : wideBorder2,
+                    bottom: !bottomBorderWide ? border2 : wideBorder2,
+                    left: !leftBorderWide ? border2 : wideBorder2
                 ),
               ),
               child: child),
@@ -418,6 +447,10 @@ class MonthPart extends HookConsumerWidget {
                 },
                 onTapUp: (int i) async {
                 },
+                topBorderWide: false,
+                rightBorderWide: false,
+                bottomBorderWide: rowIndex == dayPartRowNum - 1,
+                leftBorderWide: false,
                 day: dayList[rowIndex * weekdayPartColumnNum + colIndex],
               ),
             }
@@ -442,16 +475,17 @@ class WeekdayPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var border = const BorderSide(
+        color: borderColor, width: normalBoarderWidth
+    );
+    var wideBorder = const BorderSide(
+        color: borderColor, width: normalBoarderWidth * 2
+    );
     return Container(
-        width: width,
-        height: height,
-        decoration: const BoxDecoration(
-          border: Border.fromBorderSide(
-              BorderSide(
-                  color: borderColor,
-                  width: normalBoarderWidth
-              )
-          ),
+        width: width, height: height,
+        decoration: BoxDecoration(
+          border: Border(top: wideBorder, right: border, bottom: border,
+              left: border),
         ),
         alignment: Alignment.center,
         child: Text(weekday.title,
@@ -476,6 +510,10 @@ class DayPart extends HookConsumerWidget {
   final bool isHighlightedWeek;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
+  final bool topBorderWide;
+  final bool rightBorderWide;
+  final bool bottomBorderWide;
+  final bool leftBorderWide;
   final DayDisplay day;
 
   const DayPart({super.key,
@@ -487,6 +525,10 @@ class DayPart extends HookConsumerWidget {
     required this.isHighlightedWeek,
     required this.onTapDown,
     required this.onTapUp,
+    required this.topBorderWide,
+    required this.rightBorderWide,
+    required this.bottomBorderWide,
+    required this.leftBorderWide,
     required this.day
   });
 
@@ -505,6 +547,10 @@ class DayPart extends HookConsumerWidget {
       bgColor: isHighlightedWeek ?
         day.today ? highlightedLineAndTodayBgColor : highlightedLineColor :
         day.today ? todayBgColor : Colors.transparent,
+      topBorderWide: topBorderWide,
+      rightBorderWide: rightBorderWide,
+      bottomBorderWide: bottomBorderWide,
+      leftBorderWide: leftBorderWide,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -602,6 +648,10 @@ class EventListPart extends HookConsumerWidget {
 
                         await calendarNotifier.updateState();
                       },
+                      topBorderWide: true,
+                      rightBorderWide: true,
+                      bottomBorderWide: true,
+                      leftBorderWide: true,
                       emptyMessage: 'イベントがありません',
                     ),
                   for (int i=0; i < calendarState.eventList.length; i++) ... {
@@ -615,6 +665,10 @@ class EventListPart extends HookConsumerWidget {
 
                         await calendarNotifier.updateState();
                       },
+                      topBorderWide: i == 0,
+                      rightBorderWide: true,
+                      bottomBorderWide: i == calendarState.eventList.length - 1,
+                      leftBorderWide: true,
                       event: calendarState.eventList[i],
                     )
                   }
@@ -632,6 +686,10 @@ class EventPart extends HookConsumerWidget {
   final int index;
   final bool isHighlighted;
   final void Function(int) onTapDown;
+  final bool topBorderWide;
+  final bool rightBorderWide;
+  final bool bottomBorderWide;
+  final bool leftBorderWide;
   final String? emptyMessage;
   final EventDisplay? event;
 
@@ -641,6 +699,10 @@ class EventPart extends HookConsumerWidget {
     required this.index,
     required this.isHighlighted,
     required this.onTapDown,
+    required this.topBorderWide,
+    required this.rightBorderWide,
+    required this.bottomBorderWide,
+    required this.leftBorderWide,
     this.emptyMessage,
     this.event,
   });
@@ -662,6 +724,10 @@ class EventPart extends HookConsumerWidget {
         onTapDown: onTapDown,
         onTapUp: (int i) async {
         },
+        topBorderWide: topBorderWide,
+        rightBorderWide: rightBorderWide,
+        bottomBorderWide: bottomBorderWide,
+        leftBorderWide: leftBorderWide,
         child: Container(
             padding: const EdgeInsets.all(selectedBoarderWidth),
             child: Row(
@@ -892,6 +958,10 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
             height: hourPartHeight,
             isHighlightedDay: calendarState.hourPartIndex
                 ~/ hoursPartRowNum == rowIndex,
+            topBorderWide: rowIndex == 0,
+            rightBorderWide: false,
+            bottomBorderWide: rowIndex == hoursPartRowNum - 1,
+            leftBorderWide: true,
             dayAndWeekday: dayAndWeekdayList[rowIndex]
         ),
       }
@@ -902,6 +972,10 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 class DayAndWeekdayPart extends HookConsumerWidget {
   final double width;
   final double height;
+  final bool topBorderWide;
+  final bool rightBorderWide;
+  final bool bottomBorderWide;
+  final bool leftBorderWide;
   final bool isHighlightedDay;
   final DayAndWeekdayDisplay dayAndWeekday;
 
@@ -909,12 +983,23 @@ class DayAndWeekdayPart extends HookConsumerWidget {
     super.key,
     required this.width,
     required this.height,
+    required this.topBorderWide,
+    required this.rightBorderWide,
+    required this.bottomBorderWide,
+    required this.leftBorderWide,
     required this.isHighlightedDay,
     required this.dayAndWeekday
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var border = const BorderSide(
+        color: borderColor, width: normalBoarderWidth
+    );
+    var wideBorder = const BorderSide(
+        color: borderColor, width: normalBoarderWidth * 2
+    );
+
     return Container(
         width: width,
         height: height,
@@ -923,11 +1008,11 @@ class DayAndWeekdayPart extends HookConsumerWidget {
             dayAndWeekday.today ? highlightedLineAndTodayBgColor
                 : highlightedLineColor :
             dayAndWeekday.today ? todayBgColor : Colors.transparent,
-          border: const Border.fromBorderSide(
-              BorderSide(
-                  color: borderColor,
-                  width: normalBoarderWidth
-              )
+          border: Border(
+              top: !topBorderWide ? border : wideBorder,
+              right: !rightBorderWide ? border : wideBorder,
+              bottom: !bottomBorderWide ? border : wideBorder,
+              left: !leftBorderWide ? border : wideBorder
           ),
         ),
         alignment: Alignment.center,
@@ -993,6 +1078,10 @@ class HoursPart extends HookConsumerWidget {
                 },
                 onTapUp: (int i) async {
                 },
+                topBorderWide: rowIndex == 0,
+                rightBorderWide: colIndex == hoursPartColNum - 1,
+                bottomBorderWide: rowIndex == hoursPartRowNum - 1,
+                leftBorderWide: false,
                 hour: hourList[rowIndex * hoursPartColNum + colIndex],
               ),
             }
@@ -1012,6 +1101,10 @@ class HourPart extends HookConsumerWidget {
   final bool isHighlightedDayAndWeek;
   final void Function(int) onTapDown;
   final void Function(int) onTapUp;
+  final bool topBorderWide;
+  final bool rightBorderWide;
+  final bool bottomBorderWide;
+  final bool leftBorderWide;
   final HourDisplay hour;
 
   const HourPart({super.key,
@@ -1023,6 +1116,10 @@ class HourPart extends HookConsumerWidget {
     required this.isHighlightedDayAndWeek,
     required this.onTapDown,
     required this.onTapUp,
+    required this.topBorderWide,
+    required this.rightBorderWide,
+    required this.bottomBorderWide,
+    required this.leftBorderWide,
     required this.hour
   });
 
@@ -1041,6 +1138,10 @@ class HourPart extends HookConsumerWidget {
         bgColor: isHighlightedDayAndWeek ?
           hour.today ? highlightedLineAndTodayBgColor : highlightedLineColor :
           hour.today ? todayBgColor : Colors.transparent,
+        topBorderWide: topBorderWide,
+        rightBorderWide: rightBorderWide,
+        bottomBorderWide: bottomBorderWide,
+        leftBorderWide: leftBorderWide,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
