@@ -76,26 +76,26 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        switch (appLifecycleState) {
-          case AppLifecycleState.resumed:
-            final Brightness brightness = MediaQuery.platformBrightnessOf(
-                context);
-            if (colorConfigNotifier.applyColorConfig(brightness)) {
-              for (var i = 0; i < calendarNum; i++) {
-                await calendarNotifiers[i].initState();
-                await calendarNotifiers[i].updateCalendar(
-                    dataExclusion: true);
-              }
-              await colorConfigNotifier.updateState();
-            }
-          default:
+    // 検証
+    switch (appLifecycleState) {
+      case AppLifecycleState.resumed:
+
+      default:
+    }
+    debugPrint('appLifecycleState=$appLifecycleState');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final Brightness brightness = MediaQuery.platformBrightnessOf(
+          context);
+      if (colorConfigNotifier.applyColorConfig(brightness)) {
+        for (var i = 0; i < calendarNum; i++) {
+          await calendarNotifiers[i].initState();
+          await calendarNotifiers[i].updateCalendar(
+              dataExclusion: true);
         }
-      });
-      return () {
-      };
-    }, [appLifecycleState]);
+        await colorConfigNotifier.updateState();
+      }
+    });
 
     var appTitle = Column(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
