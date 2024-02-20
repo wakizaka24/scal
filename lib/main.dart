@@ -50,7 +50,7 @@ class SCalApp extends StatelessWidget {
                 colorConfigInitialized = true;
                 final Brightness brightness = MediaQuery.platformBrightnessOf(
                     context);
-                colorConfigNotifier.initState(brightness);
+                colorConfigNotifier.applyColorConfig(brightness);
               }
 
               return MaterialApp(
@@ -64,13 +64,14 @@ class SCalApp extends StatelessWidget {
                   Locale('ja'),
                 ],
                 theme: ThemeData(
-                    useMaterial3: colorConfigState.colorConfig.useMaterial3,
+                    useMaterial3: colorConfigState.colorConfig!.useMaterial3,
                     colorScheme: ColorScheme.fromSwatch(
-                      brightness: colorConfigState.colorConfig.brightness,
-                      primarySwatch: colorConfigState.colorConfig.primarySwatch,
-                      accentColor: colorConfigState.colorConfig.accentColor,
-                      cardColor: colorConfigState.colorConfig.cardColor,
-                      backgroundColor: colorConfigState.colorConfig
+                      brightness: colorConfigState.colorConfig!.brightness,
+                      primarySwatch: colorConfigState.colorConfig!
+                          .primarySwatch,
+                      accentColor: colorConfigState.colorConfig!.accentColor,
+                      cardColor: colorConfigState.colorConfig!.cardColor,
+                      backgroundColor: colorConfigState.colorConfig!
                           .backgroundColor
                     )
                 ),

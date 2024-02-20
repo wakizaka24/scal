@@ -24,9 +24,10 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final homeState = ref.watch(homePageNotifierProvider);
+    final appLifecycleState = useAppLifecycleState();
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
+    final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     List<CalendarPageNotifier> calendarNotifiers = [];
     for (int i=0; i < calendarNum; i++) {
@@ -51,11 +52,6 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       debugPrint('parent useEffect');
 
-      // Pageの初期化処理
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        debugPrint('parent addPostFrameCallback');
-      });
-
       homeState.homePageController.addListener(() async {
         double offset = homeState.homePageController.offset;
         double contentHeight = deviceHeight - appBarHeight
@@ -79,6 +75,32 @@ class HomePage extends HookConsumerWidget {
         // Pageの解放処理
       };
     }, const []);
+
+    switch (appLifecycleState) {
+      case AppLifecycleState.resumed:
+        final Brightness brightness = MediaQuery.platformBrightnessOf(
+            context);
+        if (colorConfigNotifier.applyColorConfig(brightness)) {
+
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            debugPrint('parent addPostFrameCallback');
+
+            for (var i = 0; i < calendarNum; i++) {
+              calendarNotifiers[i].initState();
+              // calendarNotifiers[i].updateCalendar(dataExclusion: true);
+            }
+            // 検証中
+            calendarNotifiers[0].updateCalendar(dataExclusion: true);
+            colorConfigNotifier.updateState();
+
+            debugPrint('addPostFrameCallback');
+          });
+
+          debugPrint('applyColorConfig');
+
+        }
+      default:
+    }
 
     var appTitle = Column(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight

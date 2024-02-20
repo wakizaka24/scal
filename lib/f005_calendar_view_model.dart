@@ -402,8 +402,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<WeekdayDisplay> createWeekdayList() {
-    final designConfigState = ref.read(designConfigNotifierProvider);
-    var normalTextColor = designConfigState.colorConfig.normalTextColor;
+    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+        .normalTextColor;
     return [
       WeekdayDisplay(title: '日',
           titleColor: Colors.pink),
@@ -423,8 +423,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<List<DayDisplay>> createDayLists(DateTime basisDate, int addingMonth) {
-    final designConfigState = ref.read(designConfigNotifierProvider);
-    var normalTextColor = designConfigState.colorConfig.normalTextColor;
+    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+        .normalTextColor;
 
     const columnNum = CalendarPageState.weekdayPartColNum;
 
@@ -515,7 +515,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   List<List<DayDisplay>> addEventsForMonthCalendar(
       List<List<DayDisplay>> dayLists, Map<DateTime, List<Event>> eventsMap,
       Map<String, Calendar> calendarMap) {
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
@@ -528,8 +528,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           dayInfo.eventList.add(DayEventDisplay(
               title: events[i].title!,
               titleColor: calendar.isDefault!
-                  ? designConfigState.colorConfig.normalTextColor
-                  : designConfigState.colorConfig.disabledTextColor));
+                  ? colorConfig.normalTextColor
+                  : colorConfig.disabledTextColor));
         }
       }
     }
@@ -580,7 +580,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<DayAndWeekdayDisplay> createDayAndWeekdayList(DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    final normalTextColor = ref.read(designConfigNotifierProvider)
+        .colorConfig!.normalTextColor;
 
     DateTime day = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day - selectionDay.weekday % weekdayRowNum, 0);
@@ -595,7 +596,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(currentDay),
           dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
               : rowIndex % weekdayRowNum == weekdayRowNum - 1
-              ? Colors.green : designConfigState.colorConfig.normalTextColor,
+              ? Colors.green : normalTextColor,
           today: currentDay == now
       ));
     }
@@ -605,7 +606,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<HourDisplay> createHourList(DateTime selectionDay) {
     const timeColNum = CalendarPageState.timeColNum;
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    final normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+        .normalTextColor;
 
     var timeInterval = 24 ~/ timeColNum;
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
@@ -630,7 +632,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
         var titleColor = rowIndex % weekdayRowNum == 0 ? Colors.pink
             : rowIndex % weekdayRowNum == weekdayRowNum - 1
-            ? Colors.green : designConfigState.colorConfig.normalTextColor;
+            ? Colors.green : normalTextColor;
 
         wholeTimeList.add(
             HourDisplay(
@@ -699,7 +701,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap,
       Map<String, Calendar> calendarMap) {
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     for (var hourInfo in hours) {
       hourInfo.eventList.clear();
@@ -716,8 +718,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         hourInfo.eventList.add(HourEventDisplay(
             title: event.title!,
             titleColor: calendar.isDefault!
-                ? designConfigState.colorConfig.normalTextColor
-                : designConfigState.colorConfig.disabledTextColor));
+                ? colorConfig.normalTextColor
+                : colorConfig.disabledTextColor));
       }
     }
 
@@ -893,7 +895,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   setEventList(List<Event> eventList) async {
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     if (state.eventListIndex != null
         && state.eventListIndex! >= eventList.length) {
@@ -913,8 +915,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
       event.lineColor = Color(calendar.color!);
       event.fontColor = calendar.isDefault!
-          ? designConfigState.colorConfig.normalTextColor
-          : designConfigState.colorConfig.disabledTextColor;
+          ? colorConfig.normalTextColor
+          : colorConfig.disabledTextColor;
     }
 
     List<EventDisplay> creatingEventList = [];
@@ -936,8 +938,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var lineColor = Color(calendar.color!);
       var title = event.title!;
       var fontColor = calendar.isDefault!
-          ? designConfigState.colorConfig.normalTextColor
-          : designConfigState.colorConfig.disabledTextColor;
+          ? colorConfig.normalTextColor
+          : colorConfig.disabledTextColor;
       var sameCell = await getSameCell(eventId: event.eventId,
           allDay: event.allDay);
 

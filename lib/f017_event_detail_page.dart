@@ -20,7 +20,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final designConfigState = ref.watch(designConfigNotifierProvider);
-    var normalTextColor = designConfigState.colorConfig.normalTextColor;
+    var normalTextColor = designConfigState.colorConfig!.normalTextColor;
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;

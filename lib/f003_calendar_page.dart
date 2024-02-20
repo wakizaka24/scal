@@ -84,12 +84,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     useEffect(() {
       debugPrint('child useEffect');
 
-      // Pageの初期化処理
       calendarNotifier.initState();
-
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        debugPrint('child addPostFrameCallback');
-      });
 
       calendarState.calendarSwitchingController.addListener(() async {
         double offset = calendarState.calendarSwitchingController.offset;
@@ -240,7 +235,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                 ),
                 child: Text(calendarNotifier
                     .getCalendarSwitchingButtonTitle(),
-                    style: TextStyle(color: designConfigState.colorConfig
+                    style: TextStyle(color: designConfigState.colorConfig!
                         .cardTextColor)
                 )
             )),
@@ -322,7 +317,7 @@ class SelectableCalendarCell extends HookConsumerWidget {
     final theme = Theme.of(context);
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
-    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
+    var borderColor = colorConfigState.colorConfig!.eventListTitleBgColor;
     var border1 = BorderSide(
         color: !isHighlighted || !isActive ? borderColor
             : theme.colorScheme.secondaryContainer,
@@ -476,7 +471,7 @@ class WeekdayPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
-    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
+    var borderColor = colorConfigState.colorConfig!.eventListTitleBgColor;
     var border = BorderSide(
         color: borderColor, width: normalBoarderWidth
     );
@@ -537,7 +532,7 @@ class DayPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
-    var borderColor = colorConfigState.colorConfig.eventListTitleBgColor;
+    var borderColor = colorConfigState.colorConfig!.eventListTitleBgColor;
     var todayBgColor = borderColor.withAlpha(50);
     var highlightedLineAndTodayBgColor = borderColor.withAlpha(80);
     var highlightedLineColor = borderColor.withAlpha(30);
@@ -626,7 +621,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: colorConfigState.colorConfig.eventListTitleBgColor,
+                  color: colorConfigState.colorConfig!.eventListTitleBgColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -634,7 +629,7 @@ class EventListPart extends HookConsumerWidget {
                             height: 1.3,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWidth1,
-                            color: colorConfigState.colorConfig.normalTextColor
+                            color: colorConfigState.colorConfig!.normalTextColor
                         )
                       ),
                     ],
@@ -752,7 +747,7 @@ class EventPart extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
-                            color: colorConfigState.colorConfig.normalTextColor
+                            color: colorConfigState.colorConfig!.normalTextColor
                           )
                       )
                   )
@@ -1003,7 +998,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
-    var todayBgColor = colorConfig
+    var todayBgColor = colorConfig!
         .eventListTitleBgColor.withAlpha(50);
     var highlightedLineAndTodayBgColor = colorConfig
         .eventListTitleBgColor.withAlpha(80);
@@ -1142,7 +1137,7 @@ class HourPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
-    var todayBgColor = colorConfig
+    var todayBgColor = colorConfig!
         .eventListTitleBgColor.withAlpha(50);
     var highlightedLineAndTodayBgColor = colorConfig
         .eventListTitleBgColor.withAlpha(80);

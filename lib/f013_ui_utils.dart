@@ -14,7 +14,7 @@ class UIUtils {
   Future<String?> showMessageDialog(
       BuildContext context, WidgetRef ref, String title, String message,
       [String positiveTitle = 'OK', String? negativeTitle]) async {
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
     return await showDialog<String>(
         context: context,
@@ -45,7 +45,7 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(negativeTitle ?? "",
-                          style: TextStyle(color: designConfigState.colorConfig
+                          style: TextStyle(color: designConfigState.colorConfig!
                               .cardTextColor)),
                     ),
                   ),
@@ -60,7 +60,7 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(positiveTitle,
-                          style: TextStyle(color: designConfigState.colorConfig
+                          style: TextStyle(color: designConfigState.colorConfig!
                               .cardTextColor))
                   )
                 ],

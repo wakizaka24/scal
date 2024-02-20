@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
-const double normalBoarderWidth = 0.2;
+const double normalBoarderWidth = 0.3;
 const double calendarFontSize1 = 13;
 const double calendarFontSize1Down1 = 11.5;
 const FontWeight calendarFontWidth1 = FontWeight.w300;
@@ -104,7 +104,7 @@ enum ColorConfig {
 }
 
 class DesignConfigState {
-    ColorConfig colorConfig = ColorConfig.normal02OfMaterial3;
+    ColorConfig? colorConfig;
 
     static DesignConfigState copy(DesignConfigState state) {
         var nState = DesignConfigState();
@@ -117,16 +117,18 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     final Ref ref;
     DesignConfigNotifier(this.ref, DesignConfigState state) : super(state);
 
-    initState(Brightness brightness) async {
+    bool applyColorConfig(Brightness brightness) {
+        var preColorConfig = state.colorConfig;
         if (brightness == Brightness.light) {
             state.colorConfig = ColorConfig.normal03OfMaterial3;
         } else if (brightness == Brightness.dark) {
             state.colorConfig = ColorConfig.dark02OfMaterial3;
         }
+        return preColorConfig != state.colorConfig;
     }
 
     switchColorConfig() async {
-        var index = (state.colorConfig.index + 1) % ColorConfig.values.length;
+        var index = (state.colorConfig!.index + 1) % ColorConfig.values.length;
         state.colorConfig = ColorConfig.values[index];
     }
 

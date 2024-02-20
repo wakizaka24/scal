@@ -23,7 +23,8 @@ class EndDrawer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final designConfigState = ref.read(designConfigNotifierProvider);
+    final normalTextColor = ref.read(designConfigNotifierProvider)
+        .colorConfig!.normalTextColor;
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
@@ -50,8 +51,7 @@ class EndDrawer extends HookConsumerWidget {
                           Navigator.pop(context);
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: designConfigState.colorConfig
-                              .normalTextColor,
+                          foregroundColor: normalTextColor,
                           textStyle: const TextStyle(fontSize: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -60,8 +60,7 @@ class EndDrawer extends HookConsumerWidget {
                           padding: const EdgeInsets.all(0),
                         ),
                         child: Icon(Icons.check,
-                            color: designConfigState.colorConfig
-                                .normalTextColor),
+                            color: normalTextColor),
                       )
                   )
               ),
