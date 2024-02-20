@@ -76,31 +76,26 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    switch (appLifecycleState) {
-      case AppLifecycleState.resumed:
-        final Brightness brightness = MediaQuery.platformBrightnessOf(
-            context);
-        if (colorConfigNotifier.applyColorConfig(brightness)) {
-
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            debugPrint('parent addPostFrameCallback');
-
-            for (var i = 0; i < calendarNum; i++) {
-              calendarNotifiers[i].initState();
-              // calendarNotifiers[i].updateCalendar(dataExclusion: true);
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        switch (appLifecycleState) {
+          case AppLifecycleState.resumed:
+            final Brightness brightness = MediaQuery.platformBrightnessOf(
+                context);
+            if (colorConfigNotifier.applyColorConfig(brightness)) {
+              for (var i = 0; i < calendarNum; i++) {
+                await calendarNotifiers[i].initState();
+                await calendarNotifiers[i].updateCalendar(
+                    dataExclusion: true);
+              }
+              await colorConfigNotifier.updateState();
             }
-            // 検証中
-            calendarNotifiers[0].updateCalendar(dataExclusion: true);
-            colorConfigNotifier.updateState();
-
-            debugPrint('addPostFrameCallback');
-          });
-
-          debugPrint('applyColorConfig');
-
+          default:
         }
-      default:
-    }
+      });
+      return () {
+      };
+    }, [appLifecycleState]);
 
     var appTitle = Column(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
