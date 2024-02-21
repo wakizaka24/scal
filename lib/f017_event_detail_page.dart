@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f001_home_page.dart';
 
+import 'f002_home_view_model.dart';
 import 'f016_color_config.dart';
 
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
 
   const EventDetailPage({super.key,
-    required this.unsafeAreaTopHeight});
+    required this.unsafeAreaTopHeight
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
@@ -21,6 +25,14 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final theme = Theme.of(context);
     final designConfigState = ref.watch(designConfigNotifierProvider);
     var normalTextColor = designConfigState.colorConfig!.normalTextColor;
+    final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+
+    useEffect(() {
+
+      return () {
+
+      };
+    }, const []);
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -47,8 +59,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               child: SizedBox(width: closingButtonWidth,
                   height: closingButtonWidth,
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      // Navigator.pop(context);
+
+                      homeNotifier.setUICover(false);
+                      homeNotifier.setUICoverWidget(null);
+                      homeNotifier.updateState();
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: normalTextColor,

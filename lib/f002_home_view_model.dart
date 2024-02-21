@@ -9,7 +9,8 @@ class HomePageState {
   // Data
   int homePageIndex = 0;
   String appBarTitle = '';
-  // bool uICover = false;
+  bool uICover = false;
+  Widget? uICoverWidget;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
@@ -20,7 +21,8 @@ class HomePageState {
     // Data
     nState.homePageIndex = state.homePageIndex;
     nState.appBarTitle = state.appBarTitle;
-    // nState.uICover = state.uICover;
+    nState.uICover = state.uICover;
+    nState.uICoverWidget = state.uICoverWidget;
 
     return nState;
   }
@@ -35,12 +37,12 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   initState() async {
   }
 
-  setHomePageIndex(int index) {
+  setHomePageIndex(int index) async {
     state.homePageIndex = index;
     updateState();
   }
 
-  setAppBarTitle(DateTime date, bool update) {
+  setAppBarTitle(DateTime date, bool update) async {
     state.appBarTitle = DateFormat.yMMM('ja') // 2023年6月
         .format(date).toString();
     if (update) {
@@ -48,10 +50,13 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
     }
   }
 
-  // setUICover(bool cover) async {
-  //   state.uICover = cover;
-  //   await updateState();
-  // }
+  setUICover(bool cover) async {
+    state.uICover = cover;
+  }
+
+  setUICoverWidget(Widget? widget) async {
+    state.uICoverWidget = widget;
+  }
 
   updateState() async {
     state = HomePageState.copy(state);

@@ -1012,7 +1012,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateSelectionDayOfHome() async {
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
+    await homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
   }
 
   updateState() async {

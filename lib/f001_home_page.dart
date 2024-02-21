@@ -65,7 +65,7 @@ class HomePage extends HookConsumerWidget {
         }
         if (index != homeState.homePageIndex) {
           homeState.homePageIndex = index;
-          homeNotifier.setHomePageIndex(index);
+          await homeNotifier.setHomePageIndex(index);
           final calendarNotifier = ref.watch(calendarPageNotifierProvider(
               homeState.homePageIndex).notifier);
           calendarNotifier.updateSelectionDayOfHome();
@@ -226,21 +226,26 @@ class HomePage extends HookConsumerWidget {
         onPressed: () async {
           var _ = await calendarNotifier.getSelectionEvent();
 
-          if (!context.mounted) {
-            return;
-          }
+          // 閉じた時のスピードが遅いので保留
+          // if (!context.mounted) {
+          //   return;
+          // }
+          // await Navigator.push(context,
+          //   PageRouteBuilder(
+          //       opaque: false,
+          //       pageBuilder: (BuildContext context, Animation<double> animation,
+          //           Animation<double> secondaryAnimation) {
+          //         return EventDetailPage(
+          //             unsafeAreaTopHeight: unsafeAreaTopHeight);
+          //         },
+          //       transitionDuration: const Duration(seconds: 0)
+          //   )
+          // );
 
-          await Navigator.push(context,
-            PageRouteBuilder(
-                opaque: false,
-                pageBuilder: (BuildContext context, Animation<double> animation,
-                    Animation<double> secondaryAnimation) {
-                  return EventDetailPage(
-                      unsafeAreaTopHeight: unsafeAreaTopHeight);
-                  },
-                transitionDuration: const Duration(seconds: 0)
-            )
-          );
+          homeNotifier.setUICover(true);
+          homeNotifier.setUICoverWidget(
+              EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight));
+          homeNotifier.updateState();
         },
         child: Consumer(
             builder: ((context, ref, child) {
@@ -275,8 +280,10 @@ class HomePage extends HookConsumerWidget {
               ])
             ]
         )),
-        // Visibility(visible: homeState.uICover,
-        //     child: Container(color: Colors.black.withAlpha(100)))
+        if (homeState.uICover)
+          Container(color: Colors.black.withAlpha(100)),
+        if (homeState.uICoverWidget != null)
+          homeState.uICoverWidget!
       ])
     );
 
