@@ -14,11 +14,10 @@ class UIUtils {
   Future<String?> showMessageDialog(
       BuildContext context, WidgetRef ref, String title, String message,
       [String positiveTitle = 'OK', String? negativeTitle]) async {
-    final designConfigState = ref.watch(designConfigNotifierProvider);
-
     return await showDialog<String>(
         context: context,
         builder: (_) {
+          final designConfigState = ref.watch(designConfigNotifierProvider);
           return PopScope(
               canPop: false,
               child: AlertDialog(
