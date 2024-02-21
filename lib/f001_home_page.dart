@@ -24,7 +24,8 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final appLifecycleState = useAppLifecycleState();
+    final AppLifecycleState? appLifecycleState = useAppLifecycleState();
+    final preAppLifecycle = useState(appLifecycleState);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -76,26 +77,26 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
-    // 検証
-    switch (appLifecycleState) {
-      case AppLifecycleState.resumed:
-
-      default:
-    }
+    // アプリに復帰時(再開以外から再開)またはアプリ再開以外
+    var appDistant = (appLifecycleState == AppLifecycleState.resumed
+      && preAppLifecycle.value != AppLifecycleState.resumed)
+        || appLifecycleState != AppLifecycleState.resumed;
+    preAppLifecycle.value = appLifecycleState;
     debugPrint('appLifecycleState=$appLifecycleState');
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final Brightness brightness = MediaQuery.platformBrightnessOf(
-          context);
-      if (colorConfigNotifier.applyColorConfig(brightness)) {
-        for (var i = 0; i < calendarNum; i++) {
-          await calendarNotifiers[i].initState();
-          await calendarNotifiers[i].updateCalendar(
-              dataExclusion: true);
+    if (appDistant) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final Brightness brightness = MediaQuery.platformBrightnessOf(
+            context);
+        if (colorConfigNotifier.applyColorConfig(brightness)) {
+          for (var i = 0; i < calendarNum; i++) {
+            await calendarNotifiers[i].initState();
+            await calendarNotifiers[i].updateCalendar(
+                dataExclusion: true);
+          }
+          await colorConfigNotifier.updateState();
         }
-        await colorConfigNotifier.updateState();
-      }
-    });
+      });
+    }
 
     var appTitle = Column(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
