@@ -2,7 +2,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:scal/f016_color_config.dart';
+import 'package:scal/f016_design.dart';
 
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';

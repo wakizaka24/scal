@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f001_home_page.dart';
 
 import 'f002_home_view_model.dart';
-import 'f016_color_config.dart';
+import 'f016_design.dart';
 
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;

@@ -6,7 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
-import 'f016_color_config.dart';
+import 'f016_design.dart';
 
 void main() {
   // 縦向き

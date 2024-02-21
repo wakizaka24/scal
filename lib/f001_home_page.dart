@@ -8,7 +8,7 @@ import 'f002_home_view_model.dart';
 import 'f011_end_drawer.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
-import 'f016_color_config.dart';
+import 'f016_design.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -78,9 +78,10 @@ class HomePage extends HookConsumerWidget {
     }, const []);
 
     // アプリに復帰時(再開以外から再開)またはアプリ再開以外
-    var appDistant = (appLifecycleState == AppLifecycleState.resumed
+    var appDistant = appLifecycleState != null
+      && ((appLifecycleState == AppLifecycleState.resumed
       && preAppLifecycle.value != AppLifecycleState.resumed)
-        || appLifecycleState != AppLifecycleState.resumed;
+        || appLifecycleState != AppLifecycleState.resumed);
     preAppLifecycle.value = appLifecycleState;
     debugPrint('appLifecycleState=$appLifecycleState');
     if (appDistant) {
@@ -270,6 +271,16 @@ class HomePage extends HookConsumerWidget {
         appTitle,
         appBar,
         calendars,
+        Column(
+            children: [
+              const Spacer(),
+              Row(children: [
+                const Spacer(),
+                Container(width: deviceWidth, height: unsafeAreaBottomHeight,
+                    color: Colors.transparent),
+              ])
+            ]
+        ),
         SafeArea(child: Column(
             children: [
               const Spacer(),
@@ -283,7 +294,7 @@ class HomePage extends HookConsumerWidget {
         if (homeState.uICover)
           Container(color: Colors.black.withAlpha(100)),
         if (homeState.uICoverWidget != null)
-          homeState.uICoverWidget!
+          homeState.uICoverWidget!,
       ])
     );
 

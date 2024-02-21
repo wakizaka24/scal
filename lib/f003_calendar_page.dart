@@ -8,7 +8,7 @@ import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
 import 'f015_calendar_utils.dart';
-import 'f016_color_config.dart';
+import 'f016_design.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
@@ -638,7 +638,7 @@ class EventListPart extends HookConsumerWidget {
           ),
           Expanded(child:
             ListView(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 56
+                padding: EdgeInsets.fromLTRB(0, 0, 0, eventListBottomSafeArea
                     + unsafeAreaBottomHeight),
                 children: [
                   if (calendarState.eventList.isEmpty)

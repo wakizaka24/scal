@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'f016_color_config.dart';
+import 'f016_design.dart';
 
 class UIUtils {
   static final UIUtils _instance = UIUtils._internal();
