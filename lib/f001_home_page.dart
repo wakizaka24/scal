@@ -245,7 +245,8 @@ class HomePage extends HookConsumerWidget {
 
           homeNotifier.setUICover(true);
           homeNotifier.setUICoverWidget(
-              EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight));
+              EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
+                unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           homeNotifier.updateState();
         },
         child: Consumer(

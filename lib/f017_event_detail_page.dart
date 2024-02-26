@@ -9,9 +9,11 @@ import 'f016_design.dart';
 
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
+  final double unsafeAreaBottomHeight;
 
   const EventDetailPage({super.key,
-    required this.unsafeAreaTopHeight
+    required this.unsafeAreaTopHeight,
+    required this.unsafeAreaBottomHeight
   });
 
   @override
@@ -30,7 +32,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     useEffect(() {
 
       return () {
-
       };
     }, const []);
 
@@ -41,22 +42,22 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // ページの幅
     double pageWidget = deviceWidth * 0.8;
     // ページの高さ
-    double pageHeight = (deviceHeight
-        - widget.unsafeAreaTopHeight
-        - appBarHeight) * 0.6;
+    // double pageHeight = (deviceHeight
+    //     - widget.unsafeAreaTopHeight
+    //     - appBarHeight) * 0.6;
 
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
 
-    var contents = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 8,
-              ),
-              child: SizedBox(width: closingButtonWidth,
+    var contents = Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 8,
+        ),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: closingButtonWidth,
                   height: closingButtonWidth,
                   child: TextButton(
                     onPressed: () async {
@@ -78,14 +79,38 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: Icon(Icons.check,
                         color: normalTextColor),
                   )
-              )
-          ),
-          const Spacer()
-        ]
+              ),
+              // const Spacer()
+
+              Row(children: [
+                Text('タイトル', textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: normalTextColor
+                    )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    // controller: textField1Controller,
+                    style: const TextStyle(fontSize: 17),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.all(8),
+                      border: OutlineInputBorder(),
+                      hintText: 'タイトル',
+                    ),
+                    onChanged: (text) {
+                      debugPrint("Textの変更検知={$text}");
+                    },
+                  )
+                )
+              ],)
+            ]
+        )
     );
 
     var center = Center(
-      child: SizedBox(width: pageWidget, height: pageHeight,
+      child: SizedBox(width: pageWidget, /*height: pageHeight,*/
           child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.background,
@@ -99,7 +124,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       Container(color: Colors.black.withAlpha(100)),
       Column(children: [
         SizedBox(height: widget.unsafeAreaTopHeight),
-        Expanded(child: center)
+        const Spacer(),
+        center,
+        const Spacer(),
+        SizedBox(height: widget.unsafeAreaBottomHeight),
       ])
     ]);
   }
