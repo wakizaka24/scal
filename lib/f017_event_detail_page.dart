@@ -130,10 +130,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                 )
               ],),
-
-    FloatingActionButton(
-    heroTag: 'calendar_hero_tags',
-    onPressed: () async {})
+              FloatingActionButton(
+                  heroTag: 'test',
+                  onPressed: () async {})
             ]
         )
     );
@@ -149,15 +148,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       )
     );
 
-    return Stack(children: [
-      Container(color: Colors.black.withAlpha(100)),
-      Column(children: [
-        SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
-        const Spacer(),
-        center,
-        const Spacer(),
-        SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
-      ])
+    return Column(children: [
+      SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
+      const Spacer(),
+      center,
+      const Spacer(),
+      SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
     ]);
   }
 }

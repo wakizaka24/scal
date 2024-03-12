@@ -27,6 +27,7 @@ class HomePage extends HookConsumerWidget {
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
+    final firstPrimaryFocusDy = useState(0.0);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -55,6 +56,19 @@ class HomePage extends HookConsumerWidget {
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
+    // キーボードの高さ
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    // フォーカステキストの位置
+    double focusDy = primaryFocus?.offset.dy ?? 0;
+    if (focusDy == 0) {
+      firstPrimaryFocusDy.value = focusDy;
+    } else if (firstPrimaryFocusDy.value == 0) {
+      firstPrimaryFocusDy.value = focusDy;
+    }
+    double primaryFocusDy = firstPrimaryFocusDy.value;
+    // フォーカステキストの高さ
+    double primaryFocusHeight = primaryFocusDy == 0 ? 0
+        : primaryFocus?.rect.height ?? 0;
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -300,15 +314,31 @@ class HomePage extends HookConsumerWidget {
         Container(color: Colors.black.withAlpha(100)),
       if (homeState.uICoverWidget != null)
         SingleChildScrollView(
-          controller: homeState.keyboardScrollController,
+            controller: homeState.keyboardScrollController,
+            reverse: true,
             physics: const ClampingScrollPhysics(),
             child: SizedBox(
                 width: deviceWidth,
-                height: deviceHeight,
+                height: deviceHeight + keyboardHeight - 45,
+                // height: deviceHeight + keyboardHeight
+                //     - (),
                 child: homeState.uICoverWidget!
             )
         ),
     ]);
+
+    /*
+    上
+    keyboardHeight=336.0 primaryFocusDy=310.5 primaryFocusHeight=23.0
+
+    45 = keyboardHeight - primaryFocusDy + primaryFocusHeight
+    現在のスクロール位置が抜けてる?
+     */
+
+    debugPrint("keyboardHeight=$keyboardHeight"
+        " primaryFocusDy=$primaryFocusDy"
+        " y=${deviceHeight - primaryFocusDy}"
+        " primaryFocusHeight=$primaryFocusHeight");
 
     var scaffold = Scaffold(
       key: homePageScaffoldKey,

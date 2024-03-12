@@ -42,18 +42,6 @@ enum ColorConfig {
     //     Colors.black, // eventListTitleBgColor
     //     Colors.white// cardTextColor
     // ),
-    normal02OfMaterial3(
-        true, // useMaterial3
-        Brightness.light, // brightness
-        Colors.blue, // primarySwatch
-        Colors.blue, // accentColor
-        Colors.grey, // cardColor
-        null/*Colors.white*/, // backgroundColor
-        Colors.black, // normalTextColor
-        Colors.black54, // disabledTextColor
-        Colors.black54, // eventListTitleBgColor
-        Colors.black// cardTextColor
-    ),
     normal03OfMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness

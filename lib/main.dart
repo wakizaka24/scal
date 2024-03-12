@@ -76,7 +76,10 @@ class SCalApp extends StatelessWidget {
                     )
                 ),
                 title: 'Alpha',
-                home: const HomePage(),
+                home: GestureDetector(
+                    onTap: () => primaryFocus?.unfocus(),
+                    child:const HomePage()
+                ),
               );
             })
         )
