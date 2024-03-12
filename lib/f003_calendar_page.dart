@@ -185,65 +185,63 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         ]
     );
 
-    return SafeArea(
-      bottom: false,
-      child: Stack(children: [
-        Column(children: [
-          Expanded(
-              child: PageView(
-                  controller: calendarState.calendarSwitchingController,
-                // physics: const CustomScrollPhysics(mass: 75,
-                //     stiffness: 100, damping: 0.85),
-                  physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  onPageChanged: (int index) {
-                  },
-                  children: [monthCalendar, weekCalendar]
+    return Stack(children: [
+      Column(children: [
+        Expanded(
+            child: PageView(
+                controller: calendarState.calendarSwitchingController,
+                physics: const CustomScrollPhysics(mass: 75,
+                    stiffness: 100, damping: 0.85),
+                //physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                onPageChanged: (int index) {
+                },
+                children: [monthCalendar, weekCalendar]
+            )
+        ),
+        AspectRatio(
+            aspectRatio: eventListAspectRate,
+            child: EventListPart(pageIndex: widget.pageIndex,
+                unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight)
+        )
+      ]),
+      Column(children: [
+        const Spacer(),
+        Row(children:[const Spacer(),
+          ElevatedButton(
+              onPressed: () async {
+                final calendarState = ref.watch(
+                    calendarPageNotifierProvider(homeState.homePageIndex));
+                double prePage = calendarState.calendarSwitchingController
+                    .page!;
+
+                int page = prePage.toInt();
+                if (page.toDouble() == prePage) {
+                  page = page == 0 ? 1: 0;
+                  await calendarState.calendarSwitchingController
+                      .animateToPage(page, duration: const Duration(
+                      milliseconds: 300), curve: Curves.easeIn);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(32, 32),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(fontSize: 13),
+                padding: const EdgeInsets.all(0),
+              ),
+              child: Text(calendarNotifier
+                  .getCalendarSwitchingButtonTitle(),
+                  style: TextStyle(color: designConfigState.colorConfig!
+                      .cardTextColor)
               )
           ),
-          AspectRatio(
-              aspectRatio: eventListAspectRate,
-              child: EventListPart(pageIndex: widget.pageIndex,
-                  unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight)
-          )
+          Container(width: 76)
         ]),
-        Column(children: [
-          const Spacer(),
-          Row(children:[const Spacer(),
-            SafeArea(child: ElevatedButton(
-                onPressed: () async {
-                  final calendarState = ref.watch(
-                      calendarPageNotifierProvider(homeState.homePageIndex));
-                  double prePage = calendarState.calendarSwitchingController
-                      .page!;
-
-                  int page = prePage.toInt();
-                  if (page.toDouble() == prePage) {
-                    page = page == 0 ? 1: 0;
-                    await calendarState.calendarSwitchingController
-                        .animateToPage(page, duration: const Duration(
-                        milliseconds: 300), curve: Curves.easeIn);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(32, 32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  textStyle: const TextStyle(fontSize: 13),
-                  padding: const EdgeInsets.all(0),
-                ),
-                child: Text(calendarNotifier
-                    .getCalendarSwitchingButtonTitle(),
-                    style: TextStyle(color: designConfigState.colorConfig!
-                        .cardTextColor)
-                )
-            )),
-            Container(width: 76)
-          ])
-        ])
-      ]),
-    );
+        SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight)
+      ])
+    ]);
   }
 
   @override
@@ -251,7 +249,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 }
 
 // Common
-class CustomScrollPhysics extends ScrollPhysics {
+class CustomScrollPhysics extends ClampingScrollPhysics {
   final double mass; // 速度(50)
   final double stiffness; // 100
   final double damping; // 0.85

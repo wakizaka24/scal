@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f001_home_page.dart';
 
 import 'f002_home_view_model.dart';
 import 'f016_design.dart';
@@ -38,9 +37,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
-    double deviceHeight = MediaQuery.of(context).size.height;
+    //double deviceHeight = MediaQuery.of(context).size.height;
     // ページの幅
-    double pageWidget = deviceWidth * 0.8;
+    double pageWidget = deviceWidth * 0.9;
     // ページの高さ
     // double pageHeight = (deviceHeight
     //     - widget.unsafeAreaTopHeight
@@ -85,15 +84,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               Row(children: [
                 Text('タイトル', textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 17,
-                      color: normalTextColor
+                        fontSize: 16,
+                        color: normalTextColor
                     )
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     // controller: textField1Controller,
-                    style: const TextStyle(fontSize: 17),
+                    style: const TextStyle(fontSize: 15),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(8),
                       border: OutlineInputBorder(),
@@ -104,7 +103,37 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     },
                   )
                 )
-              ],)
+              ],),
+
+              const SizedBox(height: 100),
+
+              Row(children: [
+                Text('タイトル', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: normalTextColor
+                    )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: TextField(
+                      // controller: textField1Controller,
+                      style: const TextStyle(fontSize: 15),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(8),
+                        border: OutlineInputBorder(),
+                        hintText: 'タイトル',
+                      ),
+                      onChanged: (text) {
+                        debugPrint("Textの変更検知={$text}");
+                      },
+                    )
+                )
+              ],),
+
+    FloatingActionButton(
+    heroTag: 'calendar_hero_tags',
+    onPressed: () async {})
             ]
         )
     );
@@ -123,11 +152,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     return Stack(children: [
       Container(color: Colors.black.withAlpha(100)),
       Column(children: [
-        SizedBox(height: widget.unsafeAreaTopHeight),
+        SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
         const Spacer(),
         center,
         const Spacer(),
-        SizedBox(height: widget.unsafeAreaBottomHeight),
+        SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
       ])
     ]);
   }

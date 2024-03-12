@@ -26,6 +26,7 @@ class HomePage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final preAppLifecycle = useState(appLifecycleState);
+    final maximumUnsafeAreaBottomHeight = useState(0.0);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -44,7 +45,12 @@ class HomePage extends HookConsumerWidget {
       unsafeAreaTopHeight = 10;
     }
     // アンセーフエリア下の高さ
-    double unsafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
+    // キーボード表示時セーフエリアが小さくなるので最大の値を使用する。
+    double bottomHeight = MediaQuery.of(context).padding.bottom;
+    if (bottomHeight > maximumUnsafeAreaBottomHeight.value) {
+      maximumUnsafeAreaBottomHeight.value = bottomHeight;
+    }
+    double unsafeAreaBottomHeight = maximumUnsafeAreaBottomHeight.value;
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
@@ -261,42 +267,54 @@ class HomePage extends HookConsumerWidget {
         )
     );
 
+    var stack = Stack(children: [
+      SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
+          child: Container(color: theme.primaryColor)
+      ),
+      // Image.asset('images/IMG_3173_3.jpeg'),
+      appTitle,
+      appBar,
+      calendars,
+      Column(
+          children: [
+            const Spacer(),
+            Row(children: [
+              const Spacer(),
+              Container(width: deviceWidth, height: unsafeAreaBottomHeight,
+                  color: Colors.transparent),
+            ])
+          ]
+      ),
+      Column(
+          children: [
+            const Spacer(),
+            Row(children: [
+              const Spacer(),
+              floatingActionButton,
+              Container(width: 10)
+            ]),
+            SizedBox(width: deviceWidth, height: unsafeAreaBottomHeight)
+          ]
+      ),
+      if (homeState.uICover)
+        Container(color: Colors.black.withAlpha(100)),
+      if (homeState.uICoverWidget != null)
+        SingleChildScrollView(
+          controller: homeState.keyboardScrollController,
+            physics: const ClampingScrollPhysics(),
+            child: SizedBox(
+                width: deviceWidth,
+                height: deviceHeight,
+                child: homeState.uICoverWidget!
+            )
+        ),
+    ]);
+
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
+      resizeToAvoidBottomInset: false,
       endDrawer: EndDrawer(unsafeAreaTopHeight: unsafeAreaTopHeight),
-      body: Stack(children: [
-        SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
-            child: Container(color: theme.primaryColor)
-        ),
-        // Image.asset('images/IMG_3173_3.jpeg'),
-        appTitle,
-        appBar,
-        calendars,
-        Column(
-            children: [
-              const Spacer(),
-              Row(children: [
-                const Spacer(),
-                Container(width: deviceWidth, height: unsafeAreaBottomHeight,
-                    color: Colors.transparent),
-              ])
-            ]
-        ),
-        SafeArea(child: Column(
-            children: [
-              const Spacer(),
-              Row(children: [
-                const Spacer(),
-                floatingActionButton,
-                Container(width: 10)
-              ])
-            ]
-        )),
-        if (homeState.uICover)
-          Container(color: Colors.black.withAlpha(100)),
-        if (homeState.uICoverWidget != null)
-          homeState.uICoverWidget!,
-      ])
+      body: stack
     );
 
     // 右端スワイプでナビゲーションを戻さない

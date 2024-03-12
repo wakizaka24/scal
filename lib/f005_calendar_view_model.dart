@@ -972,7 +972,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Common
 
   Future<Event?> getSelectionEvent() async {
-    if (state.eventListIndex == null) {
+    if (state.eventListIndex == null || state.eventList.isEmpty) {
       return null;
     }
     var eventId = state.eventList[state.eventListIndex!].eventId;

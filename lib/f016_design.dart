@@ -18,30 +18,30 @@ const FontWeight eventListFontWidth3 = FontWeight.w300;
 const double eventListBottomSafeArea = 56;
 
 enum ColorConfig {
-    normal01OfMaterial2(
-        false, // useMaterial3
-        Brightness.light, // brightness
-        Colors.purple, // primarySwatch
-        Colors.blue, // accentColor
-        null, // cardColor
-        null, // backgroundColor
-        Colors.black, // normalTextColor
-        Color(0xffaaaaaa), // disabledTextColor
-        Color(0xCCDED2BF), // eventListTitleBgColor
-        Colors.white// cardTextColor
-    ),
-    dark01OfMaterial2(
-        false, // useMaterial3
-        Brightness.dark, // brightness
-        Colors.purple, // primarySwatch
-        Colors.blue, // accentColor
-        null, // cardColor
-        null, // backgroundColor
-        Colors.white54, // normalTextColor
-        Colors.white30, // disabledTextColor
-        Colors.black, // eventListTitleBgColor
-        Colors.white// cardTextColor
-    ),
+    // normal01OfMaterial2(
+    //     false, // useMaterial3
+    //     Brightness.light, // brightness
+    //     Colors.purple, // primarySwatch
+    //     Colors.blue, // accentColor
+    //     null, // cardColor
+    //     null, // backgroundColor
+    //     Colors.black, // normalTextColor
+    //     Color(0xffaaaaaa), // disabledTextColor
+    //     Color(0xCCDED2BF), // eventListTitleBgColor
+    //     Colors.white// cardTextColor
+    // ),
+    // dark01OfMaterial2(
+    //     false, // useMaterial3
+    //     Brightness.dark, // brightness
+    //     Colors.purple, // primarySwatch
+    //     Colors.blue, // accentColor
+    //     null, // cardColor
+    //     null, // backgroundColor
+    //     Colors.white54, // normalTextColor
+    //     Colors.white30, // disabledTextColor
+    //     Colors.black, // eventListTitleBgColor
+    //     Colors.white// cardTextColor
+    // ),
     normal02OfMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
@@ -67,6 +67,18 @@ enum ColorConfig {
         Colors.black // cardTextColor
     ),
     dark02OfMaterial3(
+        true, // useMaterial3
+        Brightness.dark, // brightness
+        Colors.blue, // primarySwatch
+        Colors.blue, // accentColor
+        Colors.black54, // cardColor
+        Color(0xFF313131), // backgroundColor
+        Colors.white54, // normalTextColor
+        Colors.white30, // disabledTextColor
+        Colors.black54, // eventListTitleBgColor
+        Colors.white// cardTextColor
+    ),
+    dark03OfMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
         Colors.blue, // primarySwatch
