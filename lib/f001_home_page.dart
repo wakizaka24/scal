@@ -108,10 +108,10 @@ class HomePage extends HookConsumerWidget {
       //debugPrint('offset=${homeState.keyboardScrollController?.offset ?? 0}');
 
       if (focusItem) {
-        debugPrint('deviceHeight=$deviceHeight'
+        debugPrint('contentHeight=${homeState.uICoverWidgetHeight}'
             ' keyboardHeight=$keyboardHeight'
             ' y=$primaryFocusDy height=$primaryFocusHeight');
-        var offset = deviceHeight - primaryFocusDy - primaryFocusHeight - 32;
+        var offset = homeState.uICoverWidgetHeight! - primaryFocusDy - primaryFocusHeight - 32;
         debugPrint('offset=$offset');
         homeState.keyboardScrollController?.jumpTo(offset);
       }
@@ -351,14 +351,6 @@ class HomePage extends HookConsumerWidget {
             )
         ),
     ]);
-
-    /*
-    上
-    keyboardHeight=336.0 primaryFocusDy=310.5 primaryFocusHeight=23.0
-
-    45 = keyboardHeight - primaryFocusDy + primaryFocusHeight
-    現在のスクロール位置が抜けてる?
-     */
 
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
