@@ -12,6 +12,7 @@ class HomePageState {
   String appBarTitle = '';
   bool uICover = false;
   Widget? uICoverWidget;
+  double? uICoverWidgetHeight;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
@@ -25,6 +26,7 @@ class HomePageState {
     nState.appBarTitle = state.appBarTitle;
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
+    nState.uICoverWidgetHeight = state.uICoverWidgetHeight;
 
     return nState;
   }
@@ -58,6 +60,10 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
 
   setUICoverWidget(Widget? widget) async {
     state.uICoverWidget = widget;
+  }
+
+  setUICoverWidgetHeight(double? height) async {
+    state.uICoverWidgetHeight = height;
   }
 
   updateState() async {

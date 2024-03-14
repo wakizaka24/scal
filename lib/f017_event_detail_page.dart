@@ -37,13 +37,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
-    //double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceHeight = MediaQuery.of(context).size.height;
     // ページの幅
     double pageWidget = deviceWidth * 0.9;
-    // ページの高さ
-    // double pageHeight = (deviceHeight
-    //     - widget.unsafeAreaTopHeight
-    //     - appBarHeight) * 0.6;
 
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
@@ -64,6 +60,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                       homeNotifier.setUICover(false);
                       homeNotifier.setUICoverWidget(null);
+                      homeNotifier.setUICoverWidgetHeight(null);
                       homeNotifier.updateState();
                     },
                     style: TextButton.styleFrom(
@@ -91,7 +88,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    key: const Key('abc'),
                     // controller: textField1Controller,
                     style: const TextStyle(fontSize: 15),
                     decoration: const InputDecoration(
@@ -106,7 +102,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 )
               ],),
 
-              const SizedBox(height: 100),
+              const SizedBox(height: 600),
 
               Row(children: [
                 Text('タイトル', textAlign: TextAlign.center,
@@ -139,7 +135,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     );
 
     var center = Center(
-      child: SizedBox(width: pageWidget, /*height: pageHeight,*/
+      child: SizedBox(width: pageWidget, height: deviceHeight,
           child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.background,
@@ -151,9 +147,23 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     return Column(children: [
       SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
+
       const Spacer(),
-      center,
-      const Spacer(),
+      SizedBox(width: pageWidget, height: deviceHeight
+          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight + 100,
+          child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.background,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: contents)
+      ),
+      //const SizedBox(height: 50),
+
+      // const Spacer(),
+      // center,
+      // const Spacer(),
+
       SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
     ]);
   }

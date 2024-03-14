@@ -108,22 +108,13 @@ class HomePage extends HookConsumerWidget {
       //debugPrint('offset=${homeState.keyboardScrollController?.offset ?? 0}');
 
       if (focusItem) {
-        // var offset = primaryFocusDy - primaryFocusHeight;
-        debugPrint('y=$primaryFocusDy height=$primaryFocusHeight');
-        var offset = deviceHeight - primaryFocusDy - primaryFocusHeight - 185;
-        debugPrint('offset=$offset deviceHeight=$deviceHeight'
-            ' keyboardHeight=$keyboardHeight');
+        debugPrint('deviceHeight=$deviceHeight'
+            ' keyboardHeight=$keyboardHeight'
+            ' y=$primaryFocusDy height=$primaryFocusHeight');
+        var offset = deviceHeight - primaryFocusDy - primaryFocusHeight - 32;
+        debugPrint('offset=$offset');
         homeState.keyboardScrollController?.jumpTo(offset);
       }
-
-      /*
-
-      上 314 333 -3     dh-x = 591 - 205
-      下 164 481 145    dh-x = 371 - 205
-
-      deviceHeight = 852
-      keyboardHeight = 336
-       */
 
       return () {
       };
@@ -299,6 +290,7 @@ class HomePage extends HookConsumerWidget {
           homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
+          homeNotifier.setUICoverWidgetHeight(deviceHeight + 100);
           homeNotifier.updateState();
         },
         child: Consumer(
@@ -350,10 +342,12 @@ class HomePage extends HookConsumerWidget {
             controller: homeState.keyboardScrollController,
             reverse: true,
             physics: const ClampingScrollPhysics(),
-            child: SizedBox(
-                width: deviceWidth,
-                height: deviceHeight + keyboardHeight,
-                child: homeState.uICoverWidget!
+            child: Padding(padding: EdgeInsets.only(bottom: keyboardHeight),
+                child: SizedBox(
+                  width: deviceWidth,
+                  height: homeState.uICoverWidgetHeight,
+                  child: homeState.uICoverWidget!
+              )
             )
         ),
     ]);
