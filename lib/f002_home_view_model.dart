@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 class HomePageState {
   // Control
-  ScrollController keyboardScrollController = ScrollController();
+  ScrollController? keyboardScrollController;
   PageController homePageController = PageController(initialPage: 0);
 
   // Data

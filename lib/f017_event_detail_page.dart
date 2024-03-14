@@ -91,6 +91,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
+                    key: const Key('abc'),
                     // controller: textField1Controller,
                     style: const TextStyle(fontSize: 15),
                     decoration: const InputDecoration(
@@ -100,7 +101,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     ),
                     onChanged: (text) {
                       debugPrint("Textの変更検知={$text}");
-                    },
+                    }
                   )
                 )
               ],),

@@ -27,6 +27,7 @@ class HomePage extends HookConsumerWidget {
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
+    final firstPrimary = useState(true);
     final firstPrimaryFocusDy = useState(0.0);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
@@ -58,16 +59,22 @@ class HomePage extends HookConsumerWidget {
     double deviceHeight = MediaQuery.of(context).size.height;
     // キーボードの高さ
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    // フォーカス項目
+    var focusItem = false;
+    if (primaryFocus?.context != null) {
+      var focusWidget = primaryFocus!.context!.widget as Focus;
+      focusItem = focusWidget.debugLabel == "EditableText";
+    }
     // フォーカステキストの位置
-    double focusDy = primaryFocus?.offset.dy ?? 0;
-    if (focusDy == 0) {
-      firstPrimaryFocusDy.value = focusDy;
-    } else if (firstPrimaryFocusDy.value == 0) {
-      firstPrimaryFocusDy.value = focusDy;
+    if (!focusItem) {
+      firstPrimary.value = true;
+    } else if (firstPrimary.value) {
+      firstPrimary.value = false;
+      firstPrimaryFocusDy.value = primaryFocus?.offset.dy ?? 0;
     }
     double primaryFocusDy = firstPrimaryFocusDy.value;
     // フォーカステキストの高さ
-    double primaryFocusHeight = primaryFocusDy == 0 ? 0
+    double primaryFocusHeight = !focusItem ? 0
         : primaryFocus?.rect.height ?? 0;
 
     useEffect(() {
@@ -97,13 +104,38 @@ class HomePage extends HookConsumerWidget {
       };
     }, const []);
 
+    useEffect(() {
+      //debugPrint('offset=${homeState.keyboardScrollController?.offset ?? 0}');
+
+      if (focusItem) {
+        // var offset = primaryFocusDy - primaryFocusHeight;
+        debugPrint('y=$primaryFocusDy height=$primaryFocusHeight');
+        var offset = deviceHeight - primaryFocusDy - primaryFocusHeight - 185;
+        debugPrint('offset=$offset deviceHeight=$deviceHeight'
+            ' keyboardHeight=$keyboardHeight');
+        homeState.keyboardScrollController?.jumpTo(offset);
+      }
+
+      /*
+
+      上 314 333 -3     dh-x = 591 - 205
+      下 164 481 145    dh-x = 371 - 205
+
+      deviceHeight = 852
+      keyboardHeight = 336
+       */
+
+      return () {
+      };
+    }, [keyboardHeight]);
+
     // アプリに復帰時(再開以外から再開)またはアプリ再開以外
     var appDistant = appLifecycleState != null
       && ((appLifecycleState == AppLifecycleState.resumed
       && preAppLifecycle.value != AppLifecycleState.resumed)
         || appLifecycleState != AppLifecycleState.resumed);
     preAppLifecycle.value = appLifecycleState;
-    debugPrint('appLifecycleState=$appLifecycleState');
+    //debugPrint('appLifecycleState=$appLifecycleState');
     if (appDistant) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final Brightness brightness = MediaQuery.platformBrightnessOf(
@@ -281,6 +313,7 @@ class HomePage extends HookConsumerWidget {
         )
     );
 
+    homeState.keyboardScrollController = ScrollController();
     var stack = Stack(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
           child: Container(color: theme.primaryColor)
@@ -319,9 +352,7 @@ class HomePage extends HookConsumerWidget {
             physics: const ClampingScrollPhysics(),
             child: SizedBox(
                 width: deviceWidth,
-                height: deviceHeight + keyboardHeight - 45,
-                // height: deviceHeight + keyboardHeight
-                //     - (),
+                height: deviceHeight + keyboardHeight,
                 child: homeState.uICoverWidget!
             )
         ),
@@ -334,11 +365,6 @@ class HomePage extends HookConsumerWidget {
     45 = keyboardHeight - primaryFocusDy + primaryFocusHeight
     現在のスクロール位置が抜けてる?
      */
-
-    debugPrint("keyboardHeight=$keyboardHeight"
-        " primaryFocusDy=$primaryFocusDy"
-        " y=${deviceHeight - primaryFocusDy}"
-        " primaryFocusHeight=$primaryFocusHeight");
 
     var scaffold = Scaffold(
       key: homePageScaffoldKey,
