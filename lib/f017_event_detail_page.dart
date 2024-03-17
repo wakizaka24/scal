@@ -102,7 +102,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 )
               ],),
 
-              const SizedBox(height: 600),
+              const SizedBox(height: 500),
 
               Row(children: [
                 Text('タイトル', textAlign: TextAlign.center,
@@ -135,7 +135,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     );
 
     var center = Center(
-      child: SizedBox(width: pageWidget, height: deviceHeight,
+      child: SizedBox(width: pageWidget, height: /*deviceHeight*/300 + 100
+          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
           child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.background,
@@ -149,8 +150,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
       const Spacer(),
-      SizedBox(width: pageWidget, height: deviceHeight
-          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight + 100,
+      SizedBox(width: pageWidget, height: deviceHeight + 300
+          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
           child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.background,
@@ -158,7 +159,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ),
               child: contents)
       ),
-      //const SizedBox(height: 50),
 
       // const Spacer(),
       // center,

@@ -441,7 +441,7 @@ class MonthPart extends HookConsumerWidget {
                 },
                 topBorderWide: false,
                 rightBorderWide: false,
-                bottomBorderWide: rowIndex == dayPartRowNum - 1,
+                bottomBorderWide: false,
                 leftBorderWide: false,
                 day: dayList[rowIndex * weekdayPartColumnNum + colIndex],
               ),
@@ -960,10 +960,10 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
             height: hourPartHeight,
             isHighlightedDay: calendarState.hourPartIndex
                 ~/ hoursPartRowNum == rowIndex,
-            topBorderWide: rowIndex == 0,
+            topBorderWide: false,
             rightBorderWide: false,
-            bottomBorderWide: rowIndex == hoursPartRowNum - 1,
-            leftBorderWide: true,
+            bottomBorderWide: false,
+            leftBorderWide: false,
             dayAndWeekday: dayAndWeekdayList[rowIndex]
         ),
       }
@@ -1087,9 +1087,9 @@ class HoursPart extends HookConsumerWidget {
                 },
                 onTapUp: (int i) async {
                 },
-                topBorderWide: rowIndex == 0,
-                rightBorderWide: colIndex == hoursPartColNum - 1,
-                bottomBorderWide: rowIndex == hoursPartRowNum - 1,
+                topBorderWide: false,
+                rightBorderWide: false,
+                bottomBorderWide: false,
                 leftBorderWide: false,
                 hour: hourList[rowIndex * hoursPartColNum + colIndex],
               ),
