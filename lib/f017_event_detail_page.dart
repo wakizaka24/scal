@@ -78,6 +78,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ),
               // const Spacer()
 
+              const Spacer(),
+
               Row(children: [
                 Text('タイトル', textAlign: TextAlign.center,
                     style: TextStyle(
@@ -102,7 +104,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 )
               ],),
 
-              const SizedBox(height: 500),
+              const SizedBox(height: 5),
 
               Row(children: [
                 Text('タイトル', textAlign: TextAlign.center,
@@ -134,17 +136,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         )
     );
 
-    var center = Center(
-      child: SizedBox(width: pageWidget, height: /*deviceHeight*/300 + 100
-          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
-          child: Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.background,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: contents)
-      )
-    );
+    // var center = Center(
+    //   child: SizedBox(width: pageWidget, height: /*deviceHeight*/300// + 100
+    //       - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
+    //       child: Container(
+    //           decoration: BoxDecoration(
+    //             color: theme.colorScheme.background,
+    //             borderRadius: BorderRadius.circular(16),
+    //           ),
+    //           child: contents)
+    //   )
+    // );
 
     return Column(children: [
       SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),

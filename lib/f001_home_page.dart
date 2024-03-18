@@ -105,19 +105,15 @@ class HomePage extends HookConsumerWidget {
     }, const []);
 
     useEffect(() {
-      if (focusItem) {
+      if (homeState.uICoverWidgetHeight != null && focusItem) {
         var offset = homeState.keyboardScrollController?.offset ?? 0;
         var y = primaryFocus?.offset.dy ?? 0;
         debugPrint('contentHeight=${homeState.uICoverWidgetHeight}'
             ' keyboardHeight=$keyboardHeight'
             ' offset=$primaryOffsetY y=$primaryFocusY height=$primaryFocusHeight'
             ' offset=$offset y=$y ${offset + y}');
-        // リバース版
-        // var offset = homeState.uICoverWidgetHeight! - primaryFocusY
-        //     - primaryFocusHeight - 32;
-        var nextOffset = primaryFocusY - keyboardHeight + primaryOffsetY
-          - 150;
-        debugPrint('offset=$nextOffset');
+        var nextOffset = homeState.uICoverWidgetHeight! - primaryFocusY
+            - keyboardHeight + primaryOffsetY;
         homeState.keyboardScrollController?.jumpTo(nextOffset);
       }
 
@@ -347,7 +343,7 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICoverWidget != null)
         SingleChildScrollView(
             controller: homeState.keyboardScrollController,
-            //reverse: true,
+            reverse: true,
             physics: const ClampingScrollPhysics(),
             child: Padding(padding: EdgeInsets.only(bottom: keyboardHeight),
                 child: SizedBox(
