@@ -61,11 +61,7 @@ class HomePage extends HookConsumerWidget {
     // キーボードの高さ
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     // フォーカス項目
-    var focusItem = false;
-    if (primaryFocus?.context != null) {
-      var focusWidget = primaryFocus!.context!.widget as Focus;
-      focusItem = focusWidget.debugLabel == "EditableText";
-    }
+    var focusItem = deviceHeight != primaryFocus?.rect.height;
     // フォーカステキストの位置
     if (!focusItem) {
       firstPrimary.value = true;

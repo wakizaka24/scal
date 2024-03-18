@@ -716,7 +716,7 @@ class EventPart extends HookConsumerWidget {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
     return SelectableCalendarCell(
-        height: 45,
+        height: height,
         index: index,
         isHighlighted: isHighlighted,
         isActive: true,
