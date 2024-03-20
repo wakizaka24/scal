@@ -24,8 +24,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final designConfigState = ref.watch(designConfigNotifierProvider);
-    var normalTextColor = designConfigState.colorConfig!.normalTextColor;
+    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
+    var borderColor = colorConfigState.colorConfig!.normalTextColor;
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
     useEffect(() {
@@ -92,9 +93,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: TextField(
                     // controller: textField1Controller,
                     style: const TextStyle(fontSize: 15),
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.all(8),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(8),
+                      border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: borderColor,
+                                width: 2
+                            )
+                        ),
                       hintText: 'タイトル',
                     ),
                     onChanged: (text) {
@@ -118,9 +125,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: TextField(
                       // controller: textField1Controller,
                       style: const TextStyle(fontSize: 15),
-                      decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.all(8),
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(8),
+                        border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: borderColor,
+                                width: 2
+                            )
+                        ),
                         hintText: 'タイトル',
                       ),
                       onChanged: (text) {
@@ -152,7 +165,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
       const Spacer(),
-      SizedBox(width: pageWidget, height: deviceHeight + 300
+      SizedBox(width: pageWidget, height: deviceHeight + 100 /*+ 300*/
           - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
           child: Container(
               decoration: BoxDecoration(

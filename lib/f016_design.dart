@@ -4,17 +4,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.3;
-const double calendarFontSize1 = 15;//13;
-const double calendarFontSize1Down1 = 13.5;//11.5;
-const FontWeight calendarFontWidth1 = FontWeight.w300;
-const double calendarFontSize2 = 11.5;//9.5;
-const FontWeight calendarFontWidth2 = FontWeight.w300;
-const double eventListFontSize1 = 13;//13.5;
-const FontWeight eventListFontWidth1 = FontWeight.w300;
-const double eventListFontSize2 = 13;//13;
-const FontWeight eventListFontWidth2 = FontWeight.w300;
+const double calendarFontSize1 = 13;
+const double calendarFontSize1Down1 = 11.5;
+const FontWeight calendarFontWidth1 = FontWeight.w400;
+const double calendarFontSize2 = 10;
+const FontWeight calendarFontWidth2 = FontWeight.w500;
+const double eventListFontSize1 = 13.5;
+const FontWeight eventListFontWidth1 = FontWeight.w400;
+const double eventListFontSize2 = 13;
+const FontWeight eventListFontWidth2 = FontWeight.w400;
 const double eventListFontSize3 = 13;
-const FontWeight eventListFontWidth3 = FontWeight.w300;
+const FontWeight eventListFontWidth3 = FontWeight.w400;
 const double eventListBottomSafeArea = 56;
 
 enum ColorConfig {

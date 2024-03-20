@@ -61,7 +61,11 @@ class HomePage extends HookConsumerWidget {
     // キーボードの高さ
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     // フォーカス項目
-    var focusItem = deviceHeight != primaryFocus?.rect.height;
+    var focusItem = false;
+    // フォーカスにコンテキストがない場合落ちる
+    try {
+      focusItem = deviceHeight != primaryFocus?.rect.height;
+    } catch (_) {}
     // フォーカステキストの位置
     if (!focusItem) {
       firstPrimary.value = true;
@@ -110,11 +114,22 @@ class HomePage extends HookConsumerWidget {
         var y = primaryFocus?.offset.dy ?? 0;
         debugPrint('contentHeight=${homeState.uICoverWidgetHeight}'
             ' keyboardHeight=$keyboardHeight'
-            ' offset=$primaryOffsetY y=$primaryFocusY height=$primaryFocusHeight'
+            ' offset=$primaryOffsetY y=$primaryFocusY '
+            'height=$primaryFocusHeight'
             ' offset=$offset y=$y ${offset + y}');
-        var nextOffset = homeState.uICoverWidgetHeight! - primaryFocusY
-            - keyboardHeight + primaryOffsetY;
+        // var nextOffset = homeState.uICoverWidgetHeight! - primaryFocusY
+        //     - keyboardHeight + primaryOffsetY;
+        var nextOffset = 100.0;
+        debugPrint('nextOffset=$nextOffset');
         homeState.keyboardScrollController?.jumpTo(nextOffset);
+
+        /*
+        下
+        flutter: contentHeight=1152.0 keyboardHeight=336.0 offset=90.46550697771225 y=807.9655069777123 height=23.0 offset=98.74027848790688 y=480.48055697581367 579.2208354637205
+        flutter: nextOffset=98.49999999999999
+
+
+         */
       }
 
       return () {
@@ -291,7 +306,7 @@ class HomePage extends HookConsumerWidget {
           homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
-          double contentsHeight = deviceHeight + 300;
+          double contentsHeight = deviceHeight + 100 /*+ 300*/;
           homeNotifier.setUICoverWidgetHeight(contentsHeight < deviceHeight
               ? deviceHeight : contentsHeight);
           homeNotifier.updateState();
