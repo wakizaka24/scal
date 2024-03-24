@@ -577,7 +577,7 @@ class DayPart extends HookConsumerWidget {
                         day.eventList[i].title),
                         maxLines: 1,
                         style: TextStyle(
-                            height: 1.2,
+                            height: 1,
                             fontSize: calendarFontSize2,
                             fontWeight: calendarFontWidth2,
                             color: day.eventList[i].titleColor
