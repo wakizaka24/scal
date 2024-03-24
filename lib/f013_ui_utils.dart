@@ -23,13 +23,16 @@ class UIUtils {
               child: AlertDialog(
                 title: Text(title,
                     style: const TextStyle(
-                        fontSize: 21
+                      fontSize: 21,
+                      fontWeight: dialogFontWidth,
                     )
                 ),
                 content: Text(message,
                     style: const TextStyle(
-                        fontSize: 15
-                    )),
+                      fontSize: 15,
+                      fontWeight: dialogFontWidth,
+                    )
+                ),
                 actions: <Widget>[
                   Visibility(
                     visible: negativeTitle != null,
@@ -44,8 +47,13 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(negativeTitle ?? "",
-                          style: TextStyle(color: designConfigState.colorConfig!
-                              .cardTextColor)),
+                          style: TextStyle(
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight,
+                              color: designConfigState.colorConfig!
+                              .cardTextColor
+                          )
+                      ),
                     ),
                   ),
                   ElevatedButton(
@@ -59,8 +67,13 @@ class UIUtils {
                         padding: const EdgeInsets.all(0),
                       ),
                       child: Text(positiveTitle,
-                          style: TextStyle(color: designConfigState.colorConfig!
-                              .cardTextColor))
+                          style: TextStyle(
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight,
+                              color: designConfigState.colorConfig!
+                              .cardTextColor
+                          )
+                      )
                   )
                 ],
               )

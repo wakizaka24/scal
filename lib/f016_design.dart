@@ -15,7 +15,11 @@ const double eventListFontSize2 = 13;
 const FontWeight eventListFontWidth2 = FontWeight.w600;
 const double eventListFontSize3 = 13;
 const FontWeight eventListFontWidth3 = FontWeight.w600;
+const double buttonFontSize = 13;
+const FontWeight buttonFontWeight = FontWeight.w600;
+const FontWeight dialogFontWidth = FontWeight.w600;
 const double eventListBottomSafeArea = 56;
+
 
 enum ColorConfig {
     // normal01OfMaterial2(

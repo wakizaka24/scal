@@ -73,7 +73,8 @@ class SCalApp extends StatelessWidget {
                       cardColor: colorConfigState.colorConfig!.cardColor,
                       backgroundColor: colorConfigState.colorConfig!
                           .backgroundColor
-                    )
+                    ),
+                    fontFamily: 'Murecho'
                 ),
                 title: 'Alpha',
                 home: GestureDetector(

@@ -233,8 +233,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
               ),
               child: Text(calendarNotifier
                   .getCalendarSwitchingButtonTitle(),
-                  style: TextStyle(color: designConfigState.colorConfig!
-                      .cardTextColor)
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: designConfigState.colorConfig!
+                      .cardTextColor
+                  )
               )
           ),
           Container(width: 76)
@@ -486,7 +489,7 @@ class WeekdayPart extends HookConsumerWidget {
         child: Text(weekday.title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              height: 1.3,
+              height: 1,
               fontSize: calendarFontSize1,
               fontWeight: calendarFontWidth1,
               color: weekday.titleColor,
@@ -564,6 +567,7 @@ class DayPart extends HookConsumerWidget {
                 color: day.titleColor,
               )
           ),
+          SizedBox(width: width, height: 1),
           Expanded(child:
             // Web版のスクロールバー非表示
             ScrollConfiguration(
@@ -577,7 +581,7 @@ class DayPart extends HookConsumerWidget {
                         day.eventList[i].title),
                         maxLines: 1,
                         style: TextStyle(
-                            height: 1,
+                            height: 1.1,
                             fontSize: calendarFontSize2,
                             fontWeight: calendarFontWidth2,
                             color: day.eventList[i].titleColor
@@ -624,7 +628,7 @@ class EventListPart extends HookConsumerWidget {
                     children: [
                       Text(calendarState.eventListTitle,
                         style: TextStyle(
-                            height: 1.3,
+                            height: 1,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWidth1,
                             color: colorConfigState.colorConfig!.normalTextColor
@@ -743,6 +747,7 @@ class EventPart extends HookConsumerWidget {
                       child: Text(emptyMessage!,
                           maxLines: 2,
                           style: TextStyle(
+                            height: 1.1,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWidth3,
                             color: colorConfigState.colorConfig!.normalTextColor
@@ -755,6 +760,7 @@ class EventPart extends HookConsumerWidget {
                   Text(event!.head,
                       textAlign: TextAlign.center,
                       style: TextStyle(
+                          height: 1.1,
                           fontSize: eventListFontSize2,
                           fontWeight: eventListFontWidth2,
                           color: event!.fontColor
@@ -779,7 +785,7 @@ class EventPart extends HookConsumerWidget {
                       child: Text(CalendarUtils().convertCharWrapString(
                           event!.title),
                           maxLines: 2, style: TextStyle(
-                              height: 1.3,
+                              height: 1.1,
                               fontSize: eventListFontSize3,
                               fontWeight: eventListFontWidth3,
                               color: event!.fontColor
@@ -809,7 +815,8 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: const Text('コピー',
                           style: TextStyle(
-                              fontSize: 13
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -838,7 +845,8 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: const Text('移動',
                           style: TextStyle(
-                              fontSize: 13
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -858,7 +866,8 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: const Text('取消',
                           style: TextStyle(
-                              fontSize: 13
+                            fontSize: buttonFontSize,
+                            fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -900,7 +909,8 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: const Text('削除',
                           style: TextStyle(
-                              fontSize: 13
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -920,7 +930,8 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: const Text('固定',
                           style: TextStyle(
-                              fontSize: 13
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -1028,7 +1039,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
         child: Text(dayAndWeekday.dayAndWeekTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              height: 1.3,
+              height: 1.1,
               fontSize: calendarFontSize1,
               fontWeight: calendarFontWidth1,
               color: dayAndWeekday.dayAndWeekTitleColor,
@@ -1170,6 +1181,7 @@ class HourPart extends HookConsumerWidget {
                   color: hour.titleColor,
                 )
               ),
+              SizedBox(width: width, height: 1),
               Expanded(child:
                 // Web版のスクロールバー非表示
                 ScrollConfiguration(
@@ -1183,7 +1195,7 @@ class HourPart extends HookConsumerWidget {
                               hour.eventList[i].title),
                             maxLines: 1,
                             style: TextStyle(
-                                height: 1.2,
+                                height: 1,
                                 fontSize: calendarFontSize2,
                                 fontWeight: calendarFontWidth2,
                                 color: hour.eventList[i].titleColor
