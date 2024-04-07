@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+const FontWeight appBarTitleFontWeight = FontWeight.w300;
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.3;
 const double calendarFontSize1 = 13;
 const double calendarFontSize1Down1 = 11.5;
-const FontWeight calendarFontWidth1 = FontWeight.w600;
+const FontWeight calendarFontWeight1 = FontWeight.w300;
 const double calendarFontSize2 = 10;
-const FontWeight calendarFontWidth2 = FontWeight.w600;
+const FontWeight calendarFontWeight2 = FontWeight.w300;
 const double eventListFontSize1 = 13.5;
-const FontWeight eventListFontWidth1 = FontWeight.w600;
+const FontWeight eventListFontWeight1 = FontWeight.w300;
 const double eventListFontSize2 = 13;
-const FontWeight eventListFontWidth2 = FontWeight.w600;
+const FontWeight eventListFontWeight2 = FontWeight.w300;
 const double eventListFontSize3 = 13;
-const FontWeight eventListFontWidth3 = FontWeight.w600;
+const FontWeight eventListFontWeight3 = FontWeight.w300;
 const double buttonFontSize = 13;
-const FontWeight buttonFontWeight = FontWeight.w600;
-const FontWeight dialogFontWidth = FontWeight.w600;
+const FontWeight buttonFontWeight = FontWeight.w300;
+const FontWeight dialogFontWeight = FontWeight.w300;
 const double eventListBottomSafeArea = 56;
 
 
@@ -49,8 +50,8 @@ enum ColorConfig {
     normal03OfMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
-        Colors.blue, // primarySwatch
-        Colors.blue, // accentColor
+        Colors.indigo, // primarySwatch
+        Colors.indigoAccent, // accentColor
         Color(0xFFE5E5E5), // cardColor
         Colors.white, // backgroundColor
         Colors.black, // normalTextColor
@@ -61,8 +62,8 @@ enum ColorConfig {
     dark02OfMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
-        Colors.blue, // primarySwatch
-        Colors.blue, // accentColor
+        Colors.indigo, // primarySwatch
+        Colors.indigoAccent, // accentColor
         Colors.black54, // cardColor
         Color(0xFF313131), // backgroundColor
         Colors.white54, // normalTextColor
@@ -73,8 +74,8 @@ enum ColorConfig {
     dark03OfMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
-        Colors.blue, // primarySwatch
-        Colors.blue, // accentColor
+        Colors.indigo, // primarySwatch
+        Colors.indigoAccent, // accentColor
         Colors.black, // cardColor
         null, // backgroundColor
         Colors.white54, // normalTextColor

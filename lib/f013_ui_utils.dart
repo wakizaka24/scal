@@ -24,13 +24,13 @@ class UIUtils {
                 title: Text(title,
                     style: const TextStyle(
                       fontSize: 21,
-                      fontWeight: dialogFontWidth,
+                      fontWeight: dialogFontWeight,
                     )
                 ),
                 content: Text(message,
                     style: const TextStyle(
                       fontSize: 15,
-                      fontWeight: dialogFontWidth,
+                      fontWeight: dialogFontWeight,
                     )
                 ),
                 actions: <Widget>[

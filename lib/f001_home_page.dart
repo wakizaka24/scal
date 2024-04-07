@@ -15,8 +15,8 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
 
 // アプリバーの高さ
 const double appBarHeight = 39;
-// カレンダーの数
-const calendarNum = 2;
+// カレンダーウィジェットの数
+const calendarWidgetNum = 1;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -35,7 +35,7 @@ class HomePage extends HookConsumerWidget {
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     List<CalendarPageNotifier> calendarNotifiers = [];
-    for (int i=0; i < calendarNum; i++) {
+    for (int i=0; i < calendarWidgetNum; i++) {
       calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
           .notifier));
     }
@@ -148,7 +148,7 @@ class HomePage extends HookConsumerWidget {
         final Brightness brightness = MediaQuery.platformBrightnessOf(
             context);
         if (colorConfigNotifier.applyColorConfig(brightness)) {
-          for (var i = 0; i < calendarNum; i++) {
+          for (var i = 0; i < calendarWidgetNum; i++) {
             await calendarNotifiers[i].initState();
             await calendarNotifiers[i].updateCalendar(
                 dataExclusion: true);
@@ -174,7 +174,7 @@ class HomePage extends HookConsumerWidget {
                       style: const TextStyle(
                           height: 1.3,
                           color: Colors.white,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: appBarTitleFontWeight,
                           fontSize: 24
                       )
                   ),
@@ -198,7 +198,7 @@ class HomePage extends HookConsumerWidget {
                 child: TextButton(
                   onPressed: () async {
                     await colorConfigNotifier.switchColorConfig();
-                    for (var i=0; i < calendarNum; i++) {
+                    for (var i=0; i < calendarWidgetNum; i++) {
                       await calendarNotifiers[i].initState();
                       await calendarNotifiers[i].updateCalendar(
                           dataExclusion: true);
@@ -264,13 +264,13 @@ class HomePage extends HookConsumerWidget {
           Expanded(
               child: PageView(
                 controller: homeState.homePageController,
-                physics: const NeverScrollableScrollPhysics(),
+                // physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical, // 縦
                 pageSnapping: true, // ページごとにスクロールを止める
                 onPageChanged: (index) {
                 },
                 children: <Widget>[
-                  for (var i=0; i < calendarNum; i++) ... {
+                  for (var i=0; i < calendarWidgetNum; i++) ... {
                     CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                         unsafeAreaBottomHeight: unsafeAreaBottomHeight,
                         pageIndex: i),

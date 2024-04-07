@@ -27,12 +27,6 @@ class CalendarPage extends StatefulHookConsumerWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage>
     with AutomaticKeepAliveClientMixin {
-  // Common
-  double preDeviceWidth = 0;
-  double preDeviceHeight = 0;
-
-  // Month Calendar
-  List<MonthPart> monthPartList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -105,42 +99,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       };
     }, const []);
 
-    // Month Calendar
-    if (preDeviceWidth != deviceWidth || preDeviceHeight != deviceHeight
-      || calendarState.monthCalendarReload) {
-      calendarState.monthCalendarReload = false;
-
-      // for (int i = 0; i < 3; i++) {
-      //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
-      // }
-
-      monthPartList = calendarState.dayLists.map((dayList) => MonthPart(
-          pageIndex: widget.pageIndex,
-          monthPartHeight: monthPartHeight,
-          weekdayPartColumnNum: CalendarPageState.weekdayPartColNum,
-          weekdayPartWidth: weekdayPartWidth,
-          weekdayPartHeight: weekdayPartHeight,
-          onPointerDown: (int pageIndex) async {},
-          onPointerUp: (int pageIndex) async {},
-          dayList: dayList,
-        )
-      ).toList();
-    }
-
-    var monthCalendar = PageView.builder(
-      controller: calendarState.monthCalendarController,
-      physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
-          damping: 0.85),
-      onPageChanged: (int index) {
-        calendarNotifier.onCalendarPageChanged(index);
-      },
-      itemBuilder: (context, index) {
-        var adjustmentIndex = index + calendarState.indexAddingMonth
-            - calendarState.addingMonth;
-        return monthPartList[adjustmentIndex % 3];
-      },
-    );
-
     // Week Calendar
 
     double dayAndWeekdayListPartWidth = 47;
@@ -196,7 +154,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                 scrollDirection: Axis.vertical,
                 onPageChanged: (int index) {
                 },
-                children: [monthCalendar, weekCalendar]
+                children: [MonthCalendarPage(
+                    unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
+                    unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
+                    monthPartHeight: monthPartHeight,
+                    weekdayPartWidth: weekdayPartWidth,
+                    weekdayPartHeight: weekdayPartHeight,
+                    pageIndex: widget.pageIndex), weekCalendar]
             )
         ),
         AspectRatio(
@@ -234,7 +198,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
               child: Text(calendarNotifier
                   .getCalendarSwitchingButtonTitle(),
                   style: TextStyle(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: buttonFontWeight,
                       color: designConfigState.colorConfig!
                       .cardTextColor
                   )
@@ -245,6 +209,78 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight)
       ])
     ]);
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class MonthCalendarPage extends StatefulHookConsumerWidget {
+  final double unsafeAreaTopHeight;
+  final double unsafeAreaBottomHeight;
+  final double monthPartHeight;
+  final double weekdayPartWidth;
+  final double weekdayPartHeight;
+
+  final int pageIndex;
+
+  const MonthCalendarPage({super.key,
+    required this.unsafeAreaTopHeight,
+    required this.unsafeAreaBottomHeight,
+    required this.monthPartHeight,
+    required this.weekdayPartWidth,
+    required this.weekdayPartHeight,
+    required this.pageIndex});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState()
+  => _MonthCalendarPageState();
+}
+
+class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
+    with AutomaticKeepAliveClientMixin {
+
+  // Month Calendar
+  List<MonthPart> monthPartList = [];
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    final calendarState = ref.watch(calendarPageNotifierProvider(
+        widget.pageIndex));
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
+        widget.pageIndex).notifier);
+
+    // Month Calendar
+    // for (int i = 0; i < 3; i++) {
+    //   debugPrint('表示月:${calendarState.dayLists[i][0].id}');
+    // }
+
+    monthPartList = calendarState.dayLists.map((dayList) => MonthPart(
+      pageIndex: widget.pageIndex,
+      monthPartHeight: widget.monthPartHeight,
+      weekdayPartColumnNum: CalendarPageState.weekdayPartColNum,
+      weekdayPartWidth: widget.weekdayPartWidth,
+      weekdayPartHeight: widget.weekdayPartHeight,
+      onPointerDown: (int pageIndex) async {},
+      onPointerUp: (int pageIndex) async {},
+      dayList: dayList,
+    )).toList();
+
+
+    return PageView.builder(
+      controller: calendarState.monthCalendarController,
+      physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
+          damping: 0.85),
+      onPageChanged: (int index) {
+        calendarNotifier.onCalendarPageChanged(index);
+      },
+      itemBuilder: (context, index) {
+        var adjustmentIndex = index - calendarState.addingMonth;
+        return monthPartList[adjustmentIndex % 3];
+      },
+    );
   }
 
   @override
@@ -491,7 +527,7 @@ class WeekdayPart extends HookConsumerWidget {
             style: TextStyle(
               height: 1,
               fontSize: calendarFontSize1,
-              fontWeight: calendarFontWidth1,
+              fontWeight: calendarFontWeight1,
               color: weekday.titleColor,
             )
         )
@@ -563,7 +599,7 @@ class DayPart extends HookConsumerWidget {
               style: TextStyle(
                 height: 1,
                 fontSize: calendarFontSize1,
-                fontWeight: calendarFontWidth1,
+                fontWeight: calendarFontWeight1,
                 color: day.titleColor,
               )
           ),
@@ -583,7 +619,7 @@ class DayPart extends HookConsumerWidget {
                         style: TextStyle(
                             height: 1.1,
                             fontSize: calendarFontSize2,
-                            fontWeight: calendarFontWidth2,
+                            fontWeight: calendarFontWeight2,
                             color: day.eventList[i].titleColor
                         ),
                       ),
@@ -630,7 +666,7 @@ class EventListPart extends HookConsumerWidget {
                         style: TextStyle(
                             height: 1,
                             fontSize: eventListFontSize1,
-                            fontWeight: eventListFontWidth1,
+                            fontWeight: eventListFontWeight1,
                             color: colorConfigState.colorConfig!.normalTextColor
                         )
                       ),
@@ -749,7 +785,7 @@ class EventPart extends HookConsumerWidget {
                           style: TextStyle(
                             height: 1.1,
                             fontSize: eventListFontSize3,
-                            fontWeight: eventListFontWidth3,
+                            fontWeight: eventListFontWeight3,
                             color: colorConfigState.colorConfig!.normalTextColor
                           )
                       )
@@ -762,7 +798,7 @@ class EventPart extends HookConsumerWidget {
                       style: TextStyle(
                           height: 1.1,
                           fontSize: eventListFontSize2,
-                          fontWeight: eventListFontWidth2,
+                          fontWeight: eventListFontWeight2,
                           color: event!.fontColor
                       )
                   )
@@ -787,7 +823,7 @@ class EventPart extends HookConsumerWidget {
                           maxLines: 2, style: TextStyle(
                               height: 1.1,
                               fontSize: eventListFontSize3,
-                              fontWeight: eventListFontWidth3,
+                              fontWeight: eventListFontWeight3,
                               color: event!.fontColor
                           )
                       )
@@ -1041,7 +1077,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
             style: TextStyle(
               height: 1.1,
               fontSize: calendarFontSize1,
-              fontWeight: calendarFontWidth1,
+              fontWeight: calendarFontWeight1,
               color: dayAndWeekday.dayAndWeekTitleColor,
             )
         )
@@ -1177,7 +1213,7 @@ class HourPart extends HookConsumerWidget {
                   height: 1,
                   fontSize: !hour.allDay ? calendarFontSize1
                     : calendarFontSize1Down1,
-                  fontWeight: calendarFontWidth1,
+                  fontWeight: calendarFontWeight1,
                   color: hour.titleColor,
                 )
               ),
@@ -1197,7 +1233,7 @@ class HourPart extends HookConsumerWidget {
                             style: TextStyle(
                                 height: 1,
                                 fontSize: calendarFontSize2,
-                                fontWeight: calendarFontWidth2,
+                                fontWeight: calendarFontWeight2,
                                 color: hour.eventList[i].titleColor
                             ),
                           ),

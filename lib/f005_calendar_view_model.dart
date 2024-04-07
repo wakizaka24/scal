@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:scal/f016_design.dart';
 
+import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
 import 'f015_calendar_utils.dart';
@@ -18,7 +19,6 @@ class CalendarPageState {
     initialPage: 0);
 
   // Control-Month Calendar
-  bool monthCalendarReload = false;
   PageController monthCalendarController = PageController(
       initialPage: pseudoUnlimitedCenterIndex);
 
@@ -36,8 +36,6 @@ class CalendarPageState {
   static const int weekdayPartColNum = 7;
   DateTime basisMonthDate = DateTime.now();
   int addingMonth = 0;
-  int preAddingMonth = 0;
-  int indexAddingMonth = 0;
   Map<DateTime, List<Event>> dayEventsMap = {};
   List<WeekdayDisplay> weekdayList = [];
   List<List<DayDisplay>> dayLists = [];
@@ -68,7 +66,6 @@ class CalendarPageState {
     nState.calendarSwitchingController = state.calendarSwitchingController;
 
     // Control-Month Calendar
-    nState.monthCalendarReload = state.monthCalendarReload;
     nState.monthCalendarController = state.monthCalendarController;
 
     // Data-Month Calendar/Week Calendar
@@ -84,8 +81,6 @@ class CalendarPageState {
     // Data-Month Calendar
     nState.basisMonthDate = state.basisMonthDate;
     nState.addingMonth = state.addingMonth;
-    nState.preAddingMonth = state.preAddingMonth;
-    nState.indexAddingMonth = state.indexAddingMonth;
     nState.dayEventsMap = state.dayEventsMap;
     nState.weekdayList = state.weekdayList;
     nState.dayLists = state.dayLists;
@@ -275,7 +270,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   setCalendarSwitchingPageIndex(int index) async {
     state.calendarSwitchingIndex = index;
-    state.indexAddingMonth = state.preAddingMonth;
     if (index == 0) {
       await selectDay();
       await updateWeekCalendarState();
@@ -311,9 +305,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   onCalendarPageChanged(int monthIndex) async {
-    int addingMonth = monthIndex - CalendarPageState.pseudoUnlimitedCenterIndex
-        + state.indexAddingMonth;
-    state.preAddingMonth = addingMonth;
+    int addingMonth = monthIndex - CalendarPageState.pseudoUnlimitedCenterIndex;
     if (state.addingMonth == addingMonth) {
       return;
     }
@@ -326,7 +318,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
     await updateSelectionDayOfHome();
-    state.monthCalendarReload = true;
     await updateState();
   }
 
@@ -366,7 +357,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateMonthCalendarState(dataExclusion: dataExclusion);
     await updateWeekCalendarState();
     await updateEventList();
-    state.monthCalendarReload = true;
   }
 
   updateMonthCalendarState({bool dataExclusion = false}) async {
@@ -1023,6 +1013,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
 final calendarPageNotifierProvider = StateNotifierProvider.family
     .autoDispose<CalendarPageNotifier, CalendarPageState, int>((ref, index) {
-  var list = List.filled(2, CalendarPageState());
+  var list = List.filled(calendarWidgetNum, CalendarPageState());
   return CalendarPageNotifier(ref, list[index]);
 });
