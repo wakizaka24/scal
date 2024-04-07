@@ -165,7 +165,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
       const Spacer(),
-      SizedBox(width: pageWidget, height: deviceHeight + 100 /*+ 300*/
+      SizedBox(width: pageWidget, height: deviceHeight /*+ 300*/
           - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
           child: Container(
               decoration: BoxDecoration(
