@@ -9,6 +9,7 @@ import 'f011_end_drawer.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
+import 'f018_event_detail_view_model.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -43,7 +44,7 @@ class HomePage extends HookConsumerWidget {
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
-    double unsafeAreaTopHeight = MediaQuery.of(context).padding.top - 21;
+    double unsafeAreaTopHeight = MediaQuery.of(context).padding.top - 17;
     if (unsafeAreaTopHeight < 10) {
       unsafeAreaTopHeight = 10;
     }
@@ -110,11 +111,14 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(() {
       if (homeState.uICoverWidgetHeight != null && focusItem) {
-        var a = deviceHeight - primaryFocusY - primaryFocusHeight
-            + primaryOffsetY - 15;
+        // case reverse = true
+        // var offset = deviceHeight - primaryFocusY - primaryFocusHeight
+        //     + primaryOffsetY - 15;
 
-        debugPrint('nextOffset=$a');
-        homeState.keyboardScrollController?.jumpTo(a);
+        var offset = primaryFocusY + primaryFocusHeight - primaryOffsetY
+          + 100;
+
+        homeState.keyboardScrollController?.jumpTo(offset);
       }
 
       return () {
@@ -271,6 +275,10 @@ class HomePage extends HookConsumerWidget {
         onPressed: () async {
           var _ = await calendarNotifier.getSelectionEvent();
 
+          final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+          final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+              .notifier);
+
           // 閉じた時のスピードが遅いので保留
           // if (!context.mounted) {
           //   return;
@@ -287,14 +295,15 @@ class HomePage extends HookConsumerWidget {
           //   )
           // );
 
-          homeNotifier.setUICover(true);
-          homeNotifier.setUICoverWidget(
+          await homeNotifier.setUICover(true);
+          await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
-          double contentsHeight = deviceHeight /*+ 300*/;
-          homeNotifier.setUICoverWidgetHeight(contentsHeight < deviceHeight
-              ? deviceHeight : contentsHeight);
-          homeNotifier.updateState();
+          await eventDetailNotifier.setDeviceHeight(deviceHeight);
+          double contentsHeight = eventDetailState.contentsHeight!;
+          await homeNotifier.setUICoverWidgetHeight(contentsHeight
+              < deviceHeight ? deviceHeight : contentsHeight);
+          await homeNotifier.updateState();
         },
         child: Consumer(
             builder: ((context, ref, child) {
@@ -343,7 +352,7 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICoverWidget != null)
         SingleChildScrollView(
             controller: homeState.keyboardScrollController,
-            reverse: true,
+            // reverse: true,
             physics: const ClampingScrollPhysics(),
             child: Padding(padding: EdgeInsets.only(bottom: keyboardHeight),
                 child: SizedBox(

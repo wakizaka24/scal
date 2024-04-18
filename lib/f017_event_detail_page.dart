@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f002_home_view_model.dart';
 import 'f016_design.dart';
+import 'f018_event_detail_view_model.dart';
 
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
@@ -27,18 +28,25 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
     var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
     var borderColor = colorConfigState.colorConfig!.normalTextColor;
+    final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+    final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+        .notifier);
 
     useEffect(() {
-
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // homeState.keyboardScrollController?.jumpTo(
+        //     eventDetailState.contentsHeight!
+        //         - eventDetailState.deviceHeight!
+        // );
+      });
       return () {
       };
     }, const []);
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
-    // 画面の高さ
-    double deviceHeight = MediaQuery.of(context).size.height;
     // ページの幅
     double pageWidget = deviceWidth * 0.9;
 
@@ -144,40 +152,50 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ],),
               FloatingActionButton(
                   heroTag: 'test',
-                  onPressed: () async {})
+                  onPressed: () async {
+                    var contentsMode = eventDetailState.contentsMode;
+                    if (contentsMode == 0) {
+                      contentsMode = 1;
+                    } else {
+                      contentsMode = 0;
+                    }
+                    eventDetailNotifier.setContentsMode(contentsMode);
+                  })
             ]
         )
     );
 
-    // var center = Center(
-    //   child: SizedBox(width: pageWidget, height: /*deviceHeight*/300// + 100
-    //       - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
-    //       child: Container(
-    //           decoration: BoxDecoration(
-    //             color: theme.colorScheme.background,
-    //             borderRadius: BorderRadius.circular(16),
-    //           ),
-    //           child: contents)
-    //   )
-    // );
-
-    return Column(children: [
-      SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
-
-      const Spacer(),
-      SizedBox(width: pageWidget, height: deviceHeight /*+ 300*/
-          - widget.unsafeAreaTopHeight - widget.unsafeAreaBottomHeight,
+    var center = Center(
+      child: SizedBox(width: pageWidget, height: eventDetailState
+          .contentsHeight! - widget.unsafeAreaTopHeight
+          - widget.unsafeAreaBottomHeight,
           child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.background,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: contents)
-      ),
+      )
+    );
+
+    return Column(children: [
+      SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
       // const Spacer(),
-      // center,
-      // const Spacer(),
+      // SizedBox(width: pageWidget, height: eventDetailState.contentsHeight!
+      //     - widget.unsafeAreaTopHeight
+      //     - widget.unsafeAreaBottomHeight,
+      //     child: Container(
+      //         decoration: BoxDecoration(
+      //           color: theme.colorScheme.background,
+      //           borderRadius: BorderRadius.circular(16),
+      //         ),
+      //         child: contents)
+      // ),
+
+      const Spacer(),
+      center,
+      const Spacer(),
 
       SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
     ]);
