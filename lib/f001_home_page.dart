@@ -29,6 +29,7 @@ class HomePage extends HookConsumerWidget {
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
     final firstPrimary = useState(true);
+    final preKeyboardHeight = useState(0.0);
     final firstPrimaryOffsetY = useState(0.0);
     final firstPrimaryFocusY = useState(0.0);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
@@ -41,6 +42,9 @@ class HomePage extends HookConsumerWidget {
           .notifier));
     }
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
+    final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+        .notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -61,12 +65,14 @@ class HomePage extends HookConsumerWidget {
     double deviceHeight = MediaQuery.of(context).size.height;
     // キーボードの高さ
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     // フォーカス項目
     var focusItem = false;
     // フォーカスにコンテキストがない場合落ちる
     try {
       focusItem = deviceHeight != primaryFocus?.rect.height;
     } catch (_) {}
+
     // フォーカステキストの位置
     if (!focusItem) {
       firstPrimary.value = true;
@@ -76,6 +82,18 @@ class HomePage extends HookConsumerWidget {
           ?? 0;
       firstPrimaryFocusY.value = primaryFocus?.offset.dy ?? 0;
     }
+
+    // キーボードを閉じた場合
+    bool keyboardDown = false;
+    if (!focusItem && keyboardHeight == 0) {
+      keyboardDown = true;
+      preKeyboardHeight.value = 0.0;
+    }
+
+    if (keyboardHeight < preKeyboardHeight.value) {
+      preKeyboardHeight.value = keyboardHeight;
+    }
+
     double primaryOffsetY = firstPrimaryOffsetY.value;
     double primaryFocusY = firstPrimaryFocusY.value;
     // フォーカステキストの高さ
@@ -111,12 +129,11 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(() {
       if (homeState.uICoverWidgetHeight != null && focusItem) {
-        // case reverse = true
-        // var offset = deviceHeight - primaryFocusY - primaryFocusHeight
-        //     + primaryOffsetY - 15;
+        // debugPrint('primaryFocusY=$primaryFocusY '
+        //     'primaryOffsetY=$primaryOffsetY');
 
-        var offset = primaryFocusY + primaryFocusHeight - primaryOffsetY
-          + 100;
+        var offset = deviceHeight - primaryFocusY - primaryFocusHeight
+            + primaryOffsetY - 15;
 
         homeState.keyboardScrollController?.jumpTo(offset);
       }
@@ -124,6 +141,34 @@ class HomePage extends HookConsumerWidget {
       return () {
       };
     }, [keyboardHeight]);
+
+    useEffect(() {
+      if (homeState.uICoverWidgetHeight != null && keyboardDown) {
+        // homeState.keyboardScrollController?.jumpTo(
+        //     firstPrimaryOffsetY.value);
+        homeState.keyboardScrollController?.animateTo(
+            firstPrimaryOffsetY.value,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.linear);
+      }
+
+      return () {
+      };
+    }, [keyboardDown]);
+
+    useEffect(() {
+      if (!homeState.uICover) {
+        eventDetailNotifier.setDeviceHeight(deviceHeight);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          homeState.keyboardScrollController = ScrollController(
+              initialScrollOffset: eventDetailState.contentsHeight!
+                  - eventDetailState.deviceHeight!);
+        });
+      }
+
+      return () {
+      };
+    }, [homeState.uICover]);
 
     // アプリに復帰時(再開以外から再開)またはアプリ再開以外
     var appDistant = appLifecycleState != null
@@ -275,10 +320,6 @@ class HomePage extends HookConsumerWidget {
         onPressed: () async {
           var _ = await calendarNotifier.getSelectionEvent();
 
-          final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
-          final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
-              .notifier);
-
           // 閉じた時のスピードが遅いので保留
           // if (!context.mounted) {
           //   return;
@@ -299,7 +340,6 @@ class HomePage extends HookConsumerWidget {
           await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
-          await eventDetailNotifier.setDeviceHeight(deviceHeight);
           double contentsHeight = eventDetailState.contentsHeight!;
           await homeNotifier.setUICoverWidgetHeight(contentsHeight
               < deviceHeight ? deviceHeight : contentsHeight);
@@ -317,7 +357,6 @@ class HomePage extends HookConsumerWidget {
         )
     );
 
-    homeState.keyboardScrollController = ScrollController();
     var stack = Stack(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
           child: Container(color: theme.primaryColor)
@@ -352,9 +391,10 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICoverWidget != null)
         SingleChildScrollView(
             controller: homeState.keyboardScrollController,
-            // reverse: true,
+            reverse: true,
             physics: const ClampingScrollPhysics(),
-            child: Padding(padding: EdgeInsets.only(bottom: keyboardHeight),
+            child: Padding(padding: EdgeInsets.only(
+              bottom: keyboardHeight),
                 child: SizedBox(
                   width: deviceWidth,
                   height: homeState.uICoverWidgetHeight,

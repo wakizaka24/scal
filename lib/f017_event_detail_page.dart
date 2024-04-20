@@ -35,12 +35,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         .notifier);
 
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // homeState.keyboardScrollController?.jumpTo(
-        //     eventDetailState.contentsHeight!
-        //         - eventDetailState.deviceHeight!
-        // );
-      });
       return () {
       };
     }, const []);
@@ -85,7 +79,36 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         color: normalTextColor),
                   )
               ),
-              // const Spacer()
+
+              Row(children: [
+                Text('タイトル', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: normalTextColor
+                    )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: TextField(
+                      // controller: textField1Controller,
+                        style: const TextStyle(fontSize: 15),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: borderColor,
+                                  width: 2
+                              )
+                          ),
+                          hintText: 'タイトル',
+                        ),
+                        onChanged: (text) {
+                          debugPrint("Textの変更検知={$text}");
+                        }
+                    )
+                )
+              ],),
 
               const Spacer(),
 
@@ -150,16 +173,23 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                 )
               ],),
+
               FloatingActionButton(
                   heroTag: 'test',
                   onPressed: () async {
                     var contentsMode = eventDetailState.contentsMode;
-                    if (contentsMode == 0) {
-                      contentsMode = 1;
-                    } else {
-                      contentsMode = 0;
+                    switch (contentsMode) {
+                      case EventDetailPageContentsMode.simpleInput:
+                        contentsMode = EventDetailPageContentsMode.detailInput;
+                      case EventDetailPageContentsMode.detailInput:
+                        contentsMode = EventDetailPageContentsMode.simpleInput;
                     }
-                    eventDetailNotifier.setContentsMode(contentsMode);
+                    await eventDetailNotifier.setContentsMode(contentsMode);
+
+                    homeState.keyboardScrollController?.jumpTo(
+                        eventDetailState.contentsHeight!
+                            - eventDetailState.deviceHeight!
+                    );
                   })
             ]
         )
