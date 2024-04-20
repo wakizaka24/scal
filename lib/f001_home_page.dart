@@ -29,7 +29,6 @@ class HomePage extends HookConsumerWidget {
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
     final firstPrimary = useState(true);
-    final preKeyboardHeight = useState(0.0);
     final firstPrimaryOffsetY = useState(0.0);
     final firstPrimaryFocusY = useState(0.0);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
@@ -83,17 +82,6 @@ class HomePage extends HookConsumerWidget {
       firstPrimaryFocusY.value = primaryFocus?.offset.dy ?? 0;
     }
 
-    // キーボードを閉じた場合
-    bool keyboardDown = false;
-    if (!focusItem && keyboardHeight == 0) {
-      keyboardDown = true;
-      preKeyboardHeight.value = 0.0;
-    }
-
-    if (keyboardHeight < preKeyboardHeight.value) {
-      preKeyboardHeight.value = keyboardHeight;
-    }
-
     double primaryOffsetY = firstPrimaryOffsetY.value;
     double primaryFocusY = firstPrimaryFocusY.value;
     // フォーカステキストの高さ
@@ -141,20 +129,6 @@ class HomePage extends HookConsumerWidget {
       return () {
       };
     }, [keyboardHeight]);
-
-    useEffect(() {
-      if (homeState.uICoverWidgetHeight != null && keyboardDown) {
-        // homeState.keyboardScrollController?.jumpTo(
-        //     firstPrimaryOffsetY.value);
-        homeState.keyboardScrollController?.animateTo(
-            firstPrimaryOffsetY.value,
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.linear);
-      }
-
-      return () {
-      };
-    }, [keyboardDown]);
 
     useEffect(() {
       if (!homeState.uICover) {
