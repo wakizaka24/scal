@@ -44,8 +44,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.contentsHeight = await getContentsHeight();
     updateState();
 
-    await homeNotifier.setUICoverWidgetHeight(state.contentsHeight!
-        < state.deviceHeight! ? state.deviceHeight : state.contentsHeight);
+    await homeNotifier.setUICoverWidgetHeight(state.deviceHeight!,
+        state.contentsHeight!);
     await homeNotifier.updateState();
   }
 

@@ -54,6 +54,9 @@ class HomePage extends HookConsumerWidget {
     // アンセーフエリア下の高さ
     // キーボード表示時セーフエリアが小さくなるので最大の値を使用する。
     double bottomHeight = MediaQuery.of(context).padding.bottom;
+    if (bottomHeight < 10) {
+      bottomHeight = 10;
+    }
     if (bottomHeight > maximumUnsafeAreaBottomHeight.value) {
       maximumUnsafeAreaBottomHeight.value = bottomHeight;
     }
@@ -81,12 +84,17 @@ class HomePage extends HookConsumerWidget {
           ?? 0;
       firstPrimaryFocusY.value = primaryFocus?.offset.dy ?? 0;
     }
-
     double primaryOffsetY = firstPrimaryOffsetY.value;
     double primaryFocusY = firstPrimaryFocusY.value;
     // フォーカステキストの高さ
     double primaryFocusHeight = !focusItem ? 0
         : primaryFocus?.rect.height ?? 0;
+
+    // キーボードを閉じた場合
+    bool keyboardDown = false;
+    if (!focusItem && keyboardHeight == 0) {
+      keyboardDown = true;
+    }
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -121,7 +129,7 @@ class HomePage extends HookConsumerWidget {
         //     'primaryOffsetY=$primaryOffsetY');
 
         var offset = deviceHeight - primaryFocusY - primaryFocusHeight
-            + primaryOffsetY - 15;
+            + primaryOffsetY - homeState.keyboardAdjustment;
 
         homeState.keyboardScrollController?.jumpTo(offset);
       }
@@ -131,18 +139,21 @@ class HomePage extends HookConsumerWidget {
     }, [keyboardHeight]);
 
     useEffect(() {
-      if (!homeState.uICover) {
-        eventDetailNotifier.setDeviceHeight(deviceHeight);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          homeState.keyboardScrollController = ScrollController(
-              initialScrollOffset: eventDetailState.contentsHeight!
-                  - eventDetailState.deviceHeight!);
-        });
+      if (homeState.uICoverWidgetHeight != null && keyboardDown) {
+        homeNotifier.setKeyboardAdjustment(0);
       }
 
       return () {
       };
-    }, [homeState.uICover]);
+    }, [keyboardDown]);
+
+    // useEffect(() {
+    //   if (!homeState.uICover) {
+    //   }
+    //
+    //   return () {
+    //   };
+    // }, [homeState.uICover]);
 
     // アプリに復帰時(再開以外から再開)またはアプリ再開以外
     var appDistant = appLifecycleState != null
@@ -304,7 +315,8 @@ class HomePage extends HookConsumerWidget {
           //       pageBuilder: (BuildContext context, Animation<double> animation,
           //           Animation<double> secondaryAnimation) {
           //         return EventDetailPage(
-          //             unsafeAreaTopHeight: unsafeAreaTopHeight);
+          //             unsafeAreaTopHeight: unsafeAreaTopHeight,
+          //             unsafeAreaBottomHeight: unsafeAreaBottomHeight);
           //         },
           //       transitionDuration: const Duration(seconds: 0)
           //   )
@@ -314,9 +326,14 @@ class HomePage extends HookConsumerWidget {
           await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
-          double contentsHeight = eventDetailState.contentsHeight!;
-          await homeNotifier.setUICoverWidgetHeight(contentsHeight
-              < deviceHeight ? deviceHeight : contentsHeight);
+
+          await eventDetailNotifier.setDeviceHeight(deviceHeight);
+          homeState.keyboardScrollController = ScrollController(
+              initialScrollOffset: eventDetailState.contentsHeight!
+                  - eventDetailState.deviceHeight!);
+
+          await homeNotifier.setUICoverWidgetHeight(
+              eventDetailState.contentsHeight!, deviceHeight);
           await homeNotifier.updateState();
         },
         child: Consumer(

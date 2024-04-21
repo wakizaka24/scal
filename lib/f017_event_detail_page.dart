@@ -28,7 +28,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
     var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
     var borderColor = colorConfigState.colorConfig!.normalTextColor;
-    final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
@@ -41,6 +40,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
+    // キーボードの高さ
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     // ページの幅
     double pageWidget = deviceWidth * 0.9;
 
@@ -63,7 +64,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                       homeNotifier.setUICover(false);
                       homeNotifier.setUICoverWidget(null);
-                      homeNotifier.setUICoverWidgetHeight(null);
+                      homeNotifier.resetUICoverWidgetHeight();
                       homeNotifier.updateState();
                     },
                     style: TextButton.styleFrom(
@@ -135,6 +136,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         ),
                       hintText: 'タイトル',
                     ),
+                    onTap: () {
+                      homeNotifier.setKeyboardAdjustment(15);
+                    },
                     onChanged: (text) {
                       debugPrint("Textの変更検知={$text}");
                     }
@@ -167,6 +171,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         ),
                         hintText: 'タイトル',
                       ),
+                      onTap: () {
+                        homeNotifier.setKeyboardAdjustment(41);
+                      },
                       onChanged: (text) {
                         debugPrint("Textの変更検知={$text}");
                       },
@@ -186,10 +193,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     }
                     await eventDetailNotifier.setContentsMode(contentsMode);
 
-                    homeState.keyboardScrollController?.jumpTo(
-                        eventDetailState.contentsHeight!
-                            - eventDetailState.deviceHeight!
-                    );
+                    await homeNotifier.resetKeyboardOffset(
+                        eventDetailState.contentsHeight!,
+                        eventDetailState.deviceHeight!,
+                        keyboardHeight);
                   })
             ]
         )

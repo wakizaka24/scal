@@ -13,6 +13,7 @@ class HomePageState {
   bool uICover = false;
   Widget? uICoverWidget;
   double? uICoverWidgetHeight;
+  double keyboardAdjustment = 0;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
@@ -27,6 +28,7 @@ class HomePageState {
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
     nState.uICoverWidgetHeight = state.uICoverWidgetHeight;
+    nState.keyboardAdjustment = state.keyboardAdjustment;
 
     return nState;
   }
@@ -62,8 +64,30 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
     state.uICoverWidget = widget;
   }
 
-  setUICoverWidgetHeight(double? height) async {
-    state.uICoverWidgetHeight = height;
+  setUICoverWidgetHeight(double deviceHeight, double contentsHeight) async {
+    state.uICoverWidgetHeight = contentsHeight
+        < deviceHeight ? deviceHeight : contentsHeight;
+  }
+
+  resetUICoverWidgetHeight() async {
+    state.uICoverWidgetHeight = null;
+  }
+
+  resetKeyboardOffset(double contentsHeight, double deviceHeight,
+      double keyboardHeight) async {
+    double offset = 0;
+    if (contentsHeight > deviceHeight) {
+      offset = contentsHeight
+          - deviceHeight
+          + keyboardHeight;
+    } else {
+      offset = keyboardHeight;
+    }
+    state.keyboardScrollController?.jumpTo(offset);
+  }
+
+  setKeyboardAdjustment(double addingOffset) async {
+    state.keyboardAdjustment = addingOffset;
   }
 
   updateState() async {
