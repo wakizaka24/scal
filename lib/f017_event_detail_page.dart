@@ -50,154 +50,198 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 8,
+          horizontal: 15,
+          vertical: 15,
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: closingButtonWidth,
-                  height: closingButtonWidth,
-                  child: TextButton(
-                    onPressed: () async {
-                      // Navigator.pop(context);
+              Row(children: [
+                SizedBox(width: closingButtonWidth,
+                    height: closingButtonWidth,
+                    child: TextButton(
+                      onPressed: () async {
+                        // Navigator.pop(context);
 
-                      homeNotifier.setUICover(false);
-                      homeNotifier.setUICoverWidget(null);
-                      homeNotifier.resetUICoverWidgetHeight();
-                      homeNotifier.updateState();
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: normalTextColor,
-                      textStyle: const TextStyle(fontSize: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            closingButtonWidth / 2),
+                        homeNotifier.setUICover(false);
+                        homeNotifier.setUICoverWidget(null);
+                        homeNotifier.resetUICoverWidgetHeight();
+                        homeNotifier.updateState();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: normalTextColor,
+                        textStyle: const TextStyle(fontSize: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              closingButtonWidth / 2),
+                        ),
+                        padding: const EdgeInsets.all(0),
                       ),
-                      padding: const EdgeInsets.all(0),
-                    ),
-                    child: Icon(Icons.check,
-                        color: normalTextColor),
-                  )
-              ),
+                      child: Icon(Icons.check,
+                          color: normalTextColor),
+                    )
+                ),
+                SizedBox(width: closingButtonWidth,
+                    height: closingButtonWidth,
+                    child: TextButton(
+                      onPressed: () async {
+                        var contentsMode = eventDetailState.contentsMode;
+                        switch (contentsMode) {
+                          case EventDetailPageContentsMode.simpleInput:
+                            contentsMode = EventDetailPageContentsMode.detailInput;
+                          case EventDetailPageContentsMode.detailInput:
+                            contentsMode = EventDetailPageContentsMode.simpleInput;
+                        }
+                        await eventDetailNotifier.setContentsMode(contentsMode);
+
+                        await homeNotifier.resetKeyboardOffset(
+                            eventDetailState.contentsHeight!,
+                            eventDetailState.deviceHeight!,
+                            keyboardHeight);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: normalTextColor,
+                        textStyle: const TextStyle(fontSize: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              closingButtonWidth / 2),
+                        ),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: Icon(Icons.check,
+                          color: normalTextColor),
+                    )
+                ),
+              ]),
+
+              const SizedBox(height: 8),
 
               Row(children: [
-                Text('タイトル', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: normalTextColor
+                SizedBox(width: 52,
+                  child: Text('タイトル', textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: normalTextColor
+                      )
+                  )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                      height: 41,
+                      child: TextField(
+                        // controller: textField1Controller,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.all(8),
+                            border: const OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: borderColor,
+                                    width: 2
+                                )
+                            ),
+                            hintText: 'タイトル',
+                          ),
+                          // keyboardType: TextInputType.multiline,
+                          // maxLines: 2,
+                          onTap: () {
+                            homeNotifier.setKeyboardAdjustment(15);
+                          },
+                          onChanged: (text) {
+                            debugPrint("Textの変更検知={$text}");
+                          }
+                      )
+                  )
+                ),
+                const SizedBox(width: 45)
+              ]),
+
+              const SizedBox(height: 8),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('場所', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
                     )
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                    child: TextField(
-                      // controller: textField1Controller,
-                        style: const TextStyle(fontSize: 15),
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(8),
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: borderColor,
-                                  width: 2
-                              )
-                          ),
-                          hintText: 'タイトル',
-                        ),
-                        onChanged: (text) {
-                          debugPrint("Textの変更検知={$text}");
-                        }
+                    child: SizedBox(
+                        height: 41,
+                        child: TextField(
+                          // controller: textField1Controller,
+                            style: const TextStyle(fontSize: 13),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(8),
+                              border: const OutlineInputBorder(),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: borderColor,
+                                      width: 2
+                                  )
+                              ),
+                              hintText: '場所',
+                            ),
+                            // keyboardType: TextInputType.multiline,
+                            // maxLines: 1,
+                            onTap: () {
+                              homeNotifier.setKeyboardAdjustment(15);
+                            },
+                            onChanged: (text) {
+                              debugPrint("Textの変更検知={$text}");
+                            }
+                        )
                     )
-                )
-              ],),
+                ),
+              ]),
+
+              const SizedBox(height: 8),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('開始', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: SizedBox(
+                        height: 41,
+                        child: TextField(
+                          // controller: textField1Controller,
+                            style: const TextStyle(fontSize: 13),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(8),
+                              border: const OutlineInputBorder(),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: borderColor,
+                                      width: 2
+                                  )
+                              ),
+                              hintText: '場所',
+                            ),
+                            // keyboardType: TextInputType.multiline,
+                            // maxLines: 1,
+                            onTap: () {
+                              homeNotifier.setKeyboardAdjustment(15);
+                            },
+                            onChanged: (text) {
+                              debugPrint("Textの変更検知={$text}");
+                            }
+                        )
+                    )
+                ),
+              ]),
 
               const Spacer(),
-
-              Row(children: [
-                Text('タイトル', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: normalTextColor
-                    )
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    // controller: textField1Controller,
-                    style: const TextStyle(fontSize: 15),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(8),
-                      border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: borderColor,
-                                width: 2
-                            )
-                        ),
-                      hintText: 'タイトル',
-                    ),
-                    onTap: () {
-                      homeNotifier.setKeyboardAdjustment(15);
-                    },
-                    onChanged: (text) {
-                      debugPrint("Textの変更検知={$text}");
-                    }
-                  )
-                )
-              ],),
-
-              const SizedBox(height: 5),
-
-              Row(children: [
-                Text('タイトル', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: normalTextColor
-                    )
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                    child: TextField(
-                      // controller: textField1Controller,
-                      style: const TextStyle(fontSize: 15),
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.all(8),
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: borderColor,
-                                width: 2
-                            )
-                        ),
-                        hintText: 'タイトル',
-                      ),
-                      onTap: () {
-                        homeNotifier.setKeyboardAdjustment(41);
-                      },
-                      onChanged: (text) {
-                        debugPrint("Textの変更検知={$text}");
-                      },
-                    )
-                )
-              ],),
-
-              FloatingActionButton(
-                  heroTag: 'test',
-                  onPressed: () async {
-                    var contentsMode = eventDetailState.contentsMode;
-                    switch (contentsMode) {
-                      case EventDetailPageContentsMode.simpleInput:
-                        contentsMode = EventDetailPageContentsMode.detailInput;
-                      case EventDetailPageContentsMode.detailInput:
-                        contentsMode = EventDetailPageContentsMode.simpleInput;
-                    }
-                    await eventDetailNotifier.setContentsMode(contentsMode);
-
-                    await homeNotifier.resetKeyboardOffset(
-                        eventDetailState.contentsHeight!,
-                        eventDetailState.deviceHeight!,
-                        keyboardHeight);
-                  })
             ]
         )
     );

@@ -64,7 +64,7 @@ enum ColorConfig {
         Brightness.dark, // brightness
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
-        Colors.black54, // cardColor
+        Colors.black, // cardColor
         Color(0xFF313131), // backgroundColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
