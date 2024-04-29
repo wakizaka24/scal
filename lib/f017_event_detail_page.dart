@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -33,11 +34,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);
 
-    useEffect(() {
-      return () {
-      };
-    }, const []);
-
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // キーボードの高さ
@@ -47,6 +43,86 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
+
+
+    final formAllDay = useState(false);
+    final formStartYear = useState(2024);
+    final formStartMonth = useState(4);
+    final formStartDay = useState(30);
+    final formStartHour = useState(7);
+    final formStartMinute = useState(30);
+
+    final formEndYear = useState(2024);
+    final formEndMonth = useState(4);
+    final formEndDay = useState(30);
+    final formEndHour = useState(07);
+    final formEndMinute = useState(30);
+
+    final startYearList = useState<List<String>>([]);
+    final startMonthList = useState<List<String>>([]);
+    final startDayList = useState<List<String>>([]);
+
+    final endYearList = useState<List<String>>([]);
+    final endMonthList = useState<List<String>>([]);
+    final endDayList = useState<List<String>>([]);
+
+
+    bool validateDate(year, month, day) {
+      var dateTime = DateTime(year, month, day);
+      return dateTime.year == year && dateTime.day == day
+          && dateTime.day == day;
+    }
+
+    List<String> createYearList() {
+      List<String> list = [];
+      for (int i = 1800; i <= DateTime.now().year + 300; i++) {
+        list.add(i.toString());
+      }
+      return list;
+    }
+
+    List<String> createMonthList() {
+      List<String> list = [];
+      for (int i = 1; i <= 12; i++) {
+        list.add(i.toString().padLeft(2, '0'));
+      }
+      return list;
+    }
+
+    List<String> createDayList(year, month) {
+      var list = [];
+      for (int i = 1; i <= 31; i++) {
+        list.add(i);
+      }
+      return list.where((day) {
+        return validateDate(year, month, day);
+      }).map((day) => day.toString().padLeft(2, '0'))
+          .toList();
+    }
+
+    useEffect(() {
+      startYearList.value = createYearList();
+      startMonthList.value = createMonthList();
+      endYearList.value = createYearList();
+      endMonthList.value = createMonthList();
+
+      return () {
+      };
+    }, const []);
+
+    useEffect(() {
+      startDayList.value = createDayList(formStartYear.value,
+          formStartMonth.value);
+      return () {
+      };
+    }, [formStartYear.value, formStartMonth.value]);
+
+    useEffect(() {
+      endDayList.value = createDayList(formEndYear.value,
+          formEndMonth.value);
+      return () {
+      };
+    }, [formEndYear.value, formEndMonth.value]);
 
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
@@ -149,7 +225,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             homeNotifier.setKeyboardAdjustment(15);
                           },
                           onChanged: (text) {
-                            debugPrint("Textの変更検知={$text}");
+                            debugPrint('Textの変更検知={$text}');
                           }
                       )
                   )
@@ -192,11 +268,35 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               homeNotifier.setKeyboardAdjustment(15);
                             },
                             onChanged: (text) {
-                              debugPrint("Textの変更検知={$text}");
+                              debugPrint('Textの変更検知={$text}');
                             }
                         )
                     )
                 ),
+              ]),
+
+              const SizedBox(height: 8),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('終日', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                    height: 41,
+                    child: CupertinoSwitch(
+                      value: formAllDay.value,
+                      onChanged: (value) {
+                        formAllDay.value = value;
+                      },
+                    )
+                ),
+                const Spacer(),
               ]),
 
               const SizedBox(height: 8),
@@ -210,35 +310,146 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         )
                     )
                 ),
+
                 const SizedBox(width: 8),
-                Expanded(
-                    child: SizedBox(
-                        height: 41,
-                        child: TextField(
-                          // controller: textField1Controller,
-                            style: const TextStyle(fontSize: 13),
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(8),
-                              border: const OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: borderColor,
-                                      width: 2
-                                  )
-                              ),
-                              hintText: '場所',
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: borderColor,
+                                  width: 2
+                              )
+                          ),
+                        ),
+                        value: formStartYear.value,
+                        items: startYearList.value.map((year) {
+                          return DropdownMenuItem(
+                            value: int.parse(year),
+                            child: Text(year, textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: normalTextColor
+                                )
                             ),
-                            // keyboardType: TextInputType.multiline,
-                            // maxLines: 1,
-                            onTap: () {
-                              homeNotifier.setKeyboardAdjustment(15);
-                            },
-                            onChanged: (text) {
-                              debugPrint("Textの変更検知={$text}");
-                            }
-                        )
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          formStartYear.value = value!;
+                          startDayList.value = createDayList(formStartYear.value,
+                              formStartMonth.value);
+                          if (!validateDate(formStartYear.value,
+                              formStartMonth.value,
+                              formStartDay.value)) {
+                            formStartDay.value = 1;
+                          }
+                        },
+                      ),
                     )
                 ),
+
+                const SizedBox(width: 6),
+
+                Text('/', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: normalTextColor
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: borderColor,
+                                  width: 2
+                              )
+                          ),
+                        ),
+                        value: formStartMonth.value,
+                        items: startMonthList.value.map((month) {
+                          return DropdownMenuItem(
+                            value: int.parse(month),
+                            child: Text(month, textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: normalTextColor
+                                )
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          formStartMonth.value = value!;
+                          startDayList.value = createDayList(formStartYear.value,
+                              formStartMonth.value);
+                          if (!validateDate(formStartYear.value,
+                              formStartMonth.value,
+                              formStartDay.value)) {
+                            formStartDay.value = 1;
+                          }
+                        },
+                      ),
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                Text('/', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: normalTextColor
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: borderColor,
+                                  width: 2
+                              )
+                          ),
+                        ),
+                        value: formStartDay.value,
+                        items: startDayList.value.map((day) {
+                          return DropdownMenuItem(
+                            value: int.parse(day),
+                            child: Text(day, textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: normalTextColor
+                                )
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          formStartDay.value = value!;
+                        },
+                      ),
+                    )
+                ),
+
+
+                const Spacer()
               ]),
 
               const Spacer(),
