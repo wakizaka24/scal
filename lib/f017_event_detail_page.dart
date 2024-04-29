@@ -331,9 +331,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         items: startYearList.value.map((year) {
                           return DropdownMenuItem(
                             value: int.parse(year),
-                            child: Text(year, textAlign: TextAlign.center,
+                            child: Text('$year年', textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    height: 1.7,
+                                    fontSize: 13,
                                     color: normalTextColor
                                 )
                             ),
@@ -350,15 +351,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           }
                         },
                       ),
-                    )
-                ),
-
-                const SizedBox(width: 6),
-
-                Text('/', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 21,
-                        color: normalTextColor
                     )
                 ),
 
@@ -382,9 +374,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         items: startMonthList.value.map((month) {
                           return DropdownMenuItem(
                             value: int.parse(month),
-                            child: Text(month, textAlign: TextAlign.center,
+                            child: Text('$month月', textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    height: 1.7,
+                                    fontSize: 13,
                                     color: normalTextColor
                                 )
                             ),
@@ -401,15 +394,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           }
                         },
                       ),
-                    )
-                ),
-
-                const SizedBox(width: 6),
-
-                Text('/', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 21,
-                        color: normalTextColor
                     )
                 ),
 
@@ -433,9 +417,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         items: startDayList.value.map((day) {
                           return DropdownMenuItem(
                             value: int.parse(day),
-                            child: Text(day, textAlign: TextAlign.center,
+                            child: Text('$day日', textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    height: 1.7,
+                                    fontSize: 13,
                                     color: normalTextColor
                                 )
                             ),
