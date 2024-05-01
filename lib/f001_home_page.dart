@@ -31,6 +31,8 @@ class HomePage extends HookConsumerWidget {
     final firstPrimary = useState(true);
     final firstPrimaryOffsetY = useState(0.0);
     final firstPrimaryFocusY = useState(0.0);
+    final preKeyboardHeight = useState(0.0);
+    final keyboardUpCompletion = useState(false);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -93,6 +95,7 @@ class HomePage extends HookConsumerWidget {
     // キーボードを閉じた場合
     bool keyboardDown = false;
     if (!focusItem && keyboardHeight == 0) {
+      keyboardUpCompletion.value = false;
       keyboardDown = true;
     }
 
@@ -124,7 +127,21 @@ class HomePage extends HookConsumerWidget {
     }, const []);
 
     useEffect(() {
-      if (homeState.uICoverWidgetHeight != null && focusItem) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        preKeyboardHeight.value = keyboardHeight;
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (preKeyboardHeight.value == keyboardHeight) {
+          keyboardUpCompletion.value = true;
+        }
+      });
+
+      return () {
+      };
+    }, [keyboardHeight]);
+
+    useEffect(() {
+      if (homeState.uICoverWidgetHeight != null && keyboardUpCompletion.value
+          && focusItem) {
         // debugPrint('primaryFocusY=$primaryFocusY '
         //     'primaryOffsetY=$primaryOffsetY');
 
@@ -136,7 +153,7 @@ class HomePage extends HookConsumerWidget {
 
       return () {
       };
-    }, [keyboardHeight]);
+    }, [keyboardUpCompletion.value]);
 
     useEffect(() {
       if (homeState.uICoverWidgetHeight != null && keyboardDown) {
@@ -385,7 +402,7 @@ class HomePage extends HookConsumerWidget {
             reverse: true,
             physics: const ClampingScrollPhysics(),
             child: Padding(padding: EdgeInsets.only(
-              bottom: keyboardHeight),
+              bottom: keyboardUpCompletion.value ? keyboardHeight : 0),
                 child: SizedBox(
                   width: deviceWidth,
                   height: homeState.uICoverWidgetHeight,

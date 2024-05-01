@@ -230,6 +230,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
+              const Spacer(),
+
               const SizedBox(height: 8),
 
               Row(children: [
@@ -467,7 +469,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ]),
 
               const SizedBox(height: 16),
-
+/*
               Row(children: [
                 SizedBox(width: 52,
                     child: Text('終了', textAlign: TextAlign.center,
@@ -610,10 +612,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                 ),
 
+
                 const Spacer()
               ]),
-
-              const Spacer(),
+              */
+              // const Spacer(),
             ]
         )
     );
