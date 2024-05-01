@@ -395,12 +395,21 @@ class HomePage extends HookConsumerWidget {
         ),
     ]);
 
-    var scaffold = Scaffold(
-      key: homePageScaffoldKey,
-      resizeToAvoidBottomInset: false,
-      endDrawer: EndDrawer(unsafeAreaTopHeight: unsafeAreaTopHeight),
-      body: stack
-    );
+    Widget? scaffold;
+    if (!homeState.uICover) {
+      scaffold = Scaffold(
+          key: homePageScaffoldKey,
+          resizeToAvoidBottomInset: false,
+          endDrawer: EndDrawer(unsafeAreaTopHeight: unsafeAreaTopHeight),
+          body: stack
+      );
+    } else {
+      scaffold = Scaffold(
+          key: homePageScaffoldKey,
+          resizeToAvoidBottomInset: false,
+          body: stack
+      );
+    }
 
     // 右端スワイプでナビゲーションを戻さない
     return PopScope(

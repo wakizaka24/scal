@@ -36,7 +36,6 @@ class EndDrawer extends HookConsumerWidget {
 
     const double buttonWidth = 39;
     var drawer = Drawer(
-        backgroundColor: theme.colorScheme.background,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

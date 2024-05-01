@@ -107,6 +107,7 @@ enum ColorConfig {
     final Color disabledTextColor;
     final Color eventListTitleBgColor;
     final Color cardTextColor;
+
 }
 
 class DesignConfigState {

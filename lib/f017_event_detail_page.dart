@@ -29,6 +29,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
     var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
     var borderColor = colorConfigState.colorConfig!.normalTextColor;
+    var backgroundColor = colorConfigState.colorConfig!.backgroundColor;
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
@@ -58,35 +59,19 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final formEndHour = useState(07);
     final formEndMinute = useState(30);
 
-    final startYearList = useState<List<String>>([]);
-    final startMonthList = useState<List<String>>([]);
+    final yearList = useState<List<String>>([]);
+    final monthList = useState<List<String>>([]);
     final startDayList = useState<List<String>>([]);
 
-    final endYearList = useState<List<String>>([]);
-    final endMonthList = useState<List<String>>([]);
     final endDayList = useState<List<String>>([]);
 
+    final hourList = useState<List<String>>([]);
+    final minuteList = useState<List<String>>([]);
 
     bool validateDate(year, month, day) {
       var dateTime = DateTime(year, month, day);
       return dateTime.year == year && dateTime.day == day
           && dateTime.day == day;
-    }
-
-    List<String> createYearList() {
-      List<String> list = [];
-      for (int i = 1800; i <= DateTime.now().year + 300; i++) {
-        list.add(i.toString());
-      }
-      return list;
-    }
-
-    List<String> createMonthList() {
-      List<String> list = [];
-      for (int i = 1; i <= 12; i++) {
-        list.add(i.toString().padLeft(2, '0'));
-      }
-      return list;
     }
 
     List<String> createDayList(year, month) {
@@ -101,10 +86,34 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     useEffect(() {
-      startYearList.value = createYearList();
-      startMonthList.value = createMonthList();
-      endYearList.value = createYearList();
-      endMonthList.value = createMonthList();
+      yearList.value = (() {
+        List<String> list = [];
+        for (int i = 1800; i <= DateTime.now().year + 300; i++) {
+          list.add(i.toString());
+        }
+        return list;
+      })();
+      monthList.value = (() {
+        List<String> list = [];
+        for (int i = 1; i <= 12; i++) {
+          list.add(i.toString().padLeft(2, '0'));
+        }
+        return list;
+      })();
+      hourList.value = (() {
+        List<String> list = [];
+        for (int i = 0; i <= 24; i++) {
+          list.add(i.toString().padLeft(2, '0'));
+        }
+        return list;
+      })();
+      minuteList.value = (() {
+        List<String> list = [];
+        for (int i = 0; i <= 59; i++) {
+          list.add(i.toString().padLeft(2, '0'));
+        }
+        return list;
+      })();
 
       return () {
       };
@@ -123,6 +132,37 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       return () {
       };
     }, [formEndYear.value, formEndMonth.value]);
+
+    makerInputDecoration({String? hintText}) {
+      return InputDecoration(
+        contentPadding: const EdgeInsets.all(8),
+        border: const OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: borderColor,
+                width: 1)
+        ),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: theme.primaryColor,
+                width: 2)
+        ),
+        hintText: hintText,
+      );
+    }
+
+    itemMaker(value, title) {
+      return DropdownMenuItem<int>(
+        value: value,
+        child: Text(title, textAlign: TextAlign.center,
+            style: TextStyle(
+                height: 1.7,
+                fontSize: 13,
+                color: normalTextColor
+            )
+        ),
+      );
+    }
 
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
@@ -208,17 +248,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: TextField(
                         // controller: textField1Controller,
                           style: const TextStyle(fontSize: 13),
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.all(8),
-                            border: const OutlineInputBorder(),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: borderColor,
-                                    width: 2
-                                )
-                            ),
-                            hintText: 'タイトル',
-                          ),
+                          decoration: makerInputDecoration(hintText: 'タイトル'),
                           // keyboardType: TextInputType.multiline,
                           // maxLines: 2,
                           onTap: () {
@@ -251,17 +281,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: TextField(
                           // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(8),
-                              border: const OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: borderColor,
-                                      width: 2
-                                  )
-                              ),
-                              hintText: '場所',
-                            ),
+                            decoration: makerInputDecoration(hintText: '場所'),
                             // keyboardType: TextInputType.multiline,
                             // maxLines: 1,
                             onTap: () {
@@ -275,7 +295,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
 
               Row(children: [
                 SizedBox(width: 52,
@@ -299,7 +319,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const Spacer(),
               ]),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
 
               Row(children: [
                 SizedBox(width: 52,
@@ -317,28 +337,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: 41,
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(8),
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: borderColor,
-                                  width: 2
-                              )
-                          ),
-                        ),
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
                         value: formStartYear.value,
-                        items: startYearList.value.map((year) {
-                          return DropdownMenuItem(
-                            value: int.parse(year),
-                            child: Text('$year年', textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    height: 1.7,
-                                    fontSize: 13,
-                                    color: normalTextColor
-                                )
-                            ),
-                          );
+                        items: yearList.value.map((year) {
+                          return itemMaker(int.parse(year), '$year年');
                         }).toList(),
                         onChanged: (value) async {
                           formStartYear.value = value!;
@@ -360,28 +364,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: 41,
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(8),
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: borderColor,
-                                  width: 2
-                              )
-                          ),
-                        ),
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
                         value: formStartMonth.value,
-                        items: startMonthList.value.map((month) {
-                          return DropdownMenuItem(
-                            value: int.parse(month),
-                            child: Text('$month月', textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    height: 1.7,
-                                    fontSize: 13,
-                                    color: normalTextColor
-                                )
-                            ),
-                          );
+                        items: monthList.value.map((month) {
+                          return itemMaker(int.parse(month), '$month月');
                         }).toList(),
                         onChanged: (value) async {
                           formStartMonth.value = value!;
@@ -403,28 +391,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: 41,
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(8),
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: borderColor,
-                                  width: 2
-                              )
-                          ),
-                        ),
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
                         value: formStartDay.value,
                         items: startDayList.value.map((day) {
-                          return DropdownMenuItem(
-                            value: int.parse(day),
-                            child: Text('$day日', textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    height: 1.7,
-                                    fontSize: 13,
-                                    color: normalTextColor
-                                )
-                            ),
-                          );
+                          return itemMaker(int.parse(day), '$day日');
                         }).toList(),
                         onChanged: (value) async {
                           formStartDay.value = value!;
@@ -433,6 +405,210 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                 ),
 
+
+                const Spacer()
+              ]),
+
+              const SizedBox(height: 8),
+
+              Row(children: [
+                Container(width: 52),
+
+                const SizedBox(width: 8),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formStartHour.value,
+                        items: hourList.value.map((hour) {
+                          return itemMaker(int.parse(hour), hour);
+                        }).toList(),
+                        onChanged: (value) async {
+                          formStartHour.value = value!;
+                        },
+                      ),
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                Text(':', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: normalTextColor
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formStartMinute.value,
+                        items: minuteList.value.map((minute) {
+                          return itemMaker(int.parse(minute), minute);
+                        }).toList(),
+                        onChanged: (value) async {
+                          formStartMinute.value = value!;
+                        },
+                      ),
+                    )
+                ),
+
+                const Spacer()
+              ]),
+
+              const SizedBox(height: 16),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('終了', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+
+                const SizedBox(width: 8),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formEndYear.value,
+                        items: yearList.value.map((year) {
+                          return itemMaker(int.parse(year), '$year年');
+                        }).toList(),
+                        onChanged: (value) async {
+                          formEndYear.value = value!;
+                          startDayList.value = createDayList(formEndYear.value,
+                              formEndMonth.value);
+                          if (!validateDate(formEndYear.value,
+                              formEndMonth.value,
+                              formEndDay.value)) {
+                            formEndDay.value = 1;
+                          }
+                        },
+                      ),
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formEndMonth.value,
+                        items: monthList.value.map((month) {
+                          return itemMaker(int.parse(month), '$month月');
+                        }).toList(),
+                        onChanged: (value) async {
+                          formEndMonth.value = value!;
+                          startDayList.value = createDayList(formEndYear.value,
+                              formEndMonth.value);
+                          if (!validateDate(formEndYear.value,
+                              formEndMonth.value,
+                              formEndDay.value)) {
+                            formEndDay.value = 1;
+                          }
+                        },
+                      ),
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formEndDay.value,
+                        items: startDayList.value.map((day) {
+                          return itemMaker(int.parse(day), '$day日');
+                        }).toList(),
+                        onChanged: (value) async {
+                          formEndDay.value = value!;
+                        },
+                      ),
+                    )
+                ),
+
+
+                const Spacer()
+              ]),
+
+              const SizedBox(height: 8),
+
+              Row(children: [
+                Container(width: 52),
+
+                const SizedBox(width: 8),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formEndHour.value,
+                        items: hourList.value.map((hour) {
+                          return itemMaker(int.parse(hour), hour);
+                        }).toList(),
+                        onChanged: (value) async {
+                          formEndHour.value = value!;
+                        },
+                      ),
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                Text(':', textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: normalTextColor
+                    )
+                ),
+
+                const SizedBox(width: 6),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<int>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: makerInputDecoration(),
+                        value: formEndMinute.value,
+                        items: minuteList.value.map((minute) {
+                          return itemMaker(int.parse(minute), minute);
+                        }).toList(),
+                        onChanged: (value) async {
+                          formEndMinute.value = value!;
+                        },
+                      ),
+                    )
+                ),
 
                 const Spacer()
               ]),
