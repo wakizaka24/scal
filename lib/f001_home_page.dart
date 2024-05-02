@@ -32,7 +32,7 @@ class HomePage extends HookConsumerWidget {
     final firstPrimaryOffsetY = useState(0.0);
     final firstPrimaryFocusY = useState(0.0);
     final preKeyboardHeight = useState(0.0);
-    final keyboardUpCompletion = useState(false);
+    final keyboardMovingCompletion = useState(false);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -80,6 +80,7 @@ class HomePage extends HookConsumerWidget {
     // フォーカステキストの位置
     if (!focusItem) {
       firstPrimary.value = true;
+      keyboardMovingCompletion.value = false;
     } else if (firstPrimary.value) {
       firstPrimary.value = false;
       firstPrimaryOffsetY.value = homeState.keyboardScrollController?.offset
@@ -95,7 +96,6 @@ class HomePage extends HookConsumerWidget {
     // キーボードを閉じた場合
     bool keyboardDown = false;
     if (!focusItem && keyboardHeight == 0) {
-      keyboardUpCompletion.value = false;
       keyboardDown = true;
     }
 
@@ -129,31 +129,62 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         preKeyboardHeight.value = keyboardHeight;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 150));
         if (preKeyboardHeight.value == keyboardHeight) {
-          keyboardUpCompletion.value = true;
+          keyboardMovingCompletion.value = true;
+        } else {
+          keyboardMovingCompletion.value = false;
         }
       });
+
+
 
       return () {
       };
     }, [keyboardHeight]);
 
     useEffect(() {
-      if (homeState.uICoverWidgetHeight != null && keyboardUpCompletion.value
-          && focusItem) {
-        // debugPrint('primaryFocusY=$primaryFocusY '
-        //     'primaryOffsetY=$primaryOffsetY');
+      if (homeState.uICoverWidgetHeight != null
+          && keyboardMovingCompletion.value && focusItem) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // debugPrint('primaryFocusY=$primaryFocusY '
+          //     'primaryOffsetY=$primaryOffsetY');
 
-        var offset = deviceHeight - primaryFocusY - primaryFocusHeight
-            + primaryOffsetY - homeState.keyboardAdjustment;
+          // // キーボード分下げる
+          // var scrollOffset = homeState.keyboardScrollController!.offset
+          //     + keyboardHeight;
+          // homeState.keyboardScrollController?.jumpTo(scrollOffset);
 
-        homeState.keyboardScrollController?.jumpTo(offset);
+          // // キーボード調整アニメーション
+          // var scrollOffset = deviceHeight - primaryFocusY - primaryFocusHeight
+          //     + primaryOffsetY - homeState.keyboardAdjustment;
+          // var offset = homeState.keyboardScrollController!.offset;
+          // var distance = (offset - scrollOffset).abs().toInt();
+          // homeState.keyboardScrollController?.animateTo(scrollOffset,
+          //     duration: Duration(milliseconds: (distance * 0.75).toInt()),
+          //     curve: Curves.linear);
+          // // homeState.keyboardScrollController?.jumpTo(offset);
+
+          var offset = homeState.keyboardScrollController!.offset;
+          // 見切れるスクロールの上限
+          var upperLimitOffset = primaryFocusY + primaryOffsetY
+              - homeState.keyboardAdjustment - unsafeAreaTopHeight;
+          // キーボードで隠れるのでスクロールの下限
+          var lowerLimitOffset = upperLimitOffset
+              - (deviceHeight - unsafeAreaBottomHeight - keyboardHeight
+                  - primaryFocusHeight * 2 - homeState.keyboardAdjustment);
+
+          debugPrint('Test=$upperLimitOffset $primaryOffsetY $primaryFocusY');
+
+          if (offset < lowerLimitOffset) {
+            homeState.keyboardScrollController?.jumpTo(lowerLimitOffset);
+          }
+        });
       }
 
       return () {
       };
-    }, [keyboardUpCompletion.value]);
+    }, [keyboardMovingCompletion.value]);
 
     useEffect(() {
       if (homeState.uICoverWidgetHeight != null && keyboardDown) {
@@ -399,10 +430,11 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICoverWidget != null)
         SingleChildScrollView(
             controller: homeState.keyboardScrollController,
-            reverse: true,
+            // reverse: true,
             physics: const ClampingScrollPhysics(),
             child: Padding(padding: EdgeInsets.only(
-              bottom: keyboardUpCompletion.value ? keyboardHeight : 0),
+              bottom: /*keyboardMovingCompletion.value
+                ? */keyboardHeight/* : 0*/),
                 child: SizedBox(
                   width: deviceWidth,
                   height: homeState.uICoverWidgetHeight,

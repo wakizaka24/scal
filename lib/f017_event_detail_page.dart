@@ -616,7 +616,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const Spacer()
               ]),
               */
-              // const Spacer(),
+              const Spacer(),
             ]
         )
     );
