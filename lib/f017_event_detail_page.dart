@@ -613,11 +613,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const Spacer()
               ]),
               */
-              const Spacer(),
+              // const Spacer(),
 
               Row(children: [
                 SizedBox(width: 52,
-                    child: Text('場所', textAlign: TextAlign.center,
+                    child: Text('メモ', textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 13,
                             color: normalTextColor
@@ -627,7 +627,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                     child: SizedBox(
-                        height: 410,
+                        height: 410 + 200,
                         child: TextField(
                           // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),

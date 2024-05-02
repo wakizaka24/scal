@@ -130,7 +130,7 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         preKeyboardHeight.value = keyboardHeight;
-        await Future.delayed(const Duration(milliseconds: 150));
+        await Future.delayed(const Duration(milliseconds: 100));
         if (preKeyboardHeight.value == keyboardHeight) {
           keyboardMovingCompletion.value = true;
         } else {
@@ -169,7 +169,7 @@ class HomePage extends HookConsumerWidget {
           if (offset < scrollOffset) {
             var distance = (offset - scrollOffset).abs().toInt();
             homeState.keyboardScrollController?.animateTo(scrollOffset,
-                duration: Duration(milliseconds: (distance * 0.75).toInt()),
+                duration: Duration(milliseconds: (distance * 0.52).toInt()),
                 curve: Curves.linear);
             // homeState.keyboardScrollController?.jumpTo(scrollOffset);
           }
