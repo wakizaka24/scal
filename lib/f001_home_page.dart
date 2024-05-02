@@ -94,9 +94,10 @@ class HomePage extends HookConsumerWidget {
         : primaryFocus?.rect.height ?? 0;
 
     // キーボードを閉じた場合
-    bool keyboardDown = false;
     if (!focusItem && keyboardHeight == 0) {
-      keyboardDown = true;
+      if (homeState.uICoverWidgetHeight != null) {
+        homeNotifier.setKeyboardAdjustment(0);
+      }
     }
 
     useEffect(() {
@@ -137,8 +138,6 @@ class HomePage extends HookConsumerWidget {
         }
       });
 
-
-
       return () {
       };
     }, [keyboardHeight]);
@@ -147,37 +146,32 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICoverWidgetHeight != null
           && keyboardMovingCompletion.value && focusItem) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          // debugPrint('primaryFocusY=$primaryFocusY '
-          //     'primaryOffsetY=$primaryOffsetY');
-
-          // // キーボード分下げる
-          // var scrollOffset = homeState.keyboardScrollController!.offset
-          //     + keyboardHeight;
-          // homeState.keyboardScrollController?.jumpTo(scrollOffset);
-
-          // // キーボード調整アニメーション
-          // var scrollOffset = deviceHeight - primaryFocusY - primaryFocusHeight
-          //     + primaryOffsetY - homeState.keyboardAdjustment;
-          // var offset = homeState.keyboardScrollController!.offset;
-          // var distance = (offset - scrollOffset).abs().toInt();
-          // homeState.keyboardScrollController?.animateTo(scrollOffset,
-          //     duration: Duration(milliseconds: (distance * 0.75).toInt()),
-          //     curve: Curves.linear);
-          // // homeState.keyboardScrollController?.jumpTo(offset);
-
           var offset = homeState.keyboardScrollController!.offset;
           // 見切れるスクロールの上限
           var upperLimitOffset = primaryFocusY + primaryOffsetY
-              - homeState.keyboardAdjustment - unsafeAreaTopHeight;
+              - unsafeAreaTopHeight;
           // キーボードで隠れるのでスクロールの下限
           var lowerLimitOffset = upperLimitOffset
-              - (deviceHeight - unsafeAreaBottomHeight - keyboardHeight
-                  - primaryFocusHeight * 2 - homeState.keyboardAdjustment);
+              - (deviceHeight - unsafeAreaTopHeight - keyboardHeight
+                  - primaryFocusHeight);
 
-          debugPrint('Test=$upperLimitOffset $primaryOffsetY $primaryFocusY');
+          // debugPrint('Test=$primaryOffsetY $primaryFocusY $upperLimitOffset'
+          //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
 
-          if (offset < lowerLimitOffset) {
-            homeState.keyboardScrollController?.jumpTo(lowerLimitOffset);
+          var scrollOffset = lowerLimitOffset;
+          if (scrollOffset <= upperLimitOffset) {
+            scrollOffset = lowerLimitOffset + homeState.keyboardAdjustment;
+          } else {
+            // 下限が上限を上回る場合は上限に合わせる
+            scrollOffset = upperLimitOffset - homeState.keyboardAdjustment;
+          }
+
+          if (offset < scrollOffset) {
+            var distance = (offset - scrollOffset).abs().toInt();
+            homeState.keyboardScrollController?.animateTo(scrollOffset,
+                duration: Duration(milliseconds: (distance * 0.75).toInt()),
+                curve: Curves.linear);
+            // homeState.keyboardScrollController?.jumpTo(scrollOffset);
           }
         });
       }
@@ -185,15 +179,6 @@ class HomePage extends HookConsumerWidget {
       return () {
       };
     }, [keyboardMovingCompletion.value]);
-
-    useEffect(() {
-      if (homeState.uICoverWidgetHeight != null && keyboardDown) {
-        homeNotifier.setKeyboardAdjustment(0);
-      }
-
-      return () {
-      };
-    }, [keyboardDown]);
 
     // useEffect(() {
     //   if (!homeState.uICover) {
@@ -376,9 +361,7 @@ class HomePage extends HookConsumerWidget {
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
 
           await eventDetailNotifier.setDeviceHeight(deviceHeight);
-          homeState.keyboardScrollController = ScrollController(
-              initialScrollOffset: eventDetailState.contentsHeight!
-                  - eventDetailState.deviceHeight!);
+          homeState.keyboardScrollController = ScrollController();
 
           await homeNotifier.setUICoverWidgetHeight(
               eventDetailState.contentsHeight!, deviceHeight);

@@ -204,16 +204,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         var contentsMode = eventDetailState.contentsMode;
                         switch (contentsMode) {
                           case EventDetailPageContentsMode.simpleInput:
-                            contentsMode = EventDetailPageContentsMode.detailInput;
+                            contentsMode = EventDetailPageContentsMode
+                                .detailInput;
                           case EventDetailPageContentsMode.detailInput:
-                            contentsMode = EventDetailPageContentsMode.simpleInput;
+                            contentsMode = EventDetailPageContentsMode
+                                .simpleInput;
                         }
                         await eventDetailNotifier.setContentsMode(contentsMode);
-
-                        await homeNotifier.resetKeyboardOffset(
-                            eventDetailState.contentsHeight!,
-                            eventDetailState.deviceHeight!,
-                            keyboardHeight);
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: normalTextColor,
@@ -617,6 +614,37 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ]),
               */
               const Spacer(),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('場所', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: SizedBox(
+                        height: 410,
+                        child: TextField(
+                          // controller: textField1Controller,
+                            style: const TextStyle(fontSize: 13),
+                            decoration: makerInputDecoration(hintText: 'メモ'),
+                            // keyboardType: TextInputType.multiline,
+                            maxLines: 40,
+
+                            onTap: () {
+                              homeNotifier.setKeyboardAdjustment(15);
+                            },
+                            onChanged: (text) {
+                              debugPrint('Textの変更検知={$text}');
+                            }
+                        )
+                    )
+                ),
+              ]),
             ]
         )
     );

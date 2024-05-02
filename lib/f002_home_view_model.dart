@@ -73,19 +73,6 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
     state.uICoverWidgetHeight = null;
   }
 
-  resetKeyboardOffset(double contentsHeight, double deviceHeight,
-      double keyboardHeight) async {
-    double offset = 0;
-    if (contentsHeight > deviceHeight) {
-      offset = contentsHeight
-          - deviceHeight
-          + keyboardHeight;
-    } else {
-      offset = keyboardHeight;
-    }
-    state.keyboardScrollController?.jumpTo(offset);
-  }
-
   setKeyboardAdjustment(double addingOffset) async {
     state.keyboardAdjustment = addingOffset;
   }
