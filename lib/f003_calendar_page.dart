@@ -574,7 +574,6 @@ class DayPart extends HookConsumerWidget {
     var highlightedLineAndTodayBgColor = borderColor.withAlpha(80);
     var highlightedLineColor = borderColor.withAlpha(30);
 
-
     return SelectableCalendarCell(
       width: width,
       height: height,

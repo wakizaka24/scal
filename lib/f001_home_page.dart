@@ -10,6 +10,7 @@ import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
+import 'f021_keyboard_safe_area_view.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -28,11 +29,6 @@ class HomePage extends HookConsumerWidget {
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
-    final firstPrimary = useState(true);
-    final firstPrimaryOffsetY = useState(0.0);
-    final firstPrimaryFocusY = useState(0.0);
-    final preKeyboardHeight = useState(0.0);
-    final keyboardMovingCompletion = useState(false);
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
@@ -67,38 +63,6 @@ class HomePage extends HookConsumerWidget {
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
-    // キーボードの高さ
-    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
-    // フォーカス項目
-    var focusItem = false;
-    // フォーカスにコンテキストがない場合落ちる
-    try {
-      focusItem = deviceHeight != primaryFocus?.rect.height;
-    } catch (_) {}
-
-    // フォーカステキストの位置
-    if (!focusItem) {
-      firstPrimary.value = true;
-      keyboardMovingCompletion.value = false;
-    } else if (firstPrimary.value) {
-      firstPrimary.value = false;
-      firstPrimaryOffsetY.value = homeState.keyboardScrollController?.offset
-          ?? 0;
-      firstPrimaryFocusY.value = primaryFocus?.offset.dy ?? 0;
-    }
-    double primaryOffsetY = firstPrimaryOffsetY.value;
-    double primaryFocusY = firstPrimaryFocusY.value;
-    // フォーカステキストの高さ
-    double primaryFocusHeight = !focusItem ? 0
-        : primaryFocus?.rect.height ?? 0;
-
-    // キーボードを閉じた場合
-    if (!focusItem && keyboardHeight == 0) {
-      if (homeState.uICoverWidgetHeight != null) {
-        homeNotifier.setKeyboardAdjustment(0);
-      }
-    }
 
     useEffect(() {
       debugPrint('parent useEffect');
@@ -126,59 +90,6 @@ class HomePage extends HookConsumerWidget {
         // Pageの解放処理
       };
     }, const []);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        preKeyboardHeight.value = keyboardHeight;
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (preKeyboardHeight.value == keyboardHeight) {
-          keyboardMovingCompletion.value = true;
-        } else {
-          keyboardMovingCompletion.value = false;
-        }
-      });
-
-      return () {
-      };
-    }, [keyboardHeight]);
-
-    useEffect(() {
-      if (homeState.uICoverWidgetHeight != null
-          && keyboardMovingCompletion.value && focusItem) {
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          var offset = homeState.keyboardScrollController!.offset;
-          // 見切れるスクロールの上限
-          var upperLimitOffset = primaryFocusY + primaryOffsetY
-              - unsafeAreaTopHeight;
-          // キーボードで隠れるのでスクロールの下限
-          var lowerLimitOffset = upperLimitOffset
-              - (deviceHeight - unsafeAreaTopHeight - keyboardHeight
-                  - primaryFocusHeight);
-
-          // debugPrint('Test=$primaryOffsetY $primaryFocusY $upperLimitOffset'
-          //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
-
-          var scrollOffset = lowerLimitOffset;
-          if (scrollOffset <= upperLimitOffset) {
-            scrollOffset = lowerLimitOffset + homeState.keyboardAdjustment;
-          } else {
-            // 下限が上限を上回る場合は上限に合わせる
-            scrollOffset = upperLimitOffset - homeState.keyboardAdjustment;
-          }
-
-          if (offset < scrollOffset) {
-            var distance = (offset - scrollOffset).abs().toInt();
-            homeState.keyboardScrollController?.animateTo(scrollOffset,
-                duration: Duration(milliseconds: (distance * 0.52).toInt()),
-                curve: Curves.linear);
-            // homeState.keyboardScrollController?.jumpTo(scrollOffset);
-          }
-        });
-      }
-
-      return () {
-      };
-    }, [keyboardMovingCompletion.value]);
 
     // useEffect(() {
     //   if (!homeState.uICover) {
@@ -411,19 +322,13 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICover)
         Container(color: Colors.black.withAlpha(100)),
       if (homeState.uICoverWidget != null)
-        SingleChildScrollView(
-            controller: homeState.keyboardScrollController,
-            // reverse: true,
-            physics: const ClampingScrollPhysics(),
-            child: Padding(padding: EdgeInsets.only(
-              bottom: /*keyboardMovingCompletion.value
-                ? */keyboardHeight/* : 0*/),
-                child: SizedBox(
-                  width: deviceWidth,
-                  height: homeState.uICoverWidgetHeight,
-                  child: homeState.uICoverWidget!
-              )
-            )
+        KeyboardSafeAreaView(
+            keyboardScrollController: homeState.keyboardScrollController!,
+            unsafeAreaTopHeight: unsafeAreaTopHeight,
+            unsafeAreaBottomHeight: unsafeAreaBottomHeight,
+            contentsWidth: deviceWidth,
+            contentsHeight: homeState.uICoverWidgetHeight!,
+            child: homeState.uICoverWidget!
         ),
     ]);
 
