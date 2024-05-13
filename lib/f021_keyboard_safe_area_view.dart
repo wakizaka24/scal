@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'f002_home_view_model.dart';
+import 'f024_keyboard_safe_area_view_model.dart';
 
 class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
   final ScrollController keyboardScrollController;
@@ -30,9 +30,9 @@ class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
 class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
   @override
   Widget build(BuildContext context) {
-    // TODO: 専用のViewModelに移動する。
-    final homeState = ref.watch(homePageNotifierProvider);
-    final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+    final keyboardViewState = ref.watch(keyboardSafeAreaViewNotifierProvider);
+    final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
+        .notifier);
 
     final firstPrimary = useState<bool>(true);
     final firstPrimaryOffsetY = useState<double>(0.0);
@@ -70,7 +70,7 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
 
     // キーボードを閉じた場合
     if (!focusItem && keyboardHeight == 0) {
-      homeNotifier.setKeyboardAdjustment(0);
+      keyboardViewNotifier.setKeyboardAdjustment(0);
     }
 
     useEffect(() {
@@ -105,15 +105,17 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
 
           var scrollOffset = lowerLimitOffset;
           if (scrollOffset <= upperLimitOffset) {
-            scrollOffset = lowerLimitOffset + homeState.keyboardAdjustment;
+            scrollOffset = lowerLimitOffset + keyboardViewState
+                .keyboardAdjustment;
           } else {
             // 下限が上限を上回る場合は上限に合わせる
-            scrollOffset = upperLimitOffset - homeState.keyboardAdjustment;
+            scrollOffset = upperLimitOffset - keyboardViewState
+                .keyboardAdjustment;
           }
 
           if (offset < scrollOffset) {
             var distance = (offset - scrollOffset).abs().toInt();
-            homeState.keyboardScrollController?.animateTo(scrollOffset,
+            keyboardViewState.keyboardScrollController?.animateTo(scrollOffset,
                 duration: Duration(milliseconds: (distance * 0.52).toInt()),
                 curve: Curves.linear);
             // homeState.keyboardScrollController?.jumpTo(scrollOffset);

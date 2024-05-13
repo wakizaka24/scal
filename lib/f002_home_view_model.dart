@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 class HomePageState {
   // Control
-  ScrollController? keyboardScrollController;
   PageController homePageController = PageController(initialPage: 0);
 
   // Data
@@ -13,13 +12,11 @@ class HomePageState {
   bool uICover = false;
   Widget? uICoverWidget;
   double? uICoverWidgetHeight;
-  double keyboardAdjustment = 0;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
 
     // Control
-    nState.keyboardScrollController = state.keyboardScrollController;
     nState.homePageController = state.homePageController;
 
     // Data
@@ -28,8 +25,6 @@ class HomePageState {
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
     nState.uICoverWidgetHeight = state.uICoverWidgetHeight;
-    nState.keyboardAdjustment = state.keyboardAdjustment;
-
     return nState;
   }
 }
@@ -64,17 +59,15 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
     state.uICoverWidget = widget;
   }
 
+  // TODO: KeyboardSafeAreaViewViewに移動する
   setUICoverWidgetHeight(double deviceHeight, double contentsHeight) async {
     state.uICoverWidgetHeight = contentsHeight
         < deviceHeight ? deviceHeight : contentsHeight;
   }
 
+  // TODO: KeyboardSafeAreaViewViewに移動する
   resetUICoverWidgetHeight() async {
     state.uICoverWidgetHeight = null;
-  }
-
-  setKeyboardAdjustment(double addingOffset) async {
-    state.keyboardAdjustment = addingOffset;
   }
 
   updateState() async {

@@ -10,7 +10,6 @@ import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
-import 'f021_keyboard_safe_area_view.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -33,6 +32,7 @@ class HomePage extends HookConsumerWidget {
         .notifier);
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+
     List<CalendarPageNotifier> calendarNotifiers = [];
     for (int i=0; i < calendarWidgetNum; i++) {
       calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
@@ -40,8 +40,6 @@ class HomePage extends HookConsumerWidget {
     }
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
-    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
-        .notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -270,10 +268,6 @@ class HomePage extends HookConsumerWidget {
           await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
-
-          await eventDetailNotifier.setDeviceHeight(deviceHeight);
-          homeState.keyboardScrollController = ScrollController();
-
           await homeNotifier.setUICoverWidgetHeight(
               eventDetailState.contentsHeight!, deviceHeight);
           await homeNotifier.updateState();
@@ -322,14 +316,7 @@ class HomePage extends HookConsumerWidget {
       if (homeState.uICover)
         Container(color: Colors.black.withAlpha(100)),
       if (homeState.uICoverWidget != null)
-        KeyboardSafeAreaView(
-            keyboardScrollController: homeState.keyboardScrollController!,
-            unsafeAreaTopHeight: unsafeAreaTopHeight,
-            unsafeAreaBottomHeight: unsafeAreaBottomHeight,
-            contentsWidth: deviceWidth,
-            contentsHeight: homeState.uICoverWidgetHeight!,
-            child: homeState.uICoverWidget!
-        ),
+        homeState.uICoverWidget!,
     ]);
 
     Widget? scaffold;

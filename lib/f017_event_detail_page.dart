@@ -7,6 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f002_home_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
+import 'f021_keyboard_safe_area_view.dart';
+import 'f024_keyboard_safe_area_view_model.dart';
 
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
@@ -29,16 +31,20 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
     var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
     var borderColor = colorConfigState.colorConfig!.normalTextColor;
-    var backgroundColor = colorConfigState.colorConfig!.backgroundColor;
+    final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+    final keyboardViewState = ref.watch(keyboardSafeAreaViewNotifierProvider);
+    final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
+        .notifier);
+
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
-    // キーボードの高さ
-    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    // 画面の高さ
+    double deviceHeight = MediaQuery.of(context).size.height;
     // ページの幅
     double pageWidget = deviceWidth * 0.9;
 
@@ -86,6 +92,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     useEffect(() {
+      eventDetailNotifier.setDeviceHeight(deviceHeight);
+      keyboardViewState.keyboardScrollController = ScrollController();
+
       yearList.value = (() {
         List<String> list = [];
         for (int i = 1800; i <= DateTime.now().year + 300; i++) {
@@ -251,7 +260,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           // keyboardType: TextInputType.multiline,
                           // maxLines: 2,
                           onTap: () {
-                            homeNotifier.setKeyboardAdjustment(15);
+                            keyboardViewNotifier.setKeyboardAdjustment(15);
                           },
                           onChanged: (text) {
                             debugPrint('Textの変更検知={$text}');
@@ -284,7 +293,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             // keyboardType: TextInputType.multiline,
                             // maxLines: 1,
                             onTap: () {
-                              homeNotifier.setKeyboardAdjustment(15);
+                              keyboardViewNotifier.setKeyboardAdjustment(15);
                             },
                             onChanged: (text) {
                               debugPrint('Textの変更検知={$text}');
@@ -636,7 +645,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             maxLines: 40,
 
                             onTap: () {
-                              homeNotifier.setKeyboardAdjustment(15);
+                              keyboardViewNotifier.setKeyboardAdjustment(15);
                             },
                             onChanged: (text) {
                               debugPrint('Textの変更検知={$text}');
@@ -662,26 +671,34 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       )
     );
 
-    return Column(children: [
-      SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
+    return KeyboardSafeAreaView(
+        keyboardScrollController: keyboardViewState
+            .keyboardScrollController!,
+        unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
+        unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
+        contentsWidth: deviceWidth,
+        contentsHeight: homeState.uICoverWidgetHeight!,
+        child: Column(children: [
+          SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
-      // const Spacer(),
-      // SizedBox(width: pageWidget, height: eventDetailState.contentsHeight!
-      //     - widget.unsafeAreaTopHeight
-      //     - widget.unsafeAreaBottomHeight,
-      //     child: Container(
-      //         decoration: BoxDecoration(
-      //           color: theme.colorScheme.background,
-      //           borderRadius: BorderRadius.circular(16),
-      //         ),
-      //         child: contents)
-      // ),
+          // const Spacer(),
+          // SizedBox(width: pageWidget, height: eventDetailState.contentsHeight!
+          //     - widget.unsafeAreaTopHeight
+          //     - widget.unsafeAreaBottomHeight,
+          //     child: Container(
+          //         decoration: BoxDecoration(
+          //           color: theme.colorScheme.background,
+          //           borderRadius: BorderRadius.circular(16),
+          //         ),
+          //         child: contents)
+          // ),
 
-      const Spacer(),
-      center,
-      const Spacer(),
+          const Spacer(),
+          center,
+          const Spacer(),
 
-      SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
-    ]);
+          SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
+        ])
+    );
   }
 }
