@@ -44,15 +44,13 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.contentsHeight = await getContentsHeight();
     updateState();
 
-    await homeNotifier.setUICoverWidgetHeight(state.deviceHeight!,
-        state.contentsHeight!);
     await homeNotifier.updateState();
   }
 
   Future<double> getContentsHeight() async {
     switch (state.contentsMode) {
       case EventDetailPageContentsMode.simpleInput:
-        return 700 + 400;
+        return 700;
       case EventDetailPageContentsMode.detailInput:
         return state.deviceHeight! + 700;
     }

@@ -39,7 +39,7 @@ class HomePage extends HookConsumerWidget {
           .notifier));
     }
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
-    final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+    // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);
 
@@ -271,8 +271,6 @@ class HomePage extends HookConsumerWidget {
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await eventDetailNotifier.setDeviceHeight(deviceHeight);
-          await homeNotifier.setUICoverWidgetHeight(
-              eventDetailState.contentsHeight!, deviceHeight);
           await homeNotifier.updateState();
         },
         child: Consumer(

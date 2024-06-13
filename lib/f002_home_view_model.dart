@@ -11,7 +11,6 @@ class HomePageState {
   String appBarTitle = '';
   bool uICover = false;
   Widget? uICoverWidget;
-  double? uICoverWidgetHeight;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
@@ -24,7 +23,6 @@ class HomePageState {
     nState.appBarTitle = state.appBarTitle;
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
-    nState.uICoverWidgetHeight = state.uICoverWidgetHeight;
     return nState;
   }
 }
@@ -58,18 +56,6 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   setUICoverWidget(Widget? widget) async {
     state.uICoverWidget = widget;
   }
-
-  // TODO: KeyboardSafeAreaViewViewに移動する
-  setUICoverWidgetHeight(double deviceHeight, double contentsHeight) async {
-    state.uICoverWidgetHeight = contentsHeight
-        < deviceHeight ? deviceHeight : contentsHeight;
-  }
-
-  // TODO: KeyboardSafeAreaViewViewに移動する
-  resetUICoverWidgetHeight() async {
-    state.uICoverWidgetHeight = null;
-  }
-
   updateState() async {
     state = HomePageState.copy(state);
   }

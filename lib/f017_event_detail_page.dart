@@ -61,9 +61,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     final formEndYear = useState(2024);
     final formEndMonth = useState(4);
-    final formEndDay = useState(30);
-    final formEndHour = useState(07);
-    final formEndMinute = useState(30);
+    // final formEndDay = useState(30);
+    // final formEndHour = useState(07);
+    // final formEndMinute = useState(30);
 
     final yearList = useState<List<String>>([]);
     final monthList = useState<List<String>>([]);
@@ -190,7 +190,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                         homeNotifier.setUICover(false);
                         homeNotifier.setUICoverWidget(null);
-                        homeNotifier.resetUICoverWidgetHeight();
                         homeNotifier.updateState();
                       },
                       style: TextButton.styleFrom(
@@ -677,13 +676,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       )
     );
 
+    var contentHeight = eventDetailState.contentsHeight!
+        < eventDetailState.deviceHeight! ? eventDetailState.deviceHeight!
+        : eventDetailState.contentsHeight!;
+
     return KeyboardSafeAreaView(
         keyboardScrollController: keyboardViewState
             .keyboardScrollController!,
         unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
         unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
         contentsWidth: deviceWidth,
-        contentsHeight: homeState.uICoverWidgetHeight!,
+        contentsHeight: contentHeight,
         child: Column(children: [
           SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
