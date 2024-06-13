@@ -40,6 +40,8 @@ class HomePage extends HookConsumerWidget {
     }
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+        .notifier);
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
@@ -268,6 +270,7 @@ class HomePage extends HookConsumerWidget {
           await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                 unsafeAreaBottomHeight: unsafeAreaBottomHeight));
+          await eventDetailNotifier.setDeviceHeight(deviceHeight);
           await homeNotifier.setUICoverWidgetHeight(
               eventDetailState.contentsHeight!, deviceHeight);
           await homeNotifier.updateState();

@@ -160,7 +160,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       );
     }
 
-    itemMaker(value, title) {
+    dropdownMenuItemMaker(value, title) {
       return DropdownMenuItem<int>(
         value: value,
         child: Text(title, textAlign: TextAlign.center,
@@ -293,7 +293,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             // keyboardType: TextInputType.multiline,
                             // maxLines: 1,
                             onTap: () {
-                              keyboardViewNotifier.setKeyboardAdjustment(15);
+                              keyboardViewNotifier.setKeyboardAdjustment(/*15*/30);
                             },
                             onChanged: (text) {
                               debugPrint('Textの変更検知={$text}');
@@ -350,7 +350,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: makerInputDecoration(),
                         value: formStartYear.value,
                         items: yearList.value.map((year) {
-                          return itemMaker(int.parse(year), '$year年');
+                          return dropdownMenuItemMaker(int.parse(year),
+                              '$year年');
                         }).toList(),
                         onChanged: (value) async {
                           formStartYear.value = value!;
@@ -377,7 +378,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: makerInputDecoration(),
                         value: formStartMonth.value,
                         items: monthList.value.map((month) {
-                          return itemMaker(int.parse(month), '$month月');
+                          return dropdownMenuItemMaker(int.parse(month),
+                              '$month月');
                         }).toList(),
                         onChanged: (value) async {
                           formStartMonth.value = value!;
@@ -404,7 +406,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: makerInputDecoration(),
                         value: formStartDay.value,
                         items: startDayList.value.map((day) {
-                          return itemMaker(int.parse(day), '$day日');
+                          return dropdownMenuItemMaker(int.parse(day),
+                              '$day日');
                         }).toList(),
                         onChanged: (value) async {
                           formStartDay.value = value!;
@@ -433,7 +436,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: makerInputDecoration(),
                         value: formStartHour.value,
                         items: hourList.value.map((hour) {
-                          return itemMaker(int.parse(hour), hour);
+                          return dropdownMenuItemMaker(int.parse(hour), hour);
                         }).toList(),
                         onChanged: (value) async {
                           formStartHour.value = value!;
@@ -462,7 +465,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: makerInputDecoration(),
                         value: formStartMinute.value,
                         items: minuteList.value.map((minute) {
-                          return itemMaker(int.parse(minute), minute);
+                          return dropdownMenuItemMaker(int.parse(minute),
+                              minute);
                         }).toList(),
                         onChanged: (value) async {
                           formStartMinute.value = value!;
@@ -636,7 +640,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                     child: SizedBox(
-                        height: 410 + 200,
+                        height: /*410 +*/ 200,
                         child: TextField(
                           // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
@@ -654,6 +658,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                 ),
               ]),
+
+              const Spacer(),
             ]
         )
     );

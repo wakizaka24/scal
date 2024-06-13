@@ -104,16 +104,17 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
           //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
 
           var scrollOffset = lowerLimitOffset;
+          var forceScroll = false;
           if (scrollOffset <= upperLimitOffset) {
             scrollOffset = lowerLimitOffset + keyboardViewState
                 .keyboardAdjustment;
           } else {
-            // 下限が上限を上回る場合は上限に合わせる
-            scrollOffset = upperLimitOffset - keyboardViewState
-                .keyboardAdjustment;
+            // エリアが上限を上回る場合は上限に合わせる
+            forceScroll = true;
+            scrollOffset = upperLimitOffset;
           }
 
-          if (offset < scrollOffset) {
+          if (offset < scrollOffset || forceScroll) {
             var distance = (offset - scrollOffset).abs().toInt();
             keyboardViewState.keyboardScrollController?.animateTo(scrollOffset,
                 duration: Duration(milliseconds: (distance * 0.52).toInt()),
