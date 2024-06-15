@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -45,7 +46,10 @@ class HomePage extends HookConsumerWidget {
 
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
-    double unsafeAreaTopHeight = MediaQuery.of(context).padding.top - 17;
+    double unsafeAreaTopHeight = MediaQuery.of(context).padding.top;
+    if (Platform.isIOS) {
+      unsafeAreaTopHeight += -17;
+    }
     if (unsafeAreaTopHeight < 10) {
       unsafeAreaTopHeight = 10;
     }
