@@ -34,7 +34,6 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
     final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
         .notifier);
 
-    final firstPrimary = useState<bool>(true);
     final firstPrimaryOffsetY = useState<double>(0.0);
     final firstPrimaryFocusY = useState<double>(0.0);
     final preKeyboardHeight = useState<double>(0.0);
@@ -50,17 +49,23 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
     var focusItem = false;
     // フォーカスにコンテキストがない場合落ちる
     try {
-      focusItem = deviceHeight != primaryFocus?.rect.height;
+      focusItem = /*primaryFocus?.runtimeType == FocusNode
+          && */deviceHeight != primaryFocus?.rect.height;
+      // debugPrint('keyboard focusItem=$focusItem type'
+      //     '=${primaryFocus?.runtimeType ?? 'null'}');
     } catch (_) {}
 
     // フォーカステキストの位置
+    var focusY = primaryFocus?.offset.dy ?? 0;
     if (!focusItem) {
-      firstPrimary.value = true;
       keyboardMovingCompletion.value = false;
-    } else if (firstPrimary.value) {
-      firstPrimary.value = false;
+      // キーボード表示時にコンボボックスなどでキーボードを閉じて、再度キーボードを開いた時、
+      // スクロールが必要であればスクロールする。
+    } else if (firstPrimaryOffsetY.value
+        != widget.keyboardScrollController.offset
+        || firstPrimaryFocusY.value != focusY) {
       firstPrimaryOffsetY.value = widget.keyboardScrollController.offset;
-      firstPrimaryFocusY.value = primaryFocus?.offset.dy ?? 0;
+      firstPrimaryFocusY.value = focusY;
     }
     double primaryOffsetY = firstPrimaryOffsetY.value;
     double primaryFocusY = firstPrimaryFocusY.value;
@@ -77,10 +82,12 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         preKeyboardHeight.value = keyboardHeight;
         await Future.delayed(const Duration(milliseconds: 100));
-        if (preKeyboardHeight.value == keyboardHeight) {
+        if (keyboardHeight == 0 || preKeyboardHeight.value == keyboardHeight) {
           keyboardMovingCompletion.value = true;
+          // debugPrint('keyboard not moving $keyboardHeight');
         } else {
           keyboardMovingCompletion.value = false;
+          // debugPrint('keyboard moving $keyboardHeight');
         }
       });
 
@@ -89,6 +96,8 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
     }, [keyboardHeight]);
 
     useEffect(() {
+      // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
+      //     '$focusItem');
       if (keyboardMovingCompletion.value && focusItem) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           var offset = widget.keyboardScrollController.offset;
