@@ -21,66 +21,67 @@ const FontWeight buttonFontWeight = FontWeight.w300;
 const FontWeight dialogFontWeight = FontWeight.w300;
 const double eventListBottomSafeArea = 56;
 
+const MaterialColor originalLightPink = MaterialColor(
+    4294948545, // 0xFFFFB6C1
+    {
+        50: Color(0xFFFFF6F8),
+        100: Color(0xFFFFE9EC),
+        200: Color(0xFFFFDBE0),
+        300: Color(0xFFFFCCD4),
+        400: Color(0xFFFFC1CA),
+        500: Color(0xFFFFB6C1), // primary
+        600: Color(0xFFFFAFBB),
+        700: Color(0xFFFFA6B3),
+        800: Color(0xFFFF9EAB),
+        900: Color(0xFFFF8E9E),
+    }
+);
+
+abstract final class BackgroundColors {
+    static const Color grey = Color(0xFFD3D3D3);
+    static const Color black = Color(0xFF313131);
+}
+
+abstract final class EventListTitleBgColors {
+    static const Color gold = Color(0xCCC4B8A5);
+    static const Color black = Colors.black54;
+}
 
 enum ColorConfig {
-    // normal01OfMaterial2(
-    //     false, // useMaterial3
-    //     Brightness.light, // brightness
-    //     Colors.purple, // primarySwatch
-    //     Colors.blue, // accentColor
-    //     null, // cardColor
-    //     null, // backgroundColor
-    //     Colors.black, // normalTextColor
-    //     Color(0xffaaaaaa), // disabledTextColor
-    //     Color(0xCCDED2BF), // eventListTitleBgColor
-    //     Colors.white// cardTextColor
-    // ),
-    // dark01OfMaterial2(
-    //     false, // useMaterial3
-    //     Brightness.dark, // brightness
-    //     Colors.purple, // primarySwatch
-    //     Colors.blue, // accentColor
-    //     null, // cardColor
-    //     null, // backgroundColor
-    //     Colors.white54, // normalTextColor
-    //     Colors.white30, // disabledTextColor
-    //     Colors.black, // eventListTitleBgColor
-    //     Colors.white// cardTextColor
-    // ),
     normal03OfMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
         Color(0xFFE5E5E5), // cardColor
-        Colors.white, // backgroundColor
+        BackgroundColors.grey, // backgroundColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
-        Color(0xCCDED2BF), // eventListTitleBgColor
+        EventListTitleBgColors.gold, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    dark02OfMaterial3(
+    normal05OfMaterial3(
         true, // useMaterial3
-        Brightness.dark, // brightness
-        Colors.indigo, // primarySwatch
-        Colors.indigoAccent, // accentColor
-        Colors.black, // cardColor
-        Color(0xFF313131), // backgroundColor
-        Colors.white54, // normalTextColor
-        Colors.white30, // disabledTextColor
-        Colors.black54, // eventListTitleBgColor
-        Colors.white// cardTextColor
+        Brightness.light, // brightness
+        originalLightPink, // primarySwatch
+        Color(0xFFFFA6B3), // accentColor
+        Color(0xffF3ECD8), // backgroundColor
+        Color(0xFFE5E5E5), // cardColor
+        Colors.black, // normalTextColor
+        Colors.black54, // disabledTextColor
+        EventListTitleBgColors.gold, // eventListTitleBgColor
+        Colors.black // cardTextColor
     ),
-    dark03OfMaterial3(
+    dark01OfMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
+        BackgroundColors.black, // backgroundColor
         Colors.black, // cardColor
-        null, // backgroundColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
-        Colors.black54, // eventListTitleBgColor
+        EventListTitleBgColors.black, // eventListTitleBgColor
         Colors.white// cardTextColor
     );
 
@@ -89,8 +90,8 @@ enum ColorConfig {
         this.brightness,
         this.primarySwatch,
         this.accentColor,
-        this.cardColor,
         this.backgroundColor,
+        this.cardColor,
         this.normalTextColor,
         this.disabledTextColor,
         this.eventListTitleBgColor,
@@ -129,7 +130,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
         if (brightness == Brightness.light) {
             state.colorConfig = ColorConfig.normal03OfMaterial3;
         } else if (brightness == Brightness.dark) {
-            state.colorConfig = ColorConfig.dark02OfMaterial3;
+            state.colorConfig = ColorConfig.normal03OfMaterial3;
         }
         return preColorConfig != state.colorConfig;
     }

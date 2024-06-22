@@ -18,7 +18,6 @@ class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
     required this.unsafeAreaBottomHeight,
     required this.contentsWidth,
     required this.contentsHeight,
-
     required this.child
   });
 
@@ -47,16 +46,19 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
 
     // フォーカス項目
     var focusItem = false;
+    double focusY = 0;
+    double? focusHeight;
     // フォーカスにコンテキストがない場合落ちる
     try {
       focusItem = /*primaryFocus?.runtimeType == FocusNode
           && */deviceHeight != primaryFocus?.rect.height;
+      focusY = primaryFocus?.offset.dy ?? 0;
       // debugPrint('keyboard focusItem=$focusItem type'
       //     '=${primaryFocus?.runtimeType ?? 'null'}');
+      focusHeight = primaryFocus?.rect.height;
     } catch (_) {}
 
     // フォーカステキストの位置
-    var focusY = primaryFocus?.offset.dy ?? 0;
     if (!focusItem) {
       keyboardMovingCompletion.value = false;
       // キーボード表示時にコンボボックスなどでキーボードを閉じて、再度キーボードを開いた時、
@@ -71,7 +73,7 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
     double primaryFocusY = firstPrimaryFocusY.value;
     // フォーカステキストの高さ
     double primaryFocusHeight = !focusItem ? 0
-        : primaryFocus?.rect.height ?? 0;
+        : focusHeight ?? 0;
 
     // キーボードを閉じた場合
     if (!focusItem && keyboardHeight == 0) {

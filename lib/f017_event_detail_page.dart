@@ -515,6 +515,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         )
     );
 
+
     var contentHeight = eventDetailState.contentsHeight!
         < eventDetailState.deviceHeight! ? eventDetailState.deviceHeight!
         : eventDetailState.contentsHeight!;
