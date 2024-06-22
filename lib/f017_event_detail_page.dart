@@ -12,6 +12,19 @@ import 'f018_event_detail_view_model.dart';
 import 'f021_keyboard_safe_area_view.dart';
 import 'f024_keyboard_safe_area_view_model.dart';
 
+enum RepeatingPattern {
+  none('なし'),
+  daily('毎日'),
+  weekly('毎週'),
+  biweekly('隔週'),
+  monthly('毎月'),
+  yearly('毎年');
+
+  const RepeatingPattern(this.name);
+
+  final String name;
+}
+
 class EventDetailPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
   final double unsafeAreaBottomHeight;
@@ -62,19 +75,26 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
 
-
     final allDay = useState(false);
     final formStartYear = useState(2024);
     final formStartMonth = useState(4);
     final formStartDay = useState(30);
     final formStartHour = useState(7);
     final formStartMinute = useState(30);
-
     final formEndYear = useState(2025);
     final formEndMonth = useState(5);
     final formEndDay = useState(31);
     final formEndHour = useState(08);
     final formEndMinute = useState(31);
+
+    final repeatingPattern = useState<RepeatingPattern>(RepeatingPattern.none);
+    final repeatingEnd = useState(false);
+    final formRepeatEndYear = useState<int?>(null);
+    final formRepeatEndMonth = useState<int?>(null);
+    final formRepeatEndDay = useState<int?>(null);
+    final formRepeatEndHour = useState<int?>(null);
+    final formRepeatEndMinute = useState<int?>(null);
+    final calendarId = useState('TEST_ID_1');
 
     final yearList = useState<List<String>>([]);
     final monthList = useState<List<String>>([]);
@@ -82,6 +102,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final endDayList = useState<List<String>>([]);
     final hourList = useState<List<String>>([]);
     final minuteList = useState<List<String>>([]);
+    final repeatingEndDayList = useState<List<String>>([]);
+    final calendarList = useState<List<List<String>>>([]);
 
     bool validateDate(year, month, day) {
       var dateTime = DateTime(year, month, day);
@@ -132,6 +154,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         }
         return list;
       })();
+      calendarList.value = [
+        ['TEST_ID_1', 'カレンダー1あああああああああああああああああああああああああああ'],
+        ['TEST_ID_2', 'カレンダー2'],
+        ['TEST_ID_3', 'カレンダー3'],
+      ];
 
       return () {
       };
@@ -151,6 +178,22 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       };
     }, [formEndYear.value, formEndMonth.value]);
 
+    useEffect(() {
+      endDayList.value = createDayList(formEndYear.value,
+          formEndMonth.value);
+      return () {
+      };
+    }, [formEndYear.value, formEndMonth.value]);
+
+    useEffect(() {
+      if (formRepeatEndYear.value != null && formRepeatEndMonth.value != null) {
+        repeatingEndDayList.value = createDayList(formRepeatEndYear.value,
+            formRepeatEndMonth.value);
+      }
+      return () {
+      };
+    }, [formRepeatEndYear.value, formRepeatEndMonth.value]);
+
     inputDecorationMaker({String? hintText}) {
       return InputDecoration(
         contentPadding: const EdgeInsets.all(8),
@@ -167,8 +210,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       );
     }
 
-    dropdownMenuItemMaker(value, title) {
-      return DropdownMenuItem<int>(
+    dropdownMenuItemMaker<T>(value, title) {
+      return DropdownMenuItem<T>(
         value: value,
         child: Text(title, textAlign: TextAlign.center,
             style: TextStyle(
@@ -343,7 +386,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         )
                     )
                 ),
+
                 const SizedBox(width: 8),
+
                 SizedBox(
                     height: 41,
                     child: CupertinoSwitch(
@@ -353,6 +398,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       },
                     )
                 ),
+
                 const Spacer(),
               ]),
 
@@ -360,7 +406,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               Row(children: [
                 SizedBox(width: 52,
-                    child: Text(allDay.value ? "日付" : "開始",
+                    child: Text(allDay.value ? '日付' : '開始',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 13,
@@ -380,7 +426,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: inputDecorationMaker(),
                         value: formStartYear.value,
                         items: yearList.value.map((year) {
-                          return dropdownMenuItemMaker(int.parse(year),
+                          return dropdownMenuItemMaker<int>(int.parse(year),
                               '$year年');
                         }).toList(),
                         onChanged: (value) async {
@@ -408,7 +454,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: inputDecorationMaker(),
                         value: formStartMonth.value,
                         items: monthList.value.map((month) {
-                          return dropdownMenuItemMaker(int.parse(month),
+                          return dropdownMenuItemMaker<int>(int.parse(month),
                               '$month月');
                         }).toList(),
                         onChanged: (value) async {
@@ -436,7 +482,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         decoration: inputDecorationMaker(),
                         value: formStartDay.value,
                         items: startDayList.value.map((day) {
-                          return dropdownMenuItemMaker(int.parse(day),
+                          return dropdownMenuItemMaker<int>(int.parse(day),
                               '$day日');
                         }).toList(),
                         onChanged: (value) async {
@@ -445,8 +491,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       ),
                     )
                 ),
-
-
                 const Spacer()
               ]),
 
@@ -467,7 +511,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           decoration: inputDecorationMaker(),
                           value: formStartHour.value,
                           items: hourList.value.map((hour) {
-                            return dropdownMenuItemMaker(int.parse(hour), hour);
+                            return dropdownMenuItemMaker<int>(int.parse(hour),
+                                hour);
                           }).toList(),
                           onChanged: (value) async {
                             formStartHour.value = value!;
@@ -496,7 +541,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           decoration: inputDecorationMaker(),
                           value: formStartMinute.value,
                           items: minuteList.value.map((minute) {
-                            return dropdownMenuItemMaker(int.parse(minute),
+                            return dropdownMenuItemMaker<int>(int.parse(minute),
                                 minute);
                           }).toList(),
                           onChanged: (value) async {
@@ -511,99 +556,99 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               if (!allDay.value)
                 Column(children: [
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                Row(children: [
-                  SizedBox(width: 52,
-                      child: Text("終了",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: normalTextColor
-                          )
-                      )
-                  ),
+                  Row(children: [
+                    SizedBox(width: 52,
+                        child: Text('終了',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: normalTextColor
+                            )
+                        )
+                    ),
 
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
-                  SizedBox(
-                      height: 41,
-                      child: IntrinsicWidth(
-                        child: DropdownButtonFormField<int>(
-                          elevation: 0,
-                          dropdownColor: theme.cardColor,
-                          decoration: inputDecorationMaker(),
-                          value: formEndYear.value,
-                          items: yearList.value.map((year) {
-                            return dropdownMenuItemMaker(int.parse(year),
-                                '$year年');
-                          }).toList(),
-                          onChanged: (value) async {
-                            formEndYear.value = value!;
-                            endDayList.value = createDayList(formEndYear
-                                .value, formEndMonth.value);
-                            if (!validateDate(formEndYear.value,
-                                formEndMonth.value,
-                                formEndDay.value)) {
-                              formEndDay.value = 1;
-                            }
-                          },
-                        ),
-                      )
-                  ),
+                    SizedBox(
+                        height: 41,
+                        child: IntrinsicWidth(
+                          child: DropdownButtonFormField<int>(
+                            elevation: 0,
+                            dropdownColor: theme.cardColor,
+                            decoration: inputDecorationMaker(),
+                            value: formEndYear.value,
+                            items: yearList.value.map((year) {
+                              return dropdownMenuItemMaker<int>(int.parse(year),
+                                  '$year年');
+                            }).toList(),
+                            onChanged: (value) async {
+                              formEndYear.value = value!;
+                              endDayList.value = createDayList(formEndYear
+                                  .value, formEndMonth.value);
+                              if (!validateDate(formEndYear.value,
+                                  formEndMonth.value,
+                                  formEndDay.value)) {
+                                formEndDay.value = 1;
+                              }
+                            },
+                          ),
+                        )
+                    ),
 
-                  const SizedBox(width: 6),
+                    const SizedBox(width: 6),
 
-                  SizedBox(
-                      height: 41,
-                      child: IntrinsicWidth(
-                        child: DropdownButtonFormField<int>(
-                          elevation: 0,
-                          dropdownColor: theme.cardColor,
-                          decoration: inputDecorationMaker(),
-                          value: formEndMonth.value,
-                          items: monthList.value.map((month) {
-                            return dropdownMenuItemMaker(int.parse(month),
-                                '$month月');
-                          }).toList(),
-                          onChanged: (value) async {
-                            formEndMonth.value = value!;
-                            endDayList.value = createDayList(formEndYear
-                                .value, formEndMonth.value);
-                            if (!validateDate(formEndYear.value,
-                                formEndMonth.value,
-                                formEndDay.value)) {
-                              formEndDay.value = 1;
-                            }
-                          },
-                        ),
-                      )
-                  ),
+                    SizedBox(
+                        height: 41,
+                        child: IntrinsicWidth(
+                          child: DropdownButtonFormField<int>(
+                            elevation: 0,
+                            dropdownColor: theme.cardColor,
+                            decoration: inputDecorationMaker(),
+                            value: formEndMonth.value,
+                            items: monthList.value.map((month) {
+                              return dropdownMenuItemMaker<int>(int.parse(month),
+                                  '$month月');
+                            }).toList(),
+                            onChanged: (value) async {
+                              formEndMonth.value = value!;
+                              endDayList.value = createDayList(formEndYear
+                                  .value, formEndMonth.value);
+                              if (!validateDate(formEndYear.value,
+                                  formEndMonth.value,
+                                  formEndDay.value)) {
+                                formEndDay.value = 1;
+                              }
+                            },
+                          ),
+                        )
+                    ),
 
-                  const SizedBox(width: 6),
+                    const SizedBox(width: 6),
 
-                  SizedBox(
-                      height: 41,
-                      child: IntrinsicWidth(
-                        child: DropdownButtonFormField<int>(
-                          elevation: 0,
-                          dropdownColor: theme.cardColor,
-                          decoration: inputDecorationMaker(),
-                          value: formEndDay.value,
-                          items: endDayList.value.map((day) {
-                            return dropdownMenuItemMaker(int.parse(day),
-                                '$day日');
-                          }).toList(),
-                          onChanged: (value) async {
-                            formEndDay.value = value!;
-                          },
-                        ),
-                      )
-                  ),
+                    SizedBox(
+                        height: 41,
+                        child: IntrinsicWidth(
+                          child: DropdownButtonFormField<int>(
+                            elevation: 0,
+                            dropdownColor: theme.cardColor,
+                            decoration: inputDecorationMaker(),
+                            value: formEndDay.value,
+                            items: endDayList.value.map((day) {
+                              return dropdownMenuItemMaker<int>(int.parse(day),
+                                  '$day日');
+                            }).toList(),
+                            onChanged: (value) async {
+                              formEndDay.value = value!;
+                            },
+                          ),
+                        )
+                    ),
 
 
-                  const Spacer()
-                ]),
+                    const Spacer()
+                  ]),
 
                 const SizedBox(height: 8),
 
@@ -621,7 +666,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             decoration: inputDecorationMaker(),
                             value: formEndHour.value,
                             items: hourList.value.map((hour) {
-                              return dropdownMenuItemMaker(int.parse(hour), hour);
+                              return dropdownMenuItemMaker<int>(int.parse(hour),
+                                  hour);
                             }).toList(),
                             onChanged: (value) async {
                               formEndHour.value = value!;
@@ -650,8 +696,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             decoration: inputDecorationMaker(),
                             value: formEndMinute.value,
                             items: minuteList.value.map((minute) {
-                              return dropdownMenuItemMaker(int.parse(minute),
-                                  minute);
+                              return dropdownMenuItemMaker<int>(
+                                  int.parse(minute), minute);
                             }).toList(),
                             onChanged: (value) async {
                               formEndMinute.value = value!;
@@ -664,7 +710,182 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   ]),
               ]),
 
+              const SizedBox(height: 8),
 
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('繰返し',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+
+                const SizedBox(width: 8),
+
+                SizedBox(
+                    height: 41,
+                    child: IntrinsicWidth(
+                      child: DropdownButtonFormField<RepeatingPattern>(
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: inputDecorationMaker(),
+                        value: repeatingPattern.value,
+                        items: RepeatingPattern.values.map((pattern) {
+                          return dropdownMenuItemMaker<RepeatingPattern>(
+                              pattern, pattern.name);
+                        }).toList(),
+                        onChanged: (value) async {
+                          if (value != null) {
+                            repeatingPattern.value = value;
+                            if (repeatingPattern.value == RepeatingPattern
+                                .none) {
+                              repeatingEnd.value = false;
+                            }
+                          }
+                        },
+                      ),
+                    )
+                ),
+
+                const Spacer()
+              ]),
+
+              if (repeatingPattern.value != RepeatingPattern.none)
+                Column(children: [
+                  const SizedBox(height: 8),
+
+                  Row(children: [
+                    SizedBox(width: 52,
+                        child: Text('繰返し終了',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: normalTextColor
+                            )
+                        )
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    SizedBox(
+                        height: 41,
+                        child: CupertinoSwitch(
+                          value: repeatingEnd.value,
+                          onChanged: (value) {
+                            repeatingEnd.value = value;
+                            if (repeatingEnd.value) {
+                              formRepeatEndYear.value = formEndYear.value;
+                              formRepeatEndMonth.value = formEndMonth.value;
+                              formRepeatEndDay.value = formEndDay.value;
+                            }
+                          },
+                        )
+                    ),
+
+                    const Spacer()
+                  ]),
+
+                  if (repeatingEnd.value)
+                    Column(children: [
+                      const SizedBox(height: 8),
+
+                      Row(children: [
+                      SizedBox(width: 52,
+                          child: Text('繰返し終了日',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: normalTextColor
+                              )
+                          )
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      SizedBox(
+                          height: 41,
+                          child: IntrinsicWidth(
+                            child: DropdownButtonFormField<int>(
+                              elevation: 0,
+                              dropdownColor: theme.cardColor,
+                              decoration: inputDecorationMaker(),
+                              value: formRepeatEndYear.value,
+                              items: yearList.value.map((year) {
+                                return dropdownMenuItemMaker<int>(int.parse(year),
+                                    '$year年');
+                              }).toList(),
+                              onChanged: (value) async {
+                                formRepeatEndYear.value = value!;
+                                repeatingEndDayList.value = createDayList(
+                                    formRepeatEndYear.value,
+                                    formRepeatEndMonth.value);
+                                if (!validateDate(formRepeatEndYear.value,
+                                    formRepeatEndMonth.value,
+                                    formRepeatEndDay.value)) {
+                                  formRepeatEndDay.value = 1;
+                                }
+                              },
+                            ),
+                          )
+                      ),
+
+                      const SizedBox(width: 6),
+
+                      SizedBox(
+                          height: 41,
+                          child: IntrinsicWidth(
+                            child: DropdownButtonFormField<int>(
+                              elevation: 0,
+                              dropdownColor: theme.cardColor,
+                              decoration: inputDecorationMaker(),
+                              value: formRepeatEndMonth.value,
+                              items: monthList.value.map((month) {
+                                return dropdownMenuItemMaker<int>(int.parse(month),
+                                    '$month月');
+                              }).toList(),
+                              onChanged: (value) async {
+                                formRepeatEndMonth.value = value!;
+                                repeatingEndDayList.value = createDayList(
+                                    formRepeatEndYear.value,
+                                    formRepeatEndMonth.value);
+                                if (!validateDate(formRepeatEndYear.value,
+                                    formRepeatEndMonth.value,
+                                    formRepeatEndDay.value)) {
+                                  formRepeatEndDay.value = 1;
+                                }
+                              },
+                            ),
+                          )
+                      ),
+
+                      const SizedBox(width: 6),
+
+                      SizedBox(
+                          height: 41,
+                          child: IntrinsicWidth(
+                            child: DropdownButtonFormField<int>(
+                              elevation: 0,
+                              dropdownColor: theme.cardColor,
+                              decoration: inputDecorationMaker(),
+                              value: formRepeatEndDay.value,
+                              items: repeatingEndDayList.value.map((day) {
+                                return dropdownMenuItemMaker<int>(
+                                    int.parse(day), '$day日');
+                              }).toList(),
+                              onChanged: (value) async {
+                                formRepeatEndDay.value = value!;
+                              },
+                            ),
+                          )
+                      ),
+
+                      const Spacer()
+                    ]),
+                    ])
+              ]),
 
               const SizedBox(height: 8),
 
@@ -703,7 +924,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
             ]
         )
     );
-
 
     var contentHeight = eventDetailState.contentsHeight!
         < eventDetailState.deviceHeight! ? eventDetailState.deviceHeight!

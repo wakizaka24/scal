@@ -18,7 +18,7 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
 // アプリバーの高さ
 const double appBarHeight = 39;
 // カレンダーウィジェットの数
-const calendarWidgetNum = 1;
+const calendarWidgetNum = 3;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -78,12 +78,7 @@ class HomePage extends HookConsumerWidget {
         double offset = homeState.homePageController.offset;
         double contentHeight = deviceHeight - appBarHeight
             - unsafeAreaTopHeight;
-        var index = homeState.homePageIndex;
-        if (offset <= 0) {
-          index = 0;
-        } else if (offset >= contentHeight) {
-          index = 1;
-        }
+        var index = (offset / contentHeight).round();
         if (index != homeState.homePageIndex) {
           homeState.homePageIndex = index;
           await homeNotifier.setHomePageIndex(index);

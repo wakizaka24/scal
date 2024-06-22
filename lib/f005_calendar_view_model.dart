@@ -1007,7 +1007,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateState() async {
     state = CalendarPageState.copy(state);
-    debugPrint('updateState!!');
+    debugPrint('updateState');
   }
 }
 
