@@ -39,12 +39,20 @@ const MaterialColor originalLightPink = MaterialColor(
 
 abstract final class BackgroundColors {
     static const Color grey = Color(0xFFD3D3D3);
+    static const Color cream = Color(0xFFF3ECD8);
     static const Color black = Color(0xFF313131);
 }
 
 abstract final class EventListTitleBgColors {
     static const Color gold = Color(0xCCC4B8A5);
+    static const Color pink = Color(0xFFFFCCD4);
     static const Color black = Colors.black54;
+}
+
+abstract final class CardColors {
+    static const Color grey = Color(0xFFE5E5E5);
+    static const Color cream = Color(0xFFF8F5EB);
+    static const Color black = Colors.black;
 }
 
 enum ColorConfig {
@@ -53,23 +61,35 @@ enum ColorConfig {
         Brightness.light, // brightness
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
-        Color(0xFFE5E5E5), // cardColor
         BackgroundColors.grey, // backgroundColor
+        CardColors.grey, // cardColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
         EventListTitleBgColors.gold, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    normal05OfMaterial3(
+    normal052fMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
         originalLightPink, // primarySwatch
         Color(0xFFFFA6B3), // accentColor
-        Color(0xffF3ECD8), // backgroundColor
-        Color(0xFFE5E5E5), // cardColor
+        BackgroundColors.cream, // backgroundColor
+        CardColors.cream, // cardColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
         EventListTitleBgColors.gold, // eventListTitleBgColor
+        Colors.black // cardTextColor
+    ),
+    normal035fMaterial3(
+        true, // useMaterial3
+        Brightness.light, // brightness
+        originalLightPink, // primarySwatch
+        Color(0xFFFFA6B3), // accentColor
+        BackgroundColors.cream, // backgroundColor
+        CardColors.cream, // cardColor
+        Colors.black, // normalTextColor
+        Colors.black54, // disabledTextColor
+        EventListTitleBgColors.pink, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
     dark01OfMaterial3(
@@ -78,7 +98,7 @@ enum ColorConfig {
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
         BackgroundColors.black, // backgroundColor
-        Colors.black, // cardColor
+        CardColors.black, // cardColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
         EventListTitleBgColors.black, // eventListTitleBgColor
