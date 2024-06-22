@@ -29,17 +29,20 @@ class HomePage extends HookConsumerWidget {
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
-    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
-        .notifier);
+
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
+    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+        .notifier);
     List<CalendarPageNotifier> calendarNotifiers = [];
     for (int i=0; i < calendarWidgetNum; i++) {
       calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
           .notifier));
     }
+
     final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
+
     // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);

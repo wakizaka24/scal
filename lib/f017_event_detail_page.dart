@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
+import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
 import 'f021_keyboard_safe_area_view.dart';
@@ -29,10 +31,19 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorConfigState = ref.watch(designConfigNotifierProvider);
-    var normalTextColor = colorConfigState.colorConfig!.normalTextColor;
-    var borderColor = colorConfigState.colorConfig!.normalTextColor;
+    final colorConfig = colorConfigState.colorConfig!;
+    var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
+
+    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+        .notifier);
+    List<CalendarPageNotifier> calendarNotifiers = [];
+    for (int i=0; i < calendarWidgetNum; i++) {
+      calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
+          .notifier));
+    }
+
     final keyboardViewState = ref.watch(keyboardSafeAreaViewNotifierProvider);
     final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
         .notifier);
@@ -46,31 +57,29 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
     // ページの幅
-    double pageWidget = deviceWidth * 0.9;
+    double pageWidget = deviceWidth * 0.95;
 
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
 
 
-    final formAllDay = useState(false);
+    final allDay = useState(false);
     final formStartYear = useState(2024);
     final formStartMonth = useState(4);
     final formStartDay = useState(30);
     final formStartHour = useState(7);
     final formStartMinute = useState(30);
 
-    final formEndYear = useState(2024);
-    final formEndMonth = useState(4);
-    // final formEndDay = useState(30);
-    // final formEndHour = useState(07);
-    // final formEndMinute = useState(30);
+    final formEndYear = useState(2025);
+    final formEndMonth = useState(5);
+    final formEndDay = useState(31);
+    final formEndHour = useState(08);
+    final formEndMinute = useState(31);
 
     final yearList = useState<List<String>>([]);
     final monthList = useState<List<String>>([]);
     final startDayList = useState<List<String>>([]);
-
     final endDayList = useState<List<String>>([]);
-
     final hourList = useState<List<String>>([]);
     final minuteList = useState<List<String>>([]);
 
@@ -142,19 +151,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       };
     }, [formEndYear.value, formEndMonth.value]);
 
-    makerInputDecoration({String? hintText}) {
+    inputDecorationMaker({String? hintText}) {
       return InputDecoration(
         contentPadding: const EdgeInsets.all(8),
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: borderColor,
-                width: 1)
+                color: colorConfig.eventListTitleBgColor, width: 1)
         ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: theme.primaryColor,
-                width: 2)
+                color: colorConfig.accentColor, width: 2)
         ),
         hintText: hintText,
       );
@@ -179,7 +186,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           vertical: 15,
         ),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
                 SizedBox(width: closingButtonWidth,
@@ -205,6 +211,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           color: normalTextColor),
                     )
                 ),
+                const Spacer(),
                 SizedBox(width: closingButtonWidth,
                     height: closingButtonWidth,
                     child: TextButton(
@@ -233,9 +240,32 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           color: normalTextColor),
                     )
                 ),
+                SizedBox(width: closingButtonWidth,
+                    height: closingButtonWidth,
+                    child: TextButton(
+                      onPressed: () async {
+                        await colorConfigNotifier.switchColorConfig();
+                        for (var i=0; i < calendarWidgetNum; i++) {
+                          await calendarNotifiers[i].initState();
+                          await calendarNotifiers[i].updateCalendar(
+                              dataExclusion: true);
+                        }
+                        await colorConfigNotifier.updateState();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: normalTextColor,
+                        textStyle: const TextStyle(fontSize: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              closingButtonWidth / 2),
+                        ),
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      child: Icon(Icons.check,
+                          color: normalTextColor),
+                    )
+                ),
               ]),
-
-              const Spacer(),
 
               const SizedBox(height: 8),
 
@@ -255,7 +285,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: TextField(
                         // controller: textField1Controller,
                           style: const TextStyle(fontSize: 13),
-                          decoration: makerInputDecoration(hintText: 'タイトル'),
+                          decoration: inputDecorationMaker(hintText: 'タイトル'),
                           // keyboardType: TextInputType.multiline,
                           // maxLines: 2,
                           onTap: () {
@@ -288,7 +318,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: TextField(
                           // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
-                            decoration: makerInputDecoration(hintText: '場所'),
+                            decoration: inputDecorationMaker(hintText: '場所'),
                             // keyboardType: TextInputType.multiline,
                             // maxLines: 1,
                             onTap: () {
@@ -302,7 +332,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
               Row(children: [
                 SizedBox(width: 52,
@@ -317,20 +347,21 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 SizedBox(
                     height: 41,
                     child: CupertinoSwitch(
-                      value: formAllDay.value,
+                      value: allDay.value,
                       onChanged: (value) {
-                        formAllDay.value = value;
+                        allDay.value = value;
                       },
                     )
                 ),
                 const Spacer(),
               ]),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
               Row(children: [
                 SizedBox(width: 52,
-                    child: Text('開始', textAlign: TextAlign.center,
+                    child: Text(allDay.value ? "日付" : "開始",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 13,
                             color: normalTextColor
@@ -346,7 +377,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
                         dropdownColor: theme.cardColor,
-                        decoration: makerInputDecoration(),
+                        decoration: inputDecorationMaker(),
                         value: formStartYear.value,
                         items: yearList.value.map((year) {
                           return dropdownMenuItemMaker(int.parse(year),
@@ -374,7 +405,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
                         dropdownColor: theme.cardColor,
-                        decoration: makerInputDecoration(),
+                        decoration: inputDecorationMaker(),
                         value: formStartMonth.value,
                         items: monthList.value.map((month) {
                           return dropdownMenuItemMaker(int.parse(month),
@@ -402,7 +433,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
                         dropdownColor: theme.cardColor,
-                        decoration: makerInputDecoration(),
+                        decoration: inputDecorationMaker(),
                         value: formStartDay.value,
                         items: startDayList.value.map((day) {
                           return dropdownMenuItemMaker(int.parse(day),
@@ -421,63 +452,221 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               const SizedBox(height: 8),
 
-              Row(children: [
-                Container(width: 52),
+              if (!allDay.value)
+                Row(children: [
+                  Container(width: 52),
 
-                const SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<int>(
-                        elevation: 0,
-                        dropdownColor: theme.cardColor,
-                        decoration: makerInputDecoration(),
-                        value: formStartHour.value,
-                        items: hourList.value.map((hour) {
-                          return dropdownMenuItemMaker(int.parse(hour), hour);
-                        }).toList(),
-                        onChanged: (value) async {
-                          formStartHour.value = value!;
-                        },
-                      ),
-                    )
-                ),
+                  SizedBox(
+                      height: 41,
+                      child: IntrinsicWidth(
+                        child: DropdownButtonFormField<int>(
+                          elevation: 0,
+                          dropdownColor: theme.cardColor,
+                          decoration: inputDecorationMaker(),
+                          value: formStartHour.value,
+                          items: hourList.value.map((hour) {
+                            return dropdownMenuItemMaker(int.parse(hour), hour);
+                          }).toList(),
+                          onChanged: (value) async {
+                            formStartHour.value = value!;
+                          },
+                        ),
+                      )
+                  ),
 
-                const SizedBox(width: 6),
+                  const SizedBox(width: 6),
 
-                Text(':', textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 21,
-                        color: normalTextColor
-                    )
-                ),
+                  Text(':', textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 21,
+                          color: normalTextColor
+                      )
+                  ),
 
-                const SizedBox(width: 6),
+                  const SizedBox(width: 6),
 
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<int>(
-                        elevation: 0,
-                        dropdownColor: theme.cardColor,
-                        decoration: makerInputDecoration(),
-                        value: formStartMinute.value,
-                        items: minuteList.value.map((minute) {
-                          return dropdownMenuItemMaker(int.parse(minute),
-                              minute);
-                        }).toList(),
-                        onChanged: (value) async {
-                          formStartMinute.value = value!;
-                        },
-                      ),
-                    )
-                ),
+                  SizedBox(
+                      height: 41,
+                      child: IntrinsicWidth(
+                        child: DropdownButtonFormField<int>(
+                          elevation: 0,
+                          dropdownColor: theme.cardColor,
+                          decoration: inputDecorationMaker(),
+                          value: formStartMinute.value,
+                          items: minuteList.value.map((minute) {
+                            return dropdownMenuItemMaker(int.parse(minute),
+                                minute);
+                          }).toList(),
+                          onChanged: (value) async {
+                            formStartMinute.value = value!;
+                          },
+                        ),
+                      )
+                  ),
 
-                const Spacer()
+                  const Spacer()
+                ]),
+
+              if (!allDay.value)
+                Column(children: [
+                const SizedBox(height: 8),
+
+                Row(children: [
+                  SizedBox(width: 52,
+                      child: Text("終了",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: normalTextColor
+                          )
+                      )
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  SizedBox(
+                      height: 41,
+                      child: IntrinsicWidth(
+                        child: DropdownButtonFormField<int>(
+                          elevation: 0,
+                          dropdownColor: theme.cardColor,
+                          decoration: inputDecorationMaker(),
+                          value: formEndYear.value,
+                          items: yearList.value.map((year) {
+                            return dropdownMenuItemMaker(int.parse(year),
+                                '$year年');
+                          }).toList(),
+                          onChanged: (value) async {
+                            formEndYear.value = value!;
+                            endDayList.value = createDayList(formEndYear
+                                .value, formEndMonth.value);
+                            if (!validateDate(formEndYear.value,
+                                formEndMonth.value,
+                                formEndDay.value)) {
+                              formEndDay.value = 1;
+                            }
+                          },
+                        ),
+                      )
+                  ),
+
+                  const SizedBox(width: 6),
+
+                  SizedBox(
+                      height: 41,
+                      child: IntrinsicWidth(
+                        child: DropdownButtonFormField<int>(
+                          elevation: 0,
+                          dropdownColor: theme.cardColor,
+                          decoration: inputDecorationMaker(),
+                          value: formEndMonth.value,
+                          items: monthList.value.map((month) {
+                            return dropdownMenuItemMaker(int.parse(month),
+                                '$month月');
+                          }).toList(),
+                          onChanged: (value) async {
+                            formEndMonth.value = value!;
+                            endDayList.value = createDayList(formEndYear
+                                .value, formEndMonth.value);
+                            if (!validateDate(formEndYear.value,
+                                formEndMonth.value,
+                                formEndDay.value)) {
+                              formEndDay.value = 1;
+                            }
+                          },
+                        ),
+                      )
+                  ),
+
+                  const SizedBox(width: 6),
+
+                  SizedBox(
+                      height: 41,
+                      child: IntrinsicWidth(
+                        child: DropdownButtonFormField<int>(
+                          elevation: 0,
+                          dropdownColor: theme.cardColor,
+                          decoration: inputDecorationMaker(),
+                          value: formEndDay.value,
+                          items: endDayList.value.map((day) {
+                            return dropdownMenuItemMaker(int.parse(day),
+                                '$day日');
+                          }).toList(),
+                          onChanged: (value) async {
+                            formEndDay.value = value!;
+                          },
+                        ),
+                      )
+                  ),
+
+
+                  const Spacer()
+                ]),
+
+                const SizedBox(height: 8),
+
+                Row(children: [
+                    Container(width: 52),
+
+                    const SizedBox(width: 8),
+
+                    SizedBox(
+                        height: 41,
+                        child: IntrinsicWidth(
+                          child: DropdownButtonFormField<int>(
+                            elevation: 0,
+                            dropdownColor: theme.cardColor,
+                            decoration: inputDecorationMaker(),
+                            value: formEndHour.value,
+                            items: hourList.value.map((hour) {
+                              return dropdownMenuItemMaker(int.parse(hour), hour);
+                            }).toList(),
+                            onChanged: (value) async {
+                              formEndHour.value = value!;
+                            },
+                          ),
+                        )
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    Text(':', textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 21,
+                            color: normalTextColor
+                        )
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    SizedBox(
+                        height: 41,
+                        child: IntrinsicWidth(
+                          child: DropdownButtonFormField<int>(
+                            elevation: 0,
+                            dropdownColor: theme.cardColor,
+                            decoration: inputDecorationMaker(),
+                            value: formEndMinute.value,
+                            items: minuteList.value.map((minute) {
+                              return dropdownMenuItemMaker(int.parse(minute),
+                                  minute);
+                            }).toList(),
+                            onChanged: (value) async {
+                              formEndMinute.value = value!;
+                            },
+                          ),
+                        )
+                    ),
+
+                    const Spacer()
+                  ]),
               ]),
 
-              const SizedBox(height: 16),
+
+
+              const SizedBox(height: 8),
 
               Row(children: [
                 SizedBox(width: 52,
@@ -491,11 +680,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                     child: SizedBox(
-                        height: /*410 +*/ 200,
+                        height: 210,
                         child: TextField(
                           // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
-                            decoration: makerInputDecoration(hintText: 'メモ'),
+                            decoration: inputDecorationMaker(hintText: 'メモ'),
                             // keyboardType: TextInputType.multiline,
                             maxLines: 40,
 

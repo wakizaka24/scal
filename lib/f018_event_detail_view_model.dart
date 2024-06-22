@@ -50,9 +50,9 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   Future<double> getContentsHeight() async {
     switch (state.contentsMode) {
       case EventDetailPageContentsMode.simpleInput:
-        return 700;
+        return 1000;
       case EventDetailPageContentsMode.detailInput:
-        return state.deviceHeight! + 700;
+        return state.deviceHeight! + 1000;
     }
   }
 

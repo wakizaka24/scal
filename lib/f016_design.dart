@@ -56,25 +56,13 @@ abstract final class CardColors {
 }
 
 enum ColorConfig {
-    normal03OfMaterial3(
+    normal052fMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
         Colors.indigo, // primarySwatch
         Colors.indigoAccent, // accentColor
         BackgroundColors.grey, // backgroundColor
         CardColors.grey, // cardColor
-        Colors.black, // normalTextColor
-        Colors.black54, // disabledTextColor
-        EventListTitleBgColors.gold, // eventListTitleBgColor
-        Colors.black // cardTextColor
-    ),
-    normal052fMaterial3(
-        true, // useMaterial3
-        Brightness.light, // brightness
-        originalLightPink, // primarySwatch
-        Color(0xFFFFA6B3), // accentColor
-        BackgroundColors.cream, // backgroundColor
-        CardColors.cream, // cardColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
         EventListTitleBgColors.gold, // eventListTitleBgColor
@@ -92,7 +80,7 @@ enum ColorConfig {
         EventListTitleBgColors.pink, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    dark01OfMaterial3(
+    dark015fMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
         Colors.indigo, // primarySwatch
@@ -148,9 +136,9 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     bool applyColorConfig(Brightness brightness) {
         var preColorConfig = state.colorConfig;
         if (brightness == Brightness.light) {
-            state.colorConfig = ColorConfig.normal03OfMaterial3;
+            state.colorConfig = ColorConfig.normal052fMaterial3;
         } else if (brightness == Brightness.dark) {
-            state.colorConfig = ColorConfig.normal03OfMaterial3;
+            state.colorConfig = ColorConfig.dark015fMaterial3;
         }
         return preColorConfig != state.colorConfig;
     }

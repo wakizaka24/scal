@@ -127,8 +127,12 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
 
           if (offset < scrollOffset || forceScroll) {
             var distance = (offset - scrollOffset).abs().toInt();
+            var milliseconds = (distance * 0.52).toInt();
+            if (milliseconds == 0) {
+              milliseconds = 1;
+            }
             keyboardViewState.keyboardScrollController?.animateTo(scrollOffset,
-                duration: Duration(milliseconds: (distance * 0.52).toInt()),
+                duration: Duration(milliseconds: milliseconds),
                 curve: Curves.linear);
             // homeState.keyboardScrollController?.jumpTo(scrollOffset);
           }
