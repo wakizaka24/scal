@@ -92,9 +92,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final formRepeatEndYear = useState<int?>(null);
     final formRepeatEndMonth = useState<int?>(null);
     final formRepeatEndDay = useState<int?>(null);
-    final formRepeatEndHour = useState<int?>(null);
-    final formRepeatEndMinute = useState<int?>(null);
     final calendarId = useState('TEST_ID_1');
+    final prevCalendarId = useState('TEST_ID_1');
 
     final yearList = useState<List<String>>([]);
     final monthList = useState<List<String>>([]);
@@ -201,6 +200,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
                 color: colorConfig.eventListTitleBgColor, width: 1)
+        ),
+        disabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: colorConfig.eventListTitleBgColor, width: 2)
         ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
@@ -326,7 +329,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: SizedBox(
                       height: 41,
                       child: TextField(
-                        // controller: textField1Controller,
                           style: const TextStyle(fontSize: 13),
                           decoration: inputDecorationMaker(hintText: 'タイトル'),
                           // keyboardType: TextInputType.multiline,
@@ -359,7 +361,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: SizedBox(
                         height: 41,
                         child: TextField(
-                          // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
                             decoration: inputDecorationMaker(hintText: '場所'),
                             // keyboardType: TextInputType.multiline,
@@ -793,97 +794,97 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       const SizedBox(height: 8),
 
                       Row(children: [
-                      SizedBox(width: 52,
-                          child: Text('繰返し終了日',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: normalTextColor
-                              )
-                          )
-                      ),
+                        SizedBox(width: 52,
+                            child: Text('繰返し終了日',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: normalTextColor
+                                )
+                            )
+                        ),
 
-                      const SizedBox(width: 8),
+                        const SizedBox(width: 8),
 
-                      SizedBox(
-                          height: 41,
-                          child: IntrinsicWidth(
-                            child: DropdownButtonFormField<int>(
-                              elevation: 0,
-                              dropdownColor: theme.cardColor,
-                              decoration: inputDecorationMaker(),
-                              value: formRepeatEndYear.value,
-                              items: yearList.value.map((year) {
-                                return dropdownMenuItemMaker<int>(int.parse(year),
-                                    '$year年');
-                              }).toList(),
-                              onChanged: (value) async {
-                                formRepeatEndYear.value = value!;
-                                repeatingEndDayList.value = createDayList(
-                                    formRepeatEndYear.value,
-                                    formRepeatEndMonth.value);
-                                if (!validateDate(formRepeatEndYear.value,
-                                    formRepeatEndMonth.value,
-                                    formRepeatEndDay.value)) {
-                                  formRepeatEndDay.value = 1;
-                                }
-                              },
-                            ),
-                          )
-                      ),
+                        SizedBox(
+                            height: 41,
+                            child: IntrinsicWidth(
+                              child: DropdownButtonFormField<int>(
+                                elevation: 0,
+                                dropdownColor: theme.cardColor,
+                                decoration: inputDecorationMaker(),
+                                value: formRepeatEndYear.value,
+                                items: yearList.value.map((year) {
+                                  return dropdownMenuItemMaker<int>(int
+                                      .parse(year), '$year年');
+                                }).toList(),
+                                onChanged: (value) async {
+                                  formRepeatEndYear.value = value!;
+                                  repeatingEndDayList.value = createDayList(
+                                      formRepeatEndYear.value,
+                                      formRepeatEndMonth.value);
+                                  if (!validateDate(formRepeatEndYear.value,
+                                      formRepeatEndMonth.value,
+                                      formRepeatEndDay.value)) {
+                                    formRepeatEndDay.value = 1;
+                                  }
+                                },
+                              ),
+                            )
+                        ),
 
-                      const SizedBox(width: 6),
+                        const SizedBox(width: 6),
 
-                      SizedBox(
-                          height: 41,
-                          child: IntrinsicWidth(
-                            child: DropdownButtonFormField<int>(
-                              elevation: 0,
-                              dropdownColor: theme.cardColor,
-                              decoration: inputDecorationMaker(),
-                              value: formRepeatEndMonth.value,
-                              items: monthList.value.map((month) {
-                                return dropdownMenuItemMaker<int>(int.parse(month),
-                                    '$month月');
-                              }).toList(),
-                              onChanged: (value) async {
-                                formRepeatEndMonth.value = value!;
-                                repeatingEndDayList.value = createDayList(
-                                    formRepeatEndYear.value,
-                                    formRepeatEndMonth.value);
-                                if (!validateDate(formRepeatEndYear.value,
-                                    formRepeatEndMonth.value,
-                                    formRepeatEndDay.value)) {
-                                  formRepeatEndDay.value = 1;
-                                }
-                              },
-                            ),
-                          )
-                      ),
+                        SizedBox(
+                            height: 41,
+                            child: IntrinsicWidth(
+                              child: DropdownButtonFormField<int>(
+                                elevation: 0,
+                                dropdownColor: theme.cardColor,
+                                decoration: inputDecorationMaker(),
+                                value: formRepeatEndMonth.value,
+                                items: monthList.value.map((month) {
+                                  return dropdownMenuItemMaker<int>(int
+                                      .parse(month), '$month月');
+                                }).toList(),
+                                onChanged: (value) async {
+                                  formRepeatEndMonth.value = value!;
+                                  repeatingEndDayList.value = createDayList(
+                                      formRepeatEndYear.value,
+                                      formRepeatEndMonth.value);
+                                  if (!validateDate(formRepeatEndYear.value,
+                                      formRepeatEndMonth.value,
+                                      formRepeatEndDay.value)) {
+                                    formRepeatEndDay.value = 1;
+                                  }
+                                },
+                              ),
+                            )
+                        ),
 
-                      const SizedBox(width: 6),
+                        const SizedBox(width: 6),
 
-                      SizedBox(
-                          height: 41,
-                          child: IntrinsicWidth(
-                            child: DropdownButtonFormField<int>(
-                              elevation: 0,
-                              dropdownColor: theme.cardColor,
-                              decoration: inputDecorationMaker(),
-                              value: formRepeatEndDay.value,
-                              items: repeatingEndDayList.value.map((day) {
-                                return dropdownMenuItemMaker<int>(
-                                    int.parse(day), '$day日');
-                              }).toList(),
-                              onChanged: (value) async {
-                                formRepeatEndDay.value = value!;
-                              },
-                            ),
-                          )
-                      ),
+                        SizedBox(
+                            height: 41,
+                            child: IntrinsicWidth(
+                              child: DropdownButtonFormField<int>(
+                                elevation: 0,
+                                dropdownColor: theme.cardColor,
+                                decoration: inputDecorationMaker(),
+                                value: formRepeatEndDay.value,
+                                items: repeatingEndDayList.value.map((day) {
+                                  return dropdownMenuItemMaker<int>(
+                                      int.parse(day), '$day日');
+                                }).toList(),
+                                onChanged: (value) async {
+                                  formRepeatEndDay.value = value!;
+                                },
+                              ),
+                            )
+                        ),
 
-                      const Spacer()
-                    ]),
+                        const Spacer()
+                      ]),
                     ])
               ]),
 
@@ -898,12 +899,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         )
                     )
                 ),
+
                 const SizedBox(width: 8),
+
                 Expanded(
                     child: SizedBox(
                         height: 210,
                         child: TextField(
-                          // controller: textField1Controller,
                             style: const TextStyle(fontSize: 13),
                             decoration: inputDecorationMaker(hintText: 'メモ'),
                             // keyboardType: TextInputType.multiline,
@@ -920,7 +922,75 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-              const Spacer(),
+              const SizedBox(height: 8),
+
+              Row(children: [
+                SizedBox(width: 52,
+                    child: Text('保存先カレンダー',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: normalTextColor
+                        )
+                    )
+                ),
+
+                const SizedBox(width: 8),
+
+                Expanded(child:
+                  SizedBox(
+                      height: 41,
+                      child: DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        elevation: 0,
+                        dropdownColor: theme.cardColor,
+                        decoration: inputDecorationMaker(),
+                        value: calendarId.value,
+                        items: calendarList.value.map((calendar) {
+                          return dropdownMenuItemMaker<String>(
+                              calendar[0], calendar[1]);
+                        }).toList(),
+                        onChanged: (value) async {
+                          if (value != null) {
+                            calendarId.value = value;
+                          }
+                        },
+                      )
+                  )
+                ),
+              ]),
+
+              if (calendarId.value != prevCalendarId.value)
+                Column(children: [
+                  const SizedBox(height: 8),
+
+                  Row(children: [
+                    SizedBox(width: 52,
+                        child: Text('移動元カレンダー',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: normalTextColor
+                            )
+                        )
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: SizedBox(
+                            height: 41,
+                            child: TextField(
+                              enabled: false,
+                              controller: TextEditingController(
+                                  text: 'カレンダー1あああああああああああああああああ'
+                                      'ああああああああああ'),
+                              style: TextStyle(fontSize: 13,
+                              color: normalTextColor),
+                              decoration: inputDecorationMaker()
+                            )
+                        )
+                    )
+                  ]),
+                ]),
             ]
         )
     );
