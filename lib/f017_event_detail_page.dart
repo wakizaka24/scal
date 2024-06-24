@@ -121,6 +121,26 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           .toList();
     }
 
+    // TODO: 共通処理に移動する(ui_utils.dart)
+    void showBottomArea(Widget child) {
+      showCupertinoModalPopup<void>(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext context) => Container(
+          height: 216,
+          padding: const EdgeInsets.all(0),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          color: colorConfig.backgroundColor,
+          child: SafeArea(
+            top: false,
+            child: child,
+          ),
+        ),
+      );
+    }
+
     useEffect(() {
       eventDetailNotifier.setDeviceHeight(deviceHeight);
       keyboardViewState.keyboardScrollController = ScrollController();
@@ -199,7 +219,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: colorConfig.eventListTitleBgColor, width: 1)
+                color: colorConfig.eventListTitleBgColor, width: 1.5)
         ),
         disabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
@@ -217,11 +237,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       return DropdownMenuItem<T>(
         value: value,
         child: Text(title, textAlign: TextAlign.center,
-            style: TextStyle(
-                height: 1.7,
-                fontSize: 13,
-                color: normalTextColor
-            )
+          style: TextStyle(
+              height: 1.7,
+              fontSize: 13,
+              color: normalTextColor
+          ),
+          maxLines: 1,
         ),
       );
     }
@@ -937,30 +958,30 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                 const SizedBox(width: 8),
 
-                Expanded(child:
-                  SizedBox(
-                      height: 41,
-                      child: DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        elevation: 0,
-                        dropdownColor: theme.cardColor,
-                        decoration: inputDecorationMaker(),
-                        value: calendarId.value,
-                        items: calendarList.value.map((calendar) {
-                          return dropdownMenuItemMaker<String>(
-                              calendar[0], calendar[1]);
-                        }).toList(),
-                        onChanged: (value) async {
-                          if (value != null) {
-                            calendarId.value = value;
-                          }
-                        },
-                      )
-                  )
+                Expanded(
+                    child: SizedBox(
+                        height: 41,
+                        child: TextField(
+                          enabled: true,
+                          readOnly: true,
+                          scrollPhysics: const
+                          NeverScrollableScrollPhysics(),
+                          controller: TextEditingController(
+                              text: 'カレンダー1あああああああああああああああああ'
+                                  'ああああああああああ'),
+                          style: TextStyle(fontSize: 13,
+                              color: normalTextColor),
+                          decoration: inputDecorationMaker(),
+                          maxLines: 1,
+                          onTap: () {
+                            showBottomArea(Container());
+                          },
+                        )
+                    )
                 ),
               ]),
 
-              if (calendarId.value != prevCalendarId.value)
+              // if (calendarId.value != prevCalendarId.value)
                 Column(children: [
                   const SizedBox(height: 8),
 
@@ -979,13 +1000,20 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: SizedBox(
                             height: 41,
                             child: TextField(
-                              enabled: false,
+                              enabled: true,
+                              readOnly: true,
+                              scrollPhysics: const
+                                NeverScrollableScrollPhysics(),
                               controller: TextEditingController(
                                   text: 'カレンダー1あああああああああああああああああ'
                                       'ああああああああああ'),
                               style: TextStyle(fontSize: 13,
                               color: normalTextColor),
-                              decoration: inputDecorationMaker()
+                              decoration: inputDecorationMaker(),
+                              maxLines: 1,
+                              onTap: () {
+                                // showBottomArea(Container());
+                              },
                             )
                         )
                     )
