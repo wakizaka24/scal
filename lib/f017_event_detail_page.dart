@@ -9,8 +9,8 @@ import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
-import 'f021_keyboard_safe_area_view.dart';
-import 'f024_keyboard_safe_area_view_model.dart';
+import 'f021_bottom_safe_area_view.dart';
+import 'f024_bottom_safe_area_view_model.dart';
 
 enum RepeatingPattern {
   none('なし'),
@@ -57,8 +57,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           .notifier));
     }
 
-    final keyboardViewState = ref.watch(keyboardSafeAreaViewNotifierProvider);
-    final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
+    final safeAreaViewState = ref.watch(bottomSafeAreaViewNotifierProvider);
+    final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
         .notifier);
 
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
@@ -122,8 +122,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     // TODO: 共通処理に移動する(ui_utils.dart)
-    void showBottomArea(Widget child) {
-      showCupertinoModalPopup<void>(
+    Future<void> showBottomArea(Widget child) async {
+      await showCupertinoModalPopup<void>(
         context: context,
         barrierColor: Colors.transparent,
         builder: (BuildContext context) => Container(
@@ -139,11 +139,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           ),
         ),
       );
+
+      await safeAreaViewNotifier.setSafeAreaAdjustment(0);
+      await safeAreaViewNotifier.setSafeAreaHeight(0);
+      await safeAreaViewNotifier.updateState();
     }
 
     useEffect(() {
       eventDetailNotifier.setDeviceHeight(deviceHeight);
-      keyboardViewState.keyboardScrollController = ScrollController();
+      safeAreaViewState.keyboardScrollController = ScrollController();
 
       yearList.value = (() {
         List<String> list = [];
@@ -355,7 +359,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           // keyboardType: TextInputType.multiline,
                           // maxLines: 2,
                           onTap: () {
-                            keyboardViewNotifier.setKeyboardAdjustment(11.5);
+                            safeAreaViewNotifier.setSafeAreaAdjustment(11.5);
                           },
                           onChanged: (text) {
                             debugPrint('Textの変更検知={$text}');
@@ -387,7 +391,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             // keyboardType: TextInputType.multiline,
                             // maxLines: 1,
                             onTap: () {
-                              keyboardViewNotifier.setKeyboardAdjustment(11.5);
+                              safeAreaViewNotifier.setSafeAreaAdjustment(11.5);
                             },
                             onChanged: (text) {
                               debugPrint('Textの変更検知={$text}');
@@ -933,7 +937,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             maxLines: 40,
 
                             onTap: () {
-                              keyboardViewNotifier.setKeyboardAdjustment(9);
+                              safeAreaViewNotifier.setSafeAreaAdjustment(9);
                             },
                             onChanged: (text) {
                               debugPrint('Textの変更検知={$text}');
@@ -973,8 +977,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               color: normalTextColor),
                           decoration: inputDecorationMaker(),
                           maxLines: 1,
-                          onTap: () {
-                            showBottomArea(Container());
+                          onTap: () async {
+                            await safeAreaViewNotifier
+                                .setSafeAreaAdjustment(11);
+                            await safeAreaViewNotifier.setSafeAreaHeight(216);
+                            await safeAreaViewNotifier.updateState();
+                            await showBottomArea(Container());
                           },
                         )
                     )
@@ -1011,8 +1019,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               color: normalTextColor),
                               decoration: inputDecorationMaker(),
                               maxLines: 1,
-                              onTap: () {
-                                // showBottomArea(Container());
+                              onTap: () async {
+                                await safeAreaViewNotifier
+                                    .setSafeAreaAdjustment(11);
+                                await safeAreaViewNotifier.setSafeAreaHeight(216);
+                                await safeAreaViewNotifier.updateState();
+                                await showBottomArea(Container());
                               },
                             )
                         )
@@ -1027,8 +1039,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         < eventDetailState.deviceHeight! ? eventDetailState.deviceHeight!
         : eventDetailState.contentsHeight!;
 
-    return KeyboardSafeAreaView(
-        keyboardScrollController: keyboardViewState
+    return BottomSafeAreaView(
+        keyboardScrollController: safeAreaViewState
             .keyboardScrollController!,
         unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
         unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,

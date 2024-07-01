@@ -83,8 +83,8 @@ enum ColorConfig {
     dark015fMaterial3(
         true, // useMaterial3
         Brightness.dark, // brightness
-        Colors.indigo, // primarySwatch
-        Colors.indigoAccent, // accentColor
+        Colors.grey, // primarySwatch
+        Color(0xFFFF8E9E), // accentColor
         BackgroundColors.black, // backgroundColor
         CardColors.black, // cardColor
         Colors.white54, // normalTextColor

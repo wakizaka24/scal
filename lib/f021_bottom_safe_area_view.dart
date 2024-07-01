@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'f024_keyboard_safe_area_view_model.dart';
+import 'f024_bottom_safe_area_view_model.dart';
 
-class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
+class BottomSafeAreaView extends StatefulHookConsumerWidget {
   final ScrollController keyboardScrollController;
   final double unsafeAreaTopHeight;
   final double unsafeAreaBottomHeight;
@@ -12,7 +12,7 @@ class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
   final double contentsHeight;
   final Widget child;
 
-  const KeyboardSafeAreaView({super.key,
+  const BottomSafeAreaView({super.key,
     required this.keyboardScrollController,
     required this.unsafeAreaTopHeight,
     required this.unsafeAreaBottomHeight,
@@ -23,14 +23,14 @@ class KeyboardSafeAreaView extends StatefulHookConsumerWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
-  => _KeyboardSafeAreaView();
+  => _BottomSafeAreaView();
 }
 
-class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
+class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
   @override
   Widget build(BuildContext context) {
-    final keyboardViewState = ref.watch(keyboardSafeAreaViewNotifierProvider);
-    final keyboardViewNotifier = ref.watch(keyboardSafeAreaViewNotifierProvider
+    final safeAreaViewState = ref.watch(bottomSafeAreaViewNotifierProvider);
+    final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
         .notifier);
 
     final firstPrimaryOffsetY = useState<double>(0.0);
@@ -77,7 +77,44 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
 
     // キーボードを閉じた場合
     if (!focusItem && keyboardHeight == 0) {
-      keyboardViewNotifier.setKeyboardAdjustment(0);
+      safeAreaViewNotifier.setSafeAreaAdjustment(0);
+    }
+
+    adjustScroll(safeAreaHeight) {
+      var offset = widget.keyboardScrollController.offset;
+      // 見切れるスクロールの上限
+      var upperLimitOffset = primaryFocusY + primaryOffsetY
+          - widget.unsafeAreaTopHeight;
+      // キーボードで隠れるのでスクロールの下限
+      var lowerLimitOffset = upperLimitOffset
+          - (deviceHeight - widget.unsafeAreaTopHeight - safeAreaHeight
+              - primaryFocusHeight);
+
+      // debugPrint('Test=$primaryOffsetY $primaryFocusY $upperLimitOffset'
+      //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
+
+      var scrollOffset = lowerLimitOffset;
+      var forceScroll = false;
+      if (scrollOffset <= upperLimitOffset) {
+        scrollOffset = lowerLimitOffset + safeAreaViewState
+            .safeAreaAdjustment;
+      } else {
+        // エリアが上限を上回る場合は上限に合わせる
+        forceScroll = true;
+        scrollOffset = upperLimitOffset;
+      }
+
+      if (offset < scrollOffset || forceScroll) {
+        var distance = (offset - scrollOffset).abs().toInt();
+        var milliseconds = (distance * 0.52).toInt();
+        if (milliseconds == 0) {
+          milliseconds = 1;
+        }
+        safeAreaViewState.keyboardScrollController?.animateTo(scrollOffset,
+            duration: Duration(milliseconds: milliseconds),
+            curve: Curves.linear);
+        // homeState.keyboardScrollController?.jumpTo(scrollOffset);
+      }
     }
 
     useEffect(() {
@@ -102,40 +139,7 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
       //     '$focusItem');
       if (keyboardMovingCompletion.value && focusItem) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          var offset = widget.keyboardScrollController.offset;
-          // 見切れるスクロールの上限
-          var upperLimitOffset = primaryFocusY + primaryOffsetY
-              - widget.unsafeAreaTopHeight;
-          // キーボードで隠れるのでスクロールの下限
-          var lowerLimitOffset = upperLimitOffset
-              - (deviceHeight - widget.unsafeAreaTopHeight - keyboardHeight
-                  - primaryFocusHeight);
-
-          // debugPrint('Test=$primaryOffsetY $primaryFocusY $upperLimitOffset'
-          //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
-
-          var scrollOffset = lowerLimitOffset;
-          var forceScroll = false;
-          if (scrollOffset <= upperLimitOffset) {
-            scrollOffset = lowerLimitOffset + keyboardViewState
-                .keyboardAdjustment;
-          } else {
-            // エリアが上限を上回る場合は上限に合わせる
-            forceScroll = true;
-            scrollOffset = upperLimitOffset;
-          }
-
-          if (offset < scrollOffset || forceScroll) {
-            var distance = (offset - scrollOffset).abs().toInt();
-            var milliseconds = (distance * 0.52).toInt();
-            if (milliseconds == 0) {
-              milliseconds = 1;
-            }
-            keyboardViewState.keyboardScrollController?.animateTo(scrollOffset,
-                duration: Duration(milliseconds: milliseconds),
-                curve: Curves.linear);
-            // homeState.keyboardScrollController?.jumpTo(scrollOffset);
-          }
+          adjustScroll(keyboardHeight);
         });
       }
 
@@ -143,11 +147,22 @@ class _KeyboardSafeAreaView extends ConsumerState<KeyboardSafeAreaView> {
       };
     }, [keyboardMovingCompletion.value]);
 
+    var safeAreaHeight = safeAreaViewState.safeAreaHeight;
+    useEffect(() {
+      if (safeAreaHeight > 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          adjustScroll(safeAreaHeight);
+        });
+      }
+      return () {
+      };
+    }, [safeAreaHeight]);
+
     return SingleChildScrollView(
         controller: widget.keyboardScrollController,
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
-            bottom: keyboardHeight),
+            bottom: keyboardHeight + safeAreaHeight),
             child: SizedBox(
                 width: widget.contentsWidth,
                 height: widget.contentsHeight,
