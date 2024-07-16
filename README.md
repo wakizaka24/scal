@@ -1,16 +1,31 @@
-# scal
 
-A new Flutter project.
+## Android
+### app-release.aabファイル作成
+% keytool -genkey -v -keystore ~/wakizaka24-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+first-app-24
+first-app-24
+Ryota Wakizaka
+Personal development
+Ryota Wakizaka
+Katsushika ward
+Tokyo
+JP
+y
 
-## Getting Started
+% cd scal
+% cp /Users/ryota24/wakizaka24-keystore.jks ./android
 
-This project is a starting point for a Flutter application.
+% cd scal
+% vi ./android/key.properties
+storePassword=first-app-24
+keyPassword=first-app-24
+keyAlias=key
+storeFile=/Users/ryota24/wakizaka24-keystore.jks
 
-A few resources to get you started if this is your first Flutter project:
+% cd scal
+% vi ./android/app/src/main/AndroidManifest.xml
+<application
+android:label="FlickCalender"
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+% cd scal
+% fvm flutter build appbundle --release
