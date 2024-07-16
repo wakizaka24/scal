@@ -42,6 +42,7 @@ class EventDetailPage extends StatefulHookConsumerWidget {
 class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
+    // TODO: 削除
     final theme = Theme.of(context);
     final colorConfigState = ref.watch(designConfigNotifierProvider);
     final colorConfig = colorConfigState.colorConfig!;
@@ -92,8 +93,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final formRepeatEndYear = useState<int?>(null);
     final formRepeatEndMonth = useState<int?>(null);
     final formRepeatEndDay = useState<int?>(null);
-    final calendarId = useState('TEST_ID_1');
-    final prevCalendarId = useState('TEST_ID_1');
+    // final calendarId = useState('TEST_ID_1');
+    // final prevCalendarId = useState('TEST_ID_1');
 
     final yearList = useState<List<String>>([]);
     final monthList = useState<List<String>>([]);

@@ -49,6 +49,8 @@ dependencies:
   device_calendar: ^4.3.2
   # タイムゾーン
   flutter_native_timezone: ^2.0.0
+  # バージョン情報取得
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
