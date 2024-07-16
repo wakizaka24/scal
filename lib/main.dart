@@ -175,7 +175,6 @@ class SCalApp extends StatelessWidget {
                     ),
                     fontFamily: 'Murecho'
                 ),
-                title: 'Alpha',
                 home: GestureDetector(
                     onTap: () => primaryFocus?.unfocus(),
                     child:const HomePage()
