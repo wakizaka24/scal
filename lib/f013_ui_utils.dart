@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
 import 'f016_design.dart';
+import 'f024_bottom_safe_area_view_model.dart';
 
 class UIUtils {
   static final UIUtils _instance = UIUtils._internal();
@@ -79,5 +82,38 @@ class UIUtils {
               )
           );
         });
+  }
+
+  Future<void> Function(Widget child, {double height}) useShowBottomArea(
+      WidgetRef ref) {
+    final context = useContext();
+    final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
+        .notifier);
+    return (Widget child, {double height = 215}) async {
+      await showCupertinoModalPopup<void>(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext context) {
+          final colorConfig = ref.watch(designConfigNotifierProvider)
+              .colorConfig!;
+          return Container(
+            height: height,
+            padding: const EdgeInsets.all(0),
+            margin: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            color: colorConfig.backgroundColor,
+            child: SafeArea(
+              top: false,
+              child: child,
+            ),
+          );
+        },
+      );
+
+      await safeAreaViewNotifier.setSafeAreaAdjustment(0);
+      await safeAreaViewNotifier.setSafeAreaHeight(0);
+      await safeAreaViewNotifier.updateState();
+    };
   }
 }

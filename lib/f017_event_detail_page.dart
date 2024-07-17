@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:scal/f013_ui_utils.dart';
 
 import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
@@ -42,10 +43,7 @@ class EventDetailPage extends StatefulHookConsumerWidget {
 class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
-    // TODO: 削除
-    final theme = Theme.of(context);
-    final colorConfigState = ref.watch(designConfigNotifierProvider);
-    final colorConfig = colorConfigState.colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
@@ -65,6 +63,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);
+
+    final showBottomArea = UIUtils().useShowBottomArea(ref);
 
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -120,30 +120,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         return validateDate(year, month, day);
       }).map((day) => day.toString().padLeft(2, '0'))
           .toList();
-    }
-
-    // TODO: 共通処理に移動する(ui_utils.dart)
-    Future<void> showBottomArea(Widget child) async {
-      await showCupertinoModalPopup<void>(
-        context: context,
-        barrierColor: Colors.transparent,
-        builder: (BuildContext context) => Container(
-          height: 216,
-          padding: const EdgeInsets.all(0),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          color: colorConfig.backgroundColor,
-          child: SafeArea(
-            top: false,
-            child: child,
-          ),
-        ),
-      );
-
-      await safeAreaViewNotifier.setSafeAreaAdjustment(0);
-      await safeAreaViewNotifier.setSafeAreaHeight(0);
-      await safeAreaViewNotifier.updateState();
     }
 
     useEffect(() {
@@ -449,7 +425,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
-                        dropdownColor: theme.cardColor,
+                        dropdownColor: colorConfig.cardColor,
                         decoration: inputDecorationMaker(),
                         value: formStartYear.value,
                         items: yearList.value.map((year) {
@@ -477,7 +453,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
-                        dropdownColor: theme.cardColor,
+                        dropdownColor: colorConfig.cardColor,
                         decoration: inputDecorationMaker(),
                         value: formStartMonth.value,
                         items: monthList.value.map((month) {
@@ -505,7 +481,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<int>(
                         elevation: 0,
-                        dropdownColor: theme.cardColor,
+                        dropdownColor: colorConfig.cardColor,
                         decoration: inputDecorationMaker(),
                         value: formStartDay.value,
                         items: startDayList.value.map((day) {
@@ -534,7 +510,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: IntrinsicWidth(
                         child: DropdownButtonFormField<int>(
                           elevation: 0,
-                          dropdownColor: theme.cardColor,
+                          dropdownColor: colorConfig.cardColor,
                           decoration: inputDecorationMaker(),
                           value: formStartHour.value,
                           items: hourList.value.map((hour) {
@@ -564,7 +540,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: IntrinsicWidth(
                         child: DropdownButtonFormField<int>(
                           elevation: 0,
-                          dropdownColor: theme.cardColor,
+                          dropdownColor: colorConfig.cardColor,
                           decoration: inputDecorationMaker(),
                           value: formStartMinute.value,
                           items: minuteList.value.map((minute) {
@@ -603,7 +579,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: IntrinsicWidth(
                           child: DropdownButtonFormField<int>(
                             elevation: 0,
-                            dropdownColor: theme.cardColor,
+                            dropdownColor: colorConfig.cardColor,
                             decoration: inputDecorationMaker(),
                             value: formEndYear.value,
                             items: yearList.value.map((year) {
@@ -631,7 +607,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: IntrinsicWidth(
                           child: DropdownButtonFormField<int>(
                             elevation: 0,
-                            dropdownColor: theme.cardColor,
+                            dropdownColor: colorConfig.cardColor,
                             decoration: inputDecorationMaker(),
                             value: formEndMonth.value,
                             items: monthList.value.map((month) {
@@ -659,7 +635,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: IntrinsicWidth(
                           child: DropdownButtonFormField<int>(
                             elevation: 0,
-                            dropdownColor: theme.cardColor,
+                            dropdownColor: colorConfig.cardColor,
                             decoration: inputDecorationMaker(),
                             value: formEndDay.value,
                             items: endDayList.value.map((day) {
@@ -689,7 +665,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: IntrinsicWidth(
                           child: DropdownButtonFormField<int>(
                             elevation: 0,
-                            dropdownColor: theme.cardColor,
+                            dropdownColor: colorConfig.cardColor,
                             decoration: inputDecorationMaker(),
                             value: formEndHour.value,
                             items: hourList.value.map((hour) {
@@ -719,7 +695,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: IntrinsicWidth(
                           child: DropdownButtonFormField<int>(
                             elevation: 0,
-                            dropdownColor: theme.cardColor,
+                            dropdownColor: colorConfig.cardColor,
                             decoration: inputDecorationMaker(),
                             value: formEndMinute.value,
                             items: minuteList.value.map((minute) {
@@ -757,7 +733,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     child: IntrinsicWidth(
                       child: DropdownButtonFormField<RepeatingPattern>(
                         elevation: 0,
-                        dropdownColor: theme.cardColor,
+                        dropdownColor: colorConfig.cardColor,
                         decoration: inputDecorationMaker(),
                         value: repeatingPattern.value,
                         items: RepeatingPattern.values.map((pattern) {
@@ -837,7 +813,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             child: IntrinsicWidth(
                               child: DropdownButtonFormField<int>(
                                 elevation: 0,
-                                dropdownColor: theme.cardColor,
+                                dropdownColor: colorConfig.cardColor,
                                 decoration: inputDecorationMaker(),
                                 value: formRepeatEndYear.value,
                                 items: yearList.value.map((year) {
@@ -866,7 +842,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             child: IntrinsicWidth(
                               child: DropdownButtonFormField<int>(
                                 elevation: 0,
-                                dropdownColor: theme.cardColor,
+                                dropdownColor: colorConfig.cardColor,
                                 decoration: inputDecorationMaker(),
                                 value: formRepeatEndMonth.value,
                                 items: monthList.value.map((month) {
@@ -895,7 +871,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             child: IntrinsicWidth(
                               child: DropdownButtonFormField<int>(
                                 elevation: 0,
-                                dropdownColor: theme.cardColor,
+                                dropdownColor: colorConfig.cardColor,
                                 decoration: inputDecorationMaker(),
                                 value: formRepeatEndDay.value,
                                 items: repeatingEndDayList.value.map((day) {
@@ -1057,7 +1033,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   - widget.unsafeAreaBottomHeight,
                   child: Container(
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.background,
+                        color: colorConfig.backgroundColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: contents)

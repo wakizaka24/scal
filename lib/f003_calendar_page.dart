@@ -351,19 +351,18 @@ class SelectableCalendarCell extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
 
-    var borderColor = colorConfigState.colorConfig!.eventListTitleBgColor;
+    var borderColor = colorConfig.eventListTitleBgColor;
     var border1 = BorderSide(
         color: !isHighlighted || !isActive ? borderColor
-            : theme.colorScheme.secondaryContainer,
+            : colorConfig.accentColor,
         width: !isHighlighted ? normalBoarderWidth
             : selectedBoarderWidth
     );
     var wideBorder1 = BorderSide(
         color: !isHighlighted || !isActive ? borderColor
-            : theme.colorScheme.secondaryContainer,
+            : colorConfig.accentColor,
         width: !isHighlighted ? normalBoarderWidth * 2
             : selectedBoarderWidth
     );
