@@ -34,7 +34,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
 
   # 国際化パッケージ
   flutter_localizations:
@@ -42,9 +42,9 @@ dependencies:
   # ローカライゼーション
   intl: ^0.18.1
   # データ保存
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.2.3
   # WidgetとStateNotifierの分離
-  hooks_riverpod: ^2.4.9
+  hooks_riverpod: ^2.5.1
   # カレンダーアクセス
   device_calendar: ^4.3.2
   # タイムゾーン
@@ -53,6 +53,11 @@ dependencies:
   universal_io: ^2.2.2
   # バージョン情報取得
   package_info_plus: ^8.0.0
+  # Androidのテキスト読み上げ機能
+  flutter_tts: ^4.0.2
+
+dependency_overrides:
+    intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
