@@ -123,7 +123,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     useEffect(() {
-      eventDetailNotifier.setDeviceHeight(deviceHeight);
+      eventDetailNotifier.initState();
+
+      // eventDetailNotifier.setDeviceHeight(deviceHeight);
       safeAreaViewState.keyboardScrollController = ScrollController();
 
       yearList.value = (() {
@@ -193,6 +195,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       return () {
       };
     }, [formRepeatEndYear.value, formRepeatEndMonth.value]);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      BuildContext? context = eventDetailState.contentsKey.currentContext;
+      RenderBox? renderBox;
+      if (context != null) {
+        renderBox = context.findRenderObject() as RenderBox?;
+      }
+      if (renderBox != null) {
+        debugPrint('contentsHeight=${renderBox.size.height}');
+      }
+    });
 
     inputDecorationMaker({String? hintText}) {
       return InputDecoration(
@@ -273,6 +286,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             contentsMode = EventDetailPageContentsMode
                                 .simpleInput;
                         }
+
                         await eventDetailNotifier.setContentsMode(contentsMode);
                       },
                       style: TextButton.styleFrom(
@@ -398,6 +412,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       value: allDay.value,
                       onChanged: (value) {
                         allDay.value = value;
+                        if (!allDay.value) {
+                          eventDetailNotifier.setContentsMode(
+                              EventDetailPageContentsMode.detailInput);
+                        } else {
+                          eventDetailNotifier.setContentsMode(
+                              EventDetailPageContentsMode.simpleInput);
+                        }
                       },
                     )
                 ),
@@ -653,9 +674,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     const Spacer()
                   ]),
 
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                Row(children: [
+                  Row(children: [
                     Container(width: 52),
 
                     const SizedBox(width: 8),
@@ -1012,9 +1033,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         )
     );
 
-    var contentHeight = eventDetailState.contentsHeight!
-        < eventDetailState.deviceHeight! ? eventDetailState.deviceHeight!
-        : eventDetailState.contentsHeight!;
+    var baseContentsHeight = eventDetailState.contentsHeight!
+      + widget.unsafeAreaTopHeight + widget.unsafeAreaBottomHeight;
+    var contentHeight = baseContentsHeight
+        < deviceHeight! ? deviceHeight! : baseContentsHeight;
 
     return BottomSafeAreaView(
         keyboardScrollController: safeAreaViewState
@@ -1027,11 +1049,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
 
           const Spacer(),
+
           Center(
-              child: SizedBox(width: pageWidget, height: eventDetailState
-                  .contentsHeight! - widget.unsafeAreaTopHeight
-                  - widget.unsafeAreaBottomHeight,
+              child: SizedBox(width: pageWidget,
                   child: Container(
+                      key: eventDetailState.contentsKey,
                       decoration: BoxDecoration(
                         color: colorConfig.backgroundColor,
                         borderRadius: BorderRadius.circular(16),
@@ -1039,6 +1061,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       child: contents)
               )
           ),
+
           const Spacer(),
 
           SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
