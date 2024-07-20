@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'f016_design.dart';
+
+class CWPadding extends HookConsumerWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double? width;
+  final double? height;
+
+  const CWPadding({
+    super.key,
+    required this.padding,
+    this.width,
+    this.height,
+    required this.child
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(padding: padding, child:
+      SizedBox(width: width, height: height, child: child)
+    );
+  }
+}
+
+class CWLeftTitle extends HookConsumerWidget {
+  final String title;
+  final bool highlight;
+  final double rightPaddingWidth;
+  final bool expanded;
+  final Widget child;
+
+  const CWLeftTitle({
+    super.key,
+    required this.title,
+    required this.highlight,
+    this.rightPaddingWidth = 0,
+    this.expanded = true,
+    required this.child
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final theme = Theme.of(context);
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    return Container(
+      decoration: BoxDecoration(
+        color: !highlight ? Colors.transparent : colorConfig.eventListTitleBgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(padding: const EdgeInsets.symmetric(
+          vertical: 6),
+          child: Row(children: [
+            SizedBox(
+                width: 52,
+                child: Text(title, textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: !highlight ? colorConfig.normalTextColor
+                            : colorConfig.disabledTextColor
+                    )
+                )
+            ),
+            Visibility(visible: !expanded, child: child),
+            Visibility(visible: expanded, child: Expanded(child: child)),
+            Visibility(visible: expanded && rightPaddingWidth > 0,
+                child: SizedBox(width: rightPaddingWidth))
+          ])
+      ),
+    );
+  }
+}
+
+class CWTextField extends HookConsumerWidget {
+  final TextEditingController controller;
+  final String? hintText;
+  final bool? enabled;
+  final bool readOnly;
+  final bool highlight;
+  final TextInputType? keyboardType;
+  final int maxLines;
+  final Widget? suffixIcon;
+  final GestureTapCallback? onTap;
+  final ValueChanged<String>? onChanged;
+
+  const CWTextField({
+    super.key,
+    required this.controller,
+    this.hintText,
+    this.enabled,
+    this.readOnly = false,
+    required this.highlight,
+    this.keyboardType,
+    this.maxLines = 1,
+    this.suffixIcon,
+    this.onTap,
+    this.onChanged
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    const double fontSize = 13;
+    var border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(
+          color: Colors.transparent,
+          width: 0),
+    );
+    return TextField(
+        style: TextStyle(
+          fontSize: fontSize, color: colorConfig.normalTextColor,
+        ),
+        decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(8),
+            enabledBorder: border,
+            disabledBorder: border,
+            focusedBorder: border,
+            filled: true,
+            fillColor: !highlight ? Colors.transparent
+                : Colors.white38,
+            hintStyle: TextStyle(
+                fontSize: fontSize,
+                color: colorConfig.disabledTextColor,
+            ),
+            hintText: hintText,
+            suffixIcon: suffixIcon
+        ),
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        readOnly: readOnly,
+        enabled: enabled,
+        onTap: onTap,
+        onChanged: onChanged
+    );
+  }
+}

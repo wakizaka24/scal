@@ -524,6 +524,7 @@ class WeekdayPart extends HookConsumerWidget {
         child: Text(weekday.title,
             textAlign: TextAlign.center,
             style: TextStyle(
+              height: 1,
               fontSize: calendarFontSize1,
               fontWeight: calendarFontWeight1,
               color: weekday.titleColor,
@@ -594,6 +595,7 @@ class DayPart extends HookConsumerWidget {
         children: [
           Text(day.title,
               style: TextStyle(
+                height: 1,
                 fontSize: calendarFontSize1,
                 fontWeight: calendarFontWeight1,
                 color: day.titleColor,
@@ -613,6 +615,7 @@ class DayPart extends HookConsumerWidget {
                         day.eventList[i].title),
                         maxLines: 1,
                         style: TextStyle(
+                            height: 1,
                             fontSize: calendarFontSize2,
                             fontWeight: calendarFontWeight2,
                             color: day.eventList[i].titleColor
@@ -659,6 +662,7 @@ class EventListPart extends HookConsumerWidget {
                     children: [
                       Text(calendarState.eventListTitle,
                         style: TextStyle(
+                            height: 1,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWeight1,
                             color: colorConfigState.colorConfig!.normalTextColor
@@ -776,6 +780,7 @@ class EventPart extends HookConsumerWidget {
                       child: Text(emptyMessage!,
                           maxLines: 2,
                           style: TextStyle(
+                            height: 1,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWeight3,
                             color: colorConfigState.colorConfig!.normalTextColor
@@ -788,6 +793,7 @@ class EventPart extends HookConsumerWidget {
                   Text(event!.head,
                       textAlign: TextAlign.center,
                       style: TextStyle(
+                          height: 1,
                           fontSize: eventListFontSize2,
                           fontWeight: eventListFontWeight2,
                           color: event!.fontColor
@@ -812,6 +818,7 @@ class EventPart extends HookConsumerWidget {
                       child: Text(CalendarUtils().convertCharWrapString(
                           event!.title),
                           maxLines: 2, style: TextStyle(
+                              height: 1,
                               fontSize: eventListFontSize3,
                               fontWeight: eventListFontWeight3,
                               color: event!.fontColor
@@ -1065,6 +1072,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
         child: Text(dayAndWeekday.dayAndWeekTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
+              height: 1,
               fontSize: calendarFontSize1,
               fontWeight: calendarFontWeight1,
               color: dayAndWeekday.dayAndWeekTitleColor,
@@ -1199,6 +1207,7 @@ class HourPart extends HookConsumerWidget {
             children: [
               Text(hour.title,
                   style: TextStyle(
+                  height: 1,
                   fontSize: !hour.allDay ? calendarFontSize1
                     : calendarFontSize1Down1,
                   fontWeight: calendarFontWeight1,
@@ -1219,6 +1228,7 @@ class HourPart extends HookConsumerWidget {
                               hour.eventList[i].title),
                             maxLines: 1,
                             style: TextStyle(
+                                height: 1,
                                 fontSize: calendarFontSize2,
                                 fontWeight: calendarFontWeight2,
                                 color: hour.eventList[i].titleColor

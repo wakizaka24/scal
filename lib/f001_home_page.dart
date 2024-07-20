@@ -251,6 +251,8 @@ class HomePage extends HookConsumerWidget {
         onPressed: () async {
           var _ = await calendarNotifier.getSelectionEvent();
 
+          await eventDetailNotifier.initState();
+
           // 閉じた時のスピードが遅いので保留
           // if (!context.mounted) {
           //   return;

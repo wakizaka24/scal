@@ -36,6 +36,13 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   initState() async {
   }
 
+  @override
+  dispose() {
+    super.dispose();
+
+    state.homePageController.dispose();
+  }
+
   setHomePageIndex(int index) async {
     state.homePageIndex = index;
     updateState();

@@ -30,6 +30,13 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
       : super(state);
 
   initState() async {
+    state.keyboardScrollController = ScrollController();
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    state.keyboardScrollController!.dispose();
   }
 
   setSafeAreaAdjustment(double addingOffset) async {

@@ -255,6 +255,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await initSelectionWeekCalendar();
   }
 
+  @override
+  dispose() {
+    super.dispose();
+
+    state.calendarSwitchingController.dispose();
+    state.monthCalendarController.dispose();
+  }
+
   // Month Calendar/Week Calendar
 
   selectDayPartIndex(DateTime date) {

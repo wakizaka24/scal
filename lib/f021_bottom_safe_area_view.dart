@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f024_bottom_safe_area_view_model.dart';
 
 class BottomSafeAreaView extends StatefulHookConsumerWidget {
-  final ScrollController keyboardScrollController;
   final double unsafeAreaTopHeight;
   final double unsafeAreaBottomHeight;
   final double contentsWidth;
@@ -13,7 +12,6 @@ class BottomSafeAreaView extends StatefulHookConsumerWidget {
   final Widget child;
 
   const BottomSafeAreaView({super.key,
-    required this.keyboardScrollController,
     required this.unsafeAreaTopHeight,
     required this.unsafeAreaBottomHeight,
     required this.contentsWidth,
@@ -37,6 +35,13 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     final firstPrimaryFocusY = useState<double>(0.0);
     final preKeyboardHeight = useState<double>(0.0);
     final keyboardMovingCompletion = useState<bool>(false);
+
+    useEffect(() {
+      safeAreaViewNotifier.initState();
+
+      return () {
+      };
+    }, const []);
 
     // 画面の高さ
     double deviceHeight = MediaQuery.of(context).size.height;
@@ -64,9 +69,10 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       // キーボード表示時にコンボボックスなどでキーボードを閉じて、再度キーボードを開いた時、
       // スクロールが必要であればスクロールする。
     } else if (firstPrimaryOffsetY.value
-        != widget.keyboardScrollController.offset
+        != safeAreaViewState.keyboardScrollController!.offset
         || firstPrimaryFocusY.value != focusY) {
-      firstPrimaryOffsetY.value = widget.keyboardScrollController.offset;
+      firstPrimaryOffsetY.value = safeAreaViewState.keyboardScrollController!
+          .offset;
       firstPrimaryFocusY.value = focusY;
     }
     double primaryOffsetY = firstPrimaryOffsetY.value;
@@ -81,7 +87,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     }
 
     adjustScroll(safeAreaHeight) {
-      var offset = widget.keyboardScrollController.offset;
+      var offset = safeAreaViewState.keyboardScrollController!.offset;
       // 見切れるスクロールの上限
       var upperLimitOffset = primaryFocusY + primaryOffsetY
           - widget.unsafeAreaTopHeight;
@@ -159,7 +165,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     }, [safeAreaHeight]);
 
     return SingleChildScrollView(
-        controller: widget.keyboardScrollController,
+        controller: safeAreaViewState.keyboardScrollController,
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
             bottom: keyboardHeight + safeAreaHeight),
