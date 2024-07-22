@@ -35,8 +35,8 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
 
   @override
   dispose() {
-    super.dispose();
     state.keyboardScrollController!.dispose();
+    super.dispose();
   }
 
   setSafeAreaAdjustment(double addingOffset) async {

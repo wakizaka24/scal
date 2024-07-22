@@ -31,6 +31,7 @@ class EventDetailPage extends StatefulHookConsumerWidget {
 class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
@@ -299,27 +300,31 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               ]),
 
 
+              const SizedBox(height: 500),
 
               CWLeftTitle(
                   title: 'タイトル',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   rightPaddingWidth: 8,
-                  child: CWTextField(
-                    controller: eventDetailState.textEditingControllers!
-                    [TextFieldItem.title]!,
-                    hintText: 'タイトル',
-                    highlight: eventDetailState.highlightItem
-                        == HighlightItem.title,
-                    maxLines: 2,
-                    onTap: () {
-                      eventDetailNotifier.updateHighlightItem(
-                          HighlightItem.title);
-                      safeAreaViewNotifier.setSafeAreaAdjustment(11.5);
-                    },
-                    onChanged: (text) {
-                      debugPrint('Textの変更検知={$text}');
-                    },
+                  child: Padding(padding: const EdgeInsets.symmetric(
+                      vertical: 4),
+                      child: CWTextField(
+                        controller: eventDetailState.textEditingControllers!
+                        [TextFieldItem.title]!,
+                        hintText: 'タイトル',
+                        highlight: eventDetailState.highlightItem
+                            == HighlightItem.title,
+                        maxLines: 2,
+                        onTap: () {
+                          eventDetailNotifier.updateHighlightItem(
+                              HighlightItem.title);
+                          safeAreaViewNotifier.setSafeAreaAdjustment(8);
+                        },
+                        onChanged: (text) {
+                          debugPrint('Textの変更検知={$text}');
+                        }
+                      )
                   )
               ),
 
@@ -328,20 +333,24 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.place,
                   rightPaddingWidth: 8,
-                  child: CWTextField(
-                    controller: eventDetailState.textEditingControllers!
-                    [TextFieldItem.place]!,
-                    hintText: '場所',
-                    highlight: eventDetailState.highlightItem
-                        == HighlightItem.place,
-                    onTap: () {
-                      eventDetailNotifier.updateHighlightItem(
-                          HighlightItem.place);
-                      safeAreaViewNotifier.setSafeAreaAdjustment(11.5);
-                    },
-                    onChanged: (text) {
-                      debugPrint('Textの変更検知={$text}');
-                    },
+                  child: CWPadding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      height: 38,
+                      child: CWTextField(
+                        controller: eventDetailState.textEditingControllers!
+                        [TextFieldItem.place]!,
+                        hintText: '場所',
+                        highlight: eventDetailState.highlightItem
+                            == HighlightItem.place,
+                        onTap: () {
+                          eventDetailNotifier.updateHighlightItem(
+                              HighlightItem.place);
+                          safeAreaViewNotifier.setSafeAreaAdjustment(8);
+                        },
+                        onChanged: (text) {
+                          debugPrint('Textの変更検知={$text}');
+                        },
+                      )
                   )
               ),
 
@@ -351,7 +360,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.allDay,
                   expanded: false,
                   child: Padding(padding: const EdgeInsets.symmetric(
-                      vertical: 4),
+                      vertical: 2),
                       child: CupertinoSwitch(
                         value: eventDetailState.allDay!,
                         onChanged: (value) {
@@ -376,25 +385,64 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     || eventDetailState.highlightItem
                           == HighlightItem.startHour,
                   expanded: false,
-                  child: CWPadding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      width: 110, height: 38,
-                      child: CWTextField(
-                        controller: eventDetailState.textEditingControllers!
-                        [TextFieldItem.startDate]!,
-                        readOnly: true,
-                        highlight: eventDetailState.highlightItem
-                            == HighlightItem.startDate,
-                        onTap: () {
-                          eventDetailNotifier.updateHighlightItem(
-                              HighlightItem.startDate);
-                          safeAreaViewNotifier.setSafeAreaAdjustment(11.5);
-                        },
-                        onChanged: (text) {
-                          debugPrint('Textの変更検知={$text}');
-                        },
-                      )
-                  )
+                  child: Row(children: [
+                    CWPadding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        width: 120, height: 38,
+                        child: CWTextField(
+                          controller: eventDetailState.textEditingControllers!
+                          [TextFieldItem.startDate]!,
+                          fontSize: 17,
+                          textAlign: TextAlign.center,
+                          paddingAll: 6,
+                          readOnly: true,
+                          highlight: eventDetailState.highlightItem
+                              == HighlightItem.startDate,
+                          onTap: () async {
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.startDate);
+                            await safeAreaViewNotifier.setSafeAreaAdjustment(5);
+                            await safeAreaViewNotifier.setSafeAreaHeight(216);
+                            await safeAreaViewNotifier.updateState();
+                            await showBottomArea(Container());
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.none);
+                          },
+                          onChanged: (text) {
+                            debugPrint('Textの変更検知={$text}');
+                          },
+                        )
+                    ),
+
+                    if (!eventDetailState.allDay!)
+                      CWPadding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        width: 60, height: 38,
+                        child: CWTextField(
+                          controller: eventDetailState.textEditingControllers!
+                          [TextFieldItem.startHour]!,
+                          fontSize: 17,
+                          textAlign: TextAlign.center,
+                          paddingAll: 6,
+                          readOnly: true,
+                          highlight: eventDetailState.highlightItem
+                              == HighlightItem.startHour,
+                          onTap: () async {
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.startHour);
+                            await safeAreaViewNotifier.setSafeAreaAdjustment(5);
+                            await safeAreaViewNotifier.setSafeAreaHeight(216);
+                            await safeAreaViewNotifier.updateState();
+                            await showBottomArea(Container());
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.none);
+                          },
+                          onChanged: (text) {
+                            debugPrint('Textの変更検知={$text}');
+                          },
+                        )
+                    ),
+                  ])
               ),
 
 

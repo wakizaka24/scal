@@ -50,7 +50,7 @@ enum TextFieldItem {
   destinationCalendar
 }
 
-const double firstContentsHeight = 907;
+const double firstContentsHeight = 1415;
 
 class EventDetailPageState {
   // Control
@@ -133,7 +133,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.textEditingControllers = (() {
       var km = <TextFieldItem, TextEditingController>{};
       for (var item in TextFieldItem.values) {
-        km[item] = TextEditingController(text: 'aaaa');
+        km[item] = TextEditingController();
       }
       return km;
     })();
@@ -153,6 +153,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
     state.formStartHour = 7;
     state.formStartMinute = 30;
+    state.textEditingControllers!
+    [TextFieldItem.startHour]!.text = '7:30';
     state.formEndYear = 2025;
     state.formEndMonth = 5;
     state.formEndDay = 31;
@@ -172,16 +174,15 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
   @override
   dispose() {
-    super.dispose();
-
     for (var controller in state.textEditingControllers!.values) {
       controller.dispose();
     }
+    super.dispose();
   }
 
-  updateHighlightItem(HighlightItem item) {
+  updateHighlightItem(HighlightItem item) async {
     state.highlightItem = item;
-    updateState();
+    await updateState();
   }
 
   setContentsMode(EventDetailPageContentsMode contentsMode) async {
@@ -193,7 +194,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   Future<double> getContentsHeight() async {
     switch (state.contentsMode!) {
       case EventDetailPageContentsMode.simpleInput:
-        return 670;
+        return 776 + 500;
       case EventDetailPageContentsMode.detailInput:
         return firstContentsHeight;
     }

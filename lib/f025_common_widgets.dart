@@ -26,6 +26,7 @@ class CWPadding extends HookConsumerWidget {
 
 class CWLeftTitle extends HookConsumerWidget {
   final String title;
+  final double fontSize;
   final bool highlight;
   final double rightPaddingWidth;
   final bool expanded;
@@ -34,6 +35,7 @@ class CWLeftTitle extends HookConsumerWidget {
   const CWLeftTitle({
     super.key,
     required this.title,
+    this.fontSize = 15,
     required this.highlight,
     this.rightPaddingWidth = 0,
     this.expanded = true,
@@ -56,7 +58,7 @@ class CWLeftTitle extends HookConsumerWidget {
                 width: 52,
                 child: Text(title, textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         color: !highlight ? colorConfig.normalTextColor
                             : colorConfig.disabledTextColor
                     )
@@ -75,12 +77,15 @@ class CWLeftTitle extends HookConsumerWidget {
 class CWTextField extends HookConsumerWidget {
   final TextEditingController controller;
   final String? hintText;
+  final double fontSize;
+  final TextAlign textAlign;
+  final TextAlignVertical textAlignVertical;
+  final double paddingAll;
   final bool? enabled;
   final bool readOnly;
   final bool highlight;
   final TextInputType? keyboardType;
   final int maxLines;
-  final Widget? suffixIcon;
   final GestureTapCallback? onTap;
   final ValueChanged<String>? onChanged;
 
@@ -88,12 +93,15 @@ class CWTextField extends HookConsumerWidget {
     super.key,
     required this.controller,
     this.hintText,
+    this.fontSize = 15,
+    this.textAlign = TextAlign.left,
+    this.textAlignVertical = TextAlignVertical.center,
+    this.paddingAll = 8,
     this.enabled,
     this.readOnly = false,
     required this.highlight,
     this.keyboardType,
     this.maxLines = 1,
-    this.suffixIcon,
     this.onTap,
     this.onChanged
   });
@@ -101,7 +109,6 @@ class CWTextField extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
-    const double fontSize = 13;
     var border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(6),
       borderSide: const BorderSide(
@@ -109,11 +116,13 @@ class CWTextField extends HookConsumerWidget {
           width: 0),
     );
     return TextField(
+        controller: controller,
         style: TextStyle(
           fontSize: fontSize, color: colorConfig.normalTextColor,
         ),
         decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(8),
+            isDense: true,
+            contentPadding: EdgeInsets.all(paddingAll),
             enabledBorder: border,
             disabledBorder: border,
             focusedBorder: border,
@@ -125,8 +134,9 @@ class CWTextField extends HookConsumerWidget {
                 color: colorConfig.disabledTextColor,
             ),
             hintText: hintText,
-            suffixIcon: suffixIcon
         ),
+        textAlign: textAlign,
+        textAlignVertical: textAlignVertical,
         keyboardType: keyboardType,
         maxLines: maxLines,
         readOnly: readOnly,

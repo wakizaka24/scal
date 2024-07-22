@@ -257,10 +257,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   @override
   dispose() {
-    super.dispose();
-
     state.calendarSwitchingController.dispose();
     state.monthCalendarController.dispose();
+    super.dispose();
   }
 
   // Month Calendar/Week Calendar
