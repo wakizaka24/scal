@@ -2,32 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f016_design.dart';
 
-class CWPadding extends HookConsumerWidget {
-  final Widget child;
-  final EdgeInsetsGeometry padding;
-  final double? width;
-  final double? height;
-
-  const CWPadding({
-    super.key,
-    required this.padding,
-    this.width,
-    this.height,
-    required this.child
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(padding: padding, child:
-      SizedBox(width: width, height: height, child: child)
-    );
-  }
-}
+// class CWPadding extends HookConsumerWidget {
+//   final Widget child;
+//   final EdgeInsetsGeometry padding;
+//   final double? width;
+//   final double? height;
+//
+//   const CWPadding({
+//     super.key,
+//     required this.padding,
+//     this.width,
+//     this.height,
+//     required this.child
+//   });
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return Padding(padding: padding, child:
+//       SizedBox(width: width, height: height, child: child)
+//     );
+//   }
+// }
 
 class CWLeftTitle extends HookConsumerWidget {
   final String title;
   final double fontSize;
   final bool highlight;
+  final double verticalPaddingWidth;
   final double rightPaddingWidth;
   final bool expanded;
   final Widget child;
@@ -35,9 +36,10 @@ class CWLeftTitle extends HookConsumerWidget {
   const CWLeftTitle({
     super.key,
     required this.title,
-    this.fontSize = 15,
+    this.fontSize = 13,
     required this.highlight,
-    this.rightPaddingWidth = 0,
+    this.verticalPaddingWidth = 6,
+    this.rightPaddingWidth = 6,
     this.expanded = true,
     required this.child
   });
@@ -51,14 +53,14 @@ class CWLeftTitle extends HookConsumerWidget {
         color: !highlight ? Colors.transparent : colorConfig.eventListTitleBgColor,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Padding(padding: const EdgeInsets.symmetric(
-          vertical: 6),
+      child: Padding(padding: EdgeInsets.symmetric(
+          vertical: verticalPaddingWidth),
           child: Row(children: [
             SizedBox(
                 width: 52,
                 child: Text(title, textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 15,
+                        fontSize: fontSize,
                         color: !highlight ? colorConfig.normalTextColor
                             : colorConfig.disabledTextColor
                     )
@@ -93,7 +95,7 @@ class CWTextField extends HookConsumerWidget {
     super.key,
     required this.controller,
     this.hintText,
-    this.fontSize = 15,
+    this.fontSize = 13,
     this.textAlign = TextAlign.left,
     this.textAlignVertical = TextAlignVertical.center,
     this.paddingAll = 8,

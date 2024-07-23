@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 
 enum EventDetailPageContentsMode {
   simpleInput,
@@ -38,14 +39,12 @@ enum HighlightItem {
 enum TextFieldItem {
   title,
   place,
-  allDay,
-  startDate,
-  startHour,
-  endDate,
-  endHour,
+  startDay,
+  startTime,
+  endDay,
+  endTime,
   repeat,
-  repeatEnd,
-  repeatEndDate,
+  repeatEndDay,
   memo,
   destinationCalendar
 }
@@ -64,24 +63,13 @@ class EventDetailPageState {
   String? title;
   String? place;
   bool? allDay;
-  int? formStartYear;
-  int? formStartMonth;
-  int? formStartDay;
-  int? formStartHour;
-  int? formStartMinute;
-  int? formEndYear;
-  int? formEndMonth;
-  int? formEndDay;
-  int? formEndHour;
-  int? formEndMinute;
-
+  DateTime? startDate;
+  DateTime? endDate;
   RepeatingPattern? repeatingPattern;
   bool? repeatingEnd;
-  int? formRepeatEndYear;
-  int? formRepeatEndMonth;
-  int? formRepeatEndDay;
+  DateTime? repeatEndDate;
+  String? memo;
   String? calendarId;
-  String? prevCalendarId;
 
   HighlightItem? highlightItem;
 
@@ -96,24 +84,14 @@ class EventDetailPageState {
     nState.title = state.title;
     nState.place = state.place;
     nState.allDay = state.allDay;
-    nState.formStartYear = state.formStartYear;
-    nState.formStartMonth = state.formStartMonth;
-    nState.formStartDay = state.formStartDay;
-    nState.formStartHour = state.formStartHour;
-    nState.formStartMinute = state.formStartMinute;
-    nState.formEndYear = state.formEndYear;
-    nState.formEndMonth = state.formEndMonth;
-    nState.formEndDay = state.formEndDay;
-    nState.formEndHour = state.formEndHour;
-    nState.formEndMinute = state.formEndMinute;
+    nState.startDate = state.startDate;
+    nState.endDate = state.endDate;
 
     nState.repeatingPattern = state.repeatingPattern;
     nState.repeatingEnd = state.repeatingEnd;
-    nState.formRepeatEndYear = state.formRepeatEndYear;
-    nState.formRepeatEndMonth = state.formRepeatEndMonth;
-    nState.formRepeatEndDay = state.formRepeatEndDay;
+    nState.repeatEndDate = state.repeatEndDate;
+    nState.memo = state.memo;
     nState.calendarId = state.calendarId;
-    nState.prevCalendarId = state.prevCalendarId;
 
     nState.highlightItem = state.highlightItem;
 
@@ -145,29 +123,26 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.title = '';
     state.place = '';
     state.allDay = false;
-    state.formStartYear = 2024;
-    state.formStartMonth = 4;
-    state.formStartDay = 30;
-    state.textEditingControllers!
-    [TextFieldItem.startDate]!.text = '2024/04/30';
 
-    state.formStartHour = 7;
-    state.formStartMinute = 30;
-    state.textEditingControllers!
-    [TextFieldItem.startHour]!.text = '7:30';
-    state.formEndYear = 2025;
-    state.formEndMonth = 5;
-    state.formEndDay = 31;
-    state.formEndHour = 08;
-    state.formEndMinute = 31;
+    state.startDate = DateTime(2024, 4, 30, 7, 30);
+    setTextFieldController(TextFieldItem.startDay);
+    setTextFieldController(TextFieldItem.startTime);
+
+    state.endDate = DateTime(2025, 5, 31, 8, 31);
+    setTextFieldController(TextFieldItem.endDay);
+    setTextFieldController(TextFieldItem.endTime);
 
     state.repeatingPattern = RepeatingPattern.none;
+    setTextFieldController(TextFieldItem.repeat);
+
     state.repeatingEnd = false;
-    state.formRepeatEndYear = null;
-    state.formRepeatEndMonth = null;
-    state.formRepeatEndDay = null;
+    state.repeatEndDate = null;
+
+    state.memo = '';
+    setTextFieldController(TextFieldItem.memo);
+
     state.calendarId = 'TEST_ID_1';
-    state.prevCalendarId = 'TEST_ID_1';
+    setTextFieldController(TextFieldItem.destinationCalendar);
 
     state.highlightItem = HighlightItem.none;
   }
@@ -197,6 +172,108 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
         return 776 + 500;
       case EventDetailPageContentsMode.detailInput:
         return firstContentsHeight;
+    }
+  }
+
+  setTextFieldController<T>(TextFieldItem item, {T? value}) async {
+    switch (item) {
+      case TextFieldItem.title:
+        if (value != null) {
+          state.title = value as String?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.title]!.text = state.title!;
+        break;
+      case TextFieldItem.place:
+        if (value != null) {
+          state.place = value as String?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.place]!.text = state.place!;
+        break;
+      case TextFieldItem.startDay:
+        if (value != null) {
+          state.startDate = value as DateTime?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.startDay]!.text = DateFormat('yyyy/MM/dd')
+            .format(state.startDate!);
+        changeStartDate(state.startDate);
+        break;
+      case TextFieldItem.startTime:
+        if (value != null) {
+          state.startDate = value as DateTime?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.startTime]!.text = DateFormat('HH:mm')
+            .format(state.startDate!);
+        changeStartDate(state.startDate);
+        break;
+      case TextFieldItem.endDay:
+        if (value != null) {
+          state.endDate = value as DateTime?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.endDay]!.text = DateFormat('yyyy/MM/dd')
+            .format(state.endDate!);
+        changeEndDate(state.endDate);
+        break;
+      case TextFieldItem.endTime:
+        if (value != null) {
+          state.endDate = value as DateTime?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.endTime]!.text = DateFormat('HH:mm')
+            .format(state.endDate!);
+        changeEndDate(state.endDate);
+        break;
+      case TextFieldItem.repeat:
+        if (value != null) {
+          state.repeatingPattern = value as RepeatingPattern?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.repeat]!.text = state.repeatingPattern!.name;
+        break;
+      case TextFieldItem.repeatEndDay:
+        if (value != null) {
+          state.repeatEndDate = value as DateTime?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.repeatEndDay]!.text = DateFormat('yyyy/MM/dd')
+            .format(state.repeatEndDate!);
+        break;
+      case TextFieldItem.memo:
+        if (value != null) {
+          state.memo = value as String?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.memo]!.text = state.memo!;
+        break;
+      case TextFieldItem.destinationCalendar:
+        if (value != null) {
+          state.calendarId = value as String?;
+        }
+        state.textEditingControllers!
+        [TextFieldItem.destinationCalendar]!.text = state.calendarId!;
+        break;
+    }
+  }
+
+  changeStartDate(startDate) async {
+    if (startDate == state.endDate
+      || startDate.isAfter(state.endDate)) {
+      state.endDate = startDate.add(const Duration(minutes: 1));
+      setTextFieldController(TextFieldItem.endDay);
+      setTextFieldController(TextFieldItem.endTime);
+    }
+  }
+
+  changeEndDate(endDate) async {
+    if (endDate == state.startDate
+      || endDate.isBefore(state.startDate)) {
+      state.startDate = endDate.add(const Duration(minutes: -1));
+      setTextFieldController(TextFieldItem.startDay);
+      setTextFieldController(TextFieldItem.startTime);
     }
   }
 

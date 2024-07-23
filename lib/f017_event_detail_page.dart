@@ -8,6 +8,7 @@ import 'package:scal/f013_ui_utils.dart';
 import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
+import 'f015_calendar_utils.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
 import 'f021_bottom_safe_area_view.dart';
@@ -64,103 +65,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 閉じるボタンの幅
     double closingButtonWidth = 39;
 
-    final yearList = useState<List<String>>([]);
-    final monthList = useState<List<String>>([]);
-    final startDayList = useState<List<String>>([]);
-    final endDayList = useState<List<String>>([]);
-    final hourList = useState<List<String>>([]);
-    final minuteList = useState<List<String>>([]);
-    final repeatingEndDayList = useState<List<String>>([]);
-    final calendarList = useState<List<List<String>>>([]);
+    // 最小年
+    int minimumYear = 1800;
 
-    bool validateDate(year, month, day) {
-      var dateTime = DateTime(year, month, day);
-      return dateTime.year == year && dateTime.day == day
-          && dateTime.day == day;
-    }
-
-    List<String> createDayList(year, month) {
-      var list = [];
-      for (int i = 1; i <= 31; i++) {
-        list.add(i);
-      }
-      return list.where((day) {
-        return validateDate(year, month, day);
-      }).map((day) => day.toString().padLeft(2, '0'))
-          .toList();
-    }
+    // 最大年
+    int maximumYear = DateTime.now().year + 300;
 
     useEffect(() {
-      yearList.value = (() {
-        List<String> list = [];
-        for (int i = 1800; i <= DateTime.now().year + 300; i++) {
-          list.add(i.toString());
-        }
-        return list;
-      })();
-      monthList.value = (() {
-        List<String> list = [];
-        for (int i = 1; i <= 12; i++) {
-          list.add(i.toString().padLeft(2, '0'));
-        }
-        return list;
-      })();
-      hourList.value = (() {
-        List<String> list = [];
-        for (int i = 0; i <= 24; i++) {
-          list.add(i.toString().padLeft(2, '0'));
-        }
-        return list;
-      })();
-      minuteList.value = (() {
-        List<String> list = [];
-        for (int i = 0; i <= 59; i++) {
-          list.add(i.toString().padLeft(2, '0'));
-        }
-        return list;
-      })();
-      calendarList.value = [
-        ['TEST_ID_1', 'カレンダー1あああああああああああああああああああああああああああ'],
-        ['TEST_ID_2', 'カレンダー2'],
-        ['TEST_ID_3', 'カレンダー3'],
-      ];
 
       return () {
       };
     }, const []);
-
-    useEffect(() {
-      startDayList.value = createDayList(eventDetailState.formStartYear,
-          eventDetailState.formStartMonth);
-      return () {
-      };
-    }, [eventDetailState.formStartYear, eventDetailState.formStartMonth]);
-
-    useEffect(() {
-      endDayList.value = createDayList(eventDetailState.formEndYear,
-          eventDetailState.formEndMonth);
-      return () {
-      };
-    }, [eventDetailState.formEndYear, eventDetailState.formEndMonth]);
-
-    useEffect(() {
-      endDayList.value = createDayList(eventDetailState.formEndYear,
-          eventDetailState.formEndMonth);
-      return () {
-      };
-    }, [eventDetailState.formEndYear, eventDetailState.formEndMonth]);
-
-    useEffect(() {
-      if (eventDetailState.formRepeatEndYear != null
-          && eventDetailState.formRepeatEndMonth != null) {
-        repeatingEndDayList.value = createDayList(
-            eventDetailState.formRepeatEndYear,
-            eventDetailState.formRepeatEndMonth);
-      }
-      return () {
-      };
-    }, [eventDetailState.formRepeatEndYear,
-      eventDetailState.formRepeatEndMonth]);
 
     final preContentsHeight = useState<double?>(null);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -177,39 +92,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         }
       }
     });
-
-    inputDecorationMaker({String? hintText}) {
-      return InputDecoration(
-        contentPadding: const EdgeInsets.all(8),
-        enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: colorConfig.eventListTitleBgColor, width: 1.5)
-        ),
-        disabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: colorConfig.eventListTitleBgColor, width: 2)
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: colorConfig.accentColor, width: 2)
-        ),
-        hintText: hintText,
-      );
-    }
-
-    dropdownMenuItemMaker<T>(value, title) {
-      return DropdownMenuItem<T>(
-        value: value,
-        child: Text(title, textAlign: TextAlign.center,
-          style: TextStyle(
-              height: 1.7,
-              fontSize: 13,
-              color: normalTextColor
-          ),
-          maxLines: 1,
-        ),
-      );
-    }
 
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
@@ -299,32 +181,27 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-
               const SizedBox(height: 500),
 
               CWLeftTitle(
                   title: 'タイトル',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
-                  rightPaddingWidth: 8,
-                  child: Padding(padding: const EdgeInsets.symmetric(
-                      vertical: 4),
-                      child: CWTextField(
-                        controller: eventDetailState.textEditingControllers!
-                        [TextFieldItem.title]!,
-                        hintText: 'タイトル',
-                        highlight: eventDetailState.highlightItem
-                            == HighlightItem.title,
-                        maxLines: 2,
-                        onTap: () {
-                          eventDetailNotifier.updateHighlightItem(
-                              HighlightItem.title);
-                          safeAreaViewNotifier.setSafeAreaAdjustment(8);
-                        },
-                        onChanged: (text) {
-                          debugPrint('Textの変更検知={$text}');
-                        }
-                      )
+                  child: CWTextField(
+                      controller: eventDetailState.textEditingControllers!
+                      [TextFieldItem.title]!,
+                      hintText: 'タイトル',
+                      highlight: eventDetailState.highlightItem
+                          == HighlightItem.title,
+                      maxLines: 2,
+                      onTap: () {
+                        eventDetailNotifier.updateHighlightItem(
+                            HighlightItem.title);
+                        safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+                      },
+                      onChanged: (text) {
+                        debugPrint('Textの変更検知={$text}');
+                      }
                   )
               ),
 
@@ -332,10 +209,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '場所',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.place,
-                  rightPaddingWidth: 8,
-                  child: CWPadding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      height: 38,
+                  child: SizedBox(
+                      height: 36,
                       child: CWTextField(
                         controller: eventDetailState.textEditingControllers!
                         [TextFieldItem.place]!,
@@ -345,7 +220,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         onTap: () {
                           eventDetailNotifier.updateHighlightItem(
                               HighlightItem.place);
-                          safeAreaViewNotifier.setSafeAreaAdjustment(8);
+                          safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
                         },
                         onChanged: (text) {
                           debugPrint('Textの変更検知={$text}');
@@ -358,23 +233,21 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '終日',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.allDay,
+                  verticalPaddingWidth: 2,
                   expanded: false,
-                  child: Padding(padding: const EdgeInsets.symmetric(
-                      vertical: 2),
-                      child: CupertinoSwitch(
-                        value: eventDetailState.allDay!,
-                        onChanged: (value) {
-                          eventDetailState.highlightItem = HighlightItem.allDay;
-                          eventDetailState.allDay = value;
-                          if (!eventDetailState.allDay!) {
-                            eventDetailNotifier.setContentsMode(
-                                EventDetailPageContentsMode.detailInput);
-                          } else {
-                            eventDetailNotifier.setContentsMode(
-                                EventDetailPageContentsMode.simpleInput);
-                          }
-                        },
-                      )
+                  child: CupertinoSwitch(
+                    value: eventDetailState.allDay!,
+                    onChanged: (value) {
+                      eventDetailState.highlightItem = HighlightItem.allDay;
+                      eventDetailState.allDay = value;
+                      if (!eventDetailState.allDay!) {
+                        eventDetailNotifier.setContentsMode(
+                            EventDetailPageContentsMode.detailInput);
+                      } else {
+                        eventDetailNotifier.setContentsMode(
+                            EventDetailPageContentsMode.simpleInput);
+                      }
+                    },
                   )
               ),
 
@@ -386,13 +259,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.startHour,
                   expanded: false,
                   child: Row(children: [
-                    CWPadding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        width: 120, height: 38,
+                    SizedBox(
+                        width: 120, height: 36,
                         child: CWTextField(
                           controller: eventDetailState.textEditingControllers!
-                          [TextFieldItem.startDate]!,
-                          fontSize: 17,
+                          [TextFieldItem.startDay]!,
+                          fontSize: 15,
                           textAlign: TextAlign.center,
                           paddingAll: 6,
                           readOnly: true,
@@ -401,27 +273,38 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           onTap: () async {
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.startDate);
-                            await safeAreaViewNotifier.setSafeAreaAdjustment(5);
-                            await safeAreaViewNotifier.setSafeAreaHeight(216);
+                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
+                              + 8);
+                            await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(Container());
+                            await showBottomArea(
+                                CupertinoDatePicker(
+                                  initialDateTime: eventDetailState.startDate,
+                                  mode: CupertinoDatePickerMode.date,
+                                  minimumYear: minimumYear,
+                                  maximumYear: maximumYear,
+                                  onDateTimeChanged: (DateTime newDate) {
+                                    eventDetailNotifier.setTextFieldController(
+                                        TextFieldItem.startDay,
+                                        value: CalendarUtils()
+                                        .copyDate(eventDetailState.startDate!,
+                                        newDate));
+                                  },
+                                )
+                            );
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.none);
-                          },
-                          onChanged: (text) {
-                            debugPrint('Textの変更検知={$text}');
                           },
                         )
                     ),
 
                     if (!eventDetailState.allDay!)
-                      CWPadding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        width: 60, height: 38,
+                      SizedBox(
+                        width: 60, height: 36,
                         child: CWTextField(
                           controller: eventDetailState.textEditingControllers!
-                          [TextFieldItem.startHour]!,
-                          fontSize: 17,
+                          [TextFieldItem.startTime]!,
+                          fontSize: 15,
                           textAlign: TextAlign.center,
                           paddingAll: 6,
                           readOnly: true,
@@ -430,638 +313,176 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           onTap: () async {
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.startHour);
-                            await safeAreaViewNotifier.setSafeAreaAdjustment(5);
+                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
+                              + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(216);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(Container());
+                            await showBottomArea(CupertinoDatePicker(
+                              initialDateTime: eventDetailState.startDate,
+                              mode: CupertinoDatePickerMode.time,
+                              use24hFormat: true,
+                              onDateTimeChanged: (DateTime newDate) {
+                                eventDetailNotifier.setTextFieldController(
+                                    TextFieldItem.startTime,
+                                    value: CalendarUtils()
+                                        .copyTime(eventDetailState.startDate!,
+                                        newDate));
+                              },
+                            ));
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.none);
-                          },
-                          onChanged: (text) {
-                            debugPrint('Textの変更検知={$text}');
-                          },
+                          }
                         )
                     ),
                   ])
               ),
 
-
-
-
-
-              const SizedBox(height: 8),
-
-              Row(children: [
-                SizedBox(width: 52,
-                    child: Text(eventDetailState.allDay! ? '日付' : '開始',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: normalTextColor
-                        )
-                    )
-                ),
-
-                const SizedBox(width: 8),
-
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<int>(
-                        elevation: 0,
-                        dropdownColor: colorConfig.cardColor,
-                        decoration: inputDecorationMaker(),
-                        value: eventDetailState.formStartYear,
-                        items: yearList.value.map((year) {
-                          return dropdownMenuItemMaker<int>(int.parse(year),
-                              '$year年');
-                        }).toList(),
-                        onChanged: (value) async {
-                          eventDetailState.formStartYear = value!;
-                          startDayList.value = createDayList(
-                              eventDetailState.formStartYear,
-                              eventDetailState.formStartMonth);
-                          if (!validateDate(eventDetailState.formStartYear,
-                              eventDetailState.formStartMonth,
-                              eventDetailState.formStartDay)) {
-                            eventDetailState.formStartDay = 1;
-                          }
-                        },
-                      ),
-                    )
-                ),
-
-                const SizedBox(width: 6),
-
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<int>(
-                        elevation: 0,
-                        dropdownColor: colorConfig.cardColor,
-                        decoration: inputDecorationMaker(),
-                        value: eventDetailState.formStartMonth,
-                        items: monthList.value.map((month) {
-                          return dropdownMenuItemMaker<int>(int.parse(month),
-                              '$month月');
-                        }).toList(),
-                        onChanged: (value) async {
-                          eventDetailState.formStartMonth = value!;
-                          startDayList.value = createDayList(
-                              eventDetailState.formStartYear,
-                              eventDetailState.formStartMonth);
-                          if (!validateDate(
-                              eventDetailState.formStartYear,
-                              eventDetailState.formStartMonth,
-                              eventDetailState.formStartDay)) {
-                            eventDetailState.formStartDay = 1;
-                          }
-                        },
-                      ),
-                    )
-                ),
-
-                const SizedBox(width: 6),
-
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<int>(
-                        elevation: 0,
-                        dropdownColor: colorConfig.cardColor,
-                        decoration: inputDecorationMaker(),
-                        value: eventDetailState.formStartDay,
-                        items: startDayList.value.map((day) {
-                          return dropdownMenuItemMaker<int>(int.parse(day),
-                              '$day日');
-                        }).toList(),
-                        onChanged: (value) async {
-                          eventDetailState.formStartDay = value!;
-                        },
-                      ),
-                    )
-                ),
-                const Spacer()
-              ]),
-
-              const SizedBox(height: 8),
-
               if (!eventDetailState.allDay!)
-                Row(children: [
-                  Container(width: 52),
-
-                  const SizedBox(width: 8),
-
-                  SizedBox(
-                      height: 41,
-                      child: IntrinsicWidth(
-                        child: DropdownButtonFormField<int>(
-                          elevation: 0,
-                          dropdownColor: colorConfig.cardColor,
-                          decoration: inputDecorationMaker(),
-                          value: eventDetailState.formStartHour,
-                          items: hourList.value.map((hour) {
-                            return dropdownMenuItemMaker<int>(int.parse(hour),
-                                hour);
-                          }).toList(),
-                          onChanged: (value) async {
-                            eventDetailState.formStartHour = value!;
-                          },
-                        ),
-                      )
-                  ),
-
-                  const SizedBox(width: 6),
-
-                  Text(':', textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 21,
-                          color: normalTextColor
-                      )
-                  ),
-
-                  const SizedBox(width: 6),
-
-                  SizedBox(
-                      height: 41,
-                      child: IntrinsicWidth(
-                        child: DropdownButtonFormField<int>(
-                          elevation: 0,
-                          dropdownColor: colorConfig.cardColor,
-                          decoration: inputDecorationMaker(),
-                          value: eventDetailState.formStartMinute,
-                          items: minuteList.value.map((minute) {
-                            return dropdownMenuItemMaker<int>(int.parse(minute),
-                                minute);
-                          }).toList(),
-                          onChanged: (value) async {
-                            eventDetailState.formStartMinute = value!;
-                          },
-                        ),
-                      )
-                  ),
-
-                  const Spacer()
-                ]),
-
-              if (!eventDetailState.allDay!)
-                Column(children: [
-                  const SizedBox(height: 8),
-
-                  Row(children: [
-                    SizedBox(width: 52,
-                        child: Text('終了',
+                CWLeftTitle(
+                    title: '終了',
+                    highlight: eventDetailState.highlightItem
+                        == HighlightItem.endDate
+                        || eventDetailState.highlightItem
+                            == HighlightItem.endHour,
+                    expanded: false,
+                    child: Row(children: [
+                      SizedBox(
+                          width: 120, height: 36,
+                          child: CWTextField(
+                            controller: eventDetailState.textEditingControllers!
+                            [TextFieldItem.endDay]!,
+                            fontSize: 15,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: normalTextColor
-                            )
-                        )
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    SizedBox(
-                        height: 41,
-                        child: IntrinsicWidth(
-                          child: DropdownButtonFormField<int>(
-                            elevation: 0,
-                            dropdownColor: colorConfig.cardColor,
-                            decoration: inputDecorationMaker(),
-                            value: eventDetailState.formEndYear,
-                            items: yearList.value.map((year) {
-                              return dropdownMenuItemMaker<int>(int.parse(year),
-                                  '$year年');
-                            }).toList(),
-                            onChanged: (value) async {
-                              eventDetailState.formEndYear = value!;
-                              endDayList.value = createDayList(
-                                  eventDetailState.formEndYear,
-                                  eventDetailState.formEndMonth);
-                              if (!validateDate(eventDetailState.formEndYear,
-                                  eventDetailState.formEndMonth,
-                                  eventDetailState.formEndDay)) {
-                                eventDetailState.formEndDay = 1;
-                              }
+                            paddingAll: 6,
+                            readOnly: true,
+                            highlight: eventDetailState.highlightItem
+                                == HighlightItem.endDate,
+                            onTap: () async {
+                              await eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.endDate);
+                              await safeAreaViewNotifier.setSafeAreaAdjustment(5
+                                  + 8);
+                              await safeAreaViewNotifier.setSafeAreaHeight(215);
+                              await safeAreaViewNotifier.updateState();
+                              await showBottomArea(
+                                  CupertinoDatePicker(
+                                    initialDateTime: eventDetailState.startDate,
+                                    mode: CupertinoDatePickerMode.date,
+                                    onDateTimeChanged: (DateTime newDate) {
+                                      eventDetailNotifier
+                                          .setTextFieldController(
+                                          TextFieldItem.endDay,
+                                          value: CalendarUtils()
+                                              .copyDate(
+                                              eventDetailState.endDate!,
+                                              newDate));
+                                    },
+                                  )
+                              );
+                              await eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.none);
                             },
-                          ),
-                        )
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    SizedBox(
-                        height: 41,
-                        child: IntrinsicWidth(
-                          child: DropdownButtonFormField<int>(
-                            elevation: 0,
-                            dropdownColor: colorConfig.cardColor,
-                            decoration: inputDecorationMaker(),
-                            value: eventDetailState.formEndMonth,
-                            items: monthList.value.map((month) {
-                              return dropdownMenuItemMaker<int>(int.parse(month),
-                                  '$month月');
-                            }).toList(),
-                            onChanged: (value) async {
-                              eventDetailState.formEndMonth = value!;
-                              endDayList.value = createDayList(
-                                  eventDetailState.formEndYear,
-                                  eventDetailState.formEndMonth);
-                              if (!validateDate(eventDetailState.formEndYear,
-                                  eventDetailState.formEndMonth,
-                                  eventDetailState.formEndDay)) {
-                                eventDetailState.formEndDay = 1;
-                              }
-                            },
-                          ),
-                        )
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    SizedBox(
-                        height: 41,
-                        child: IntrinsicWidth(
-                          child: DropdownButtonFormField<int>(
-                            elevation: 0,
-                            dropdownColor: colorConfig.cardColor,
-                            decoration: inputDecorationMaker(),
-                            value: eventDetailState.formEndDay,
-                            items: endDayList.value.map((day) {
-                              return dropdownMenuItemMaker<int>(int.parse(day),
-                                  '$day日');
-                            }).toList(),
-                            onChanged: (value) async {
-                              eventDetailState.formEndDay = value!;
-                            },
-                          ),
-                        )
-                    ),
-
-
-                    const Spacer()
-                  ]),
-
-                  const SizedBox(height: 8),
-
-                  Row(children: [
-                    Container(width: 52),
-
-                    const SizedBox(width: 8),
-
-                    SizedBox(
-                        height: 41,
-                        child: IntrinsicWidth(
-                          child: DropdownButtonFormField<int>(
-                            elevation: 0,
-                            dropdownColor: colorConfig.cardColor,
-                            decoration: inputDecorationMaker(),
-                            value: eventDetailState.formEndHour,
-                            items: hourList.value.map((hour) {
-                              return dropdownMenuItemMaker<int>(int.parse(hour),
-                                  hour);
-                            }).toList(),
-                            onChanged: (value) async {
-                              eventDetailState.formEndHour = value!;
-                            },
-                          ),
-                        )
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    Text(':', textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 21,
-                            color: normalTextColor
-                        )
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    SizedBox(
-                        height: 41,
-                        child: IntrinsicWidth(
-                          child: DropdownButtonFormField<int>(
-                            elevation: 0,
-                            dropdownColor: colorConfig.cardColor,
-                            decoration: inputDecorationMaker(),
-                            value: eventDetailState.formEndMinute,
-                            items: minuteList.value.map((minute) {
-                              return dropdownMenuItemMaker<int>(
-                                  int.parse(minute), minute);
-                            }).toList(),
-                            onChanged: (value) async {
-                              eventDetailState.formEndMinute = value!;
-                            },
-                          ),
-                        )
-                    ),
-
-                    const Spacer()
-                  ]),
-              ]),
-
-              const SizedBox(height: 8),
-
-              Row(children: [
-                SizedBox(width: 52,
-                    child: Text('繰返し',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: normalTextColor
-                        )
-                    )
-                ),
-
-                const SizedBox(width: 8),
-
-                SizedBox(
-                    height: 41,
-                    child: IntrinsicWidth(
-                      child: DropdownButtonFormField<RepeatingPattern>(
-                        elevation: 0,
-                        dropdownColor: colorConfig.cardColor,
-                        decoration: inputDecorationMaker(),
-                        value: eventDetailState.repeatingPattern,
-                        items: RepeatingPattern.values.map((pattern) {
-                          return dropdownMenuItemMaker<RepeatingPattern>(
-                              pattern, pattern.name);
-                        }).toList(),
-                        onChanged: (value) async {
-                          if (value != null) {
-                            eventDetailState.repeatingPattern = value;
-                            if (eventDetailState.repeatingPattern
-                                == RepeatingPattern.none) {
-                              eventDetailState.repeatingEnd = false;
-                            }
-                          }
-                        },
+                          )
                       ),
-                    )
-                ),
 
-                const Spacer()
-              ]),
-
-              if (eventDetailState.repeatingPattern != RepeatingPattern.none)
-                Column(children: [
-                  const SizedBox(height: 8),
-
-                  Row(children: [
-                    SizedBox(width: 52,
-                        child: Text('繰返し終了',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: normalTextColor
-                            )
-                        )
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    SizedBox(
-                        height: 41,
-                        child: CupertinoSwitch(
-                          value: eventDetailState.repeatingEnd!,
-                          onChanged: (value) {
-                            eventDetailState.repeatingEnd = value;
-                            if (eventDetailState.repeatingEnd!) {
-                              eventDetailState.formRepeatEndYear
-                                = eventDetailState.formEndYear;
-                              eventDetailState.formRepeatEndMonth
-                                = eventDetailState.formEndMonth;
-                              eventDetailState.formRepeatEndDay
-                                = eventDetailState.formEndDay;
-                            }
-                          },
-                        )
-                    ),
-
-                    const Spacer()
-                  ]),
-
-                  if (eventDetailState.repeatingEnd!)
-                    Column(children: [
-                      const SizedBox(height: 8),
-
-                      Row(children: [
-                        SizedBox(width: 52,
-                            child: Text('繰返し終了日',
+                      if (!eventDetailState.allDay!)
+                        SizedBox(
+                            width: 60, height: 36,
+                            child: CWTextField(
+                                controller: eventDetailState.textEditingControllers!
+                                [TextFieldItem.endTime]!,
+                                fontSize: 15,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: normalTextColor
-                                )
+                                paddingAll: 6,
+                                readOnly: true,
+                                highlight: eventDetailState.highlightItem
+                                    == HighlightItem.endHour,
+                                onTap: () async {
+                                  await eventDetailNotifier.updateHighlightItem(
+                                      HighlightItem.endHour);
+                                  await safeAreaViewNotifier
+                                      .setSafeAreaAdjustment(5 + 8);
+                                  await safeAreaViewNotifier.setSafeAreaHeight(
+                                      216);
+                                  await safeAreaViewNotifier.updateState();
+                                  await showBottomArea(CupertinoDatePicker(
+                                    initialDateTime: eventDetailState.endDate,
+                                    mode: CupertinoDatePickerMode.time,
+                                    minimumYear: minimumYear,
+                                    maximumYear: maximumYear,
+                                    use24hFormat: true,
+                                    onDateTimeChanged: (DateTime newDate) {
+                                      eventDetailNotifier
+                                          .setTextFieldController(
+                                          TextFieldItem.endTime,
+                                          value: CalendarUtils()
+                                              .copyTime(eventDetailState
+                                              .endDate!, newDate));
+                                    },
+                                  ));
+                                  await eventDetailNotifier.updateHighlightItem(
+                                      HighlightItem.none);
+                                }
                             )
                         ),
-
-                        const SizedBox(width: 8),
-
-                        SizedBox(
-                            height: 41,
-                            child: IntrinsicWidth(
-                              child: DropdownButtonFormField<int>(
-                                elevation: 0,
-                                dropdownColor: colorConfig.cardColor,
-                                decoration: inputDecorationMaker(),
-                                value: eventDetailState.formRepeatEndYear,
-                                items: yearList.value.map((year) {
-                                  return dropdownMenuItemMaker<int>(int
-                                      .parse(year), '$year年');
-                                }).toList(),
-                                onChanged: (value) async {
-                                  eventDetailState.formRepeatEndYear = value!;
-                                  repeatingEndDayList.value = createDayList(
-                                      eventDetailState.formRepeatEndYear,
-                                      eventDetailState.formRepeatEndMonth);
-                                  if (!validateDate(eventDetailState
-                                      .formRepeatEndYear,
-                                      eventDetailState.formRepeatEndMonth,
-                                      eventDetailState.formRepeatEndDay)) {
-                                    eventDetailState.formRepeatEndDay = 1;
-                                  }
-                                },
-                              ),
-                            )
-                        ),
-
-                        const SizedBox(width: 6),
-
-                        SizedBox(
-                            height: 41,
-                            child: IntrinsicWidth(
-                              child: DropdownButtonFormField<int>(
-                                elevation: 0,
-                                dropdownColor: colorConfig.cardColor,
-                                decoration: inputDecorationMaker(),
-                                value: eventDetailState.formRepeatEndMonth,
-                                items: monthList.value.map((month) {
-                                  return dropdownMenuItemMaker<int>(int
-                                      .parse(month), '$month月');
-                                }).toList(),
-                                onChanged: (value) async {
-                                  eventDetailState.formRepeatEndMonth = value!;
-                                  repeatingEndDayList.value = createDayList(
-                                      eventDetailState.formRepeatEndYear,
-                                      eventDetailState.formRepeatEndMonth);
-                                  if (!validateDate(eventDetailState
-                                      .formRepeatEndYear,
-                                      eventDetailState.formRepeatEndMonth,
-                                      eventDetailState.formRepeatEndDay)) {
-                                    eventDetailState.formRepeatEndDay = 1;
-                                  }
-                                },
-                              ),
-                            )
-                        ),
-
-                        const SizedBox(width: 6),
-
-                        SizedBox(
-                            height: 41,
-                            child: IntrinsicWidth(
-                              child: DropdownButtonFormField<int>(
-                                elevation: 0,
-                                dropdownColor: colorConfig.cardColor,
-                                decoration: inputDecorationMaker(),
-                                value: eventDetailState.formRepeatEndDay,
-                                items: repeatingEndDayList.value.map((day) {
-                                  return dropdownMenuItemMaker<int>(
-                                      int.parse(day), '$day日');
-                                }).toList(),
-                                onChanged: (value) async {
-                                  eventDetailState.formRepeatEndDay = value!;
-                                },
-                              ),
-                            )
-                        ),
-
-                        const Spacer()
-                      ]),
                     ])
-              ]),
-
-              const SizedBox(height: 8),
-
-              Row(children: [
-                SizedBox(width: 52,
-                    child: Text('メモ', textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: normalTextColor
-                        )
-                    )
                 ),
 
-                const SizedBox(width: 8),
-
-                Expanded(
-                    child: SizedBox(
-                        height: 210,
-                        child: TextField(
-                            style: const TextStyle(fontSize: 13),
-                            decoration: inputDecorationMaker(hintText: 'メモ'),
-                            // keyboardType: TextInputType.multiline,
-                            maxLines: 40,
-
-                            onTap: () {
-                              safeAreaViewNotifier.setSafeAreaAdjustment(9);
-                            },
-                            onChanged: (text) {
-                              debugPrint('Textの変更検知={$text}');
-                            }
-                        )
-                    )
-                ),
-              ]),
-
-              const SizedBox(height: 8),
-
-              Row(children: [
-                SizedBox(width: 52,
-                    child: Text('保存先カレンダー',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: normalTextColor
-                        )
-                    )
-                ),
-
-                const SizedBox(width: 8),
-
-                Expanded(
-                    child: SizedBox(
-                        height: 41,
-                        child: TextField(
-                          enabled: true,
+              CWLeftTitle(
+                  title: '繰返し',
+                  highlight: eventDetailState.highlightItem
+                      == HighlightItem.repeat,
+                  expanded: false,
+                  child: Row(children: [
+                    SizedBox(
+                        width: 65, height: 36,
+                        child: CWTextField(
+                          controller: eventDetailState.textEditingControllers!
+                          [TextFieldItem.repeat]!,
+                          fontSize: 13,
+                          textAlign: TextAlign.center,
+                          paddingAll: 8,
                           readOnly: true,
-                          scrollPhysics: const
-                          NeverScrollableScrollPhysics(),
-                          controller: TextEditingController(
-                              text: 'カレンダー1あああああああああああああああああ'
-                                  'ああああああああああ'),
-                          style: TextStyle(fontSize: 13,
-                              color: normalTextColor),
-                          decoration: inputDecorationMaker(),
-                          maxLines: 1,
+                          highlight: eventDetailState.highlightItem
+                              == HighlightItem.repeat,
                           onTap: () async {
-                            await safeAreaViewNotifier
-                                .setSafeAreaAdjustment(11);
-                            await safeAreaViewNotifier.setSafeAreaHeight(216);
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.repeat);
+                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
+                                + 8);
+                            await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(Container());
+                            await showBottomArea(
+                                CupertinoPicker(
+                                    itemExtent: 32,
+                                    scrollController:
+                                    FixedExtentScrollController(
+                                      initialItem: RepeatingPattern
+                                          .values.indexOf(eventDetailState
+                                          .repeatingPattern!),
+                                    ),
+                                    onSelectedItemChanged: (int index) {
+                                      eventDetailNotifier
+                                          .setTextFieldController(
+                                          TextFieldItem.repeat,
+                                          value: RepeatingPattern
+                                              .values[index]);
+                                    },
+                                    children:
+                                    List<Widget>.generate(RepeatingPattern
+                                        .values.length, (int index) {
+                                      return Center(child: Text(
+                                          RepeatingPattern.values[index].name));
+                                    })
+                                )
+                            );
+                            await eventDetailNotifier.updateHighlightItem(
+                                HighlightItem.none);
                           },
                         )
                     )
-                ),
-              ]),
-
-              // if (calendarId.value != prevCalendarId.value)
-                Column(children: [
-                  const SizedBox(height: 8),
-
-                  Row(children: [
-                    SizedBox(width: 52,
-                        child: Text('移動元カレンダー',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: normalTextColor
-                            )
-                        )
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: SizedBox(
-                            height: 41,
-                            child: TextField(
-                              enabled: true,
-                              readOnly: true,
-                              scrollPhysics: const
-                                NeverScrollableScrollPhysics(),
-                              controller: TextEditingController(
-                                  text: 'カレンダー1あああああああああああああああああ'
-                                      'ああああああああああ'),
-                              style: TextStyle(fontSize: 13,
-                              color: normalTextColor),
-                              decoration: inputDecorationMaker(),
-                              maxLines: 1,
-                              onTap: () async {
-                                await safeAreaViewNotifier
-                                    .setSafeAreaAdjustment(11);
-                                await safeAreaViewNotifier.setSafeAreaHeight(216);
-                                await safeAreaViewNotifier.updateState();
-                                await showBottomArea(Container());
-                              },
-                            )
-                        )
-                    )
-                  ]),
-                ]),
+                  ])
+              ),
             ]
         )
     );
