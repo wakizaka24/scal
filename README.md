@@ -25,7 +25,7 @@ storeFile=/Users/ryota24/wakizaka24-keystore.jks
 % cd scal
 % vi ./android/app/src/main/AndroidManifest.xml
 <application
-android:label="FlickCalender"
+android:label="Scal"
 
 % cd scal
 % fvm flutter build appbundle --release

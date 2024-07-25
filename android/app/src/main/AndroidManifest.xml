@@ -9,7 +9,7 @@
         </intent>
     </queries>
     <application
-        android:label="FlickCalender"
+        android:label="Scal"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
