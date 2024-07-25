@@ -40,8 +40,6 @@
 	<false/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>カレンダーの表示と編集を行うためカレンダー機能にアクセスします。</string>
-	<key>FLTEnableImpeller</key>
-	<string>false</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCalendarsFullAccessUsageDescription</key>
