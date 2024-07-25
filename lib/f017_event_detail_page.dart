@@ -277,10 +277,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
                       maxLines: 2,
-                      onTap: () {
-                        eventDetailNotifier.updateHighlightItem(
+                      onTap: () async {
+                        await safeAreaViewNotifier.downBottomSheet();
+                        await eventDetailNotifier.updateHighlightItem(
                             HighlightItem.title);
-                        safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+                        await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
                       },
                       onChanged: (text) {
                         debugPrint('Textの変更検知={$text}');
@@ -300,10 +301,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         hintText: '場所',
                         highlight: eventDetailState.highlightItem
                             == HighlightItem.place,
-                        onTap: () {
-                          eventDetailNotifier.updateHighlightItem(
+                        onTap: () async {
+                          await safeAreaViewNotifier.downBottomSheet();
+                          await eventDetailNotifier.updateHighlightItem(
                               HighlightItem.place);
-                          safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+                          await safeAreaViewNotifier.setSafeAreaAdjustment(8
+                              + 6);
                         },
                         onChanged: (text) {
                           debugPrint('Textの変更検知={$text}');
@@ -316,7 +319,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '終日',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.allDay,
-                  verticalPaddingWidth: 4,
+                  verticalPaddingWidth: 5,
                   expanded: false,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
@@ -360,9 +363,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(startDayPicker);
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.none);
+                            showBottomArea(startDayPicker);
                           },
                         )
                     ),
@@ -386,9 +387,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(216);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(startTimePicker);
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.none);
+                            showBottomArea(startTimePicker);
                           }
                         )
                     ),
@@ -422,9 +421,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                   + 8);
                               await safeAreaViewNotifier.setSafeAreaHeight(215);
                               await safeAreaViewNotifier.updateState();
-                              await showBottomArea(endDayPicker);
-                              await eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.none);
+                              showBottomArea(endDayPicker);
                             },
                           )
                       ),
@@ -450,9 +447,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                   await safeAreaViewNotifier.setSafeAreaHeight(
                                       216);
                                   await safeAreaViewNotifier.updateState();
-                                  await showBottomArea(endTimePicker);
-                                  await eventDetailNotifier.updateHighlightItem(
-                                      HighlightItem.none);
+                                  showBottomArea(endTimePicker);
                                 }
                             )
                         ),
@@ -483,9 +478,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                 + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(repeatPicker);
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.none);
+                            showBottomArea(repeatPicker);
                           },
                         )
                     )
@@ -499,7 +492,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.repeatEnd
                       || eventDetailState.highlightItem
                       == HighlightItem.repeatEndDay,
-                  verticalPaddingWidth: 4,
+                  verticalPaddingWidth: 5,
                   expanded: false,
                   child: Row(children: [
                     CupertinoSwitch(
@@ -543,9 +536,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                   + 8);
                               await safeAreaViewNotifier.setSafeAreaHeight(215);
                               await safeAreaViewNotifier.updateState();
-                              await showBottomArea(repeatingEndDayPicker);
-                              await eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.none);
+                              showBottomArea(repeatingEndDayPicker);
                             },
                           )
                       ),
@@ -562,10 +553,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.memo,
                       maxLines: 6,
-                      onTap: () {
-                        eventDetailNotifier.updateHighlightItem(
+                      onTap: () async {
+                        await safeAreaViewNotifier.downBottomSheet();
+                        await eventDetailNotifier.updateHighlightItem(
                             HighlightItem.memo);
-                        safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+                        await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
                       },
                       onChanged: (text) {
                         debugPrint('Textの変更検知={$text}');
@@ -598,9 +590,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //                   + 8);
               //               await safeAreaViewNotifier.setSafeAreaHeight(215);
               //               await safeAreaViewNotifier.updateState();
-              //               await showBottomArea(repeatPicker);
-              //               await eventDetailNotifier.updateHighlightItem(
-              //                   HighlightItem.none);
+              //               showBottomArea(repeatPicker);
               //             },
               //           )
               //       )

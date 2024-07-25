@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -84,15 +83,15 @@ class UIUtils {
         });
   }
 
-  Future<void> Function(Widget child, {double height}) useShowBottomArea(
+  Function(Widget child, {double height}) useShowBottomArea(
       WidgetRef ref) {
     final context = useContext();
     final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
         .notifier);
-    return (Widget child, {double height = 215}) async {
-      await showCupertinoModalPopup<void>(
+    safeAreaViewNotifier.setBottomSheetContext(context);
+    return (Widget child, {double height = 215}) {
+      showBottomSheet(
         context: context,
-        barrierColor: Colors.transparent,
         builder: (BuildContext context) {
           final colorConfig = ref.watch(designConfigNotifierProvider)
               .colorConfig!;
@@ -110,10 +109,6 @@ class UIUtils {
           );
         },
       );
-
-      await safeAreaViewNotifier.setSafeAreaAdjustment(0);
-      await safeAreaViewNotifier.setSafeAreaHeight(0);
-      await safeAreaViewNotifier.updateState();
     };
   }
 }

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class BottomSafeAreaViewState {
   // Control
   ScrollController? keyboardScrollController;
+  BuildContext? bottomSheetContext;
 
   // Data
   double safeAreaAdjustment = 0;
@@ -14,6 +15,7 @@ class BottomSafeAreaViewState {
 
     // Control
     nState.keyboardScrollController = state.keyboardScrollController;
+    nState.bottomSheetContext = state.bottomSheetContext;
 
     // Data
     nState.safeAreaAdjustment = state.safeAreaAdjustment;
@@ -45,6 +47,22 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
 
   setSafeAreaHeight(double height) async {
     state.safeAreaHeight = height;
+  }
+
+  downBottomSheet() async {
+    if (state.safeAreaHeight > 0) {
+      if (state.bottomSheetContext!.mounted) {
+        Navigator.pop(state.bottomSheetContext!);
+      }
+      await setBottomSheetContext(null);
+      await setSafeAreaAdjustment(0);
+      await setSafeAreaHeight(0);
+      await updateState();
+    }
+  }
+
+  setBottomSheetContext(BuildContext? context) {
+    state.bottomSheetContext = context;
   }
 
   updateState() async {

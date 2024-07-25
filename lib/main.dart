@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
+import 'f024_bottom_safe_area_view_model.dart';
 
 void main() {
   // 縦向き
@@ -53,6 +53,8 @@ class SCalApp extends StatelessWidget {
               final colorConfigState = ref.watch(designConfigNotifierProvider);
               final colorConfigNotifier = ref.watch(designConfigNotifierProvider
                   .notifier);
+              final safeAreaViewNotifier = ref.watch(
+                  bottomSafeAreaViewNotifierProvider.notifier);
               final eventDetailNotifier = ref.watch(
                   eventDetailPageNotifierProvider.notifier);
 
@@ -86,9 +88,10 @@ class SCalApp extends StatelessWidget {
                     ),
                 ),
                 home: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       primaryFocus?.unfocus();
-                      eventDetailNotifier.updateHighlightItem(
+                      await safeAreaViewNotifier.downBottomSheet();
+                      await eventDetailNotifier.updateHighlightItem(
                           HighlightItem.none);
                     },
                     child:const HomePage()
