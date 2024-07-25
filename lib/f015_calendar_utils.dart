@@ -63,9 +63,13 @@ class CalendarUtils {
     return charWrapStr;
   }
 
-  DateTime copyDate(DateTime baseDate, DateTime day) {
+  DateTime copyDay(DateTime baseDate, DateTime day) {
     return DateTime(day.year, day.month, day.day, baseDate.hour,
         baseDate.minute);
+  }
+
+  DateTime trimDay(DateTime day) {
+    return DateTime(day.year, day.month, day.day);
   }
 
   DateTime copyTime(DateTime baseDate, DateTime time) {

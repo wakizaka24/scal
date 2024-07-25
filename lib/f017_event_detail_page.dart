@@ -93,6 +93,89 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       }
     });
 
+    var startDayPicker = CupertinoDatePicker(
+      initialDateTime: eventDetailState.startDate,
+      mode: CupertinoDatePickerMode.date,
+      minimumYear: minimumYear,
+      maximumYear: maximumYear,
+      onDateTimeChanged: (DateTime newDate) {
+        eventDetailNotifier.setTextFieldController(TextFieldItem.startDay,
+            value: CalendarUtils().copyDay(eventDetailState.startDate!,
+                newDate));
+      },
+    );
+
+    var endDayPicker = CupertinoDatePicker(
+      initialDateTime: eventDetailState.endDate,
+      mode: CupertinoDatePickerMode.date,
+      onDateTimeChanged: (DateTime newDate) {
+        eventDetailNotifier.setTextFieldController(TextFieldItem.endDay,
+            value: CalendarUtils().copyDay(eventDetailState
+                .endDate!, newDate));
+      },
+    );
+
+    var startTimePicker = CupertinoDatePicker(
+      initialDateTime: eventDetailState.startDate,
+      mode: CupertinoDatePickerMode.time,
+      use24hFormat: true,
+      onDateTimeChanged: (DateTime newDate) {
+        eventDetailNotifier.setTextFieldController(
+            TextFieldItem.startTime,
+            value: CalendarUtils()
+                .copyTime(eventDetailState.startDate!,
+                newDate));
+      },
+    );
+
+    var endTimePicker = CupertinoDatePicker(
+      initialDateTime: eventDetailState.endDate,
+      mode: CupertinoDatePickerMode.time,
+      minimumYear: minimumYear,
+      maximumYear: maximumYear,
+      use24hFormat: true,
+      onDateTimeChanged: (DateTime newDate) {
+        eventDetailNotifier.setTextFieldController(
+            TextFieldItem.endTime,
+            value: CalendarUtils().copyTime(eventDetailState
+                .endDate!, newDate));
+      },
+    );
+
+    var repeatPicker = CupertinoPicker(
+        itemExtent: 32,
+        scrollController:
+        FixedExtentScrollController(
+          initialItem: RepeatingPattern.values.indexOf(eventDetailState
+              .repeatingPattern!),
+        ),
+        onSelectedItemChanged: (int index) {
+          var repeatingPattern =
+          RepeatingPattern.values[index];
+          eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
+              value: repeatingPattern);
+          if (repeatingPattern == RepeatingPattern.none) {
+            eventDetailNotifier.setRepeatingEnd(false);
+          }
+          eventDetailNotifier.updateState();
+        },
+        children: List<Widget>.generate(RepeatingPattern.values.length,
+                (int index) {
+          return Center(child: Text(RepeatingPattern.values[index].name));
+        })
+    );
+
+    var repeatingEndDayPicker = CupertinoDatePicker(
+      initialDateTime: eventDetailState.repeatingEndDate,
+      mode: CupertinoDatePickerMode.date,
+      onDateTimeChanged: (DateTime newDate) {
+        eventDetailNotifier.setTextFieldController(
+            TextFieldItem.repeatingEndDay,
+            value: CalendarUtils().copyDay(eventDetailState
+                .repeatingEndDate!, newDate));
+      },
+    );
+
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 15,
@@ -233,7 +316,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '終日',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.allDay,
-                  verticalPaddingWidth: 2,
+                  verticalPaddingWidth: 4,
                   expanded: false,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
@@ -254,7 +337,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               CWLeftTitle(
                   title: eventDetailState.allDay! ? '日付' : '開始',
                   highlight: eventDetailState.highlightItem
-                      == HighlightItem.startDate
+                      == HighlightItem.startDay
                     || eventDetailState.highlightItem
                           == HighlightItem.startHour,
                   expanded: false,
@@ -269,29 +352,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           paddingAll: 6,
                           readOnly: true,
                           highlight: eventDetailState.highlightItem
-                              == HighlightItem.startDate,
+                              == HighlightItem.startDay,
                           onTap: () async {
                             await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.startDate);
+                                HighlightItem.startDay);
                             await safeAreaViewNotifier.setSafeAreaAdjustment(5
                               + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(
-                                CupertinoDatePicker(
-                                  initialDateTime: eventDetailState.startDate,
-                                  mode: CupertinoDatePickerMode.date,
-                                  minimumYear: minimumYear,
-                                  maximumYear: maximumYear,
-                                  onDateTimeChanged: (DateTime newDate) {
-                                    eventDetailNotifier.setTextFieldController(
-                                        TextFieldItem.startDay,
-                                        value: CalendarUtils()
-                                        .copyDate(eventDetailState.startDate!,
-                                        newDate));
-                                  },
-                                )
-                            );
+                            await showBottomArea(startDayPicker);
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.none);
                           },
@@ -317,18 +386,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(216);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(CupertinoDatePicker(
-                              initialDateTime: eventDetailState.startDate,
-                              mode: CupertinoDatePickerMode.time,
-                              use24hFormat: true,
-                              onDateTimeChanged: (DateTime newDate) {
-                                eventDetailNotifier.setTextFieldController(
-                                    TextFieldItem.startTime,
-                                    value: CalendarUtils()
-                                        .copyTime(eventDetailState.startDate!,
-                                        newDate));
-                              },
-                            ));
+                            await showBottomArea(startTimePicker);
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.none);
                           }
@@ -341,7 +399,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 CWLeftTitle(
                     title: '終了',
                     highlight: eventDetailState.highlightItem
-                        == HighlightItem.endDate
+                        == HighlightItem.endDay
                         || eventDetailState.highlightItem
                             == HighlightItem.endHour,
                     expanded: false,
@@ -356,29 +414,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             paddingAll: 6,
                             readOnly: true,
                             highlight: eventDetailState.highlightItem
-                                == HighlightItem.endDate,
+                                == HighlightItem.endDay,
                             onTap: () async {
                               await eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.endDate);
+                                  HighlightItem.endDay);
                               await safeAreaViewNotifier.setSafeAreaAdjustment(5
                                   + 8);
                               await safeAreaViewNotifier.setSafeAreaHeight(215);
                               await safeAreaViewNotifier.updateState();
-                              await showBottomArea(
-                                  CupertinoDatePicker(
-                                    initialDateTime: eventDetailState.startDate,
-                                    mode: CupertinoDatePickerMode.date,
-                                    onDateTimeChanged: (DateTime newDate) {
-                                      eventDetailNotifier
-                                          .setTextFieldController(
-                                          TextFieldItem.endDay,
-                                          value: CalendarUtils()
-                                              .copyDate(
-                                              eventDetailState.endDate!,
-                                              newDate));
-                                    },
-                                  )
-                              );
+                              await showBottomArea(endDayPicker);
                               await eventDetailNotifier.updateHighlightItem(
                                   HighlightItem.none);
                             },
@@ -389,7 +433,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         SizedBox(
                             width: 60, height: 36,
                             child: CWTextField(
-                                controller: eventDetailState.textEditingControllers!
+                                controller: eventDetailState
+                                    .textEditingControllers!
                                 [TextFieldItem.endTime]!,
                                 fontSize: 15,
                                 textAlign: TextAlign.center,
@@ -405,21 +450,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                   await safeAreaViewNotifier.setSafeAreaHeight(
                                       216);
                                   await safeAreaViewNotifier.updateState();
-                                  await showBottomArea(CupertinoDatePicker(
-                                    initialDateTime: eventDetailState.endDate,
-                                    mode: CupertinoDatePickerMode.time,
-                                    minimumYear: minimumYear,
-                                    maximumYear: maximumYear,
-                                    use24hFormat: true,
-                                    onDateTimeChanged: (DateTime newDate) {
-                                      eventDetailNotifier
-                                          .setTextFieldController(
-                                          TextFieldItem.endTime,
-                                          value: CalendarUtils()
-                                              .copyTime(eventDetailState
-                                              .endDate!, newDate));
-                                    },
-                                  ));
+                                  await showBottomArea(endTimePicker);
                                   await eventDetailNotifier.updateHighlightItem(
                                       HighlightItem.none);
                                 }
@@ -452,30 +483,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                 + 8);
                             await safeAreaViewNotifier.setSafeAreaHeight(215);
                             await safeAreaViewNotifier.updateState();
-                            await showBottomArea(
-                                CupertinoPicker(
-                                    itemExtent: 32,
-                                    scrollController:
-                                    FixedExtentScrollController(
-                                      initialItem: RepeatingPattern
-                                          .values.indexOf(eventDetailState
-                                          .repeatingPattern!),
-                                    ),
-                                    onSelectedItemChanged: (int index) {
-                                      eventDetailNotifier
-                                          .setTextFieldController(
-                                          TextFieldItem.repeat,
-                                          value: RepeatingPattern
-                                              .values[index]);
-                                    },
-                                    children:
-                                    List<Widget>.generate(RepeatingPattern
-                                        .values.length, (int index) {
-                                      return Center(child: Text(
-                                          RepeatingPattern.values[index].name));
-                                    })
-                                )
-                            );
+                            await showBottomArea(repeatPicker);
                             await eventDetailNotifier.updateHighlightItem(
                                 HighlightItem.none);
                           },
@@ -483,6 +491,69 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                   ])
               ),
+
+              if (eventDetailState.repeatingPattern != RepeatingPattern.none)
+                CWLeftTitle(
+                  title: '繰返し終了',
+                  highlight: eventDetailState.highlightItem
+                      == HighlightItem.repeatEnd
+                      || eventDetailState.highlightItem
+                      == HighlightItem.repeatEndDay,
+                  verticalPaddingWidth: 4,
+                  expanded: false,
+                  child: Row(children: [
+                    CupertinoSwitch(
+                      value: eventDetailState.repeatingEnd!,
+                      onChanged: (value) {
+                        eventDetailState.highlightItem = HighlightItem
+                            .repeatEnd;
+                        eventDetailState.repeatingEnd = value;
+
+                        DateTime? repeatingEndDay;
+                        if (value) {
+                          repeatingEndDay = eventDetailState.endDate!;
+                          if (repeatingEndDay.hour > 0
+                              || repeatingEndDay.minute > 0) {
+                            repeatingEndDay = CalendarUtils().trimDay(
+                                repeatingEndDay).add(const Duration(days: 1));
+                          }
+                        }
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.repeatingEndDay,
+                        value: repeatingEndDay);
+                        eventDetailNotifier.updateState();
+                      },
+                    ),
+                    if (eventDetailState.repeatingEnd!)
+                      SizedBox(
+                          width: 120, height: 36,
+                          child: CWTextField(
+                            controller: eventDetailState.textEditingControllers!
+                            [TextFieldItem.repeatingEndDay]!,
+                            fontSize: 15,
+                            textAlign: TextAlign.center,
+                            paddingAll: 6,
+                            readOnly: true,
+                            highlight: eventDetailState.highlightItem
+                                == HighlightItem.repeatEndDay,
+                            onTap: () async {
+                              await eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.repeatEndDay);
+                              await safeAreaViewNotifier.setSafeAreaAdjustment(5
+                                  + 8);
+                              await safeAreaViewNotifier.setSafeAreaHeight(215);
+                              await safeAreaViewNotifier.updateState();
+                              await showBottomArea(repeatingEndDayPicker);
+                              await eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.none);
+                            },
+                          )
+                      ),
+                  ])
+              ),
+
+
+
             ]
         )
     );
