@@ -267,7 +267,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               const SizedBox(height: 500),
 
               CWLeftTitle(
-                  title: 'タイトル',
+                  title: 'タイト\nル',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   child: CWTextField(
@@ -552,8 +552,60 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   ])
               ),
 
+              CWLeftTitle(
+                  title: 'メモ',
+                  highlight: eventDetailState.highlightItem
+                      == HighlightItem.memo,
+                  child: CWTextField(
+                      controller: eventDetailState.textEditingControllers!
+                      [TextFieldItem.memo]!,
+                      highlight: eventDetailState.highlightItem
+                          == HighlightItem.memo,
+                      maxLines: 6,
+                      onTap: () {
+                        eventDetailNotifier.updateHighlightItem(
+                            HighlightItem.memo);
+                        safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+                      },
+                      onChanged: (text) {
+                        debugPrint('Textの変更検知={$text}');
+                      }
+                  )
+              ),
 
-
+              // 移動する
+              // CWLeftTitle(
+              //     title: 'カレン\nダー',
+              //     // fontSize: 13,
+              //     highlight: eventDetailState.highlightItem
+              //         == HighlightItem.destinationCalendar,
+              //     expanded: false,
+              //     child: Row(children: [
+              //       SizedBox(height: 36, width: 100,
+              //           child: CWTextField(
+              //             controller: eventDetailState.textEditingControllers!
+              //             [TextFieldItem.destinationCalendar]!,
+              //             fontSize: 13,
+              //             textAlign: TextAlign.center,
+              //             paddingAll: 8,
+              //             readOnly: true,
+              //             highlight: eventDetailState.highlightItem
+              //                 == HighlightItem.destinationCalendar,
+              //             onTap: () async {
+              //               await eventDetailNotifier.updateHighlightItem(
+              //                   HighlightItem.destinationCalendar);
+              //               await safeAreaViewNotifier.setSafeAreaAdjustment(5
+              //                   + 8);
+              //               await safeAreaViewNotifier.setSafeAreaHeight(215);
+              //               await safeAreaViewNotifier.updateState();
+              //               await showBottomArea(repeatPicker);
+              //               await eventDetailNotifier.updateHighlightItem(
+              //                   HighlightItem.none);
+              //             },
+              //           )
+              //       )
+              //     ])
+              // ),
             ]
         )
     );

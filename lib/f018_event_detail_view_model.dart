@@ -33,7 +33,8 @@ enum HighlightItem {
   repeatEnd,
   repeatEndDay,
   memo,
-  destinationCalendar
+  // 移動する
+  // destinationCalendar
 }
 
 enum TextFieldItem {
@@ -46,7 +47,8 @@ enum TextFieldItem {
   repeat,
   repeatingEndDay,
   memo,
-  destinationCalendar
+  // 移動する
+  // destinationCalendar
 }
 
 const double firstContentsHeight = 1415;
@@ -141,8 +143,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.memo = '';
     setTextFieldController(TextFieldItem.memo);
 
-    state.calendarId = 'TEST_ID_1';
-    setTextFieldController(TextFieldItem.destinationCalendar);
+    // state.calendarId = 'TEST_ID_1';
+    // setTextFieldController(TextFieldItem.destinationCalendar);
 
     state.highlightItem = HighlightItem.none;
   }
@@ -253,13 +255,14 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
         state.textEditingControllers!
         [TextFieldItem.memo]!.text = state.memo!;
         break;
-      case TextFieldItem.destinationCalendar:
-        if (value != null) {
-          state.calendarId = value as String?;
-        }
-        state.textEditingControllers!
-        [TextFieldItem.destinationCalendar]!.text = state.calendarId!;
-        break;
+      // 移動する
+      // case TextFieldItem.destinationCalendar:
+      //   if (value != null) {
+      //     state.calendarId = value as String?;
+      //   }
+      //   state.textEditingControllers!
+      //   [TextFieldItem.destinationCalendar]!.text = state.calendarId!;
+      //   break;
     }
   }
 
