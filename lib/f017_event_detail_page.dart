@@ -93,6 +93,47 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       }
     });
 
+    Function (bool hasFocus) createOnTextFocusChange(HighlightItem item) {
+      return (bool hasFocus) async {
+        reset() async {
+          await eventDetailNotifier.updateHighlightItem(
+              HighlightItem.none);
+          await safeAreaViewNotifier.downBottomSheet();
+        }
+        if (hasFocus) {
+          await reset();
+          await eventDetailNotifier.updateHighlightItem(item);
+          await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+        } else {
+          // 他のテキストにフォーカス時は動かない
+          await reset();
+        }
+      };
+    }
+
+    Function (bool hasFocus) createOnBottomPopTextFocusChange(
+        HighlightItem item, Widget child) {
+      return (bool hasFocus) async {
+        reset() async {
+          await eventDetailNotifier.updateHighlightItem(
+              HighlightItem.none);
+          await safeAreaViewNotifier.downBottomSheet();
+        }
+        if (hasFocus) {
+          await reset();
+          await eventDetailNotifier.updateHighlightItem(item);
+          await safeAreaViewNotifier.setSafeAreaAdjustment(5
+              + 8);
+          await safeAreaViewNotifier.setSafeAreaHeight(215);
+          await safeAreaViewNotifier.updateState();
+          showBottomArea(child);
+        } else {
+          // 他のテキストにフォーカス時は動かない
+          await reset();
+        }
+      };
+    }
+
     var startDayPicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.startDate,
       mode: CupertinoDatePickerMode.date,
@@ -188,8 +229,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
-                        // Navigator.pop(context);
+                        await safeAreaViewNotifier.downBottomSheet();
 
+                        // Navigator.pop(context);
                         homeNotifier.setUICover(false);
                         homeNotifier.setUICoverWidget(null);
                         homeNotifier.updateState();
@@ -212,6 +254,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
+                        await safeAreaViewNotifier.downBottomSheet();
+
                         var contentsMode = eventDetailState.contentsMode!;
                         switch (contentsMode) {
                           case EventDetailPageContentsMode.simpleInput:
@@ -241,6 +285,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
+                        await safeAreaViewNotifier.downBottomSheet();
+
                         await colorConfigNotifier.switchColorConfig();
                         for (var i=0; i < calendarWidgetNum; i++) {
                           await calendarNotifiers[i].initState();
@@ -264,7 +310,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-              const SizedBox(height: 500),
+              // const SizedBox(height: 500),
 
               CWLeftTitle(
                   title: 'タイト\nル',
@@ -277,12 +323,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
                       maxLines: 2,
-                      onTap: () async {
-                        await safeAreaViewNotifier.downBottomSheet();
-                        await eventDetailNotifier.updateHighlightItem(
-                            HighlightItem.title);
-                        await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
-                      },
+                      onFocusChange: createOnTextFocusChange(HighlightItem
+                          .title),
                       onChanged: (text) {
                         debugPrint('Textの変更検知={$text}');
                       }
@@ -301,13 +343,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         hintText: '場所',
                         highlight: eventDetailState.highlightItem
                             == HighlightItem.place,
-                        onTap: () async {
-                          await safeAreaViewNotifier.downBottomSheet();
-                          await eventDetailNotifier.updateHighlightItem(
-                              HighlightItem.place);
-                          await safeAreaViewNotifier.setSafeAreaAdjustment(8
-                              + 6);
-                        },
+                        onFocusChange: createOnTextFocusChange(HighlightItem
+                            .place),
                         onChanged: (text) {
                           debugPrint('Textの変更検知={$text}');
                         },
@@ -342,7 +379,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.startDay
                     || eventDetailState.highlightItem
-                          == HighlightItem.startHour,
+                          == HighlightItem.startTime,
                   expanded: false,
                   child: Row(children: [
                     SizedBox(
@@ -356,15 +393,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           readOnly: true,
                           highlight: eventDetailState.highlightItem
                               == HighlightItem.startDay,
-                          onTap: () async {
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.startDay);
-                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
-                              + 8);
-                            await safeAreaViewNotifier.setSafeAreaHeight(215);
-                            await safeAreaViewNotifier.updateState();
-                            showBottomArea(startDayPicker);
-                          },
+                          onFocusChange: createOnBottomPopTextFocusChange(
+                              HighlightItem.startDay, startDayPicker)
                         )
                     ),
 
@@ -372,23 +402,16 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       SizedBox(
                         width: 60, height: 36,
                         child: CWTextField(
-                          controller: eventDetailState.textEditingControllers!
-                          [TextFieldItem.startTime]!,
-                          fontSize: 15,
-                          textAlign: TextAlign.center,
-                          paddingAll: 6,
-                          readOnly: true,
-                          highlight: eventDetailState.highlightItem
-                              == HighlightItem.startHour,
-                          onTap: () async {
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.startHour);
-                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
-                              + 8);
-                            await safeAreaViewNotifier.setSafeAreaHeight(216);
-                            await safeAreaViewNotifier.updateState();
-                            showBottomArea(startTimePicker);
-                          }
+                            controller: eventDetailState.textEditingControllers!
+                            [TextFieldItem.startTime]!,
+                            fontSize: 15,
+                            textAlign: TextAlign.center,
+                            paddingAll: 6,
+                            readOnly: true,
+                            highlight: eventDetailState.highlightItem
+                                == HighlightItem.startTime,
+                            onFocusChange: createOnBottomPopTextFocusChange(
+                                HighlightItem.startTime, startTimePicker)
                         )
                     ),
                   ])
@@ -400,29 +423,23 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     highlight: eventDetailState.highlightItem
                         == HighlightItem.endDay
                         || eventDetailState.highlightItem
-                            == HighlightItem.endHour,
+                            == HighlightItem.endTime,
                     expanded: false,
                     child: Row(children: [
                       SizedBox(
                           width: 120, height: 36,
                           child: CWTextField(
-                            controller: eventDetailState.textEditingControllers!
-                            [TextFieldItem.endDay]!,
-                            fontSize: 15,
-                            textAlign: TextAlign.center,
-                            paddingAll: 6,
-                            readOnly: true,
-                            highlight: eventDetailState.highlightItem
-                                == HighlightItem.endDay,
-                            onTap: () async {
-                              await eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.endDay);
-                              await safeAreaViewNotifier.setSafeAreaAdjustment(5
-                                  + 8);
-                              await safeAreaViewNotifier.setSafeAreaHeight(215);
-                              await safeAreaViewNotifier.updateState();
-                              showBottomArea(endDayPicker);
-                            },
+                              controller: eventDetailState
+                                  .textEditingControllers!
+                              [TextFieldItem.endDay]!,
+                              fontSize: 15,
+                              textAlign: TextAlign.center,
+                              paddingAll: 6,
+                              readOnly: true,
+                              highlight: eventDetailState.highlightItem
+                                  == HighlightItem.endDay,
+                              onFocusChange: createOnBottomPopTextFocusChange(
+                                  HighlightItem.endDay, endDayPicker)
                           )
                       ),
 
@@ -438,17 +455,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                 paddingAll: 6,
                                 readOnly: true,
                                 highlight: eventDetailState.highlightItem
-                                    == HighlightItem.endHour,
-                                onTap: () async {
-                                  await eventDetailNotifier.updateHighlightItem(
-                                      HighlightItem.endHour);
-                                  await safeAreaViewNotifier
-                                      .setSafeAreaAdjustment(5 + 8);
-                                  await safeAreaViewNotifier.setSafeAreaHeight(
-                                      216);
-                                  await safeAreaViewNotifier.updateState();
-                                  showBottomArea(endTimePicker);
-                                }
+                                    == HighlightItem.endTime,
+                                onFocusChange: createOnBottomPopTextFocusChange(
+                                  HighlightItem.endTime, endTimePicker)
                             )
                         ),
                     ])
@@ -463,23 +472,16 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     SizedBox(
                         width: 65, height: 36,
                         child: CWTextField(
-                          controller: eventDetailState.textEditingControllers!
-                          [TextFieldItem.repeat]!,
-                          fontSize: 13,
-                          textAlign: TextAlign.center,
-                          paddingAll: 8,
-                          readOnly: true,
-                          highlight: eventDetailState.highlightItem
-                              == HighlightItem.repeat,
-                          onTap: () async {
-                            await eventDetailNotifier.updateHighlightItem(
-                                HighlightItem.repeat);
-                            await safeAreaViewNotifier.setSafeAreaAdjustment(5
-                                + 8);
-                            await safeAreaViewNotifier.setSafeAreaHeight(215);
-                            await safeAreaViewNotifier.updateState();
-                            showBottomArea(repeatPicker);
-                          },
+                            controller: eventDetailState.textEditingControllers!
+                            [TextFieldItem.repeat]!,
+                            fontSize: 14,
+                            textAlign: TextAlign.center,
+                            paddingAll: 8,
+                            readOnly: true,
+                            highlight: eventDetailState.highlightItem
+                                == HighlightItem.repeat,
+                            onFocusChange: createOnBottomPopTextFocusChange(
+                                HighlightItem.repeat, repeatPicker)
                         )
                     )
                   ])
@@ -487,7 +489,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               if (eventDetailState.repeatingPattern != RepeatingPattern.none)
                 CWLeftTitle(
-                  title: '繰返し終了',
+                  title: '繰返し\n終了',
+                  fontSize: 13,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.repeatEnd
                       || eventDetailState.highlightItem
@@ -521,23 +524,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       SizedBox(
                           width: 120, height: 36,
                           child: CWTextField(
-                            controller: eventDetailState.textEditingControllers!
-                            [TextFieldItem.repeatingEndDay]!,
-                            fontSize: 15,
-                            textAlign: TextAlign.center,
-                            paddingAll: 6,
-                            readOnly: true,
-                            highlight: eventDetailState.highlightItem
-                                == HighlightItem.repeatEndDay,
-                            onTap: () async {
-                              await eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.repeatEndDay);
-                              await safeAreaViewNotifier.setSafeAreaAdjustment(5
-                                  + 8);
-                              await safeAreaViewNotifier.setSafeAreaHeight(215);
-                              await safeAreaViewNotifier.updateState();
-                              showBottomArea(repeatingEndDayPicker);
-                            },
+                              controller: eventDetailState
+                                  .textEditingControllers!
+                              [TextFieldItem.repeatingEndDay]!,
+                              textAlign: TextAlign.center,
+                              paddingAll: 6,
+                              readOnly: true,
+                              highlight: eventDetailState.highlightItem
+                                  == HighlightItem.repeatEndDay,
+                              onFocusChange: createOnBottomPopTextFocusChange(
+                                  HighlightItem.repeatEndDay,
+                                  repeatingEndDayPicker)
                           )
                       ),
                   ])
@@ -553,12 +550,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.memo,
                       maxLines: 6,
-                      onTap: () async {
-                        await safeAreaViewNotifier.downBottomSheet();
-                        await eventDetailNotifier.updateHighlightItem(
-                            HighlightItem.memo);
-                        await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
-                      },
+                      onFocusChange: createOnTextFocusChange(HighlightItem
+                          .memo),
                       onChanged: (text) {
                         debugPrint('Textの変更検知={$text}');
                       }
@@ -596,6 +589,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //       )
               //     ])
               // ),
+
+
+
             ]
         )
     );

@@ -36,7 +36,7 @@ class CWLeftTitle extends HookConsumerWidget {
   const CWLeftTitle({
     super.key,
     required this.title,
-    this.fontSize = 13,
+    this.fontSize = 15,
     required this.highlight,
     this.verticalPaddingWidth = 6,
     this.rightPaddingWidth = 6,
@@ -61,6 +61,7 @@ class CWLeftTitle extends HookConsumerWidget {
                 child: Text(title, textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: fontSize,
+                        fontWeight: FontWeight.w300,
                         color: !highlight ? colorConfig.normalTextColor
                             : colorConfig.disabledTextColor
                     )
@@ -88,14 +89,14 @@ class CWTextField extends HookConsumerWidget {
   final bool highlight;
   final TextInputType? keyboardType;
   final int maxLines;
-  final GestureTapCallback? onTap;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<bool>? onFocusChange;
 
   const CWTextField({
     super.key,
     required this.controller,
     this.hintText,
-    this.fontSize = 13,
+    this.fontSize = 15,
     this.textAlign = TextAlign.left,
     this.textAlignVertical = TextAlignVertical.center,
     this.paddingAll = 8,
@@ -104,8 +105,8 @@ class CWTextField extends HookConsumerWidget {
     required this.highlight,
     this.keyboardType,
     this.maxLines = 1,
-    this.onTap,
-    this.onChanged
+    this.onChanged,
+    this.onFocusChange
   });
 
   @override
@@ -117,34 +118,38 @@ class CWTextField extends HookConsumerWidget {
           color: Colors.transparent,
           width: 0),
     );
-    return TextField(
-        controller: controller,
-        style: TextStyle(
-          fontSize: fontSize, color: colorConfig.normalTextColor,
-        ),
-        decoration: InputDecoration(
-            isDense: true,
-            contentPadding: EdgeInsets.all(paddingAll),
-            enabledBorder: border,
-            disabledBorder: border,
-            focusedBorder: border,
-            filled: true,
-            fillColor: !highlight ? Colors.transparent
-                : Colors.white38,
-            hintStyle: TextStyle(
-                fontSize: fontSize,
-                color: colorConfig.disabledTextColor,
-            ),
-            hintText: hintText,
-        ),
-        textAlign: textAlign,
-        textAlignVertical: textAlignVertical,
-        keyboardType: keyboardType,
-        maxLines: maxLines,
-        readOnly: readOnly,
-        enabled: enabled,
-        onTap: onTap,
-        onChanged: onChanged
+    return
+      Focus(
+          onFocusChange: onFocusChange,
+          child: TextField(
+              controller: controller,
+              style: TextStyle(
+                fontSize: fontSize, color: colorConfig.normalTextColor,
+              ),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.all(paddingAll),
+                enabledBorder: border,
+                disabledBorder: border,
+                focusedBorder: border,
+                filled: true,
+                fillColor: !highlight ? Colors.transparent
+                    : Colors.white38,
+                hintStyle: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w300,
+                  color: colorConfig.disabledTextColor,
+                ),
+                hintText: hintText,
+              ),
+              textAlign: textAlign,
+              textAlignVertical: textAlignVertical,
+              keyboardType: keyboardType,
+              maxLines: maxLines,
+              readOnly: readOnly,
+              enabled: enabled,
+              onChanged: onChanged
+          )
     );
   }
 }

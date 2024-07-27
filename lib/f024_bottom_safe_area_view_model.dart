@@ -51,7 +51,8 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
 
   downBottomSheet() async {
     if (state.safeAreaHeight > 0) {
-      if (state.bottomSheetContext!.mounted) {
+      if (state.bottomSheetContext != null
+          && state.bottomSheetContext!.mounted) {
         Navigator.pop(state.bottomSheetContext!);
       }
       await setBottomSheetContext(null);
@@ -61,7 +62,7 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
     }
   }
 
-  setBottomSheetContext(BuildContext? context) {
+  setBottomSheetContext(BuildContext? context) async {
     state.bottomSheetContext = context;
   }
 

@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'f015_calendar_utils.dart';
+
 enum EventDetailPageContentsMode {
   simpleInput,
   detailInput;
@@ -26,9 +28,9 @@ enum HighlightItem {
   place,
   allDay,
   startDay,
-  startHour,
+  startTime,
   endDay,
-  endHour,
+  endTime,
   repeat,
   repeatEnd,
   repeatEndDay,
@@ -51,7 +53,7 @@ enum TextFieldItem {
   // destinationCalendar
 }
 
-const double firstContentsHeight = 1415;
+const double firstContentsHeight = 550/* + 1000*/;
 
 class EventDetailPageState {
   // Control
@@ -237,7 +239,9 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
         [TextFieldItem.repeat]!.text = state.repeatingPattern!.name;
         break;
       case TextFieldItem.repeatingEndDay:
-        state.repeatingEndDate = value as DateTime?;
+        if (value != null) {
+          state.repeatingEndDate = value as DateTime?;
+        }
         if (state.repeatingEndDate == null) {
           state.textEditingControllers!
           [TextFieldItem.repeatingEndDay]!.text = '';
@@ -284,6 +288,18 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       state.startDate = endDate.add(const Duration(hours: -1));
       setTextFieldController(TextFieldItem.startDay);
       setTextFieldController(TextFieldItem.startTime);
+    }
+
+    if (state.repeatingEnd == true && (endDate == state.repeatingEndDate
+        || endDate.isAfter(state.repeatingEndDate))) {
+      state.repeatingEndDate = endDate;
+      if (state.repeatingEndDate!.hour > 0
+          || state.repeatingEndDate!.minute > 0) {
+        state.repeatingEndDate = CalendarUtils().trimDay(
+            state.repeatingEndDate!).add(const Duration(days: 1));
+      }
+
+      setTextFieldController(TextFieldItem.repeatingEndDay);
     }
   }
 

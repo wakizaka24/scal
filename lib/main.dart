@@ -90,9 +90,6 @@ class SCalApp extends StatelessWidget {
                 home: GestureDetector(
                     onTap: () async {
                       primaryFocus?.unfocus();
-                      await safeAreaViewNotifier.downBottomSheet();
-                      await eventDetailNotifier.updateHighlightItem(
-                          HighlightItem.none);
                     },
                     child:const HomePage()
                 ),

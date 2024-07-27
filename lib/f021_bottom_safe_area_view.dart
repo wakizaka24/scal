@@ -82,18 +82,19 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         : focusHeight ?? 0;
 
     // キーボードを閉じた場合
-    if (!focusItem && keyboardHeight == 0) {
+    var keyboardDown = !focusItem && keyboardHeight == 0;
+    if (keyboardDown) {
       safeAreaViewNotifier.setSafeAreaAdjustment(0);
     }
 
-    adjustScroll(safeAreaHeight) {
+    adjustScroll(bottomHeight) {
       var offset = safeAreaViewState.keyboardScrollController!.offset;
       // 見切れるスクロールの上限
       var upperLimitOffset = primaryFocusY + primaryOffsetY
           - widget.unsafeAreaTopHeight;
       // キーボードで隠れるのでスクロールの下限
       var lowerLimitOffset = upperLimitOffset
-          - (deviceHeight - widget.unsafeAreaTopHeight - safeAreaHeight
+          - (deviceHeight - widget.unsafeAreaTopHeight - bottomHeight
               - primaryFocusHeight);
 
       // debugPrint('Test=$primaryOffsetY $primaryFocusY $upperLimitOffset'
@@ -168,7 +169,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         controller: safeAreaViewState.keyboardScrollController,
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
-            bottom: keyboardHeight + safeAreaHeight),
+            bottom: safeAreaHeight > 0 ? safeAreaHeight : keyboardHeight),
             child: SizedBox(
                 width: widget.contentsWidth,
                 height: widget.contentsHeight,

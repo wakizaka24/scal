@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const FontWeight appBarTitleFontWeight = FontWeight.w300;
+const FontWeight appBarTitleFontWeight = FontWeight.w400;
 const double selectedBoarderWidth = 2;
 const double eventSelectedBoarderWidth = 2;
 const double normalBoarderWidth = 0.3;
@@ -9,13 +9,13 @@ const double calendarFontSize1 = 13;
 const double calendarFontSize1Down1 = 11.5;
 const FontWeight calendarFontWeight1 = FontWeight.w300;
 const double calendarFontSize2 = 10;
-const FontWeight calendarFontWeight2 = FontWeight.w300;
+const FontWeight calendarFontWeight2 = FontWeight.w400;
 const double eventListFontSize1 = 13.5;
 const FontWeight eventListFontWeight1 = FontWeight.w300;
 const double eventListFontSize2 = 13;
-const FontWeight eventListFontWeight2 = FontWeight.w300;
+const FontWeight eventListFontWeight2 = FontWeight.w400;
 const double eventListFontSize3 = 13;
-const FontWeight eventListFontWeight3 = FontWeight.w300;
+const FontWeight eventListFontWeight3 = FontWeight.w400;
 const double buttonFontSize = 13;
 const FontWeight buttonFontWeight = FontWeight.w300;
 const FontWeight dialogFontWeight = FontWeight.w300;
