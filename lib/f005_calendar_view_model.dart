@@ -1009,7 +1009,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateSelectionDayOfHome() async {
     final homeNotifier = ref.read(homePageNotifierProvider.notifier);
-    await homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
+    if (state.dayLists.length == 3) {
+      await homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
+    }
   }
 
   updateState() async {
@@ -1018,8 +1020,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 }
 
-final calendarPageNotifierProvider = StateNotifierProvider.family
-    .autoDispose<CalendarPageNotifier, CalendarPageState, int>((ref, index) {
-  var list = List.filled(calendarWidgetNum, CalendarPageState());
-  return CalendarPageNotifier(ref, list[index]);
+final calendarPageNotifierProvider = StateNotifierProvider
+    .autoDispose<CalendarPageNotifier, CalendarPageState>((ref) {
+  return CalendarPageNotifier(ref, CalendarPageState());
 });

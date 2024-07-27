@@ -17,8 +17,6 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
 
 // アプリバーの高さ
 const double appBarHeight = 39;
-// カレンダーウィジェットの数
-const calendarWidgetNum = 3;
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -33,15 +31,10 @@ class HomePage extends HookConsumerWidget {
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
+
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
-    List<CalendarPageNotifier> calendarNotifiers = [];
-    for (int i=0; i < calendarWidgetNum; i++) {
-      calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
-          .notifier));
-    }
-
-    final calendarNotifier = calendarNotifiers[homeState.homePageIndex];
 
     // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
@@ -69,24 +62,13 @@ class HomePage extends HookConsumerWidget {
     // 画面の幅
     double deviceWidth = MediaQuery.of(context).size.width;
     // 画面の高さ
-    double deviceHeight = MediaQuery.of(context).size.height;
+    // double deviceHeight = MediaQuery.of(context).size.height;
 
     useEffect(() {
       debugPrint('parent useEffect');
 
-      homeState.homePageController.addListener(() async {
-        double offset = homeState.homePageController.offset;
-        double contentHeight = deviceHeight - appBarHeight
-            - unsafeAreaTopHeight;
-        var index = (offset / contentHeight).round();
-        if (index != homeState.homePageIndex) {
-          homeState.homePageIndex = index;
-          await homeNotifier.setHomePageIndex(index);
-          final calendarNotifier = ref.watch(calendarPageNotifierProvider(
-              homeState.homePageIndex).notifier);
-          calendarNotifier.updateSelectionDayOfHome();
-        }
-      });
+      final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
+      calendarNotifier.updateSelectionDayOfHome();
 
       return () {
         // Pageの解放処理
@@ -113,11 +95,8 @@ class HomePage extends HookConsumerWidget {
         final Brightness brightness = MediaQuery.platformBrightnessOf(
             context);
         if (colorConfigNotifier.applyColorConfig(brightness)) {
-          for (var i = 0; i < calendarWidgetNum; i++) {
-            await calendarNotifiers[i].initState();
-            await calendarNotifiers[i].updateCalendar(
-                dataExclusion: true);
-          }
+          await calendarNotifier.initState();
+          await calendarNotifier.updateCalendar(dataExclusion: true);
           await colorConfigNotifier.updateState();
         }
       });
@@ -163,11 +142,8 @@ class HomePage extends HookConsumerWidget {
                 child: TextButton(
                   onPressed: () async {
                     await colorConfigNotifier.switchColorConfig();
-                    for (var i=0; i < calendarWidgetNum; i++) {
-                      await calendarNotifiers[i].initState();
-                      await calendarNotifiers[i].updateCalendar(
-                          dataExclusion: true);
-                    }
+                    await calendarNotifier.initState();
+                    await calendarNotifier.updateCalendar(dataExclusion: true);
                     await colorConfigNotifier.updateState();
                   },
                   style: TextButton.styleFrom(
@@ -226,22 +202,8 @@ class HomePage extends HookConsumerWidget {
           SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
               + appBarHeight
           ),
-          Expanded(
-              child: PageView(
-                controller: homeState.homePageController,
-                // physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical, // 縦
-                pageSnapping: true, // ページごとにスクロールを止める
-                onPageChanged: (index) {
-                },
-                children: <Widget>[
-                  for (var i=0; i < calendarWidgetNum; i++) ... {
-                    CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
-                        unsafeAreaBottomHeight: unsafeAreaBottomHeight,
-                        pageIndex: i),
-                  }
-                ],
-              )
+          Expanded(child: CalendarPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
+              unsafeAreaBottomHeight: unsafeAreaBottomHeight)
           )
         ]
     );
@@ -278,9 +240,7 @@ class HomePage extends HookConsumerWidget {
         },
         child: Consumer(
             builder: ((context, ref, child) {
-              final homeState = ref.watch(homePageNotifierProvider);
-              final calendarState = ref.watch(calendarPageNotifierProvider(
-                  homeState.homePageIndex));
+              final calendarState = ref.watch(calendarPageNotifierProvider);
               return Icon(calendarState.cellActive
                   ? Icons.add : Icons.add_circle_outline,
                   color: Colors.white);

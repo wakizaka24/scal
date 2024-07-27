@@ -5,7 +5,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f013_ui_utils.dart';
 
-import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f015_calendar_utils.dart';
@@ -40,11 +39,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
     final colorConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
-    List<CalendarPageNotifier> calendarNotifiers = [];
-    for (int i=0; i < calendarWidgetNum; i++) {
-      calendarNotifiers.add(ref.watch(calendarPageNotifierProvider(i)
-          .notifier));
-    }
+
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider
+        .notifier);
 
     final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
         .notifier);
@@ -295,11 +292,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         await onCommonPressed();
 
                         await colorConfigNotifier.switchColorConfig();
-                        for (var i=0; i < calendarWidgetNum; i++) {
-                          await calendarNotifiers[i].initState();
-                          await calendarNotifiers[i].updateCalendar(
-                              dataExclusion: true);
-                        }
+                        await calendarNotifier.initState();
+                        await calendarNotifier.updateCalendar(
+                            dataExclusion: true);
                         await colorConfigNotifier.updateState();
                       },
                       style: TextButton.styleFrom(

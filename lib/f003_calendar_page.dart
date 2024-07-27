@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
-import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
 import 'f015_calendar_utils.dart';
@@ -13,12 +12,10 @@ import 'f016_design.dart';
 class CalendarPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
   final double unsafeAreaBottomHeight;
-  final int pageIndex;
 
   const CalendarPage({super.key,
     required this.unsafeAreaTopHeight,
-    required this.unsafeAreaBottomHeight,
-    required this.pageIndex});
+    required this.unsafeAreaBottomHeight});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
@@ -32,11 +29,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final homeState = ref.watch(homePageNotifierProvider);
-    final calendarState = ref.watch(calendarPageNotifierProvider(
-        widget.pageIndex));
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
-        widget.pageIndex).notifier);
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider
+        .notifier);
     final designConfigState = ref.watch(designConfigNotifierProvider);
 
     // Month Calendar/Week Calendar
@@ -107,7 +102,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 
     var dayAndWeekdayListPart = DayAndWeekdayListPart(
         hoursPartRowNum: CalendarPageState.hoursPartRowNum,
-        pageIndex: widget.pageIndex,
         hourPartWidth: dayAndWeekdayListPartWidth,
         hourPartHeight: hourPartHeight,
         dayAndWeekdayList: calendarState.dayAndWeekdayList);
@@ -122,7 +116,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     var hoursPart = HoursPart(
         hoursPartColNum: hoursPartCowNum,
         hoursPartRowNum: hoursPartRowNum,
-        pageIndex: widget.pageIndex,
         hourPartWidth: hourPartWidth,
         hourPartHeight: hourPartHeight,
         onPointerDown: (int pageIndex) async {},
@@ -159,14 +152,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                     unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
                     monthPartHeight: monthPartHeight,
                     weekdayPartWidth: weekdayPartWidth,
-                    weekdayPartHeight: weekdayPartHeight,
-                    pageIndex: widget.pageIndex), weekCalendar]
+                    weekdayPartHeight: weekdayPartHeight), weekCalendar]
             )
         ),
         AspectRatio(
             aspectRatio: eventListAspectRate,
-            child: EventListPart(pageIndex: widget.pageIndex,
-                unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight)
+            child: EventListPart(unsafeAreaBottomHeight:
+            widget.unsafeAreaBottomHeight)
         )
       ]),
       Column(children: [
@@ -174,8 +166,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         Row(children:[const Spacer(),
           ElevatedButton(
               onPressed: () async {
-                final calendarState = ref.watch(
-                    calendarPageNotifierProvider(homeState.homePageIndex));
+                final calendarState = ref.watch(calendarPageNotifierProvider);
                 double prePage = calendarState.calendarSwitchingController
                     .page!;
 
@@ -222,15 +213,12 @@ class MonthCalendarPage extends StatefulHookConsumerWidget {
   final double weekdayPartWidth;
   final double weekdayPartHeight;
 
-  final int pageIndex;
-
   const MonthCalendarPage({super.key,
     required this.unsafeAreaTopHeight,
     required this.unsafeAreaBottomHeight,
     required this.monthPartHeight,
     required this.weekdayPartWidth,
-    required this.weekdayPartHeight,
-    required this.pageIndex});
+    required this.weekdayPartHeight});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
@@ -247,10 +235,8 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final calendarState = ref.watch(calendarPageNotifierProvider(
-        widget.pageIndex));
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
-        widget.pageIndex).notifier);
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     // Month Calendar
     // for (int i = 0; i < 3; i++) {
@@ -258,7 +244,6 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
     // }
 
     monthPartList = calendarState.dayLists.map((dayList) => MonthPart(
-      pageIndex: widget.pageIndex,
       monthPartHeight: widget.monthPartHeight,
       weekdayPartColumnNum: CalendarPageState.weekdayPartColNum,
       weekdayPartWidth: widget.weekdayPartWidth,
@@ -416,7 +401,6 @@ class SelectableCalendarCell extends HookConsumerWidget {
 // Month Calendar
 
 class MonthPart extends HookConsumerWidget {
-  final int pageIndex;
   final double monthPartHeight;
   final int weekdayPartColumnNum;
   final double weekdayPartWidth;
@@ -427,7 +411,6 @@ class MonthPart extends HookConsumerWidget {
 
   const MonthPart({
     super.key,
-    required this.pageIndex,
     required this.monthPartHeight,
     required this.weekdayPartColumnNum,
     required this.weekdayPartWidth,
@@ -439,9 +422,8 @@ class MonthPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
-        .notifier);
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     // 日部分の行数
     int dayPartRowNum = (dayList.length / calendarState.weekdayList
@@ -635,20 +617,17 @@ class DayPart extends HookConsumerWidget {
 // Event List
 
 class EventListPart extends HookConsumerWidget {
-  final int pageIndex;
   final double unsafeAreaBottomHeight;
 
   const EventListPart({
     super.key,
-    required this.pageIndex,
     required this.unsafeAreaBottomHeight,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
-        .notifier);
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
     return Column(
@@ -679,7 +658,6 @@ class EventListPart extends HookConsumerWidget {
                 children: [
                   if (calendarState.eventList.isEmpty)
                     EventPart(
-                      pageIndex: pageIndex,
                       height: 45,
                       index: 0,
                       isHighlighted: calendarState.eventListIndex == 0,
@@ -695,7 +673,6 @@ class EventListPart extends HookConsumerWidget {
                     ),
                   for (int i=0; i < calendarState.eventList.length; i++) ... {
                     EventPart(
-                      pageIndex: pageIndex,
                       height: 45,
                       index: i,
                       isHighlighted: calendarState.eventListIndex == i,
@@ -720,7 +697,6 @@ class EventListPart extends HookConsumerWidget {
 }
 
 class EventPart extends HookConsumerWidget {
-  final int pageIndex;
   final double height;
   final int index;
   final bool isHighlighted;
@@ -733,7 +709,6 @@ class EventPart extends HookConsumerWidget {
   final EventDisplay? event;
 
   const EventPart({super.key,
-    required this.pageIndex,
     required this.height,
     required this.index,
     required this.isHighlighted,
@@ -748,8 +723,7 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(pageIndex)
-        .notifier);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
     return SelectableCalendarCell(
@@ -979,7 +953,6 @@ class EventPart extends HookConsumerWidget {
 // Week Calendar
 
 class DayAndWeekdayListPart extends HookConsumerWidget {
-  final int pageIndex;
   final int hoursPartRowNum;
   final double hourPartWidth;
   final double hourPartHeight;
@@ -987,7 +960,6 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 
   const DayAndWeekdayListPart({
     super.key,
-    required this.pageIndex,
     required this.hoursPartRowNum,
     required this.hourPartWidth,
     required this.hourPartHeight,
@@ -996,7 +968,7 @@ class DayAndWeekdayListPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarState = ref.watch(calendarPageNotifierProvider(pageIndex));
+    final calendarState = ref.watch(calendarPageNotifierProvider);
     return Column(children: [
       for (int rowIndex = 0; rowIndex < hoursPartRowNum; rowIndex++) ... {
         DayAndWeekdayPart(
@@ -1085,7 +1057,6 @@ class DayAndWeekdayPart extends HookConsumerWidget {
 class HoursPart extends HookConsumerWidget {
   final int hoursPartColNum;
   final int hoursPartRowNum;
-  final int pageIndex;
   final double hourPartWidth;
   final double hourPartHeight;
   final void Function(int) onPointerDown;
@@ -1096,7 +1067,6 @@ class HoursPart extends HookConsumerWidget {
     super.key,
     required this.hourPartWidth,
     required this.hourPartHeight,
-    required this.pageIndex,
     required this.hoursPartColNum,
     required this.hoursPartRowNum,
     required this.onPointerDown,
@@ -1106,10 +1076,8 @@ class HoursPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarState = ref.watch(calendarPageNotifierProvider(
-        pageIndex));
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider(
-        pageIndex).notifier);
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     return Row(children: [
       for (int colIndex = 0; colIndex < hoursPartColNum; colIndex++) ... {

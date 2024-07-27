@@ -3,11 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class HomePageState {
-  // Control
-  PageController homePageController = PageController(initialPage: 0);
-
   // Data
-  int homePageIndex = 0;
   String appBarTitle = '';
   bool uICover = false;
   Widget? uICoverWidget;
@@ -15,11 +11,7 @@ class HomePageState {
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
 
-    // Control
-    nState.homePageController = state.homePageController;
-
     // Data
-    nState.homePageIndex = state.homePageIndex;
     nState.appBarTitle = state.appBarTitle;
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
@@ -36,14 +28,7 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   initState() async {
   }
 
-  @override
-  dispose() {
-    state.homePageController.dispose();
-    super.dispose();
-  }
-
   setHomePageIndex(int index) async {
-    state.homePageIndex = index;
     updateState();
   }
 
