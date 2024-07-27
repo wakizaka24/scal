@@ -4,11 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'f015_calendar_utils.dart';
 
-enum EventDetailPageContentsMode {
-  simpleInput,
-  detailInput;
-}
-
 enum RepeatingPattern {
   none('なし'),
   daily('毎日'),
@@ -53,15 +48,12 @@ enum TextFieldItem {
   // destinationCalendar
 }
 
-const double firstContentsHeight = 550/* + 1000*/;
-
 class EventDetailPageState {
   // Control
   GlobalKey? contentsKey;
   Map<TextFieldItem, TextEditingController>? textEditingControllers;
 
   // Data
-  EventDetailPageContentsMode? contentsMode;
   double? contentsHeight;
 
   String? title;
@@ -82,7 +74,6 @@ class EventDetailPageState {
     nState.contentsKey = state.contentsKey;
     nState.textEditingControllers = state.textEditingControllers;
 
-    nState.contentsMode = state.contentsMode;
     nState.contentsHeight = state.contentsHeight;
 
     nState.title = state.title;
@@ -121,7 +112,6 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     })();
 
     // Data
-    state.contentsMode = EventDetailPageContentsMode.detailInput;
     state.contentsHeight = await getContentsHeight();
 
     state.title = '';
@@ -164,19 +154,18 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     await updateState();
   }
 
-  setContentsMode(EventDetailPageContentsMode contentsMode) async {
-    state.contentsMode = contentsMode;
-    state.contentsHeight = await getContentsHeight();
-    updateState();
-  }
-
   Future<double> getContentsHeight() async {
-    switch (state.contentsMode!) {
-      case EventDetailPageContentsMode.simpleInput:
-        return 776 + 500;
-      case EventDetailPageContentsMode.detailInput:
-        return firstContentsHeight;
+    double baseHeight = 598;
+
+    if (state.allDay!) {
+      baseHeight -= 48;
     }
+
+    if (state.repeatingEnd!) {
+      baseHeight += 49;
+    }
+
+    return baseHeight;
   }
 
   setTextFieldController<T>(TextFieldItem item, {T? value}) async {

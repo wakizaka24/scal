@@ -3,6 +3,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f016_design.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'f025_common_widgets.dart';
+
 enum EndDrawerMenuType {
   softwareLicense(title: 'ソフトウェアライセンス');
 
@@ -26,7 +28,8 @@ class EndDrawer extends HookConsumerWidget {
       // physics: const NeverScrollableScrollPhysics(),
       children: [
         for (int i=0; i < EndDrawerMenuType.values.length; i++) ... {
-          TextButton(
+          CWTextButton(
+            title: 'ソフトウェアライセンス',
             onPressed: () async {
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
               if (!context.mounted) return;
@@ -37,13 +40,7 @@ class EndDrawer extends HookConsumerWidget {
                   )
                 )
               );
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: normalTextColor,
-              textStyle: const TextStyle(fontSize: 15),
-              padding: const EdgeInsets.all(0),
-            ),
-            child: const Text('ソフトウェアライセンス'),
+            }
           )
         }
       ],

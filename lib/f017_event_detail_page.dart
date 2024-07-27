@@ -229,86 +229,51 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         child: Column(
             children: [
               Row(children: [
-                SizedBox(width: closingButtonWidth,
-                    height: closingButtonWidth,
-                    child: TextButton(
-                      onPressed: () async {
-                        await onCommonPressed();
+                CWIconButton(
+                  icon: Icons.check,
+                  width: closingButtonWidth,
+                  height: closingButtonWidth,
+                  radius: closingButtonWidth / 2,
+                  foregroundColor: normalTextColor,
+                  onPressed: () async {
+                    await onCommonPressed();
 
-                        // Navigator.pop(context);
-                        homeNotifier.setUICover(false);
-                        homeNotifier.setUICoverWidget(null);
-                        homeNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: normalTextColor,
-                        textStyle: const TextStyle(fontSize: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              closingButtonWidth / 2),
-                        ),
-                        padding: const EdgeInsets.all(0),
-                      ),
-                      child: Icon(Icons.check,
-                          color: normalTextColor),
-                    )
+                    // Navigator.pop(context);
+                    homeNotifier.setUICover(false);
+                    homeNotifier.setUICoverWidget(null);
+                    homeNotifier.updateState();
+                  },
                 ),
+
                 const Spacer(),
-                SizedBox(width: closingButtonWidth,
-                    height: closingButtonWidth,
-                    child: TextButton(
-                      onPressed: () async {
-                        await onCommonPressed();
 
-                        var contentsMode = eventDetailState.contentsMode!;
-                        switch (contentsMode) {
-                          case EventDetailPageContentsMode.simpleInput:
-                            contentsMode = EventDetailPageContentsMode
-                                .detailInput;
-                          case EventDetailPageContentsMode.detailInput:
-                            contentsMode = EventDetailPageContentsMode
-                                .simpleInput;
-                        }
+                CWIconButton(
+                  icon: Icons.check,
+                  width: closingButtonWidth,
+                  height: closingButtonWidth,
+                  radius: closingButtonWidth / 2,
+                  foregroundColor: normalTextColor,
+                  onPressed: () async {
+                    await onCommonPressed();
 
-                        await eventDetailNotifier.setContentsMode(contentsMode);
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: normalTextColor,
-                        textStyle: const TextStyle(fontSize: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              closingButtonWidth / 2),
-                        ),
-                        padding: const EdgeInsets.all(0),
-                      ),
-                      child: Icon(Icons.check,
-                          color: normalTextColor),
-                    )
+                  },
                 ),
-                SizedBox(width: closingButtonWidth,
-                    height: closingButtonWidth,
-                    child: TextButton(
-                      onPressed: () async {
-                        await onCommonPressed();
 
-                        await colorConfigNotifier.switchColorConfig();
-                        await calendarNotifier.initState();
-                        await calendarNotifier.updateCalendar(
-                            dataExclusion: true);
-                        await colorConfigNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: normalTextColor,
-                        textStyle: const TextStyle(fontSize: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              closingButtonWidth / 2),
-                        ),
-                        padding: const EdgeInsets.all(0),
-                      ),
-                      child: Icon(Icons.check,
-                          color: normalTextColor),
-                    )
+                CWIconButton(
+                  icon: Icons.check,
+                  width: closingButtonWidth,
+                  height: closingButtonWidth,
+                  radius: closingButtonWidth / 2,
+                  foregroundColor: normalTextColor,
+                  onPressed: () async {
+                    await onCommonPressed();
+
+                    await colorConfigNotifier.switchColorConfig();
+                    await calendarNotifier.initState();
+                    await calendarNotifier.updateCalendar(
+                        dataExclusion: true);
+                    await colorConfigNotifier.updateState();
+                  },
                 ),
               ]),
 
@@ -316,7 +281,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: 'タイト\nル',
-                  fontSize: 14,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   child: CWTextField(
@@ -366,13 +330,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     onChanged: (value) {
                       eventDetailState.highlightItem = HighlightItem.allDay;
                       eventDetailState.allDay = value;
-                      if (!eventDetailState.allDay!) {
-                        eventDetailNotifier.setContentsMode(
-                            EventDetailPageContentsMode.detailInput);
-                      } else {
-                        eventDetailNotifier.setContentsMode(
-                            EventDetailPageContentsMode.simpleInput);
-                      }
+                      eventDetailNotifier.updateState();
                     },
                   )
               ),
@@ -468,7 +426,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: '繰返し',
-                  fontSize: 14,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.repeat,
                   expanded: false,
@@ -594,8 +551,27 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //     ])
               // ),
 
+              CWElevatedButton(
+                  title: '保存する',
+                  fixedWidth: 120,
+                  fixedHeight: 48,
+                  fontSize: 15,
+                  backgroundColor: colorConfig.backgroundColor,
+                  onPressed: () async {
+                    await onCommonPressed();
 
-
+                    final calendarState = ref.watch(calendarPageNotifierProvider);
+                    double prePage = calendarState.calendarSwitchingController
+                        .page!;
+                    int page = prePage.toInt();
+                    if (page.toDouble() == prePage) {
+                      page = page == 0 ? 1: 0;
+                      await calendarState.calendarSwitchingController
+                          .animateToPage(page, duration: const Duration(
+                          milliseconds: 300), curve: Curves.easeIn);
+                    }
+                  }
+              )
             ]
         )
     );

@@ -11,6 +11,7 @@ import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
+import 'f025_common_widgets.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
   = GlobalKey<ScaffoldState>();
@@ -138,58 +139,41 @@ class HomePage extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             const Spacer(),
-            SizedBox(width: appBarHeight, height: appBarHeight,
-                child: TextButton(
-                  onPressed: () async {
-                    await colorConfigNotifier.switchColorConfig();
-                    await calendarNotifier.initState();
-                    await calendarNotifier.updateCalendar(dataExclusion: true);
-                    await colorConfigNotifier.updateState();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(fontSize: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(appBarHeight / 2),
-                    ),
-                    padding: const EdgeInsets.all(0),
-                  ),
-                  child: const Icon(Icons.check),
-                )
+
+            CWIconButton(
+              icon: Icons.check,
+              width: appBarHeight,
+              height: appBarHeight,
+              radius: appBarHeight / 2,
+              onPressed: () async {
+                await colorConfigNotifier.switchColorConfig();
+                await calendarNotifier.initState();
+                await calendarNotifier.updateCalendar(dataExclusion: true);
+                await colorConfigNotifier.updateState();
+              },
             ),
-            SizedBox(width: appBarHeight, height: appBarHeight,
-                child: TextButton(
-                  onPressed: () async {
-                    await calendarNotifier.onTapTodayButton();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(fontSize: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(appBarHeight / 2),
-                    ),
-                    padding: const EdgeInsets.all(0),
-                  ),
-                  child: const Icon(Icons.check),
-                )
+
+            CWIconButton(
+              icon: Icons.check,
+              width: appBarHeight,
+              height: appBarHeight,
+              radius: appBarHeight / 2,
+              onPressed: () async {
+                await calendarNotifier.onTapTodayButton();
+              },
             ),
-            SizedBox(width: appBarHeight, height: appBarHeight,
-                child: TextButton(
-                  onPressed: () async {
-                    homePageScaffoldKey.currentState!
-                        .openEndDrawer();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(fontSize: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(appBarHeight / 2),
-                    ),
-                    padding: const EdgeInsets.all(0),
-                  ),
-                  child: const Icon(Icons.check),
-                )
+
+            CWIconButton(
+              icon: Icons.check,
+              width: appBarHeight,
+              height: appBarHeight,
+              radius: appBarHeight / 2,
+              onPressed: () async {
+                homePageScaffoldKey.currentState!
+                    .openEndDrawer();
+              },
             ),
+
             Container(width: 8)
           ],
         ),
@@ -266,17 +250,15 @@ class HomePage extends HookConsumerWidget {
             ])
           ]
       ),
-      Column(
-          children: [
-            const Spacer(),
-            Row(children: [
-              const Spacer(),
-              floatingActionButton,
-              Container(width: 10)
-            ]),
-            SizedBox(width: deviceWidth, height: unsafeAreaBottomHeight)
-          ]
-      ),
+      Column(children: [
+        const Spacer(),
+        Row(children: [
+          const Spacer(),
+          floatingActionButton,
+          Container(width: 10)
+        ]),
+        SizedBox(width: deviceWidth, height: unsafeAreaBottomHeight)
+      ]),
       if (homeState.uICover)
         Container(color: Colors.black.withAlpha(100)),
       if (homeState.uICoverWidget != null)

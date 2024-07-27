@@ -2,6 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f016_design.dart';
 
+// class CWx extends HookConsumerWidget {
+//   final String title;
+//
+//   const CWx({
+//     super.key,
+//     required this.title,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return Container();
+//   }
+// }
+
 // class CWPadding extends HookConsumerWidget {
 //   final Widget child;
 //   final EdgeInsetsGeometry padding;
@@ -118,38 +132,146 @@ class CWTextField extends HookConsumerWidget {
           color: Colors.transparent,
           width: 0),
     );
-    return
-      Focus(
-          onFocusChange: onFocusChange,
-          child: TextField(
-              controller: controller,
-              style: TextStyle(
-                fontSize: fontSize, color: colorConfig.normalTextColor,
+    return Focus(
+        onFocusChange: onFocusChange,
+        child: TextField(
+            controller: controller,
+            style: TextStyle(
+              fontSize: fontSize, color: colorConfig.normalTextColor,
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.all(paddingAll),
+              enabledBorder: border,
+              disabledBorder: border,
+              focusedBorder: border,
+              filled: true,
+              fillColor: !highlight ? Colors.transparent
+                  : Colors.white38,
+              hintStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w300,
+                color: colorConfig.disabledTextColor,
               ),
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.all(paddingAll),
-                enabledBorder: border,
-                disabledBorder: border,
-                focusedBorder: border,
-                filled: true,
-                fillColor: !highlight ? Colors.transparent
-                    : Colors.white38,
-                hintStyle: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w300,
-                  color: colorConfig.disabledTextColor,
-                ),
-                hintText: hintText,
-              ),
-              textAlign: textAlign,
-              textAlignVertical: textAlignVertical,
-              keyboardType: keyboardType,
-              maxLines: maxLines,
-              readOnly: readOnly,
-              enabled: enabled,
-              onChanged: onChanged
-          )
+              hintText: hintText,
+            ),
+            textAlign: textAlign,
+            textAlignVertical: textAlignVertical,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            readOnly: readOnly,
+            enabled: enabled,
+            onChanged: onChanged
+        )
+    );
+  }
+}
+
+//normalTextColor
+class CWIconButton extends HookConsumerWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final double width;
+  final double height;
+  final double radius;
+  final Color foregroundColor;
+
+  const CWIconButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+    this.width = 32,
+    this.height = 32,
+    this.radius = 16,
+    this.foregroundColor = Colors.white
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(width: width, height: height,
+        child: TextButton(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: foregroundColor,
+            textStyle: const TextStyle(fontSize: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius),
+            ),
+            padding: const EdgeInsets.all(0),
+          ),
+          child: const Icon(Icons.check),
+        )
+    );
+  }
+}
+
+class CWElevatedButton extends HookConsumerWidget {
+  final String title;
+  final VoidCallback onPressed;
+  final double fixedWidth;
+  final double fixedHeight;
+  final double fontSize;
+  final Color? backgroundColor;
+
+  const CWElevatedButton({
+    super.key,
+    required this.title,
+    required this.onPressed,
+    this.fixedWidth = 32,
+    this.fixedHeight = 32,
+    this.fontSize = 13,
+    this.backgroundColor
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          fixedSize: Size(fixedWidth, fixedHeight),
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: TextStyle(fontSize: fontSize),
+          padding: const EdgeInsets.all(0),
+        ),
+        child: Text(title,
+            style: TextStyle(
+                fontWeight: buttonFontWeight,
+                color: colorConfig.cardTextColor
+            )
+        )
+    );
+  }
+}
+
+class CWTextButton extends HookConsumerWidget {
+  final String title;
+  final VoidCallback onPressed;
+  final double fontSize;
+
+  const CWTextButton({
+    super.key,
+    required this.title,
+    required this.onPressed,
+    this.fontSize = 15
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final normalTextColor = ref.read(designConfigNotifierProvider)
+        .colorConfig!.normalTextColor;
+
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: normalTextColor,
+        textStyle: TextStyle(fontSize: fontSize),
+        padding: const EdgeInsets.all(0),
+      ),
+      child: Text(title),
     );
   }
 }

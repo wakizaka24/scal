@@ -8,6 +8,7 @@ import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
 import 'f015_calendar_utils.dart';
 import 'f016_design.dart';
+import 'f025_common_widgets.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
   final double unsafeAreaTopHeight;
@@ -163,8 +164,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       ]),
       Column(children: [
         const Spacer(),
-        Row(children:[const Spacer(),
-          ElevatedButton(
+        Row(children:[
+          const Spacer(),
+          CWElevatedButton(
+              title: calendarNotifier.getCalendarSwitchingButtonTitle(),
               onPressed: () async {
                 final calendarState = ref.watch(calendarPageNotifierProvider);
                 double prePage = calendarState.calendarSwitchingController
@@ -177,23 +180,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                       .animateToPage(page, duration: const Duration(
                       milliseconds: 300), curve: Curves.easeIn);
                 }
-              },
-              style: ElevatedButton.styleFrom(
-                fixedSize: const Size(32, 32),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                textStyle: const TextStyle(fontSize: 13),
-                padding: const EdgeInsets.all(0),
-              ),
-              child: Text(calendarNotifier
-                  .getCalendarSwitchingButtonTitle(),
-                  style: TextStyle(
-                      fontWeight: buttonFontWeight,
-                      color: designConfigState.colorConfig!
-                      .cardTextColor
-                  )
-              )
+              }
           ),
           Container(width: 76)
         ]),
