@@ -132,7 +132,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     setTextFieldController(TextFieldItem.startDay);
     setTextFieldController(TextFieldItem.startTime);
 
-    state.endDate = DateTime(2025, 5, 31, 8, 31);
+    state.endDate = DateTime(2025, 5, 31, 8, 30);
     setTextFieldController(TextFieldItem.endDay);
     setTextFieldController(TextFieldItem.endTime);
 

@@ -96,8 +96,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     Function (bool hasFocus) createOnTextFocusChange(HighlightItem item) {
       return (bool hasFocus) async {
         reset() async {
-          await eventDetailNotifier.updateHighlightItem(
-              HighlightItem.none);
           await safeAreaViewNotifier.downBottomSheet();
         }
         if (hasFocus) {
@@ -115,15 +113,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         HighlightItem item, Widget child) {
       return (bool hasFocus) async {
         reset() async {
-          await eventDetailNotifier.updateHighlightItem(
-              HighlightItem.none);
           await safeAreaViewNotifier.downBottomSheet();
         }
         if (hasFocus) {
           await reset();
           await eventDetailNotifier.updateHighlightItem(item);
-          await safeAreaViewNotifier.setSafeAreaAdjustment(5
-              + 8);
+          await safeAreaViewNotifier.setSafeAreaAdjustment(5 + 8);
           await safeAreaViewNotifier.setSafeAreaHeight(215);
           await safeAreaViewNotifier.updateState();
           showBottomArea(child);
@@ -132,6 +127,14 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           await reset();
         }
       };
+    }
+
+    onCommonPressed() async {
+      // ハイライト解除
+      await eventDetailNotifier.updateHighlightItem(
+          HighlightItem.none);
+
+      await safeAreaViewNotifier.downBottomSheet();
     }
 
     var startDayPicker = CupertinoDatePicker(
@@ -149,6 +152,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var endDayPicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.endDate,
       mode: CupertinoDatePickerMode.date,
+      minimumYear: minimumYear,
+      maximumYear: maximumYear,
       onDateTimeChanged: (DateTime newDate) {
         eventDetailNotifier.setTextFieldController(TextFieldItem.endDay,
             value: CalendarUtils().copyDay(eventDetailState
@@ -159,6 +164,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var startTimePicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.startDate,
       mode: CupertinoDatePickerMode.time,
+      // 初期値が設定できない値の場合落ちる
+      minuteInterval: 1,
       use24hFormat: true,
       onDateTimeChanged: (DateTime newDate) {
         eventDetailNotifier.setTextFieldController(
@@ -172,8 +179,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var endTimePicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.endDate,
       mode: CupertinoDatePickerMode.time,
-      minimumYear: minimumYear,
-      maximumYear: maximumYear,
+      // 初期値が設定できない値の場合落ちる
+      minuteInterval: 1,
       use24hFormat: true,
       onDateTimeChanged: (DateTime newDate) {
         eventDetailNotifier.setTextFieldController(
@@ -229,7 +236,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
-                        await safeAreaViewNotifier.downBottomSheet();
+                        await onCommonPressed();
 
                         // Navigator.pop(context);
                         homeNotifier.setUICover(false);
@@ -254,7 +261,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
-                        await safeAreaViewNotifier.downBottomSheet();
+                        await onCommonPressed();
 
                         var contentsMode = eventDetailState.contentsMode!;
                         switch (contentsMode) {
@@ -285,7 +292,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     height: closingButtonWidth,
                     child: TextButton(
                       onPressed: () async {
-                        await safeAreaViewNotifier.downBottomSheet();
+                        await onCommonPressed();
 
                         await colorConfigNotifier.switchColorConfig();
                         for (var i=0; i < calendarWidgetNum; i++) {
@@ -314,6 +321,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: 'タイト\nル',
+                  fontSize: 14,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   child: CWTextField(
@@ -325,9 +333,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       maxLines: 2,
                       onFocusChange: createOnTextFocusChange(HighlightItem
                           .title),
-                      onChanged: (text) {
-                        debugPrint('Textの変更検知={$text}');
-                      }
+                      // onChanged: (text) {
+                      //   debugPrint('Textの変更検知={$text}');
+                      // }
                   )
               ),
 
@@ -345,9 +353,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             == HighlightItem.place,
                         onFocusChange: createOnTextFocusChange(HighlightItem
                             .place),
-                        onChanged: (text) {
-                          debugPrint('Textの変更検知={$text}');
-                        },
+                        // onChanged: (text) {
+                        //   debugPrint('Textの変更検知={$text}');
+                        // },
                       )
                   )
               ),
@@ -465,6 +473,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: '繰返し',
+                  fontSize: 14,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.repeat,
                   expanded: false,
@@ -552,9 +561,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
                           .memo),
-                      onChanged: (text) {
-                        debugPrint('Textの変更検知={$text}');
-                      }
+                      // onChanged: (text) {
+                      //   debugPrint('Textの変更検知={$text}');
+                      // }
                   )
               ),
 
