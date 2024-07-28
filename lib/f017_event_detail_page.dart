@@ -127,6 +127,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     onCommonPressed() async {
+      primaryFocus?.unfocus();
+
       // ハイライト解除
       await eventDetailNotifier.updateHighlightItem(
           HighlightItem.none);
@@ -328,8 +330,16 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
                     onChanged: (value) {
+                      primaryFocus?.unfocus();
+
                       eventDetailState.highlightItem = HighlightItem.allDay;
                       eventDetailState.allDay = value;
+                      if (value) {
+                        eventDetailState.startDate = CalendarUtils()
+                            .trimDay(eventDetailState.startDate!);
+                        eventDetailState.endDate = eventDetailState.startDate!
+                            .add(const Duration(days: 1));
+                      }
                       eventDetailNotifier.updateState();
                     },
                   )
@@ -462,6 +472,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     CupertinoSwitch(
                       value: eventDetailState.repeatingEnd!,
                       onChanged: (value) {
+                        primaryFocus?.unfocus();
+
                         eventDetailState.highlightItem = HighlightItem
                             .repeatEnd;
                         eventDetailState.repeatingEnd = value;
@@ -550,6 +562,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //       )
               //     ])
               // ),
+
+              const SizedBox(height: 8),
 
               CWElevatedButton(
                   title: '保存する',

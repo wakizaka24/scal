@@ -155,7 +155,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   }
 
   Future<double> getContentsHeight() async {
-    double baseHeight = 598;
+    double baseHeight = 606;
 
     if (state.allDay == true) {
       baseHeight -= 48;
@@ -263,20 +263,38 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     if (state.endDate == null) {
       return;
     }
-    if (startDate == state.endDate
-      || startDate.isAfter(state.endDate)) {
-      state.endDate = startDate.add(const Duration(hours: 1));
-      setTextFieldController(TextFieldItem.endDay);
-      setTextFieldController(TextFieldItem.endTime);
+    if (!state.allDay!) {
+      if (startDate == state.endDate
+          || startDate.isAfter(state.endDate)) {
+        state.endDate = startDate.add(const Duration(hours: 1));
+        setTextFieldController(TextFieldItem.endDay);
+        setTextFieldController(TextFieldItem.endTime);
+      }
+    } else {
+      var endDate = startDate.add(const Duration(days: 1));
+      if (endDate != state.endDate) {
+        state.endDate = endDate;
+        setTextFieldController(TextFieldItem.endDay);
+        setTextFieldController(TextFieldItem.endTime);
+      }
     }
   }
 
   changeEndDate(endDate) async {
-    if (endDate == state.startDate
-      || endDate.isBefore(state.startDate)) {
-      state.startDate = endDate.add(const Duration(hours: -1));
-      setTextFieldController(TextFieldItem.startDay);
-      setTextFieldController(TextFieldItem.startTime);
+    if (!state.allDay!) {
+      if (endDate == state.startDate
+          || endDate.isBefore(state.startDate)) {
+        state.startDate = endDate.add(const Duration(hours: -1));
+        setTextFieldController(TextFieldItem.startDay);
+        setTextFieldController(TextFieldItem.startTime);
+      }
+    } else {
+      var startDate = endDate.add(const Duration(days: -1));
+      if (startDate != state.startDate) {
+        state.startDate = startDate;
+        setTextFieldController(TextFieldItem.startDay);
+        setTextFieldController(TextFieldItem.startTime);
+      }
     }
 
     if (state.repeatingEnd == true && (endDate == state.repeatingEndDate

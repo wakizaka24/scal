@@ -22,31 +22,64 @@ const FontWeight dialogFontWeight = FontWeight.w300;
 const double eventListBottomSafeArea = 56;
 
 const MaterialColor originalLightPink = MaterialColor(
-    4294948545, // 0xFFFFB6C1
+    _originalLightPinkPrimary,
     {
-        50: Color(0xFFFFF6F8),
-        100: Color(0xFFFFE9EC),
-        200: Color(0xFFFFDBE0),
-        300: Color(0xFFFFCCD4),
-        400: Color(0xFFFFC1CA),
-        500: Color(0xFFFFB6C1), // primary
-        600: Color(0xFFFFAFBB),
-        700: Color(0xFFFFA6B3),
-        800: Color(0xFFFF9EAB),
-        900: Color(0xFFFF8E9E),
-    }
-);
+      50: Color(0xFFFFF6F8),
+      100: Color(0xFFFFE9EC),
+      200: Color(0xFFFFDBE0),
+      300: Color(0xFFFFCCD4),
+      400: Color(0xFFFFC1CA),
+      500: Color(_originalLightPinkPrimary),
+      600: Color(0xFFFFAFBB),
+      700: Color(0xFFFFA6B3),
+      800: Color(0xFFFF9EAB),
+      900: Color(0xFFFF8E9E),
+    });
+const int _originalLightPinkPrimary = 0xFFFFB6C1;
+
+const MaterialColor originalLightBlue = MaterialColor(
+    _originalLightBluePrimary,
+    {
+      50: Color(0xFFF5F8FF),
+      100: Color(0xFFE6EDFF),
+      200: Color(0xFFD5E2FF),
+      300: Color(0xFFC4D6FF),
+      400: Color(0xFFB7CDFF),
+      500: Color(_originalLightBluePrimary),
+      600: Color(0xFFA3BEFF),
+      700: Color(0xFF99B6FF),
+      800: Color(0xFF90AFFF),
+      900: Color(0xFF7FA2FF),
+});
+const int _originalLightBluePrimary = 0xFFAAC4FF;
+
+const MaterialColor originalBrown = MaterialColor(
+    _originalBrownPrimaryValue, <int, Color>{
+      50: Color(0xFFF7F6F5),
+      100: Color(0xFFECE8E6),
+      200: Color(0xFFDFD9D6),
+      300: Color(0xFFD2C9C6),
+      400: Color(0xFFC8BEB9),
+      500: Color(_originalBrownPrimaryValue),
+      600: Color(0xFFB8ABA6),
+      700: Color(0xFFAFA29C),
+      800: Color(0xFFA79993),
+      900: Color(0xFF998A83),
+});
+const int _originalBrownPrimaryValue = 0xFFBEB2AD;
 
 abstract final class BackgroundColors {
     static const Color grey = Color(0xFFD3D3D3);
     static const Color cream = Color(0xFFF3ECD8);
+    static const Color cream3 = Color(0xFFeae1cf);
     static const Color black = Color(0xFF313131);
 }
 
 abstract final class EventListTitleBgColors {
     static const Color gold = Color(0xCCC4B8A5);
     static const Color pink = Color(0xFFFFCCD4);
-    static const Color black = Colors.black54;
+    static const Color indigo = Color(0xFFC4DDFF);
+    static const Color black = Colors.black45;
 }
 
 abstract final class CardColors {
@@ -59,8 +92,8 @@ enum ColorConfig {
     normal052fMaterial3(
         true, // useMaterial3
         Brightness.light, // brightness
-        Colors.indigo, // primarySwatch
-        Colors.indigoAccent, // accentColor
+        originalBrown, // primarySwatch
+        Color(0xFFAFA29C), // accentColor
         BackgroundColors.grey, // backgroundColor
         CardColors.grey, // cardColor
         Colors.black, // normalTextColor
@@ -78,6 +111,18 @@ enum ColorConfig {
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
         EventListTitleBgColors.pink, // eventListTitleBgColor
+        Colors.black // cardTextColor
+    ),
+    normal017fMaterial3(
+        true, // useMaterial3
+        Brightness.light, // brightness
+        originalLightBlue, // primarySwatch
+        Color(0xFF99B6FF), // accentColor
+        BackgroundColors.cream3, // backgroundColor
+        CardColors.cream, // cardColor
+        Colors.black, // normalTextColor
+        Colors.black54, // disabledTextColor
+        EventListTitleBgColors.indigo, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
     dark015fMaterial3(

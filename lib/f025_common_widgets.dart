@@ -71,7 +71,7 @@ class CWLeftTitle extends HookConsumerWidget {
           vertical: verticalPaddingWidth),
           child: Row(children: [
             SizedBox(
-                width: 52,
+                width: 65,
                 child: Text(title, textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: fontSize,
@@ -167,7 +167,6 @@ class CWTextField extends HookConsumerWidget {
   }
 }
 
-//normalTextColor
 class CWIconButton extends HookConsumerWidget {
   final IconData icon;
   final VoidCallback onPressed;
