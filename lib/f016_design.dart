@@ -54,54 +54,71 @@ const MaterialColor originalLightBlue = MaterialColor(
 const int _originalLightBluePrimary = 0xFFAAC4FF;
 
 const MaterialColor originalBrown = MaterialColor(
-    _originalBrownPrimaryValue, <int, Color>{
+    _originalBrownPrimary, <int, Color>{
       50: Color(0xFFF7F6F5),
       100: Color(0xFFECE8E6),
       200: Color(0xFFDFD9D6),
       300: Color(0xFFD2C9C6),
       400: Color(0xFFC8BEB9),
-      500: Color(_originalBrownPrimaryValue),
+      500: Color(_originalBrownPrimary),
       600: Color(0xFFB8ABA6),
       700: Color(0xFFAFA29C),
       800: Color(0xFFA79993),
       900: Color(0xFF998A83),
 });
-const int _originalBrownPrimaryValue = 0xFFBEB2AD;
+const int _originalBrownPrimary = 0xFFBEB2AD;
+
+const MaterialColor originalLightGray = MaterialColor(
+    _originalLightGrayPrimary, <int, Color>{
+      50: Color(0xFFF2F2F2),
+      100: Color(0xFFDEDEDE),
+      200: Color(0xFFC8C8C8),
+      300: Color(0xFFB1B1B1),
+      400: Color(0xFFA1A1A1),
+      500: Color(_originalLightGrayPrimary),
+      600: Color(0xFF888888),
+      700: Color(0xFF7D7D7D),
+      800: Color(0xFF737373),
+      900: Color(0xFF616161),
+});
+const int _originalLightGrayPrimary = 0xFF909090;
 
 abstract final class BackgroundColors {
-    static const Color grey = Color(0xFFD3D3D3);
+    static const Color extraLightGrey = Color(0xFFD3D3D3);
     static const Color cream = Color(0xFFF3ECD8);
-    static const Color cream3 = Color(0xFFeae1cf);
-    static const Color black = Color(0xFF313131);
+    static const Color cream3 = Color(0xFFEAE1CF);
+    static const Color darkModeGrey = Color(0xFF313131);
 }
 
 abstract final class EventListTitleBgColors {
     static const Color gold = Color(0xCCC4B8A5);
     static const Color pink = Color(0xFFFFCCD4);
     static const Color indigo = Color(0xFFC4DDFF);
-    static const Color black = Colors.black45;
+    static const Color darkModeLightBlack = Colors.black45;
 }
 
 abstract final class CardColors {
     static const Color grey = Color(0xFFE5E5E5);
     static const Color cream = Color(0xFFF8F5EB);
-    static const Color black = Colors.black;
+    static const Color darkModeBlack = Colors.black;
 }
 
 enum ColorConfig {
-    normal052fMaterial3(
+    normal15Brown(
+        'normal15Brown',
         true, // useMaterial3
         Brightness.light, // brightness
         originalBrown, // primarySwatch
         Color(0xFFAFA29C), // accentColor
-        BackgroundColors.grey, // backgroundColor
+        BackgroundColors.extraLightGrey, // backgroundColor
         CardColors.grey, // cardColor
         Colors.black, // normalTextColor
         Colors.black54, // disabledTextColor
         EventListTitleBgColors.gold, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    normal035fMaterial3(
+    normal35Pink(
+        'normal35Pink',
         true, // useMaterial3
         Brightness.light, // brightness
         originalLightPink, // primarySwatch
@@ -113,7 +130,8 @@ enum ColorConfig {
         EventListTitleBgColors.pink, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    normal017fMaterial3(
+    normal17LightBlue(
+        'normal17LightBlue',
         true, // useMaterial3
         Brightness.light, // brightness
         originalLightBlue, // primarySwatch
@@ -125,20 +143,22 @@ enum ColorConfig {
         EventListTitleBgColors.indigo, // eventListTitleBgColor
         Colors.black // cardTextColor
     ),
-    dark015fMaterial3(
+    dark11Gray(
+        'dark11Gray',
         true, // useMaterial3
         Brightness.dark, // brightness
-        Colors.grey, // primarySwatch
-        Color(0xFFFF8E9E), // accentColor
-        BackgroundColors.black, // backgroundColor
-        CardColors.black, // cardColor
+        originalLightGray, // primarySwatch
+        Color(0xFFC8C8C8), // accentColor
+        BackgroundColors.darkModeGrey, // backgroundColor
+        CardColors.darkModeBlack, // cardColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
-        EventListTitleBgColors.black, // eventListTitleBgColor
+        EventListTitleBgColors.darkModeLightBlack, // eventListTitleBgColor
         Colors.white// cardTextColor
     );
 
     const ColorConfig(
+        this.name,
         this.useMaterial3,
         this.brightness,
         this.primarySwatch,
@@ -148,9 +168,9 @@ enum ColorConfig {
         this.normalTextColor,
         this.disabledTextColor,
         this.eventListTitleBgColor,
-        this.cardTextColor,
-        );
+        this.cardTextColor);
 
+    final String name;
     final bool useMaterial3;
     final Brightness brightness;
     final MaterialColor primarySwatch;
@@ -181,9 +201,9 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     bool applyColorConfig(Brightness brightness) {
         var preColorConfig = state.colorConfig;
         if (brightness == Brightness.light) {
-            state.colorConfig = ColorConfig.normal035fMaterial3;
+            state.colorConfig = ColorConfig.normal35Pink;
         } else if (brightness == Brightness.dark) {
-            state.colorConfig = ColorConfig.dark015fMaterial3;
+            state.colorConfig = ColorConfig.dark11Gray;
         }
         return preColorConfig != state.colorConfig;
     }
