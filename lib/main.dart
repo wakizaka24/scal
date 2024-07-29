@@ -87,15 +87,7 @@ class SCalApp extends StatelessWidget {
                           .backgroundColor
                     ),
                 ),
-                home: GestureDetector(
-                    onTap: () async {
-                      primaryFocus?.unfocus();
-                      // ハイライト解除
-                      await eventDetailNotifier.updateHighlightItem(
-                          HighlightItem.none);
-                    },
-                    child:const HomePage()
-                ),
+                home: const HomePage(),
               );
             })
         )

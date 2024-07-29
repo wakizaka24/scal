@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:scal/f016_design.dart';
 
-import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
 import 'f015_calendar_utils.dart';

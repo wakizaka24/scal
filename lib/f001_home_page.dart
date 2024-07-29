@@ -195,26 +195,46 @@ class HomePage extends HookConsumerWidget {
     var floatingActionButton = FloatingActionButton(
         heroTag: 'calendar_hero_tag',
         onPressed: () async {
-          var _ = await calendarNotifier.getSelectionEvent();
-
-          await eventDetailNotifier.initState();
+          var event = await calendarNotifier.getSelectionEvent();
+          final calendarState = ref.watch(calendarPageNotifierProvider);
+          double prePage = calendarState.calendarSwitchingController
+              .page!;
+          var selectDay = event != null ? null : prePage.toInt() == 0;
+          var selectionDate = selectDay == null ? null
+              : selectDay ? calendarState.selectionDate
+              : calendarState.selectionHour;
+          await eventDetailNotifier.initState(event != null,
+              selectDay: selectDay, selectionDate: selectionDate, event: event);
 
           // 閉じた時のスピードが遅いので保留
-          // if (!context.mounted) {
-          //   return;
-          // }
-          // await Navigator.push(context,
-          //   PageRouteBuilder(
-          //       opaque: false,
-          //       pageBuilder: (BuildContext context, Animation<double> animation,
-          //           Animation<double> secondaryAnimation) {
-          //         return EventDetailPage(
-          //             unsafeAreaTopHeight: unsafeAreaTopHeight,
-          //             unsafeAreaBottomHeight: unsafeAreaBottomHeight);
-          //         },
-          //       transitionDuration: const Duration(seconds: 0)
-          //   )
-          // );
+          /*
+          if (!context.mounted) {
+            return;
+          }
+          await Navigator.push(context,
+            PageRouteBuilder(
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) {
+                    return Scaffold(
+                        backgroundColor: Colors.transparent,
+                        resizeToAvoidBottomInset: false,
+                        body: GestureDetector(
+                            onTap: () async {
+                              primaryFocus?.unfocus();
+                              // ハイライト解除
+                              await eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.none);
+                            },
+                            child: EventDetailPage(
+                                unsafeAreaTopHeight: unsafeAreaTopHeight,
+                                unsafeAreaBottomHeight: unsafeAreaBottomHeight)
+                        )
+                    );
+                  },
+                transitionDuration: const Duration(seconds: 0)
+            )
+          );
+           */
 
           await homeNotifier.setUICover(true);
           await homeNotifier.setUICoverWidget(
@@ -282,13 +302,23 @@ class HomePage extends HookConsumerWidget {
     }
 
     // 右端スワイプでナビゲーションを戻さない
-    return PopScope(
+    var popScope = PopScope(
         canPop: false,
         child: MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: scaffold
+            context: context,
+            removeTop: true,
+            child: scaffold
         )
+    );
+
+    return GestureDetector(
+        onTap: () async {
+          primaryFocus?.unfocus();
+          // ハイライト解除
+          await eventDetailNotifier.updateHighlightItem(
+              HighlightItem.none);
+        },
+        child: popScope
     );
   }
 }

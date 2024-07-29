@@ -136,26 +136,26 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       await safeAreaViewNotifier.downBottomSheet();
     }
 
-    var startDayPicker = CupertinoDatePicker(
+    var startDatePicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.startDate,
       mode: CupertinoDatePickerMode.date,
       minimumYear: minimumYear,
       maximumYear: maximumYear,
       onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(TextFieldItem.startDay,
-            value: CalendarUtils().copyDay(eventDetailState.startDate!,
+        eventDetailNotifier.setTextFieldController(TextFieldItem.startDate,
+            value: CalendarUtils().copyDate(eventDetailState.startDate!,
                 newDate));
       },
     );
 
-    var endDayPicker = CupertinoDatePicker(
+    var endDatePicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.endDate,
       mode: CupertinoDatePickerMode.date,
       minimumYear: minimumYear,
       maximumYear: maximumYear,
       onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(TextFieldItem.endDay,
-            value: CalendarUtils().copyDay(eventDetailState
+        eventDetailNotifier.setTextFieldController(TextFieldItem.endDate,
+            value: CalendarUtils().copyDate(eventDetailState
                 .endDate!, newDate));
       },
     );
@@ -212,13 +212,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         })
     );
 
-    var repeatingEndDayPicker = CupertinoDatePicker(
+    var repeatingEndDatePicker = CupertinoDatePicker(
       initialDateTime: eventDetailState.repeatingEndDate,
       mode: CupertinoDatePickerMode.date,
       onDateTimeChanged: (DateTime newDate) {
         eventDetailNotifier.setTextFieldController(
-            TextFieldItem.repeatingEndDay,
-            value: CalendarUtils().copyDay(eventDetailState
+            TextFieldItem.repeatingEndDate,
+            value: CalendarUtils().copyDate(eventDetailState
                 .repeatingEndDate!, newDate));
       },
     );
@@ -240,7 +240,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   onPressed: () async {
                     await onCommonPressed();
 
-                    // Navigator.pop(context);
+                    // if (context.mounted) {
+                    //   Navigator.pop(context);
+                    // }
+
                     homeNotifier.setUICover(false);
                     homeNotifier.setUICoverWidget(null);
                     homeNotifier.updateState();
@@ -336,7 +339,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       eventDetailState.allDay = value;
                       if (value) {
                         eventDetailState.startDate = CalendarUtils()
-                            .trimDay(eventDetailState.startDate!);
+                            .trimDate(eventDetailState.startDate!);
                         eventDetailState.endDate = eventDetailState.startDate!
                             .add(const Duration(days: 1));
                       }
@@ -348,7 +351,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               CWLeftTitle(
                   title: eventDetailState.allDay! ? '日付' : '開始',
                   highlight: eventDetailState.highlightItem
-                      == HighlightItem.startDay
+                      == HighlightItem.startDate
                     || eventDetailState.highlightItem
                           == HighlightItem.startTime,
                   expanded: false,
@@ -357,15 +360,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         width: 120, height: 36,
                         child: CWTextField(
                           controller: eventDetailState.textEditingControllers!
-                          [TextFieldItem.startDay]!,
+                          [TextFieldItem.startDate]!,
                           fontSize: 15,
                           textAlign: TextAlign.center,
                           paddingAll: 6,
                           readOnly: true,
                           highlight: eventDetailState.highlightItem
-                              == HighlightItem.startDay,
+                              == HighlightItem.startDate,
                           onFocusChange: createOnBottomPopTextFocusChange(
-                              HighlightItem.startDay, startDayPicker)
+                              HighlightItem.startDate, startDatePicker)
                         )
                     ),
 
@@ -392,7 +395,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 CWLeftTitle(
                     title: '終了',
                     highlight: eventDetailState.highlightItem
-                        == HighlightItem.endDay
+                        == HighlightItem.endDate
                         || eventDetailState.highlightItem
                             == HighlightItem.endTime,
                     expanded: false,
@@ -402,15 +405,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           child: CWTextField(
                               controller: eventDetailState
                                   .textEditingControllers!
-                              [TextFieldItem.endDay]!,
+                              [TextFieldItem.endDate]!,
                               fontSize: 15,
                               textAlign: TextAlign.center,
                               paddingAll: 6,
                               readOnly: true,
                               highlight: eventDetailState.highlightItem
-                                  == HighlightItem.endDay,
+                                  == HighlightItem.endDate,
                               onFocusChange: createOnBottomPopTextFocusChange(
-                                  HighlightItem.endDay, endDayPicker)
+                                  HighlightItem.endDate, endDatePicker)
                           )
                       ),
 
@@ -465,7 +468,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.repeatEnd
                       || eventDetailState.highlightItem
-                      == HighlightItem.repeatEndDay,
+                      == HighlightItem.repeatEndDate,
                   verticalPaddingWidth: 5,
                   expanded: false,
                   child: Row(children: [
@@ -478,18 +481,18 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             .repeatEnd;
                         eventDetailState.repeatingEnd = value;
 
-                        DateTime? repeatingEndDay;
+                        DateTime? repeatingEndDate;
                         if (value) {
-                          repeatingEndDay = eventDetailState.endDate!;
-                          if (repeatingEndDay.hour > 0
-                              || repeatingEndDay.minute > 0) {
-                            repeatingEndDay = CalendarUtils().trimDay(
-                                repeatingEndDay).add(const Duration(days: 1));
+                          repeatingEndDate = eventDetailState.endDate!;
+                          if (repeatingEndDate.hour > 0
+                              || repeatingEndDate.minute > 0) {
+                            repeatingEndDate = CalendarUtils().trimDate(
+                                repeatingEndDate).add(const Duration(days: 1));
                           }
                         }
                         eventDetailNotifier.setTextFieldController(
-                            TextFieldItem.repeatingEndDay,
-                        value: repeatingEndDay);
+                            TextFieldItem.repeatingEndDate,
+                        value: repeatingEndDate);
                         eventDetailNotifier.updateState();
                       },
                     ),
@@ -499,15 +502,15 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           child: CWTextField(
                               controller: eventDetailState
                                   .textEditingControllers!
-                              [TextFieldItem.repeatingEndDay]!,
+                              [TextFieldItem.repeatingEndDate]!,
                               textAlign: TextAlign.center,
                               paddingAll: 6,
                               readOnly: true,
                               highlight: eventDetailState.highlightItem
-                                  == HighlightItem.repeatEndDay,
+                                  == HighlightItem.repeatEndDate,
                               onFocusChange: createOnBottomPopTextFocusChange(
-                                  HighlightItem.repeatEndDay,
-                                  repeatingEndDayPicker)
+                                  HighlightItem.repeatEndDate,
+                                  repeatingEndDatePicker)
                           )
                       ),
                   ])

@@ -1,6 +1,8 @@
+import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:scal/f008_calendar_repository.dart';
 
 import 'f015_calendar_utils.dart';
 
@@ -22,13 +24,13 @@ enum HighlightItem {
   title,
   place,
   allDay,
-  startDay,
+  startDate,
   startTime,
-  endDay,
+  endDate,
   endTime,
   repeat,
   repeatEnd,
-  repeatEndDay,
+  repeatEndDate,
   memo,
   // 移動する
   // destinationCalendar
@@ -37,12 +39,12 @@ enum HighlightItem {
 enum TextFieldItem {
   title,
   place,
-  startDay,
+  startDate,
   startTime,
-  endDay,
+  endDate,
   endTime,
   repeat,
-  repeatingEndDay,
+  repeatingEndDate,
   memo,
   // 移動する
   // destinationCalendar
@@ -100,7 +102,9 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   EventDetailPageNotifier(this.ref, EventDetailPageState state)
       : super(state);
 
-  initState() async {
+  initState(bool selectDayOrTime, {bool? selectDay, DateTime? selectionDate,
+    Event? event}) async {
+
     // Control
     state.contentsKey = GlobalKey();
     state.textEditingControllers = (() {
@@ -114,16 +118,19 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     // Data
     state.contentsHeight = await getContentsHeight();
 
+    // String? eventId, String? calendarId, bool? readOnly}
+
+
     state.title = '';
     state.place = '';
     state.allDay = false;
 
     state.startDate = DateTime(2024, 4, 30, 7, 30);
-    setTextFieldController(TextFieldItem.startDay);
+    setTextFieldController(TextFieldItem.startDate);
     setTextFieldController(TextFieldItem.startTime);
 
     state.endDate = DateTime(2025, 5, 31, 8, 30);
-    setTextFieldController(TextFieldItem.endDay);
+    setTextFieldController(TextFieldItem.endDate);
     setTextFieldController(TextFieldItem.endTime);
 
     state.repeatingPattern = RepeatingPattern.none;
@@ -184,12 +191,12 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
         state.textEditingControllers!
         [TextFieldItem.place]!.text = state.place!;
         break;
-      case TextFieldItem.startDay:
+      case TextFieldItem.startDate:
         if (value != null) {
           state.startDate = value as DateTime?;
         }
         state.textEditingControllers!
-        [TextFieldItem.startDay]!.text = DateFormat('yyyy/MM/dd')
+        [TextFieldItem.startDate]!.text = DateFormat('yyyy/MM/dd')
             .format(state.startDate!);
         changeStartDate(state.startDate);
         break;
@@ -202,12 +209,12 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
             .format(state.startDate!);
         changeStartDate(state.startDate);
         break;
-      case TextFieldItem.endDay:
+      case TextFieldItem.endDate:
         if (value != null) {
           state.endDate = value as DateTime?;
         }
         state.textEditingControllers!
-        [TextFieldItem.endDay]!.text = DateFormat('yyyy/MM/dd')
+        [TextFieldItem.endDate]!.text = DateFormat('yyyy/MM/dd')
             .format(state.endDate!);
         changeEndDate(state.endDate);
         break;
@@ -227,16 +234,16 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
         state.textEditingControllers!
         [TextFieldItem.repeat]!.text = state.repeatingPattern!.name;
         break;
-      case TextFieldItem.repeatingEndDay:
+      case TextFieldItem.repeatingEndDate:
         if (value != null) {
           state.repeatingEndDate = value as DateTime?;
         }
         if (state.repeatingEndDate == null) {
           state.textEditingControllers!
-          [TextFieldItem.repeatingEndDay]!.text = '';
+          [TextFieldItem.repeatingEndDate]!.text = '';
         } else {
           state.textEditingControllers!
-          [TextFieldItem.repeatingEndDay]!.text = DateFormat('yyyy/MM/dd')
+          [TextFieldItem.repeatingEndDate]!.text = DateFormat('yyyy/MM/dd')
               .format(state.repeatingEndDate!);
         }
         changeRepeatingEndDate(state.repeatingEndDate);
@@ -267,14 +274,14 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       if (startDate == state.endDate
           || startDate.isAfter(state.endDate)) {
         state.endDate = startDate.add(const Duration(hours: 1));
-        setTextFieldController(TextFieldItem.endDay);
+        setTextFieldController(TextFieldItem.endDate);
         setTextFieldController(TextFieldItem.endTime);
       }
     } else {
       var endDate = startDate.add(const Duration(days: 1));
       if (endDate != state.endDate) {
         state.endDate = endDate;
-        setTextFieldController(TextFieldItem.endDay);
+        setTextFieldController(TextFieldItem.endDate);
         setTextFieldController(TextFieldItem.endTime);
       }
     }
@@ -285,14 +292,14 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       if (endDate == state.startDate
           || endDate.isBefore(state.startDate)) {
         state.startDate = endDate.add(const Duration(hours: -1));
-        setTextFieldController(TextFieldItem.startDay);
+        setTextFieldController(TextFieldItem.startDate);
         setTextFieldController(TextFieldItem.startTime);
       }
     } else {
       var startDate = endDate.add(const Duration(days: -1));
       if (startDate != state.startDate) {
         state.startDate = startDate;
-        setTextFieldController(TextFieldItem.startDay);
+        setTextFieldController(TextFieldItem.startDate);
         setTextFieldController(TextFieldItem.startTime);
       }
     }
@@ -302,11 +309,11 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       state.repeatingEndDate = endDate;
       if (state.repeatingEndDate!.hour > 0
           || state.repeatingEndDate!.minute > 0) {
-        state.repeatingEndDate = CalendarUtils().trimDay(
+        state.repeatingEndDate = CalendarUtils().trimDate(
             state.repeatingEndDate!).add(const Duration(days: 1));
       }
 
-      setTextFieldController(TextFieldItem.repeatingEndDay);
+      setTextFieldController(TextFieldItem.repeatingEndDate);
     }
   }
 
@@ -314,7 +321,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     if (endRepeatingDate != null &&
         endRepeatingDate.isBefore(state.endDate)) {
       state.endDate = endRepeatingDate;
-      setTextFieldController(TextFieldItem.endDay);
+      setTextFieldController(TextFieldItem.endDate);
       setTextFieldController(TextFieldItem.endTime);
     }
   }
