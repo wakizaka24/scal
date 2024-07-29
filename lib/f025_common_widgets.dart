@@ -62,10 +62,13 @@ class CWLeftTitle extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final theme = Theme.of(context);
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    var borderColor = colorConfig.borderColor;
+    var highlightAlpha = colorConfig.highlightBgColorAlpha;
+
     return Container(
       decoration: BoxDecoration(
-        color: !highlight ? Colors.transparent : colorConfig.eventListTitleBgColor,
-        borderRadius: BorderRadius.circular(6),
+        color: !highlight ? Colors.transparent : borderColor.withAlpha(
+            highlightAlpha), borderRadius: BorderRadius.circular(6),
       ),
       child: Padding(padding: EdgeInsets.symmetric(
           vertical: verticalPaddingWidth),
