@@ -1,5 +1,7 @@
 // import 'package:flutter/foundation.dart';
 
+import 'package:device_calendar/device_calendar.dart';
+
 class CalendarUtils {
   static final CalendarUtils _instance = CalendarUtils._internal();
   CalendarUtils._internal();
@@ -75,5 +77,13 @@ class CalendarUtils {
   DateTime copyTime(DateTime baseDate, DateTime time) {
     return DateTime(baseDate.year, baseDate.month, baseDate.day, time.hour,
         time.minute);
+  }
+
+  DateTime? convertDateTime(TZDateTime? dateTime) {
+    if (dateTime == null) {
+      return null;
+    }
+    return DateTime(dateTime.year, dateTime.month, dateTime.day,
+      dateTime.hour, dateTime.minute);
   }
 }

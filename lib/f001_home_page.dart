@@ -200,11 +200,12 @@ class HomePage extends HookConsumerWidget {
           double prePage = calendarState.calendarSwitchingController
               .page!;
           var selectDay = event != null ? null : prePage.toInt() == 0;
-          var selectionDate = selectDay == null ? null
+          var selectionDateTime = selectDay == null ? null
               : selectDay ? calendarState.selectionDate
               : calendarState.selectionHour;
-          await eventDetailNotifier.initState(event != null,
-              selectDay: selectDay, selectionDate: selectionDate, event: event);
+          await eventDetailNotifier.initState(event == null,
+              selectDay: selectDay, selectionDateTime: selectionDateTime,
+              event: event);
 
           // 閉じた時のスピードが遅いので保留
           /*

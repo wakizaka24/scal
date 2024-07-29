@@ -2,21 +2,48 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:scal/f008_calendar_repository.dart';
 
 import 'f015_calendar_utils.dart';
 
 enum RepeatingPattern {
-  none('なし'),
-  daily('毎日'),
-  weekly('毎週'),
-  biweekly('隔週'),
-  monthly('毎月'),
-  yearly('毎年');
+  none('なし', true, null, null),
+  daily('毎日', true, RecurrenceFrequency.Daily, 1),
+  weekly('毎週', true, RecurrenceFrequency.Weekly, 1),
+  biweekly('隔週', true, RecurrenceFrequency.Weekly, 2),
+  monthly('毎月', true, RecurrenceFrequency.Monthly, 1),
+  yearly('毎年', true, RecurrenceFrequency.Yearly, 1),
+  other('その他', false, null, null);
 
-  const RepeatingPattern(this.name);
+  const RepeatingPattern(
+      this.name,
+      this.defaultDisplay,
+      this.frequency,
+      this.interval
+      );
 
   final String name;
+  final bool defaultDisplay;
+  final RecurrenceFrequency? frequency;
+  final int? interval;
+
+  static List<RepeatingPattern> getDisplayList(bool all) {
+    return values.where((type) {
+      return type.defaultDisplay || all;
+    }).toList();
+  }
+
+  static RepeatingPattern getType(RecurrenceFrequency? frequency,
+      int? interval) {
+    var list = values.where((type) {
+      return type.defaultDisplay && type.frequency == frequency
+        && type.interval == interval;
+    }).toList();
+    if (list.length == 1) {
+      return list.first;
+    } else {
+      return RepeatingPattern.other;
+    }
+  }
 }
 
 enum HighlightItem {
@@ -64,6 +91,7 @@ class EventDetailPageState {
   DateTime? startDate;
   DateTime? endDate;
   RepeatingPattern? repeatingPattern;
+  bool? repeatingEndWithOther;
   bool? repeatingEnd;
   DateTime? repeatingEndDate;
   String? memo;
@@ -85,6 +113,7 @@ class EventDetailPageState {
     nState.endDate = state.endDate;
 
     nState.repeatingPattern = state.repeatingPattern;
+    nState.repeatingEndWithOther = state.repeatingEndWithOther;
     nState.repeatingEnd = state.repeatingEnd;
     nState.repeatingEndDate = state.repeatingEndDate;
     nState.memo = state.memo;
@@ -102,8 +131,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   EventDetailPageNotifier(this.ref, EventDetailPageState state)
       : super(state);
 
-  initState(bool selectDayOrTime, {bool? selectDay, DateTime? selectionDate,
-    Event? event}) async {
+  initState(bool selectDateOrTime, {bool? selectDay,
+    DateTime? selectionDateTime, Event? event}) async {
 
     // Control
     state.contentsKey = GlobalKey();
@@ -120,26 +149,49 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
     // String? eventId, String? calendarId, bool? readOnly}
 
+    state.title = selectDateOrTime ? '' : event!.title;
+    setTextFieldController(TextFieldItem.title);
 
-    state.title = '';
-    state.place = '';
-    state.allDay = false;
+    state.place = selectDateOrTime ? '' : event!.location;
+    setTextFieldController(TextFieldItem.place);
 
-    state.startDate = DateTime(2024, 4, 30, 7, 30);
+    state.allDay = selectDateOrTime ? false : event!.allDay;
+
+    if (selectDateOrTime) {
+      var date = selectionDateTime!;
+      if (selectDay!) {
+        state.startDate = DateTime(date.year, date.month, date.day,
+            DateTime.now().hour);
+      } else {
+        state.startDate = date;
+      }
+      state.endDate = state.startDate!.add(const Duration(hours: 1));
+    } else {
+      state.startDate = CalendarUtils().convertDateTime(event!.start)!;
+      state.endDate = CalendarUtils().convertDateTime(event.end)!;
+    }
     setTextFieldController(TextFieldItem.startDate);
     setTextFieldController(TextFieldItem.startTime);
-
-    state.endDate = DateTime(2025, 5, 31, 8, 30);
     setTextFieldController(TextFieldItem.endDate);
     setTextFieldController(TextFieldItem.endTime);
 
-    state.repeatingPattern = RepeatingPattern.none;
+    if (selectDateOrTime) {
+      state.repeatingPattern = RepeatingPattern.none;
+      state.repeatingEndWithOther = false;
+      state.repeatingEnd = false;
+      state.repeatingEndDate = null;
+    } else {
+      var rule = event!.recurrenceRule;
+      state.repeatingPattern = RepeatingPattern.getType(
+          rule?.recurrenceFrequency, rule?.interval);
+      state.repeatingEndWithOther = state.repeatingPattern
+          == RepeatingPattern.other;
+      state.repeatingEnd = rule?.endDate != null;
+      state.repeatingEndDate = rule?.endDate;
+    }
     setTextFieldController(TextFieldItem.repeat);
 
-    state.repeatingEnd = false;
-    state.repeatingEndDate = null;
-
-    state.memo = '';
+    state.memo = selectDateOrTime ? '' : event!.description;
     setTextFieldController(TextFieldItem.memo);
 
     // state.calendarId = 'TEST_ID_1';
@@ -182,14 +234,14 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
           state.title = value as String?;
         }
         state.textEditingControllers!
-        [TextFieldItem.title]!.text = state.title!;
+        [TextFieldItem.title]!.text = state.title ?? '';
         break;
       case TextFieldItem.place:
         if (value != null) {
           state.place = value as String?;
         }
         state.textEditingControllers!
-        [TextFieldItem.place]!.text = state.place!;
+        [TextFieldItem.place]!.text = state.place ?? '';
         break;
       case TextFieldItem.startDate:
         if (value != null) {
@@ -253,7 +305,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
           state.memo = value as String?;
         }
         state.textEditingControllers!
-        [TextFieldItem.memo]!.text = state.memo!;
+        [TextFieldItem.memo]!.text = state.memo ?? "";
         break;
       // 移動する
       // case TextFieldItem.destinationCalendar:

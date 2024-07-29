@@ -193,12 +193,14 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         itemExtent: 32,
         scrollController:
         FixedExtentScrollController(
-          initialItem: RepeatingPattern.values.indexOf(eventDetailState
+          initialItem: RepeatingPattern.getDisplayList(eventDetailState
+              .repeatingEndWithOther!).indexOf(eventDetailState
               .repeatingPattern!),
         ),
         onSelectedItemChanged: (int index) {
           var repeatingPattern =
-          RepeatingPattern.values[index];
+          RepeatingPattern.getDisplayList(eventDetailState
+              .repeatingEndWithOther!)[index];
           eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
               value: repeatingPattern);
           if (repeatingPattern == RepeatingPattern.none) {
@@ -206,8 +208,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           }
           eventDetailNotifier.updateState();
         },
-        children: List<Widget>.generate(RepeatingPattern.values.length,
-                (int index) {
+        children: List<Widget>.generate(RepeatingPattern.getDisplayList(
+            eventDetailState.repeatingEndWithOther!).length, (int index) {
           return Center(child: Text(RepeatingPattern.values[index].name));
         })
     );

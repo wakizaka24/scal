@@ -182,8 +182,8 @@ enum ColorConfig {
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
         BorderColors.darkModeBlack, // borderColor
-        80, // calendarTodayBgColorAlpha
-        50, // calendarLineBgColorAlpha
+        39, // calendarTodayBgColorAlpha
+        25, // calendarLineBgColorAlpha
         45, // highlightBgColorAlpha
         Colors.white // cardTextColor
     );
