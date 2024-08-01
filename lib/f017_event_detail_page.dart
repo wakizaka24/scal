@@ -246,9 +246,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     //   Navigator.pop(context);
                     // }
 
-                    homeNotifier.setUICover(false);
-                    homeNotifier.setUICoverWidget(null);
-                    homeNotifier.updateState();
+                    await homeNotifier.setUICover(false);
+                    await homeNotifier.setUICoverWidget(null);
+                    await homeNotifier.updateState();
                   },
                 ),
 
@@ -294,14 +294,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.title]!,
                       hintText: 'タイトル',
+                      readOnly: eventDetailState.readOnly!,
+                      focus: !eventDetailState.readOnly!,
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
                       maxLines: 2,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .title),
-                      // onChanged: (text) {
-                      //   debugPrint('Textの変更検知={$text}');
-                      // }
+                          .title)
                   )
               ),
 
@@ -315,13 +314,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         controller: eventDetailState.textEditingControllers!
                         [TextFieldItem.place]!,
                         hintText: '場所',
+                        readOnly: eventDetailState.readOnly!,
+                        focus: !eventDetailState.readOnly!,
                         highlight: eventDetailState.highlightItem
                             == HighlightItem.place,
                         onFocusChange: createOnTextFocusChange(HighlightItem
-                            .place),
-                        // onChanged: (text) {
-                        //   debugPrint('Textの変更検知={$text}');
-                        // },
+                            .place)
                       )
                   )
               ),
@@ -335,6 +333,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
                     onChanged: (value) {
+                      if (eventDetailState.readOnly!) {
+                        return;
+                      }
+
                       primaryFocus?.unfocus();
 
                       eventDetailState.highlightItem = HighlightItem.allDay;
@@ -367,6 +369,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           textAlign: TextAlign.center,
                           paddingAll: 6,
                           readOnly: true,
+                          focus: !eventDetailState.readOnly!,
                           highlight: eventDetailState.highlightItem
                               == HighlightItem.startDate,
                           onFocusChange: createOnBottomPopTextFocusChange(
@@ -384,6 +387,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             textAlign: TextAlign.center,
                             paddingAll: 6,
                             readOnly: true,
+                            focus: !eventDetailState.readOnly!,
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.startTime,
                             onFocusChange: createOnBottomPopTextFocusChange(
@@ -412,6 +416,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               textAlign: TextAlign.center,
                               paddingAll: 6,
                               readOnly: true,
+                              focus: !eventDetailState.readOnly!,
                               highlight: eventDetailState.highlightItem
                                   == HighlightItem.endDate,
                               onFocusChange: createOnBottomPopTextFocusChange(
@@ -430,6 +435,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                 textAlign: TextAlign.center,
                                 paddingAll: 6,
                                 readOnly: true,
+                                focus: !eventDetailState.readOnly!,
                                 highlight: eventDetailState.highlightItem
                                     == HighlightItem.endTime,
                                 onFocusChange: createOnBottomPopTextFocusChange(
@@ -454,6 +460,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             textAlign: TextAlign.center,
                             paddingAll: 8,
                             readOnly: true,
+                            focus: !eventDetailState.readOnly!,
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.repeat,
                             onFocusChange: createOnBottomPopTextFocusChange(
@@ -477,6 +484,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     CupertinoSwitch(
                       value: eventDetailState.repeatingEnd!,
                       onChanged: (value) {
+                        if (eventDetailState.readOnly!) {
+                          return;
+                        }
+
                         primaryFocus?.unfocus();
 
                         eventDetailState.highlightItem = HighlightItem
@@ -508,6 +519,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               textAlign: TextAlign.center,
                               paddingAll: 6,
                               readOnly: true,
+                              focus: !eventDetailState.readOnly!,
                               highlight: eventDetailState.highlightItem
                                   == HighlightItem.repeatEndDate,
                               onFocusChange: createOnBottomPopTextFocusChange(
@@ -525,14 +537,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.memo]!,
+                      readOnly: eventDetailState.readOnly!,
+                      focus: !eventDetailState.readOnly!,
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo),
-                      // onChanged: (text) {
-                      //   debugPrint('Textの変更検知={$text}');
-                      // }
+                          .memo)
                   )
               ),
 
@@ -576,18 +587,20 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   fixedHeight: 48,
                   fontSize: 15,
                   backgroundColor: colorConfig.backgroundColor,
-                  onPressed: () async {
+                  onPressed: !eventDetailState.saveButtonEnabled! ? null
+                      : () async {
                     await onCommonPressed();
-
-                    final calendarState = ref.watch(calendarPageNotifierProvider);
-                    double prePage = calendarState.calendarSwitchingController
-                        .page!;
-                    int page = prePage.toInt();
-                    if (page.toDouble() == prePage) {
-                      page = page == 0 ? 1: 0;
-                      await calendarState.calendarSwitchingController
-                          .animateToPage(page, duration: const Duration(
-                          milliseconds: 300), curve: Curves.easeIn);
+                    if (!(await eventDetailNotifier.saveEvent())) {
+                      if (context.mounted) {
+                        await UIUtils().showMessageDialog(context, ref,
+                            'カレンダー更新', 'カレンダー更新に失敗しました');
+                      }
+                    } else {
+                      await calendarNotifier.updateCalendar();
+                      await homeNotifier.setUICover(false);
+                      await homeNotifier.setUICoverWidget(null);
+                      await homeNotifier.updateState();
+                      // await calendarNotifier.updateState();
                     }
                   }
               )

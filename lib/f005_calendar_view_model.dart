@@ -306,7 +306,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await selectDay(index: index);
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
-    await updateSelectionDayOfHome();
     await updateState();
   }
 
@@ -324,7 +323,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
     await updateSelectionDayOfHome();
-    await updateState();
   }
 
   initSelectionWeekCalendar() async {
@@ -903,7 +901,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     var calendars = await calendarRepo.getCalendars();
-
     for (int i = 0; i < state.editingEventList.length; i++) {
       var event = state.editingEventList[i];
       var calendar = calendars.firstWhere((calendar) =>
@@ -981,7 +978,17 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       calendars = await calendarRepo.getCalendars();
       // debugPrint('カレンダー数 ${calendars.length}');
     }
-    return calendars;
+
+    // debugPrint('カレンダー一覧');
+    // for (var cal in calendars) {
+    //   debugPrint('name:${cal.name} isReadOnly:${cal.isReadOnly}'
+    //       ' isDefault:${cal.isDefault} accountType:${cal.accountType}'
+    //       ' accountName:${cal.accountName}');
+    // }
+
+    return calendars.where((cal) {
+      return cal.isDefault!;
+    }).toList();
   }
 
   Map<String, Calendar> convertCalendarMap(List<Calendar> calendars) {
@@ -1015,7 +1022,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   updateState() async {
     state = CalendarPageState.copy(state);
-    debugPrint('updateState');
+    debugPrint('updateState(calendar)');
   }
 }
 

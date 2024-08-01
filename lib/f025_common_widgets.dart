@@ -103,6 +103,7 @@ class CWTextField extends HookConsumerWidget {
   final double paddingAll;
   final bool? enabled;
   final bool readOnly;
+  final bool focus;
   final bool highlight;
   final TextInputType? keyboardType;
   final int maxLines;
@@ -119,6 +120,7 @@ class CWTextField extends HookConsumerWidget {
     this.paddingAll = 8,
     this.enabled,
     this.readOnly = false,
+    this.focus = true,
     required this.highlight,
     this.keyboardType,
     this.maxLines = 1,
@@ -135,38 +137,45 @@ class CWTextField extends HookConsumerWidget {
           color: Colors.transparent,
           width: 0),
     );
-    return Focus(
-        onFocusChange: onFocusChange,
-        child: TextField(
-            controller: controller,
-            style: TextStyle(
-              fontSize: fontSize, color: colorConfig.normalTextColor,
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.all(paddingAll),
-              enabledBorder: border,
-              disabledBorder: border,
-              focusedBorder: border,
-              filled: true,
-              fillColor: !highlight ? Colors.transparent
-                  : Colors.white38,
-              hintStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w300,
-                color: colorConfig.disabledTextColor,
-              ),
-              hintText: hintText,
-            ),
-            textAlign: textAlign,
-            textAlignVertical: textAlignVertical,
-            keyboardType: keyboardType,
-            maxLines: maxLines,
-            readOnly: readOnly,
-            enabled: enabled,
-            onChanged: onChanged
-        )
+
+    var textField = TextField(
+        controller: controller,
+        style: TextStyle(
+          fontSize: fontSize, color: colorConfig.normalTextColor,
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: EdgeInsets.all(paddingAll),
+          enabledBorder: border,
+          disabledBorder: border,
+          focusedBorder: border,
+          filled: true,
+          fillColor: !highlight ? Colors.transparent
+              : Colors.white38,
+          hintStyle: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w300,
+            color: colorConfig.disabledTextColor,
+          ),
+          hintText: hintText,
+        ),
+        textAlign: textAlign,
+        textAlignVertical: textAlignVertical,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        readOnly: readOnly,
+        enabled: enabled,
+        onChanged: onChanged
     );
+
+    if (focus) {
+      return Focus(
+          onFocusChange: onFocusChange,
+          child: textField
+      );
+    } else {
+      return textField;
+    }
   }
 }
 
@@ -209,7 +218,7 @@ class CWIconButton extends HookConsumerWidget {
 
 class CWElevatedButton extends HookConsumerWidget {
   final String title;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double fixedWidth;
   final double fixedHeight;
   final double fontSize;
@@ -218,7 +227,7 @@ class CWElevatedButton extends HookConsumerWidget {
   const CWElevatedButton({
     super.key,
     required this.title,
-    required this.onPressed,
+    this.onPressed,
     this.fixedWidth = 32,
     this.fixedHeight = 32,
     this.fontSize = 13,

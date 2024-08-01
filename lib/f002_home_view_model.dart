@@ -49,6 +49,7 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   }
   updateState() async {
     state = HomePageState.copy(state);
+    debugPrint('updateState(home)');
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:device_calendar/device_calendar.dart';
 import 'package:universal_io/io.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -203,9 +204,15 @@ class HomePage extends HookConsumerWidget {
           var selectionDateTime = selectDay == null ? null
               : selectDay ? calendarState.selectionDate
               : calendarState.selectionHour;
+          Calendar? calendar = (await calendarNotifier.getCalendars())
+              .firstWhere((cal) => cal.isDefault!);
+          if (event != null) {
+            calendar = (await calendarNotifier.getCalendars())
+                .firstWhere((cal) => cal.id == event.calendarId);
+          }
           await eventDetailNotifier.initState(event == null,
               selectDay: selectDay, selectionDateTime: selectionDateTime,
-              event: event);
+              calendar: calendar, event: event);
 
           // 閉じた時のスピードが遅いので保留
           /*

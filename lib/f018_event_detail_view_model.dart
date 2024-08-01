@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'f008_calendar_repository.dart';
 import 'f015_calendar_utils.dart';
 
 enum RepeatingPattern {
@@ -85,6 +86,9 @@ class EventDetailPageState {
   // Data
   double? contentsHeight;
 
+  Calendar? calendar;
+  Event? event;
+  bool? readOnly;
   String? title;
   String? place;
   bool? allDay;
@@ -95,7 +99,7 @@ class EventDetailPageState {
   bool? repeatingEnd;
   DateTime? repeatingEndDate;
   String? memo;
-  String? calendarId;
+  bool? saveButtonEnabled;
 
   HighlightItem? highlightItem;
 
@@ -106,6 +110,9 @@ class EventDetailPageState {
 
     nState.contentsHeight = state.contentsHeight;
 
+    nState.calendar = state.calendar;
+    nState.event = state.event;
+    nState.readOnly = state.readOnly;
     nState.title = state.title;
     nState.place = state.place;
     nState.allDay = state.allDay;
@@ -117,7 +124,7 @@ class EventDetailPageState {
     nState.repeatingEnd = state.repeatingEnd;
     nState.repeatingEndDate = state.repeatingEndDate;
     nState.memo = state.memo;
-    nState.calendarId = state.calendarId;
+    nState.saveButtonEnabled = state.saveButtonEnabled;
 
     nState.highlightItem = state.highlightItem;
 
@@ -127,12 +134,13 @@ class EventDetailPageState {
 
 class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   final Ref ref;
+  CalendarRepository calendarRepo = CalendarRepository();
 
   EventDetailPageNotifier(this.ref, EventDetailPageState state)
       : super(state);
 
   initState(bool selectDateOrTime, {bool? selectDay,
-    DateTime? selectionDateTime, Event? event}) async {
+    DateTime? selectionDateTime, Calendar? calendar, Event? event}) async {
 
     // Control
     state.contentsKey = GlobalKey();
@@ -140,6 +148,25 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       var km = <TextFieldItem, TextEditingController>{};
       for (var item in TextFieldItem.values) {
         km[item] = TextEditingController();
+        km[item]!.addListener((){
+          switch (item) {
+            case TextFieldItem.title:
+              state.title = km[item]!.text;
+              if (state.title!.isEmpty == state.saveButtonEnabled) {
+                state.saveButtonEnabled = state.title!.isNotEmpty;
+                updateState();
+              }
+              break;
+            case TextFieldItem.place:
+              state.place = km[item]!.text;
+              break;
+            case TextFieldItem.memo:
+              state.memo = km[item]!.text;
+              break;
+            default:
+              break;
+          }
+        });
       }
       return km;
     })();
@@ -147,8 +174,9 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     // Data
     state.contentsHeight = await getContentsHeight();
 
-    // String? eventId, String? calendarId, bool? readOnly}
-
+    state.calendar = calendar;
+    state.event = event;
+    state.readOnly = calendar != null && calendar.isReadOnly!;
     state.title = selectDateOrTime ? '' : event!.title;
     setTextFieldController(TextFieldItem.title);
 
@@ -196,6 +224,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
     // state.calendarId = 'TEST_ID_1';
     // setTextFieldController(TextFieldItem.destinationCalendar);
+
+    state.saveButtonEnabled = state.title!.isNotEmpty && !state.readOnly!;
 
     state.highlightItem = HighlightItem.none;
   }
@@ -382,8 +412,35 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.repeatingEnd = repeatingEnd;
   }
 
+  Future<bool> saveEvent() async {
+    var event = state.event ?? Event(state.calendar!.id);
+
+    event.title = state.title;
+    event.location = state.place;
+    event.allDay = state.allDay;
+    event.start = calendarRepo.convertTZDateTime(state.startDate);
+    event.end = calendarRepo.convertTZDateTime(state.endDate);
+    event.recurrenceRule = null;
+    if (state.repeatingPattern != RepeatingPattern.none) {
+      var repeatingEndDate = !state.repeatingEnd! ? null
+          : state.repeatingEndDate;
+      if (state.repeatingPattern != RepeatingPattern.other) {
+        var frequency = state.repeatingPattern!.frequency;
+        var interval = state.repeatingPattern!.interval;
+        event.recurrenceRule = RecurrenceRule(frequency, interval: interval,
+            endDate: repeatingEndDate);
+      } else {
+        event.recurrenceRule!.endDate = repeatingEndDate;
+      }
+    }
+    event.description = state.memo;
+
+    return await calendarRepo.createOrUpdateEvent(event);
+  }
+
   updateState() async {
     state = EventDetailPageState.copy(state);
+    debugPrint('updateState(detail)');
   }
 }
 
