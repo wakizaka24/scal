@@ -90,7 +90,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       }
     });
 
-    Function (bool hasFocus) createOnTextFocusChange(HighlightItem item) {
+    Function (bool hasFocus) createOnTextFocusChange(
+        HighlightItem item, {double bottomSpace = 6}) {
       return (bool hasFocus) async {
         reset() async {
           await safeAreaViewNotifier.downBottomSheet();
@@ -98,7 +99,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         if (hasFocus) {
           await reset();
           await eventDetailNotifier.updateHighlightItem(item);
-          await safeAreaViewNotifier.setSafeAreaAdjustment(8 + 6);
+          await safeAreaViewNotifier.setSafeAreaAdjustment(8 + bottomSpace);
         } else {
           // 他のテキストにフォーカス時は動かない
           await reset();
@@ -298,7 +299,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       focus: !eventDetailState.readOnly!,
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
-                      maxLines: 2,
                       onFocusChange: createOnTextFocusChange(HighlightItem
                           .title)
                   )
@@ -328,7 +328,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '終日',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.allDay,
-                  verticalPaddingWidth: 5,
+                  verticalPaddingWidth: 6,
                   expanded: false,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
@@ -478,7 +478,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.repeatEnd
                       || eventDetailState.highlightItem
                       == HighlightItem.repeatEndDate,
-                  verticalPaddingWidth: 5,
+                  verticalPaddingWidth: 6,
                   expanded: false,
                   child: Row(children: [
                     CupertinoSwitch(
@@ -543,7 +543,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo)
+                          .memo, bottomSpace: 8 + 84)
                   )
               ),
 

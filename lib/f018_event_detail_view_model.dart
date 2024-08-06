@@ -20,7 +20,7 @@ enum RepeatingPattern {
       this.defaultDisplay,
       this.frequency,
       this.interval
-      );
+  );
 
   final String name;
   final bool defaultDisplay;
@@ -218,6 +218,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       state.repeatingEndDate = rule?.endDate;
     }
     setTextFieldController(TextFieldItem.repeat);
+    setTextFieldController(TextFieldItem.repeatingEndDate);
 
     state.memo = selectDateOrTime ? '' : event!.description;
     setTextFieldController(TextFieldItem.memo);
@@ -244,14 +245,14 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   }
 
   Future<double> getContentsHeight() async {
-    double baseHeight = 606;
+    double baseHeight = 612;
 
     if (state.allDay == true) {
-      baseHeight -= 48;
+      baseHeight -= 52;
     }
 
     if (state.repeatingEnd == true) {
-      baseHeight += 49;
+      baseHeight += 51;
     }
 
     return baseHeight;

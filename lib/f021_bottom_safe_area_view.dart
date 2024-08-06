@@ -129,7 +129,9 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         preKeyboardHeight.value = keyboardHeight;
         await Future.delayed(const Duration(milliseconds: 100));
         if (keyboardHeight == 0 || preKeyboardHeight.value == keyboardHeight) {
-          keyboardMovingCompletion.value = true;
+          try {
+            keyboardMovingCompletion.value = true;
+          } catch(_) {}
           // debugPrint('keyboard not moving $keyboardHeight');
         } else {
           keyboardMovingCompletion.value = false;
