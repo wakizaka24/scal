@@ -229,6 +229,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.saveButtonEnabled = state.title!.isNotEmpty && !state.readOnly!;
 
     state.highlightItem = HighlightItem.none;
+
+    await setContentsHeight();
   }
 
   @override
@@ -244,6 +246,10 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     await updateState();
   }
 
+  Future<void> setContentsHeight() async {
+    state.contentsHeight = await getContentsHeight();
+  }
+
   Future<double> getContentsHeight() async {
     double baseHeight = 612;
 
@@ -251,7 +257,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       baseHeight -= 52;
     }
 
-    if (state.repeatingEnd == true) {
+    if (state.repeatingPattern != RepeatingPattern.none) {
       baseHeight += 51;
     }
 

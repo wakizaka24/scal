@@ -198,16 +198,17 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               .repeatingEndWithOther!).indexOf(eventDetailState
               .repeatingPattern!),
         ),
-        onSelectedItemChanged: (int index) {
+        onSelectedItemChanged: (int index) async {
           var repeatingPattern =
           RepeatingPattern.getDisplayList(eventDetailState
               .repeatingEndWithOther!)[index];
-          eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
+          await eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
               value: repeatingPattern);
           if (repeatingPattern == RepeatingPattern.none) {
             eventDetailNotifier.setRepeatingEnd(false);
           }
-          eventDetailNotifier.updateState();
+          await eventDetailNotifier.setContentsHeight();
+          await eventDetailNotifier.updateState();
         },
         children: List<Widget>.generate(RepeatingPattern.getDisplayList(
             eventDetailState.repeatingEndWithOther!).length, (int index) {
@@ -289,6 +290,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: 'タイト\nル',
+                  fontSize: 13,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   child: CWTextField(
@@ -332,7 +334,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   expanded: false,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       if (eventDetailState.readOnly!) {
                         return;
                       }
@@ -347,7 +349,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         eventDetailState.endDate = eventDetailState.startDate!
                             .add(const Duration(days: 1));
                       }
-                      eventDetailNotifier.updateState();
+                      await eventDetailNotifier.setContentsHeight();
+                      await eventDetailNotifier.updateState();
                     },
                   )
               ),
