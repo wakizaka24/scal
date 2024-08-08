@@ -91,7 +91,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     });
 
     Function (bool hasFocus) createOnTextFocusChange(
-        HighlightItem item, {double bottomSpace = 6}) {
+        HighlightItem item, {double bottomSpace = 6,
+          bool forceScroll = false}) {
       return (bool hasFocus) async {
         reset() async {
           await safeAreaViewNotifier.downBottomSheet();
@@ -99,6 +100,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         if (hasFocus) {
           await reset();
           await eventDetailNotifier.updateHighlightItem(item);
+          await safeAreaViewNotifier.setForceScroll(forceScroll);
           await safeAreaViewNotifier.setSafeAreaAdjustment(8 + bottomSpace);
         } else {
           // 他のテキストにフォーカス時は動かない
@@ -330,7 +332,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '終日',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.allDay,
-                  verticalPaddingWidth: 6,
+                  verticalPaddingWidth: 4,
                   expanded: false,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
@@ -481,7 +483,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.repeatEnd
                       || eventDetailState.highlightItem
                       == HighlightItem.repeatEndDate,
-                  verticalPaddingWidth: 6,
+                  verticalPaddingWidth: 4,
                   expanded: false,
                   child: Row(children: [
                     CupertinoSwitch(
@@ -546,7 +548,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo, bottomSpace: 8 + 84)
+                          .memo, bottomSpace: 8 + 84, forceScroll: true)
                   )
               ),
 
@@ -603,7 +605,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
                       await homeNotifier.updateState();
-                      // await calendarNotifier.updateState();
                     }
                   }
               )

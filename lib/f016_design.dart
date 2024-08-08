@@ -220,7 +220,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     bool applyColorConfig(Brightness brightness) {
         var preColorConfig = state.colorConfig;
         if (brightness == Brightness.light) {
-            state.colorConfig = ColorConfig.normal35Pink;
+            state.colorConfig = ColorConfig.normal15Brown;
         } else if (brightness == Brightness.dark) {
             state.colorConfig = ColorConfig.dark11Gray;
         }

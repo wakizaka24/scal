@@ -9,6 +9,7 @@ class BottomSafeAreaViewState {
   // Data
   double safeAreaAdjustment = 0;
   double safeAreaHeight = 0;
+  bool forceScroll = false;
 
   static BottomSafeAreaViewState copy(BottomSafeAreaViewState state) {
     var nState = BottomSafeAreaViewState();
@@ -20,6 +21,7 @@ class BottomSafeAreaViewState {
     // Data
     nState.safeAreaAdjustment = state.safeAreaAdjustment;
     nState.safeAreaHeight = state.safeAreaHeight;
+    nState.forceScroll = state.forceScroll;
 
     return nState;
   }
@@ -57,6 +59,7 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
       }
       await setBottomSheetContext(null);
       await setSafeAreaAdjustment(0);
+      await setForceScroll(false);
       await setSafeAreaHeight(0);
       await updateState();
     }
@@ -64,6 +67,10 @@ class BottomSafeAreaViewNotifier extends StateNotifier<BottomSafeAreaViewState> 
 
   setBottomSheetContext(BuildContext? context) async {
     state.bottomSheetContext = context;
+  }
+
+  setForceScroll(bool forceScroll) async {
+    state.forceScroll = forceScroll;
   }
 
   updateState() async {

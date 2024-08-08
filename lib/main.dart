@@ -5,8 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
 import 'f016_design.dart';
-import 'f018_event_detail_view_model.dart';
-import 'f024_bottom_safe_area_view_model.dart';
 
 void main() {
   // 縦向き
@@ -53,10 +51,6 @@ class SCalApp extends StatelessWidget {
               final colorConfigState = ref.watch(designConfigNotifierProvider);
               final colorConfigNotifier = ref.watch(designConfigNotifierProvider
                   .notifier);
-              final safeAreaViewNotifier = ref.watch(
-                  bottomSafeAreaViewNotifierProvider.notifier);
-              final eventDetailNotifier = ref.watch(
-                  eventDetailPageNotifierProvider.notifier);
 
               if (!colorConfigInitialized) {
                 colorConfigInitialized = true;

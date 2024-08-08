@@ -85,6 +85,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     var keyboardDown = !focusItem && keyboardHeight == 0;
     if (keyboardDown) {
       safeAreaViewNotifier.setSafeAreaAdjustment(0);
+      safeAreaViewNotifier.setForceScroll(false);
     }
 
     adjustScroll(bottomHeight) {
@@ -101,7 +102,8 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
 
       var scrollOffset = lowerLimitOffset;
-      var forceScroll = false;
+      var forceScroll = safeAreaViewState.forceScroll;
+
       if (scrollOffset <= upperLimitOffset) {
         scrollOffset = lowerLimitOffset + safeAreaViewState
             .safeAreaAdjustment;

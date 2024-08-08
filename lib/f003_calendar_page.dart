@@ -715,7 +715,8 @@ class EventPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
-    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    final colorConfig = ref.watch(designConfigNotifierProvider)
+        .colorConfig!;
 
     return SelectableCalendarCell(
         height: height,
@@ -748,7 +749,7 @@ class EventPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWeight3,
-                            color: colorConfigState.colorConfig!.normalTextColor
+                            color: colorConfig.normalTextColor
                           )
                       )
                   )
@@ -811,8 +812,9 @@ class EventPart extends HookConsumerWidget {
                           textStyle: const TextStyle(fontSize: 15),
                           padding: const EdgeInsets.all(0)
                       ),
-                      child: const Text('コピー',
+                      child: Text('コピー',
                           style: TextStyle(
+                              color: colorConfig.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -841,8 +843,9 @@ class EventPart extends HookConsumerWidget {
                           textStyle: const TextStyle(fontSize: 15),
                           padding: const EdgeInsets.all(0)
                       ),
-                      child: const Text('移動',
+                      child: Text('移動',
                           style: TextStyle(
+                              color: colorConfig.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -862,10 +865,11 @@ class EventPart extends HookConsumerWidget {
                           textStyle: const TextStyle(fontSize: 15),
                           padding: const EdgeInsets.all(0)
                       ),
-                      child: const Text('取消',
+                      child: Text('取消',
                           style: TextStyle(
-                            fontSize: buttonFontSize,
-                            fontWeight: buttonFontWeight
+                              color: colorConfig.normalTextColor,
+                              fontSize: buttonFontSize,
+                              fontWeight: buttonFontWeight
                           )
                       ),
                     )
@@ -905,8 +909,9 @@ class EventPart extends HookConsumerWidget {
                           padding: const EdgeInsets.all(0),
                           // splashFactory: NoSplash.splashFactory
                       ),
-                      child: const Text('削除',
+                      child: Text('削除',
                           style: TextStyle(
+                              color: colorConfig.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -926,8 +931,9 @@ class EventPart extends HookConsumerWidget {
                           textStyle: const TextStyle(fontSize: 15),
                           padding: const EdgeInsets.all(0)
                       ),
-                      child: const Text('固定',
+                      child: Text('固定',
                           style: TextStyle(
+                              color: colorConfig.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )

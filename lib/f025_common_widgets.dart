@@ -52,8 +52,8 @@ class CWLeftTitle extends HookConsumerWidget {
     required this.title,
     this.fontSize = 15,
     required this.highlight,
-    this.verticalPaddingWidth = 8,
-    this.rightPaddingWidth = 8,
+    this.verticalPaddingWidth = 6,
+    this.rightPaddingWidth = 6,
     this.expanded = true,
     required this.child
   });
