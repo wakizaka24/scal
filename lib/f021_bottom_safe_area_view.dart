@@ -126,7 +126,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
 
       var scrollOffset = lowerLimitOffset;
-      var forceScroll = false;//safeAreaViewState.forceScroll;
+      var forceScroll = false;
 
       if (scrollOffset <= upperLimitOffset) {
         scrollOffset = lowerLimitOffset + safeAreaViewState.safeAreaAdjustment;
@@ -142,8 +142,14 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       if (milliseconds == 0) {
         milliseconds = 1;
       }
+
       if (scroll < 0) {
-        bottom = scroll.abs();
+        // 非表示エリアの食い込み
+        var biting = (widget.contentsHeight - deviceHeight - offset).abs();
+        bottom = scroll.abs() - biting;
+        if (bottom < 0) {
+          bottom = 0;
+        }
       }
 
       return ScrollStatus(offset: offset, scrollOffset: scrollOffset,
@@ -186,7 +192,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     var safeAreaHeight = safeAreaViewState.safeAreaHeight;
     useEffect(() {
       if (safeAreaHeight > 0) {
-        var scrollState = calcScrollStatus(keyboardHeight);
+        var scrollState = calcScrollStatus(safeAreaHeight);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           adjustScroll(scrollState);
         });

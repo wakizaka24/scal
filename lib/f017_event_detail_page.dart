@@ -117,7 +117,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         if (hasFocus) {
           await reset();
           await eventDetailNotifier.updateHighlightItem(item);
-          await safeAreaViewNotifier.setSafeAreaAdjustment(5 + 8);
+          await safeAreaViewNotifier.setSafeAreaAdjustment(10 + 6);
           await safeAreaViewNotifier.setSafeAreaHeight(215);
           await safeAreaViewNotifier.updateState();
           showBottomArea(child);
@@ -307,25 +307,26 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   )
               ),
 
+              const SizedBox(height: 3),
+
               CWLeftTitle(
                   title: '場所',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.place,
-                  child: SizedBox(
-                      height: 36,
-                      child: CWTextField(
-                        controller: eventDetailState.textEditingControllers!
-                        [TextFieldItem.place]!,
-                        hintText: '場所',
-                        readOnly: eventDetailState.readOnly!,
-                        focus: !eventDetailState.readOnly!,
-                        highlight: eventDetailState.highlightItem
-                            == HighlightItem.place,
-                        onFocusChange: createOnTextFocusChange(HighlightItem
-                            .place)
-                      )
+                  child: CWTextField(
+                      controller: eventDetailState.textEditingControllers!
+                      [TextFieldItem.place]!,
+                      hintText: '場所',
+                      readOnly: eventDetailState.readOnly!,
+                      focus: !eventDetailState.readOnly!,
+                      highlight: eventDetailState.highlightItem
+                          == HighlightItem.place,
+                      onFocusChange: createOnTextFocusChange(HighlightItem
+                          .place)
                   )
               ),
+
+              const SizedBox(height: 3),
 
               CWLeftTitle(
                   title: '終日',
@@ -355,6 +356,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     },
                   )
               ),
+
+              const SizedBox(height: 3),
 
               CWLeftTitle(
                   title: eventDetailState.allDay! ? '日付' : '開始',
@@ -400,6 +403,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     ),
                   ])
               ),
+
+              if (!eventDetailState.allDay!)
+                const SizedBox(height: 3),
 
               if (!eventDetailState.allDay!)
                 CWLeftTitle(
@@ -449,6 +455,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     ])
                 ),
 
+              const SizedBox(height: 3),
+
               CWLeftTitle(
                   title: '繰返し',
                   highlight: eventDetailState.highlightItem
@@ -473,6 +481,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     )
                   ])
               ),
+
+              if (eventDetailState.repeatingPattern != RepeatingPattern.none)
+                const SizedBox(height: 3),
 
               if (eventDetailState.repeatingPattern != RepeatingPattern.none)
                 CWLeftTitle(
@@ -534,6 +545,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   ])
               ),
 
+              const SizedBox(height: 3),
+
               CWLeftTitle(
                   title: 'メモ',
                   highlight: eventDetailState.highlightItem
@@ -547,7 +560,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo, bottomSpace: 8 + 84, forceScroll: true)
+                          .memo, bottomSpace: 8 + 74, forceScroll: true)
                   )
               ),
 
@@ -583,7 +596,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //     ])
               // ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 3),
 
               CWElevatedButton(
                   title: '保存する',
