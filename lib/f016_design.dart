@@ -88,20 +88,19 @@ abstract final class BackgroundColors {
     static const Color cream = Color(0xFFF3ECD8);
     static const Color cream3 = Color(0xFFEAE1CF);
     static const Color darkModeGrey = Color(0xFF313131);
-    static const Color darkModeBlack = Color(0xFF212121);
 }
 
 abstract final class BorderColors {
     static const Color gold = Color(0xCCC4B8A5);
     static const Color pink = Color(0xFFFFCCD4);
     static const Color indigo = Color(0xFFC4DDFF);
-    static const Color darkModeBlack = Colors.black;
+    static const Color darkModeGrey = Color(0xFF212121);
 }
 
 abstract final class CardColors {
     static const Color grey = Color(0xFFE5E5E5);
     static const Color cream = Color(0xFFF8F5EB);
-    static const Color darkModeBlack = Colors.black;
+    static const Color darkModeBlack = Colors.black26;
 }
 
 enum ColorConfig {
@@ -163,9 +162,9 @@ enum ColorConfig {
         CardColors.darkModeBlack, // cardColor
         Colors.white54, // normalTextColor
         Colors.white30, // disabledTextColor
-        BorderColors.darkModeBlack, // borderColor
-        50, // calendarTodayBgColorAlpha
-        30, // calendarLineBgColorAlpha
+        BorderColors.darkModeGrey, // borderColor
+        135, // calendarTodayBgColorAlpha
+        80, // calendarLineBgColorAlpha
         255, // highlightBgColorAlpha
         Colors.white // cardTextColor
     );
