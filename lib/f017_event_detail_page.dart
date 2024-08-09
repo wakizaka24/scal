@@ -100,7 +100,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         if (hasFocus) {
           await reset();
           await eventDetailNotifier.updateHighlightItem(item);
-          await safeAreaViewNotifier.setForceScroll(forceScroll);
           await safeAreaViewNotifier.setSafeAreaAdjustment(8 + bottomSpace);
         } else {
           // 他のテキストにフォーカス時は動かない

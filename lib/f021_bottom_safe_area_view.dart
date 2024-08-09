@@ -24,6 +24,20 @@ class BottomSafeAreaView extends StatefulHookConsumerWidget {
   => _BottomSafeAreaView();
 }
 
+class ScrollStatus {
+  final double offset;
+  final double scrollOffset;
+  final bool forceScroll;
+  final int milliseconds;
+
+  const ScrollStatus({
+    required this.offset,
+    required this.scrollOffset,
+    required this.forceScroll,
+    required this.milliseconds
+  });
+}
+
 class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
   @override
   Widget build(BuildContext context) {
@@ -85,10 +99,20 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     var keyboardDown = !focusItem && keyboardHeight == 0;
     if (keyboardDown) {
       safeAreaViewNotifier.setSafeAreaAdjustment(0);
-      safeAreaViewNotifier.setForceScroll(false);
     }
 
-    adjustScroll(bottomHeight) {
+    double bottom = 0;
+    adjustScroll(scrollStatus) async {
+      if (scrollStatus.offset < scrollStatus.scrollOffset
+          || scrollStatus.forceScroll) {
+        await safeAreaViewState.keyboardScrollController?.animateTo(
+            scrollStatus.scrollOffset, duration: Duration(
+            milliseconds: scrollStatus.milliseconds), curve: Curves.linear);
+        // homeState.keyboardScrollController?.jumpTo(scrollOffset);
+      }
+    }
+
+    ScrollStatus calcScrollStatus(double bottomHeight) {
       var offset = safeAreaViewState.keyboardScrollController!.offset;
       // 見切れるスクロールの上限
       var upperLimitOffset = primaryFocusY + primaryOffsetY
@@ -102,28 +126,28 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       //     ' $lowerLimitOffset ${homeState.keyboardAdjustment}');
 
       var scrollOffset = lowerLimitOffset;
-      var forceScroll = safeAreaViewState.forceScroll;
+      var forceScroll = false;//safeAreaViewState.forceScroll;
 
       if (scrollOffset <= upperLimitOffset) {
-        scrollOffset = lowerLimitOffset + safeAreaViewState
-            .safeAreaAdjustment;
+        scrollOffset = lowerLimitOffset + safeAreaViewState.safeAreaAdjustment;
       } else {
         // エリアが上限を上回る場合は上限に合わせる
         forceScroll = true;
         scrollOffset = upperLimitOffset;
       }
 
-      if (offset < scrollOffset || forceScroll) {
-        var distance = (offset - scrollOffset).abs().toInt();
-        var milliseconds = (distance * 0.52).toInt();
-        if (milliseconds == 0) {
-          milliseconds = 1;
-        }
-        safeAreaViewState.keyboardScrollController?.animateTo(scrollOffset,
-            duration: Duration(milliseconds: milliseconds),
-            curve: Curves.linear);
-        // homeState.keyboardScrollController?.jumpTo(scrollOffset);
+      var scroll = offset - scrollOffset;
+      var distance = scroll.abs().toInt();
+      var milliseconds = (distance * 0.52).toInt();
+      if (milliseconds == 0) {
+        milliseconds = 1;
       }
+      if (scroll < 0) {
+        bottom = scroll.abs();
+      }
+
+      return ScrollStatus(offset: offset, scrollOffset: scrollOffset,
+          forceScroll: forceScroll, milliseconds: milliseconds);
     }
 
     useEffect(() {
@@ -149,8 +173,9 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
       //     '$focusItem');
       if (keyboardMovingCompletion.value && focusItem) {
+        var scrollState = calcScrollStatus(keyboardHeight);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          adjustScroll(keyboardHeight);
+          adjustScroll(scrollState);
         });
       }
 
@@ -161,8 +186,9 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     var safeAreaHeight = safeAreaViewState.safeAreaHeight;
     useEffect(() {
       if (safeAreaHeight > 0) {
+        var scrollState = calcScrollStatus(keyboardHeight);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          adjustScroll(safeAreaHeight);
+          adjustScroll(scrollState);
         });
       }
       return () {
@@ -173,7 +199,8 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         controller: safeAreaViewState.keyboardScrollController,
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
-            bottom: safeAreaHeight > 0 ? safeAreaHeight : keyboardHeight),
+            bottom: /*safeAreaHeight > 0 ? safeAreaHeight : keyboardHeight*/
+            bottom),
             child: SizedBox(
                 width: widget.contentsWidth,
                 height: widget.contentsHeight,
