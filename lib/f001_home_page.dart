@@ -101,6 +101,11 @@ class HomePage extends HookConsumerWidget {
           await calendarNotifier.updateCalendar(dataExclusion: true);
           await colorConfigNotifier.updateState();
         }
+
+        primaryFocus?.unfocus();
+        // ハイライト解除
+        await eventDetailNotifier.updateHighlightItem(
+            HighlightItem.none);
       });
     }
 
