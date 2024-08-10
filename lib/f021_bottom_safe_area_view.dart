@@ -81,6 +81,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     // フォーカステキストの位置
     if (!focusItem) {
       keyboardMovingCompletion.value = false;
+      bottom.value = 0;
       // キーボード表示時にコンボボックスなどでキーボードを閉じて、再度キーボードを開いた時、
       // スクロールが必要であればスクロールする。
     } else if (firstPrimaryOffsetY.value
@@ -96,14 +97,12 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     double primaryFocusHeight = !focusItem ? 0
         : focusHeight ?? 0;
 
+    // debugPrint('$primaryOffsetY $primaryFocusY $primaryFocusHeight');
+
     // キーボードを閉じた場合
     var keyboardDown = !focusItem && keyboardHeight == 0;
     if (keyboardDown) {
       safeAreaViewNotifier.setSafeAreaAdjustment(0);
-    }
-
-    if (!focusItem) {
-      bottom.value = 0;
     }
 
     adjustScroll(scrollStatus) async {
@@ -178,31 +177,30 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       };
     }, [keyboardHeight]);
 
-    useEffect(() {
-      // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
-      //     '$focusItem');
-      if (keyboardMovingCompletion.value && focusItem) {
-        var scrollState = calcScrollStatus(keyboardHeight);
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          adjustScroll(scrollState);
-        });
-      }
-
-      return () {
-      };
-    }, [keyboardHeight, keyboardMovingCompletion.value]);
-
     var safeAreaHeight = safeAreaViewState.safeAreaHeight;
-    useEffect(() {
-      if (safeAreaHeight > 0) {
+    if (safeAreaHeight == 0) {
+      useEffect(() {
+        // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
+        //     '$focusItem');
+        if (keyboardMovingCompletion.value && focusItem) {
+          var scrollState = calcScrollStatus(keyboardHeight);
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            adjustScroll(scrollState);
+          });
+        }
+
+        return () {};
+      }, [keyboardHeight, keyboardMovingCompletion.value, primaryFocusY]);
+    } else {
+      useEffect(() {
         var scrollState = calcScrollStatus(safeAreaHeight);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           adjustScroll(scrollState);
         });
-      }
-      return () {
-      };
-    }, [safeAreaHeight]);
+        return () {
+        };
+      }, [safeAreaHeight, primaryFocusY]);
+    }
 
     return SingleChildScrollView(
         controller: safeAreaViewState.keyboardScrollController,
