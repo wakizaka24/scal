@@ -287,7 +287,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                 ),
               ]),
 
-              const SizedBox(height: 500),
+              // const SizedBox(height: 500),
 
               CWLeftTitle(
                   title: 'タイト\nル',

@@ -251,7 +251,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   }
 
   Future<double> getContentsHeight() async {
-    double baseHeight = 500 + 597;
+    double baseHeight = /*500 + */597;
 
     if (state.allDay == true) {
       baseHeight -= 51;
