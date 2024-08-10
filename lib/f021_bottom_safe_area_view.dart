@@ -49,6 +49,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     final firstPrimaryFocusY = useState<double>(0.0);
     final preKeyboardHeight = useState<double>(0.0);
     final keyboardMovingCompletion = useState<bool>(false);
+    final bottom = useState<double>(0.0);
 
     useEffect(() {
       safeAreaViewNotifier.initState();
@@ -101,7 +102,10 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       safeAreaViewNotifier.setSafeAreaAdjustment(0);
     }
 
-    double bottom = 0;
+    if (!focusItem) {
+      bottom.value = 0;
+    }
+
     adjustScroll(scrollStatus) async {
       if (scrollStatus.offset < scrollStatus.scrollOffset
           || scrollStatus.forceScroll) {
@@ -143,13 +147,12 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         milliseconds = 1;
       }
 
-      if (scroll < 0) {
-        // 非表示エリアの食い込み
-        var biting = (widget.contentsHeight - deviceHeight - offset).abs();
-        bottom = scroll.abs() - biting;
-        if (bottom < 0) {
-          bottom = 0;
-        }
+      // 非表示エリアの食い込み
+      var biting = widget.contentsHeight - deviceHeight - offset;
+      debugPrint('base=$biting scroll=$scroll');
+      bottom.value = -biting - scroll;
+      if (bottom.value < 0) {
+        bottom.value = 0;
       }
 
       return ScrollStatus(offset: offset, scrollOffset: scrollOffset,
@@ -187,7 +190,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
 
       return () {
       };
-    }, [keyboardMovingCompletion.value]);
+    }, [keyboardHeight, keyboardMovingCompletion.value]);
 
     var safeAreaHeight = safeAreaViewState.safeAreaHeight;
     useEffect(() {
@@ -206,7 +209,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
             bottom: /*safeAreaHeight > 0 ? safeAreaHeight : keyboardHeight*/
-            bottom),
+            bottom.value),
             child: SizedBox(
                 width: widget.contentsWidth,
                 height: widget.contentsHeight,
