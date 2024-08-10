@@ -49,6 +49,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     final firstPrimaryFocusY = useState<double>(0.0);
     final preKeyboardHeight = useState<double>(0.0);
     final keyboardMovingCompletion = useState<bool>(false);
+    final keyboardMovingCount = useState<int>(0);
     final bottom = useState<double>(0.0);
 
     useEffect(() {
@@ -111,7 +112,8 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         await safeAreaViewState.keyboardScrollController?.animateTo(
             scrollStatus.scrollOffset, duration: Duration(
             milliseconds: scrollStatus.milliseconds), curve: Curves.linear);
-        // homeState.keyboardScrollController?.jumpTo(scrollOffset);
+        // safeAreaViewState.keyboardScrollController?.jumpTo(
+        //     scrollStatus.scrollOffset);
       }
     }
 
@@ -148,7 +150,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
 
       // 非表示エリアの食い込み
       var biting = widget.contentsHeight - deviceHeight - offset;
-      debugPrint('base=$biting scroll=$scroll');
+      // debugPrint('base=$biting scroll=$scroll');
       bottom.value = -biting - scroll;
       if (bottom.value < 0) {
         bottom.value = 0;
@@ -165,10 +167,14 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         if (keyboardHeight == 0 || preKeyboardHeight.value == keyboardHeight) {
           try {
             keyboardMovingCompletion.value = true;
+            keyboardMovingCount.value = 0;
           } catch(_) {}
           // debugPrint('keyboard not moving $keyboardHeight');
-        } else {
+        } else if (keyboardMovingCompletion.value) {
           keyboardMovingCompletion.value = false;
+          // debugPrint('keyboard stating to move $keyboardHeight');
+        } else {
+          keyboardMovingCount.value++;
           // debugPrint('keyboard moving $keyboardHeight');
         }
       });
@@ -178,29 +184,34 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     }, [keyboardHeight]);
 
     var safeAreaHeight = safeAreaViewState.safeAreaHeight;
-    if (safeAreaHeight == 0) {
-      useEffect(() {
-        // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
-        //     '$focusItem');
-        if (keyboardMovingCompletion.value && focusItem) {
+
+    useEffect(() {
+      // debugPrint('keyboard Upping Event ${keyboardMovingCompletion.value} '
+      //     '$focusItem');
+
+      if (safeAreaHeight == 0) {
+        if (keyboardMovingCompletion.value && keyboardHeight > 0 && focusItem) {
+          // debugPrint('primaryFocusY=$primaryFocusY');
           var scrollState = calcScrollStatus(keyboardHeight);
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             adjustScroll(scrollState);
           });
         }
+      }
+      return () {};
+    }, [keyboardMovingCompletion.value, keyboardMovingCount.value,
+      primaryFocusY]);
 
-        return () {};
-      }, [keyboardHeight, keyboardMovingCompletion.value, primaryFocusY]);
-    } else {
-      useEffect(() {
+    useEffect(() {
+      if (safeAreaHeight > 0) {
         var scrollState = calcScrollStatus(safeAreaHeight);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           adjustScroll(scrollState);
         });
-        return () {
-        };
-      }, [safeAreaHeight, primaryFocusY]);
-    }
+      }
+      return () {
+      };
+    }, [safeAreaHeight, primaryFocusY]);
 
     return SingleChildScrollView(
         controller: safeAreaViewState.keyboardScrollController,
