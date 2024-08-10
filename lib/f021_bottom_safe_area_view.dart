@@ -82,6 +82,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
     // フォーカステキストの位置
     if (!focusItem) {
       keyboardMovingCompletion.value = false;
+      keyboardMovingCount.value = 0;
       bottom.value = 0;
       // キーボード表示時にコンボボックスなどでキーボードを閉じて、再度キーボードを開いた時、
       // スクロールが必要であればスクロールする。
@@ -167,7 +168,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         if (keyboardHeight == 0 || preKeyboardHeight.value == keyboardHeight) {
           try {
             keyboardMovingCompletion.value = true;
-            keyboardMovingCount.value = 0;
+            keyboardMovingCount.value++;
           } catch(_) {}
           // debugPrint('keyboard not moving $keyboardHeight');
         } else if (keyboardMovingCompletion.value) {
@@ -190,7 +191,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
       //     '$focusItem');
 
       if (safeAreaHeight == 0) {
-        if (keyboardMovingCompletion.value && keyboardHeight > 0 && focusItem) {
+        if (keyboardMovingCompletion.value && focusItem) {
           // debugPrint('primaryFocusY=$primaryFocusY');
           var scrollState = calcScrollStatus(keyboardHeight);
           WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -217,8 +218,7 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
         controller: safeAreaViewState.keyboardScrollController,
         physics: const ClampingScrollPhysics(),
         child: Padding(padding: EdgeInsets.only(
-            bottom: /*safeAreaHeight > 0 ? safeAreaHeight : keyboardHeight*/
-            bottom.value),
+            bottom: bottom.value),
             child: SizedBox(
                 width: widget.contentsWidth,
                 height: widget.contentsHeight,
