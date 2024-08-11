@@ -1,15 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <!-- APIレベル30の場合テキスト読み上げに宣言が必要 -->
-    <queries>
-        <intent>
-            <action
-                android:name="android.intent.action.TTS_SERVICE" />
-        </intent>
-    </queries>
     <application
-        android:label="Scal"
+        android:label="Starlight"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
