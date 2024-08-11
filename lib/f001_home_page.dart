@@ -147,7 +147,7 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              icon: Icons.check,
+              assetName: 'images/icon_locking_tool_unlock.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -269,7 +269,7 @@ class HomePage extends HookConsumerWidget {
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
           child: Container(color: theme.primaryColor)
       ),
-      // Image.asset('images/IMG_3173_3.jpeg'),
+      // Image.asset('images/IMG_3173.jpeg'),
       appTitle,
       appBar,
       calendars,

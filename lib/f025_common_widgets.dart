@@ -180,7 +180,9 @@ class CWTextField extends HookConsumerWidget {
 }
 
 class CWIconButton extends HookConsumerWidget {
-  final IconData icon;
+  final String? assetName;
+  final double? assetIconSize;
+  final IconData? icon;
   final VoidCallback onPressed;
   final double width;
   final double height;
@@ -189,7 +191,9 @@ class CWIconButton extends HookConsumerWidget {
 
   const CWIconButton({
     super.key,
-    required this.icon,
+    this.assetName,
+    this.assetIconSize = 21,
+    this.icon,
     required this.onPressed,
     this.width = 32,
     this.height = 32,
@@ -199,6 +203,9 @@ class CWIconButton extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var child = assetName != null ? ImageIcon(AssetImage(assetName!),
+        size: assetIconSize) : Icon(icon);
+    
     return SizedBox(width: width, height: height,
         child: TextButton(
           onPressed: onPressed,
@@ -209,8 +216,7 @@ class CWIconButton extends HookConsumerWidget {
               borderRadius: BorderRadius.circular(radius),
             ),
             padding: const EdgeInsets.all(0),
-          ),
-          child: const Icon(Icons.check),
+          ), child: child,
         )
     );
   }
