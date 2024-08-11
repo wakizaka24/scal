@@ -346,10 +346,18 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       eventDetailState.highlightItem = HighlightItem.allDay;
                       eventDetailState.allDay = value;
                       if (value) {
-                        eventDetailState.startDate = CalendarUtils()
-                            .trimDate(eventDetailState.startDate!);
-                        eventDetailState.endDate = eventDetailState.startDate!
-                            .add(const Duration(days: 1));
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.startDate, value: CalendarUtils()
+                            .trimDate(eventDetailState.startDate!));
+
+                        var endDate = CalendarUtils()
+                            .trimDate(eventDetailState.endDate!);
+                        if (eventDetailState.startDate == endDate) {
+                          endDate = endDate.add(const Duration(days: 1));
+                        }
+
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.endDate, value: endDate);
                       }
                       await eventDetailNotifier.setContentsHeight();
                       await eventDetailNotifier.updateState();
@@ -360,7 +368,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               const SizedBox(height: 3),
 
               CWLeftTitle(
-                  title: eventDetailState.allDay! ? '日付' : '開始',
+                  title: '開始',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.startDate
                     || eventDetailState.highlightItem
@@ -404,56 +412,54 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   ])
               ),
 
-              if (!eventDetailState.allDay!)
-                const SizedBox(height: 3),
+              const SizedBox(height: 3),
 
-              if (!eventDetailState.allDay!)
-                CWLeftTitle(
-                    title: '終了',
-                    highlight: eventDetailState.highlightItem
-                        == HighlightItem.endDate
-                        || eventDetailState.highlightItem
-                            == HighlightItem.endTime,
-                    expanded: false,
-                    child: Row(children: [
+              CWLeftTitle(
+                  title: '終了',
+                  highlight: eventDetailState.highlightItem
+                      == HighlightItem.endDate
+                      || eventDetailState.highlightItem
+                          == HighlightItem.endTime,
+                  expanded: false,
+                  child: Row(children: [
+                    SizedBox(
+                        width: 120, height: 36,
+                        child: CWTextField(
+                            controller: eventDetailState
+                                .textEditingControllers!
+                            [TextFieldItem.endDate]!,
+                            fontSize: 15,
+                            textAlign: TextAlign.center,
+                            paddingAll: 6,
+                            readOnly: true,
+                            focus: !eventDetailState.readOnly!,
+                            highlight: eventDetailState.highlightItem
+                                == HighlightItem.endDate,
+                            onFocusChange: createOnBottomPopTextFocusChange(
+                                HighlightItem.endDate, endDatePicker)
+                        )
+                    ),
+
+                    if (!eventDetailState.allDay!)
                       SizedBox(
-                          width: 120, height: 36,
+                          width: 60, height: 36,
                           child: CWTextField(
                               controller: eventDetailState
                                   .textEditingControllers!
-                              [TextFieldItem.endDate]!,
+                              [TextFieldItem.endTime]!,
                               fontSize: 15,
                               textAlign: TextAlign.center,
                               paddingAll: 6,
                               readOnly: true,
                               focus: !eventDetailState.readOnly!,
                               highlight: eventDetailState.highlightItem
-                                  == HighlightItem.endDate,
+                                  == HighlightItem.endTime,
                               onFocusChange: createOnBottomPopTextFocusChange(
-                                  HighlightItem.endDate, endDatePicker)
+                                HighlightItem.endTime, endTimePicker)
                           )
                       ),
-
-                      if (!eventDetailState.allDay!)
-                        SizedBox(
-                            width: 60, height: 36,
-                            child: CWTextField(
-                                controller: eventDetailState
-                                    .textEditingControllers!
-                                [TextFieldItem.endTime]!,
-                                fontSize: 15,
-                                textAlign: TextAlign.center,
-                                paddingAll: 6,
-                                readOnly: true,
-                                focus: !eventDetailState.readOnly!,
-                                highlight: eventDetailState.highlightItem
-                                    == HighlightItem.endTime,
-                                onFocusChange: createOnBottomPopTextFocusChange(
-                                  HighlightItem.endTime, endTimePicker)
-                            )
-                        ),
-                    ])
-                ),
+                  ])
+              ),
 
               const SizedBox(height: 3),
 
@@ -560,7 +566,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo, bottomSpace: 8 + 74, forceScroll: true)
+                          .memo, bottomSpace: 8 + 78, forceScroll: true)
                   )
               ),
 
