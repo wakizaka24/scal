@@ -160,7 +160,7 @@ class HomePage extends HookConsumerWidget {
             ),
 
             CWIconButton(
-              icon: Icons.check,
+              assetName: 'images/icon_today_selection.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -170,7 +170,7 @@ class HomePage extends HookConsumerWidget {
             ),
 
             CWIconButton(
-              icon: Icons.check,
+              assetName: 'images/icon_drawer.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
