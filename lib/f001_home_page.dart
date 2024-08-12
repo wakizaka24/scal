@@ -10,6 +10,7 @@ import 'f002_home_view_model.dart';
 import 'f011_end_drawer.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
+import 'f013_ui_utils.dart';
 import 'f016_design.dart';
 import 'f018_event_detail_view_model.dart';
 import 'f025_common_widgets.dart';
@@ -27,7 +28,6 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
-    final preAppLifecycle = useState(appLifecycleState);
     final maximumUnsafeAreaBottomHeight = useState(0.0);
 
     final homeState = ref.watch(homePageNotifierProvider);
@@ -85,29 +85,30 @@ class HomePage extends HookConsumerWidget {
     //   };
     // }, [homeState.uICover]);
 
-    // 前回とステータスが異なり、(再開または非活性)の場合
-    var appDistant = preAppLifecycle.value != appLifecycleState
-      && (appLifecycleState == AppLifecycleState.resumed
-            || appLifecycleState == AppLifecycleState.inactive);
-
-    preAppLifecycle.value = appLifecycleState;
     //debugPrint('appLifecycleState=$appLifecycleState');
-    if (appDistant) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final Brightness brightness = MediaQuery.platformBrightnessOf(
-            context);
-        if (colorConfigNotifier.applyColorConfig(brightness)) {
-          await calendarNotifier.initState();
-          await calendarNotifier.updateCalendar(dataExclusion: true);
-          await colorConfigNotifier.updateState();
-        }
+    useEffect(() {
+      // 再開または非活性に変化した場合
+      if (appLifecycleState == AppLifecycleState.resumed
+          || appLifecycleState == AppLifecycleState.inactive) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final Brightness brightness = MediaQuery.platformBrightnessOf(
+              context);
+          if (colorConfigNotifier.applyColorConfig(brightness)) {
+            await calendarNotifier.initState();
+            await calendarNotifier.updateCalendar(dataExclusion: true);
+            await colorConfigNotifier.updateState();
+          }
 
-        primaryFocus?.unfocus();
-        // ハイライト解除
-        await eventDetailNotifier.updateHighlightItem(
-            HighlightItem.none);
-      });
-    }
+          primaryFocus?.unfocus();
+          // ハイライト解除
+          await eventDetailNotifier.updateHighlightItem(
+              HighlightItem.none);
+        });
+      }
+
+      return () {
+      };
+    }, [appLifecycleState]);
 
     var appTitle = Column(children: [
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
@@ -209,8 +210,20 @@ class HomePage extends HookConsumerWidget {
           var selectionDateTime = selectDay == null ? null
               : selectDay ? calendarState.selectionDate
               : calendarState.selectionHour;
-          Calendar? calendar = (await calendarNotifier.getCalendars())
-              .firstWhere((cal) => cal.isDefault!);
+          List<Calendar> calendarList = (await calendarNotifier.getCalendars())
+              .where((cal) => cal.isDefault!).toList();
+          Calendar? calendar;
+          if (calendarList.isEmpty) {
+            if (context.mounted) {
+              await UIUtils().showMessageDialog(context, ref,
+                  '登録', 'イベントの登録には、OS標準のカレンダーアプリで'
+                      'カレンダー情報を設定する必要があります。');
+              return;
+            }
+          } else {
+            calendar = calendarList.first;
+          }
+
           if (event != null) {
             calendar = (await calendarNotifier.getCalendars())
                 .firstWhere((cal) => cal.id == event.calendarId);

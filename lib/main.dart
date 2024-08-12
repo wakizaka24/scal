@@ -13,6 +13,25 @@ void main() {
     DeviceOrientation.portraitUp
   ]);
 
+  // ステータスバーの設定
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    // iOSの文字を白にする。
+    statusBarBrightness: Brightness.dark,
+    // Androidの文字を白にする。
+    statusBarIconBrightness: Brightness.light,
+    // Androidの背景色を透明にする。
+    statusBarColor: Colors.transparent,
+  ));
+
+  // // Androidのジェスチャーナビゲーションを透明にする。
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+  //     overlays: [SystemUiOverlay.top]).then((_) {
+  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+  //     systemNavigationBarColor: Colors.transparent,
+  //     systemNavigationBarDividerColor: Colors.transparent,
+  //   ));
+  // });
+
   // // MediaQuery.removePadding removeTopと
   // // 併用でセーフエリアのボタンを有効にする。
   // SystemChrome.setEnabledSystemUIMode(
@@ -72,12 +91,16 @@ class SCalApp extends StatelessWidget {
                       backgroundColor: colorConfigState.colorConfig!
                           .backgroundColor
                     ),
-                    appBarTheme: const AppBarTheme(
-                      systemOverlayStyle: SystemUiOverlayStyle(
-                        statusBarBrightness: Brightness.dark, // iOS
-                        statusBarIconBrightness: Brightness.dark, // Android
-                      )
-                    )
+                    // appBarTheme: const AppBarTheme(
+                    //   systemOverlayStyle: SystemUiOverlayStyle(
+                    //     // iOSの文字を白にする。
+                    //     statusBarBrightness: Brightness.light,
+                    //     // Androidの文字を白にする。
+                    //     statusBarIconBrightness: Brightness.light,
+                    //     // Androidの背景色を透明にする。
+                    //     statusBarColor: Colors.transparent,
+                    //   )
+                    // )
                 ),
                 home: const HomePage(),
               );

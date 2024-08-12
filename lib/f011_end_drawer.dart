@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f016_design.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -40,6 +41,18 @@ class EndDrawer extends HookConsumerWidget {
                   )
                 )
               );
+
+              await Future.delayed(const Duration(milliseconds: 500));
+
+              // ステータスバーの設定
+              SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+                // iOSの文字を白にする。
+                statusBarBrightness: Brightness.dark,
+                // Androidの文字を白にする。
+                statusBarIconBrightness: Brightness.light,
+                // Androidの背景色を透明にする。
+                statusBarColor: Colors.transparent,
+              ));
             }
           )
         }
