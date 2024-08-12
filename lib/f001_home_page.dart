@@ -85,11 +85,11 @@ class HomePage extends HookConsumerWidget {
     //   };
     // }, [homeState.uICover]);
 
-    // アプリに復帰時(再開以外から再開)またはアプリ再開以外
-    var appDistant = appLifecycleState != null
-      && ((appLifecycleState == AppLifecycleState.resumed
-      && preAppLifecycle.value != AppLifecycleState.resumed)
-        || appLifecycleState != AppLifecycleState.resumed);
+    // 前回とステータスが異なり、(再開または非活性)の場合
+    var appDistant = preAppLifecycle.value != appLifecycleState
+      && (appLifecycleState == AppLifecycleState.resumed
+            || appLifecycleState == AppLifecycleState.inactive);
+
     preAppLifecycle.value = appLifecycleState;
     //debugPrint('appLifecycleState=$appLifecycleState');
     if (appDistant) {

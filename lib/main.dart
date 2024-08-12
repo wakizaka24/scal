@@ -13,14 +13,6 @@ void main() {
     DeviceOrientation.portraitUp
   ]);
 
-  // ステータスバーのフォントカラーを白にする。
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark, // iOS
-      statusBarIconBrightness: Brightness.dark, // Android
-    )
-  );
-
   // // MediaQuery.removePadding removeTopと
   // // 併用でセーフエリアのボタンを有効にする。
   // SystemChrome.setEnabledSystemUIMode(
@@ -80,6 +72,12 @@ class SCalApp extends StatelessWidget {
                       backgroundColor: colorConfigState.colorConfig!
                           .backgroundColor
                     ),
+                    appBarTheme: const AppBarTheme(
+                      systemOverlayStyle: SystemUiOverlayStyle(
+                        statusBarBrightness: Brightness.dark, // iOS
+                        statusBarIconBrightness: Brightness.dark, // Android
+                      )
+                    )
                 ),
                 home: const HomePage(),
               );

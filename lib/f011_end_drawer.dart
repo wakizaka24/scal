@@ -53,23 +53,16 @@ class EndDrawer extends HookConsumerWidget {
             children: [
               Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: SizedBox(width: buttonWidth, height: buttonWidth,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: normalTextColor,
-                          textStyle: const TextStyle(fontSize: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                buttonWidth / 2),
-                          ),
-                          padding: const EdgeInsets.all(0),
-                        ),
-                        child: Icon(Icons.check,
-                            color: normalTextColor),
-                      )
+                  child: CWIconButton(
+                    assetName: 'images/icon_closing.png',
+                    assetIconSize: 15,
+                    width: buttonWidth,
+                    height: buttonWidth,
+                    radius: buttonWidth / 2,
+                    foregroundColor: normalTextColor,
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
                   )
               ),
               Expanded(
