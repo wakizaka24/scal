@@ -68,7 +68,6 @@ class EndDrawer extends HookConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: CWIconButton(
                     assetName: 'images/icon_closing.png',
-                    assetIconSize: 15,
                     width: buttonWidth,
                     height: buttonWidth,
                     radius: buttonWidth / 2,
