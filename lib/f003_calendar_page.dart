@@ -70,6 +70,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     // 週部分の高さ
     double weekPartHeight = deviceHeight - appBarHeight - eventListHeight
         - widget.unsafeAreaTopHeight;
+    double dayAndWeekdayListPartWidth = 47;
+    var hours = calendarState.hours;
+    var hoursPartRowNum = CalendarPageState.hoursPartRowNum;
+    var hoursPartCowNum = hours.length ~/ hoursPartRowNum;
+    double hourPartWidth = (deviceWidth - dayAndWeekdayListPartWidth)
+        / hoursPartCowNum;
+    double hourPartHeight = weekPartHeight / CalendarPageState
+        .hoursPartRowNum;
 
     useEffect(() {
       debugPrint('child useEffect');
@@ -95,52 +103,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       };
     }, const []);
 
-    // Week Calendar
-
-    double dayAndWeekdayListPartWidth = 47;
-    double hourPartHeight = weekPartHeight / CalendarPageState
-        .hoursPartRowNum;
-
-    var dayAndWeekdayListPart = DayAndWeekdayListPart(
-        hoursPartRowNum: CalendarPageState.hoursPartRowNum,
-        hourPartWidth: dayAndWeekdayListPartWidth,
-        hourPartHeight: hourPartHeight,
-        dayAndWeekdayList: calendarState.dayAndWeekdayList);
-
-    var hours = calendarState.hours;
-    var hoursPartRowNum = CalendarPageState.hoursPartRowNum;
-    var hoursPartCowNum = hours.length ~/ hoursPartRowNum;
-
-    double hourPartWidth = (deviceWidth - dayAndWeekdayListPartWidth)
-        / hoursPartCowNum;
-
-    var hoursPart = HoursPart(
-        hoursPartColNum: hoursPartCowNum,
-        hoursPartRowNum: hoursPartRowNum,
-        hourPartWidth: hourPartWidth,
-        hourPartHeight: hourPartHeight,
-        onPointerDown: (int pageIndex) async {},
-        onPointerUp: (int pageIndex) async {},
-        hourList: calendarState.hours
-    );
-
-    var weekCalendar = Column(
-        children: [
-          // 週と日付部分
-          Expanded(
-              child: Row(children: [
-                SizedBox(width: dayAndWeekdayListPartWidth,
-                    child: dayAndWeekdayListPart),
-                Expanded(child: hoursPart)
-              ])
-          ),
-        ]
-    );
-
     return Stack(children: [
       Column(children: [
         Expanded(
-            child: PageView(
+            child: PageView.builder(
                 controller: calendarState.calendarSwitchingController,
                 physics: const CustomScrollPhysics(mass: 75,
                     stiffness: 100, damping: 0.85),
@@ -148,12 +114,20 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                 scrollDirection: Axis.vertical,
                 onPageChanged: (int index) {
                 },
-                children: [MonthCalendarPage(
-                    unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
-                    unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
-                    monthPartHeight: monthPartHeight,
-                    weekdayPartWidth: weekdayPartWidth,
-                    weekdayPartHeight: weekdayPartHeight), weekCalendar]
+                itemCount: 2,
+                itemBuilder: (context, index) {
+                  return [MonthCalendarPage(
+                      weekdayPartWidth: weekdayPartWidth,
+                      weekdayPartHeight: weekdayPartHeight,
+                      monthPartHeight: monthPartHeight
+                  ), WeekCalendarPage(
+                      hoursPartCowNum: hoursPartCowNum,
+                      hoursPartRowNum: hoursPartRowNum,
+                      dayAndWeekdayListPartWidth: dayAndWeekdayListPartWidth,
+                      hourPartWidth: hourPartWidth,
+                      hourPartHeight: hourPartHeight
+                  )][index];
+                }
             )
         ),
         AspectRatio(
@@ -194,18 +168,15 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
 }
 
 class MonthCalendarPage extends StatefulHookConsumerWidget {
-  final double unsafeAreaTopHeight;
-  final double unsafeAreaBottomHeight;
-  final double monthPartHeight;
   final double weekdayPartWidth;
   final double weekdayPartHeight;
+  final double monthPartHeight;
 
   const MonthCalendarPage({super.key,
-    required this.unsafeAreaTopHeight,
-    required this.unsafeAreaBottomHeight,
-    required this.monthPartHeight,
     required this.weekdayPartWidth,
-    required this.weekdayPartHeight});
+    required this.weekdayPartHeight,
+    required this.monthPartHeight
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState()
@@ -240,7 +211,6 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
       dayList: dayList,
     )).toList();
 
-
     return PageView.builder(
       controller: calendarState.monthCalendarController,
       physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
@@ -253,6 +223,72 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
         return monthPartList[adjustmentIndex % 3];
       },
     );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class WeekCalendarPage extends StatefulHookConsumerWidget {
+  final int hoursPartCowNum;
+  final int hoursPartRowNum;
+  final double dayAndWeekdayListPartWidth;
+  final double hourPartWidth;
+  final double hourPartHeight;
+
+  const WeekCalendarPage({super.key,
+    required this.hoursPartCowNum,
+    required this.hoursPartRowNum,
+    required this.dayAndWeekdayListPartWidth,
+    required this.hourPartWidth,
+    required this.hourPartHeight
+  });
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState()
+  => _WeekCalendarPageState();
+}
+
+class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
+    with AutomaticKeepAliveClientMixin {
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    final calendarState = ref.watch(calendarPageNotifierProvider);
+
+    // Week Calendar
+    var dayAndWeekdayListPart = DayAndWeekdayListPart(
+        hoursPartRowNum: CalendarPageState.hoursPartRowNum,
+        hourPartWidth: widget.dayAndWeekdayListPartWidth,
+        hourPartHeight: widget.hourPartHeight,
+        dayAndWeekdayList: calendarState.dayAndWeekdayList);
+
+    var hoursPart = HoursPart(
+        hoursPartColNum: widget.hoursPartCowNum,
+        hoursPartRowNum: widget.hoursPartRowNum,
+        hourPartWidth: widget.hourPartWidth,
+        hourPartHeight: widget.hourPartHeight,
+        onPointerDown: (int pageIndex) async {},
+        onPointerUp: (int pageIndex) async {},
+        hourList: calendarState.hours
+    );
+
+    var weekCalendar = Column(
+        children: [
+          // 週と日付部分
+          Expanded(
+              child: Row(children: [
+                SizedBox(width: widget.dayAndWeekdayListPartWidth,
+                    child: dayAndWeekdayListPart),
+                Expanded(child: hoursPart)
+              ])
+          ),
+        ]
+    );
+
+    return weekCalendar;
   }
 
   @override

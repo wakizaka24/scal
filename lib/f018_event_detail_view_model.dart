@@ -356,22 +356,18 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       return;
     }
 
-    if (startDate == state.endDate
+    if (!state.allDay! && startDate == state.endDate
         || startDate.isAfter(state.endDate)) {
-      var duration = !state.allDay! ? const Duration(hours: 1)
-        : const Duration(days: 1);
-      state.endDate = startDate.add(duration);
+      state.endDate = startDate.add(const Duration(hours: 1));
       setTextFieldController(TextFieldItem.endDate);
       setTextFieldController(TextFieldItem.endTime);
     }
   }
 
   changeEndDate(endDate) async {
-    if (endDate == state.startDate
+    if (!state.allDay! && endDate == state.startDate
         || endDate.isBefore(state.startDate)) {
-      var duration = !state.allDay! ? const Duration(hours: -1)
-          : const Duration(days: -1);
-      state.startDate = endDate.add(duration);
+      state.startDate = endDate.add(const Duration(hours: -1));
       setTextFieldController(TextFieldItem.startDate);
       setTextFieldController(TextFieldItem.startTime);
     }

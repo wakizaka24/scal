@@ -237,7 +237,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
             children: [
               Row(children: [
                 CWIconButton(
-                  assetName: 'images/icon_closing.png',
+                  assetName: 'images/icon_closing@3x.png',
                   width: closingButtonWidth,
                   height: closingButtonWidth,
                   radius: closingButtonWidth / 2,
@@ -349,15 +349,28 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.startDate, value: CalendarUtils()
                             .trimDate(eventDetailState.startDate!));
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.startTime);
 
                         var endDate = CalendarUtils()
                             .trimDate(eventDetailState.endDate!);
-                        if (eventDetailState.startDate == endDate) {
-                          endDate = endDate.add(const Duration(days: 1));
-                        }
-
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.endDate, value: endDate);
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.endTime);
+                      } else {
+                        var now = DateTime.now();
+                        var startDate = eventDetailState.startDate!;
+                        startDate = DateTime(startDate.year,
+                          startDate.month, startDate.day, now.hour, 0);
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.startTime, value: startDate);
+
+                        var endDate = startDate.add(const Duration(hours: 1));
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.endDate, value: endDate);
+                        eventDetailNotifier.setTextFieldController(
+                            TextFieldItem.endTime);
                       }
                       await eventDetailNotifier.setContentsHeight();
                       await eventDetailNotifier.updateState();

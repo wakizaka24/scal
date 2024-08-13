@@ -246,7 +246,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     DateTime now = state.now;
 
     // UI-Month Calendar
-    selectDayPartIndex(now);
+    await selectDayPartIndex(now);
 
     await updateSelectionDayOfHome();
     await setDayEventList(state.selectionDate, state.dayEventsMap);
@@ -263,7 +263,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Month Calendar/Week Calendar
 
-  selectDayPartIndex(DateTime date) {
+  selectDayPartIndex(DateTime date) async {
     state.dayPartIndex = 0;
     for (int i=0; i < state.dayLists[1].length; i++) {
       if (state.dayLists[1][i].id == DateTime(date.year, date.month,

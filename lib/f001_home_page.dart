@@ -45,9 +45,9 @@ class HomePage extends HookConsumerWidget {
     // Widgetの一番上で取得可能な項目
     // アンセーフエリア上の高さ
     double unsafeAreaTopHeight = MediaQuery.of(context).padding.top;
-    if (Platform.isIOS) {
-      unsafeAreaTopHeight += -17;
-    }
+    // if (Platform.isIOS) {
+    unsafeAreaTopHeight += -17;
+    // }
     if (unsafeAreaTopHeight < 10) {
       unsafeAreaTopHeight = 10;
     }
@@ -99,10 +99,14 @@ class HomePage extends HookConsumerWidget {
             await colorConfigNotifier.updateState();
           }
 
-          primaryFocus?.unfocus();
-          // ハイライト解除
-          await eventDetailNotifier.updateHighlightItem(
-              HighlightItem.none);
+          // Androidの場合、非活性時、フォーカスがあったテキストが、
+          // フォーカスがあるがキーボードがでないことがあるので対応する。
+          if (Platform.isAndroid) {
+            primaryFocus?.unfocus();
+            // ハイライト解除
+            await eventDetailNotifier.updateHighlightItem(
+                HighlightItem.none);
+          }
         });
       }
 
@@ -148,7 +152,7 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              assetName: 'images/icon_locking_tool_unlock.png',
+              assetName: 'images/icon_locking_tool_unlock@3x.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -161,7 +165,7 @@ class HomePage extends HookConsumerWidget {
             ),
 
             CWIconButton(
-              assetName: 'images/icon_today_selection.png',
+              assetName: 'images/icon_today_selection@3x.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -171,7 +175,7 @@ class HomePage extends HookConsumerWidget {
             ),
 
             CWIconButton(
-              assetName: 'images/icon_drawer.png',
+              assetName: 'images/icon_drawer@3x.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
