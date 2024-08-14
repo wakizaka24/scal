@@ -165,7 +165,7 @@ enum ColorConfig {
         BorderColors.darkModeGrey, // borderColor
         135, // calendarTodayBgColorAlpha
         80, // calendarLineBgColorAlpha
-        255, // highlightBgColorAlpha
+        135, // highlightBgColorAlpha
         Colors.white // cardTextColor
     );
 

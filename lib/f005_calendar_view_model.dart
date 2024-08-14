@@ -412,7 +412,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       WeekdayDisplay(title: '金',
           titleColor: normalTextColor),
       WeekdayDisplay(title: '土',
-          titleColor: Colors.green),
+          titleColor: Colors.blueAccent),
     ];
   }
 
@@ -459,7 +459,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           DayDisplay(id: currentDay, title: currentDay.day.toString(),
               titleColor: j % columnNum == 0 ? Colors.pink
                   : j % columnNum == columnNum - 1
-                  ? Colors.green : normalTextColor, eventList: [],
+                  ? Colors.blueAccent : normalTextColor, eventList: [],
               today: currentDay == now)
         }
       ]);
@@ -590,7 +590,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(currentDay),
           dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
               : rowIndex % weekdayRowNum == weekdayRowNum - 1
-              ? Colors.green : normalTextColor,
+              ? Colors.blueAccent : normalTextColor,
           today: currentDay == now
       ));
     }
@@ -626,7 +626,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
         var titleColor = rowIndex % weekdayRowNum == 0 ? Colors.pink
             : rowIndex % weekdayRowNum == weekdayRowNum - 1
-            ? Colors.green : normalTextColor;
+            ? Colors.blueAccent : normalTextColor;
 
         wholeTimeList.add(
             HourDisplay(
