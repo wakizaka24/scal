@@ -88,6 +88,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }, [startHighlight]);
 
     final double startOtherOpacity = calendarDisplay.value ? 0.25 : 1;
+    final double hideOpacity = calendarDisplay.value ? 0 : 1;
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -319,6 +320,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.title]!,
@@ -339,6 +341,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.place,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.place]!,
@@ -361,6 +364,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   verticalPaddingWidth: 4,
                   expanded: false,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
                     onChanged: (value) async {
@@ -482,6 +486,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.endTime,
                   expanded: false,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: Row(children: [
                     SizedBox(
                         width: 120, height: 36,
@@ -530,6 +535,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.repeat,
                   expanded: false,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: Row(children: [
                     SizedBox(
                         width: 65, height: 36,
@@ -564,6 +570,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     verticalPaddingWidth: 4,
                     expanded: false,
                     opacity: startOtherOpacity,
+                    highlightAlpha: !calendarDisplay.value ? null : 0,
                     child: Row(children: [
                       CupertinoSwitch(
                         value: eventDetailState.repeatingEnd!,
@@ -622,6 +629,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.memo,
                   opacity: startOtherOpacity,
+                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.memo]!,
@@ -643,6 +651,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
               //         == HighlightItem.destinationCalendar,
               //     expanded: false,
               //     opacity: startOtherItemOpacity,
+              //     highlightAlpha: !calendarDisplay.value ? null : 0,
               //     child: Row(children: [
               //       SizedBox(height: 36, width: 100,
               //           child: CWTextField(
@@ -718,7 +727,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       key: eventDetailState.contentsKey,
                       decoration: BoxDecoration(
                         color: colorConfig.backgroundColor!.withAlpha((255
-                            * startOtherOpacity).toInt()),
+                            * hideOpacity).toInt()),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: contents)

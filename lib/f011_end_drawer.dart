@@ -29,7 +29,9 @@ class EndDrawer extends HookConsumerWidget {
       // physics: const NeverScrollableScrollPhysics(),
       children: [
         for (int i=0; i < EndDrawerMenuType.values.length; i++) ... {
-          CWTextButton(
+        Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            child: CWTextButton(
             title: 'ソフトウェアライセンス',
             onPressed: () async {
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -55,6 +57,7 @@ class EndDrawer extends HookConsumerWidget {
               ));
             }
           )
+        )
         }
       ],
     );

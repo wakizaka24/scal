@@ -259,7 +259,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   }
 
   Future<double> getContentsHeight() async {
-    double baseHeight = /*500 + */597;
+    double baseHeight = /*500 + */600;
 
     if (state.repeatingPattern != RepeatingPattern.none) {
       baseHeight += 50;
