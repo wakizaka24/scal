@@ -70,8 +70,9 @@ class CalendarUtils {
         baseDate.minute);
   }
 
-  DateTime trimDate(DateTime day) {
-    return DateTime(day.year, day.month, day.day);
+  DateTime trimDate(DateTime day, {maxTime=false}) {
+    return DateTime(day.year, day.month, day.day, !maxTime ? 0 : 23,
+      !maxTime ? 0 : 59);
   }
 
   DateTime copyTime(DateTime baseDate, DateTime time) {
@@ -85,5 +86,13 @@ class CalendarUtils {
     }
     return DateTime(dateTime.year, dateTime.month, dateTime.day,
       dateTime.hour, dateTime.minute);
+  }
+
+  bool someDate(DateTime? date1, DateTime? date2) {
+    if (date1 == null || date2 == null) {
+      return false;
+    }
+    return date1.year == date2.year && date1.month == date2.month
+        && date1.day == date2.day;
   }
 }

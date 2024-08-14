@@ -248,8 +248,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       onDateTimeChanged: (DateTime newDate) {
         eventDetailNotifier.setTextFieldController(
             TextFieldItem.repeatingEndDate,
-            value: CalendarUtils().copyDate(eventDetailState
-                .repeatingEndDate!, newDate));
+            value: CalendarUtils().trimDate(newDate, maxTime: true));
       },
     );
 
@@ -382,7 +381,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             .trimDate(eventDetailState.startDate!));
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.startTime);
-
                         var endDate = CalendarUtils()
                             .trimDate(eventDetailState.endDate!);
                         eventDetailNotifier.setTextFieldController(
@@ -390,14 +388,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.endTime);
                       } else {
-                        var now = DateTime.now();
                         var startDate = eventDetailState.startDate!;
                         startDate = DateTime(startDate.year,
-                          startDate.month, startDate.day, now.hour, 0);
+                          startDate.month, startDate.day, 0, 0);
+                        var endDate = CalendarUtils().trimDate(
+                            eventDetailState.endDate!, maxTime: true);
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.startTime, value: startDate);
-
-                        var endDate = startDate.add(const Duration(hours: 1));
                         eventDetailNotifier.setTextFieldController(
                             TextFieldItem.endDate, value: endDate);
                         eventDetailNotifier.setTextFieldController(
@@ -507,8 +504,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     ),
 
                     if (!eventDetailState.allDay!)
-                      SizedBox(
-                          width: 60, height: 36,
+                      SizedBox(width: 60, height: 36,
                           child: CWTextField(
                               controller: eventDetailState
                                   .textEditingControllers!
@@ -587,13 +583,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                           DateTime? repeatingEndDate;
                           if (value) {
-                            repeatingEndDate = eventDetailState.endDate!;
-                            if (repeatingEndDate.hour > 0
-                                || repeatingEndDate.minute > 0) {
-                              repeatingEndDate = CalendarUtils().trimDate(
-                                  repeatingEndDate).add(const Duration(
-                                  days: 1));
-                            }
+                            repeatingEndDate = CalendarUtils().trimDate(
+                                eventDetailState.endDate!, maxTime: true);
                           }
                           eventDetailNotifier.setTextFieldController(
                               TextFieldItem.repeatingEndDate,

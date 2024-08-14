@@ -330,6 +330,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       case TextFieldItem.repeatingEndDate:
         if (value != null) {
           state.repeatingEndDate = value as DateTime?;
+        } else {
+          state.repeatingEndDate = null;
         }
         if (state.repeatingEndDate == null) {
           state.textEditingControllers!
@@ -366,7 +368,9 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
     if (!state.allDay! && startDate == state.endDate
         || startDate.isAfter(state.endDate)) {
-      state.endDate = startDate.add(const Duration(hours: 1));
+      debugPrint('changeStartDate ${state.endDate}');
+      state.endDate = !state.allDay! ? startDate.add(
+          const Duration(hours: 1)) : startDate;
       setTextFieldController(TextFieldItem.endDate);
       setTextFieldController(TextFieldItem.endTime);
     }
@@ -375,21 +379,18 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   changeEndDate(endDate) async {
     if (!state.allDay! && endDate == state.startDate
         || endDate.isBefore(state.startDate)) {
-      state.startDate = endDate.add(const Duration(hours: -1));
+      debugPrint('changeEndDate ${state.startDate}');
+      state.startDate = !state.allDay! ? endDate.add(
+          const Duration(hours: -1)) : endDate;
       setTextFieldController(TextFieldItem.startDate);
       setTextFieldController(TextFieldItem.startTime);
     }
 
-    if (state.repeatingEnd == true && (endDate == state.repeatingEndDate
-        || endDate.isAfter(state.repeatingEndDate))) {
-      state.repeatingEndDate = endDate;
-      if (state.repeatingEndDate!.hour > 0
-          || state.repeatingEndDate!.minute > 0) {
-        state.repeatingEndDate = CalendarUtils().trimDate(
-            state.repeatingEndDate!).add(const Duration(days: 1));
-      }
-
-      setTextFieldController(TextFieldItem.repeatingEndDate);
+    if (state.repeatingEnd == true && (
+        endDate.isAfter(state.repeatingEndDate))) {
+      state.repeatingEndDate = CalendarUtils().trimDate(endDate, maxTime: true);
+      setTextFieldController(TextFieldItem.repeatingEndDate,
+          value: state.repeatingEndDate);
     }
   }
 
