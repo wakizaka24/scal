@@ -92,12 +92,12 @@ flutter:
     - images/IMG_1737.jpeg
     - images/IMG_3173.jpeg
     - images/IMG_3173_3.jpeg
-    - images/icon_locking_tool_unlock@3x.png
-    - images/icon_locking_tool_lock@3x.png
-    - images/icon_closing@3x.png
+    - images/icon_unlock_locking_tool@3x.png
+    - images/icon_lock_locking_tool@3x.png
+    - images/icon_close@3x.png
     - images/icon_today_selection@3x.png
     - images/icon_drawer@3x.png
-    - images/icon_detail@3x.png
+    - images/icon_event_detail@3x.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

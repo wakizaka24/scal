@@ -236,7 +236,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
             children: [
               Row(children: [
                 CWIconButton(
-                  assetName: 'images/icon_closing@3x.png',
+                  assetName: 'images/icon_close@3x.png',
                   width: closingButtonWidth,
                   height: closingButtonWidth,
                   radius: closingButtonWidth / 2,

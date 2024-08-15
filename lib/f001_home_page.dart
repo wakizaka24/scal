@@ -152,7 +152,7 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              assetName: 'images/icon_locking_tool_unlock@3x.png',
+              assetName: 'images/icon_unlock_locking_tool@3x.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
