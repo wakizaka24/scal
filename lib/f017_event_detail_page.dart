@@ -68,36 +68,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // 最大年
     int maximumYear = DateTime.now().year + 300;
 
-    final startHighlight = eventDetailState.highlightItem
-        == HighlightItem.startDate
-        || eventDetailState.highlightItem == HighlightItem.startTime;
-    final calendarDisplay = useState<bool>(false);
-
     useEffect(() {
 
       return () {
       };
     }, const []);
-
-    useEffect(() {
-      if (!startHighlight) {
-        calendarDisplay.value = false;
-      }
-      return () {
-      };
-    }, [startHighlight]);
-
-    final double startOtherOpacity = calendarDisplay.value ? 0.25 : 1;
-    final double hideOpacity = calendarDisplay.value ? 0 : 1;
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await homeNotifier.setUICover(!calendarDisplay.value);
-        await homeNotifier.updateState();
-      });
-      return () {
-      };
-    }, [calendarDisplay.value]);
 
     final preContentsHeight = useState<double?>(null);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -259,7 +234,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         ),
         child: Column(
             children: [
-              CWRow(opacity: startOtherOpacity, children: [
+              Row(children: [
                 CWIconButton(
                   assetName: 'images/icon_closing@3x.png',
                   width: closingButtonWidth,
@@ -318,8 +293,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   fontSize: 13,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.title]!,
@@ -339,8 +312,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: '場所',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.place,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.place]!,
@@ -362,8 +333,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       == HighlightItem.allDay,
                   verticalPaddingWidth: 4,
                   expanded: false,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CupertinoSwitch(
                     value: eventDetailState.allDay!,
                     onChanged: (value) async {
@@ -410,9 +379,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWLeftTitle(
                   title: '開始',
-                  highlight: startHighlight,
+                  highlight: eventDetailState.highlightItem
+                      == HighlightItem.startDate
+                      || eventDetailState.highlightItem
+                          == HighlightItem.startTime,
                   expanded: false,
-                  highlightAlpha: !calendarDisplay.value ? null : 255,
                   child: Row(children: [
                     SizedBox(
                         width: 120, height: 36,
@@ -449,27 +420,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             onFocusChange: createOnBottomPopTextFocusChange(
                                 HighlightItem.startTime, startTimePicker)
                         )
-                      ),
-
-                    const SizedBox(width: 6),
-
-                    CWIconButton(
-                      icon: Icons.check,
-                      width: closingButtonWidth,
-                      height: closingButtonWidth,
-                      radius: closingButtonWidth / 2,
-                      foregroundColor: normalTextColor,
-                      onPressed: () async {
-                        calendarDisplay.value = !calendarDisplay.value;
-                        primaryFocus?.unfocus();
-                        if (eventDetailState.highlightItem
-                            != HighlightItem.startTime) {
-                          eventDetailState.startDateFocusNode!.requestFocus();
-                        } else {
-                          eventDetailState.startTimeFocusNode!.requestFocus();
-                        }
-                      },
-                    ),
+                      )
                   ])
               ),
 
@@ -482,8 +433,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       || eventDetailState.highlightItem
                           == HighlightItem.endTime,
                   expanded: false,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: Row(children: [
                     SizedBox(
                         width: 120, height: 36,
@@ -530,8 +479,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.repeat,
                   expanded: false,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: Row(children: [
                     SizedBox(
                         width: 65, height: 36,
@@ -565,8 +512,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         == HighlightItem.repeatEndDate,
                     verticalPaddingWidth: 4,
                     expanded: false,
-                    opacity: startOtherOpacity,
-                    highlightAlpha: !calendarDisplay.value ? null : 0,
                     child: Row(children: [
                       CupertinoSwitch(
                         value: eventDetailState.repeatingEnd!,
@@ -619,8 +564,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   title: 'メモ',
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.memo,
-                  opacity: startOtherOpacity,
-                  highlightAlpha: !calendarDisplay.value ? null : 0,
                   child: CWTextField(
                       controller: eventDetailState.textEditingControllers!
                       [TextFieldItem.memo]!,
@@ -676,7 +619,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   fixedHeight: 48,
                   fontSize: 15,
                   backgroundColor: colorConfig.backgroundColor,
-                  opacity: startOtherOpacity,
                   onPressed: !eventDetailState.saveButtonEnabled! ? null
                       : () async {
                     await onCommonPressed();
@@ -717,8 +659,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   child: Container(
                       key: eventDetailState.contentsKey,
                       decoration: BoxDecoration(
-                        color: colorConfig.backgroundColor!.withAlpha((255
-                            * hideOpacity).toInt()),
+                        color: colorConfig.backgroundColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: contents)

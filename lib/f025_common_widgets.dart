@@ -38,34 +38,13 @@ import 'f016_design.dart';
 //   }
 // }
 
-class CWRow extends HookConsumerWidget {
-  final double opacity;
-  final List<Widget> children;
-
-  const CWRow({
-    super.key,
-    this.opacity = 1,
-    required this.children
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Opacity(
-        opacity: opacity,
-        child: Row(children: children)
-    );
-  }
-}
-
 class CWLeftTitle extends HookConsumerWidget {
   final String title;
   final double fontSize;
   final bool highlight;
-  final int? highlightAlpha;
   final double verticalPaddingWidth;
   final double rightPaddingWidth;
   final bool expanded;
-  final double opacity;
   final Widget child;
 
   const CWLeftTitle({
@@ -73,11 +52,9 @@ class CWLeftTitle extends HookConsumerWidget {
     required this.title,
     this.fontSize = 15,
     required this.highlight,
-    this.highlightAlpha,
     this.verticalPaddingWidth = 6,
     this.rightPaddingWidth = 6,
     this.expanded = true,
-    this.opacity = 1,
     required this.child
   });
 
@@ -86,37 +63,33 @@ class CWLeftTitle extends HookConsumerWidget {
     // final theme = Theme.of(context);
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
     var borderColor = colorConfig.borderColor;
-    var highlightAlpha = this.highlightAlpha ?? colorConfig
-        .highlightBgColorAlpha;
+    var highlightAlpha = colorConfig.highlightBgColorAlpha;
 
-    return Opacity(
-        opacity: opacity,
-        child: Container(
-          decoration: BoxDecoration(
-            color: !highlight ? Colors.transparent : borderColor.withAlpha(
-                highlightAlpha), borderRadius: BorderRadius.circular(6),
-          ),
-          child: Padding(padding: EdgeInsets.symmetric(
-              vertical: verticalPaddingWidth),
-              child: Row(children: [
-                SizedBox(
-                    width: 65,
-                    child: Text(title, textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: FontWeight.w300,
-                            color: !highlight ? colorConfig.normalTextColor
-                                : colorConfig.disabledTextColor
-                        )
+    return Container(
+      decoration: BoxDecoration(
+        color: !highlight ? Colors.transparent : borderColor.withAlpha(
+            highlightAlpha), borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(padding: EdgeInsets.symmetric(
+          vertical: verticalPaddingWidth),
+          child: Row(children: [
+            SizedBox(
+                width: 65,
+                child: Text(title, textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w300,
+                        color: !highlight ? colorConfig.normalTextColor
+                            : colorConfig.disabledTextColor
                     )
-                ),
-                Visibility(visible: !expanded, child: child),
-                Visibility(visible: expanded, child: Expanded(child: child)),
-                Visibility(visible: expanded && rightPaddingWidth > 0,
-                    child: SizedBox(width: rightPaddingWidth))
-              ])
-          ),
-        )
+                )
+            ),
+            Visibility(visible: !expanded, child: child),
+            Visibility(visible: expanded, child: Expanded(child: child)),
+            Visibility(visible: expanded && rightPaddingWidth > 0,
+                child: SizedBox(width: rightPaddingWidth))
+          ])
+      ),
     );
   }
 }
@@ -258,7 +231,6 @@ class CWElevatedButton extends HookConsumerWidget {
   final double fixedHeight;
   final double fontSize;
   final Color? backgroundColor;
-  final double opacity;
   final VoidCallback? onPressed;
 
   const CWElevatedButton({
@@ -268,31 +240,27 @@ class CWElevatedButton extends HookConsumerWidget {
     this.fixedHeight = 32,
     this.fontSize = 13,
     this.backgroundColor,
-    this.opacity = 1,
     this.onPressed
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
-    return Opacity(
-        opacity: opacity,
-        child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              fixedSize: Size(fixedWidth, fixedHeight),
-              backgroundColor: backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              textStyle: TextStyle(fontSize: fontSize),
-              padding: const EdgeInsets.all(0),
-            ),
-            child: Text(title,
-                style: TextStyle(
-                    fontWeight: buttonFontWeight,
-                    color: colorConfig.cardTextColor
-                )
+    return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          fixedSize: Size(fixedWidth, fixedHeight),
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: TextStyle(fontSize: fontSize),
+          padding: const EdgeInsets.all(0),
+        ),
+        child: Text(title,
+            style: TextStyle(
+                fontWeight: buttonFontWeight,
+                color: colorConfig.cardTextColor
             )
         )
     );
