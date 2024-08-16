@@ -11,7 +11,7 @@ import 'f011_end_drawer.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
-import 'f016_design.dart';
+import 'f016_design_config.dart';
 import 'f018_event_detail_view_model.dart';
 import 'f025_common_widgets.dart';
 
@@ -29,6 +29,7 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final maximumUnsafeAreaBottomHeight = useState(0.0);
 
@@ -71,11 +72,12 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       debugPrint('parent useEffect');
 
+      colorConfigNotifier.initState();
+
       final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
       calendarNotifier.updateSelectionDayOfHome();
 
       return () {
-        // Pageの解放処理
       };
     }, const []);
 
@@ -153,7 +155,17 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              assetName: 'images/icon_unlock_locking_tool@3x.png',
+              assetName: 'images/icon_light_and_dark@3x.png',
+              width: appBarHeight,
+              height: appBarHeight,
+              radius: appBarHeight / 2,
+              onPressed: () async {
+
+              },
+            ),
+
+            CWIconButton(
+              assetName: 'images/icon_change_calendar_color@3x.png',
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,

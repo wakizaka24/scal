@@ -7,7 +7,7 @@ import 'f001_home_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
 import 'f015_calendar_utils.dart';
-import 'f016_design.dart';
+import 'f016_design_config.dart';
 import 'f025_common_widgets.dart';
 
 class CalendarPage extends StatefulHookConsumerWidget {
@@ -99,7 +99,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       });
 
       return () {
-        // Pageの解放処理
       };
     }, const []);
 

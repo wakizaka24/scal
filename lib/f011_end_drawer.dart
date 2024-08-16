@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f016_design.dart';
+import 'package:scal/f016_design_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'f025_common_widgets.dart';
 
 enum EndDrawerMenuType {
   softwareLicense(title: 'ソフトウェアライセンス');
-
-  const EndDrawerMenuType({required this.title});
   final String title;
+  const EndDrawerMenuType({required this.title});
 }
 
 class EndDrawer extends HookConsumerWidget {

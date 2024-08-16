@@ -4,12 +4,15 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 class CalendarRepository {
   static final CalendarRepository _instance = CalendarRepository._internal();
-  CalendarRepository._internal() {
-    setNativeLocation();
-  }
+  final DeviceCalendarPlugin _plugin = DeviceCalendarPlugin();
+  Location _location = local;
 
   factory CalendarRepository() {
     return _instance;
+  }
+
+  CalendarRepository._internal() {
+    setNativeLocation();
   }
 
   Future setNativeLocation() async {
@@ -21,9 +24,6 @@ class CalendarRepository {
       debugPrint('ネイティブのロケーションを取得できませんでした');
     }
   }
-
-  final DeviceCalendarPlugin _plugin = DeviceCalendarPlugin();
-  Location _location = local;
 
   Future<bool> hasPermissions() async {
     var permissions = await _plugin.hasPermissions();

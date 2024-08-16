@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'f016_design.dart';
+import 'f016_design_config.dart';
 import 'f024_bottom_safe_area_view_model.dart';
 
 class UIUtils {

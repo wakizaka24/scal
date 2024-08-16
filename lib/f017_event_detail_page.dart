@@ -9,7 +9,7 @@ import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f015_calendar_utils.dart';
-import 'f016_design.dart';
+import 'f016_design_config.dart';
 import 'f018_event_detail_view_model.dart';
 import 'f021_bottom_safe_area_view.dart';
 import 'f024_bottom_safe_area_view_model.dart';
@@ -574,7 +574,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo, bottomSpace: 8 + 74, forceScroll: true)
+                          .memo, bottomSpace: 8 + 76, forceScroll: true)
                   )
               ),
 

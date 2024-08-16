@@ -15,17 +15,17 @@ enum RepeatingPattern {
   yearly('毎年', true, RecurrenceFrequency.Yearly, 1),
   other('その他', false, null, null);
 
+  final String name;
+  final bool defaultDisplay;
+  final RecurrenceFrequency? frequency;
+  final int? interval;
+
   const RepeatingPattern(
       this.name,
       this.defaultDisplay,
       this.frequency,
       this.interval
   );
-
-  final String name;
-  final bool defaultDisplay;
-  final RecurrenceFrequency? frequency;
-  final int? interval;
 
   static List<RepeatingPattern> getDisplayList(bool all) {
     return values.where((type) {
