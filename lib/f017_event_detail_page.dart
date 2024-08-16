@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f013_ui_utils.dart';
 
+import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
 import 'f015_calendar_utils.dart';
@@ -644,7 +645,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var contentHeight = baseContentsHeight
         < deviceHeight ? deviceHeight : baseContentsHeight;
 
-    return BottomSafeAreaView(
+    var bottomSafeAreaView = BottomSafeAreaView(
         unsafeAreaTopHeight: widget.unsafeAreaTopHeight,
         unsafeAreaBottomHeight: widget.unsafeAreaBottomHeight,
         contentsWidth: deviceWidth,
@@ -671,5 +672,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
         ])
     );
+
+    var stack = Stack(children: [
+      bottomSafeAreaView,
+        SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight,
+        child: Container(color: uIColorColor)
+      )]);
+
+    return stack;
   }
 }

@@ -21,6 +21,8 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
 // アプリバーの高さ
 const double appBarHeight = 39;
 
+var uIColorColor = Colors.black.withAlpha(100);
+
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
@@ -48,14 +50,14 @@ class HomePage extends HookConsumerWidget {
     // if (Platform.isIOS) {
     unsafeAreaTopHeight += -17;
     // }
-    if (unsafeAreaTopHeight < 10) {
-      unsafeAreaTopHeight = 10;
+    if (unsafeAreaTopHeight < 21) {
+      unsafeAreaTopHeight = 21;
     }
     // アンセーフエリア下の高さ
     // キーボード表示時セーフエリアが小さくなるので最大の値を使用する。
     double bottomHeight = MediaQuery.of(context).padding.bottom;
-    if (bottomHeight < 10) {
-      bottomHeight = 10;
+    if (bottomHeight < 15) {
+      bottomHeight = 15;
     }
     if (bottomHeight > maximumUnsafeAreaBottomHeight.value) {
       maximumUnsafeAreaBottomHeight.value = bottomHeight;
@@ -115,15 +117,14 @@ class HomePage extends HookConsumerWidget {
     }, [appLifecycleState]);
 
     var appTitle = Column(children: [
-      SizedBox(width: deviceWidth, height: unsafeAreaTopHeight
-      ),
+      SizedBox(width: deviceWidth, height: unsafeAreaTopHeight),
       SizedBox(width: deviceWidth, height: appBarHeight,
         child: Consumer(
             builder: ((context, ref, child) {
               final homeState = ref.watch(
                   homePageNotifierProvider);
               return Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                // crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(width: 8),
                   Text(homeState.appBarTitle,
@@ -310,7 +311,8 @@ class HomePage extends HookConsumerWidget {
         SizedBox(width: deviceWidth, height: unsafeAreaBottomHeight)
       ]),
       if (homeState.uICover)
-        Container(color: Colors.black.withAlpha(100)),
+        Padding(padding: EdgeInsets.fromLTRB(0, unsafeAreaTopHeight,
+            0, 0), child: Container(color: uIColorColor)),
       if (homeState.uICoverWidget != null)
         homeState.uICoverWidget!,
     ]);
