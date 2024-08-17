@@ -4,7 +4,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
-import 'f005_calendar_view_model.dart';
 import 'f016_design_config.dart';
 
 void main() async {
