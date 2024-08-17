@@ -1,9 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'f016_design_config.dart';
 
 enum SharedPreferenceKey {
   brightnessMode('brightnessMode'),
-  colorConfig('colorConfig'),
+  lightAndDarkColorConfig('lightAndDarkColorConfig'),
   lightColorConfig('lightColorConfig'),
   darkColorConfig('darkColorConfig'),
 

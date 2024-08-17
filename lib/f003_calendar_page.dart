@@ -358,7 +358,7 @@ class SelectableCalendarCell extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
 
     var borderColor = colorConfig.borderColor;
     var border1 = BorderSide(
@@ -511,7 +511,7 @@ class WeekdayPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
-    var borderColor = colorConfigState.colorConfig!.borderColor;
+    var borderColor = colorConfigState.colorConfig.borderColor;
     var border = BorderSide(
         color: borderColor, width: normalBoarderWidth
     );
@@ -572,7 +572,7 @@ class DayPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
-        .colorConfig!;
+        .colorConfig;
     var borderColor = colorConfig.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;
@@ -662,7 +662,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: colorConfigState.colorConfig!.borderColor,
+                  color: colorConfigState.colorConfig.borderColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -670,7 +670,7 @@ class EventListPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWeight1,
-                            color: colorConfigState.colorConfig!.normalTextColor
+                            color: colorConfigState.colorConfig.normalTextColor
                         )
                       ),
                     ],
@@ -751,7 +751,7 @@ class EventPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider)
-        .colorConfig!;
+        .colorConfig;
 
     return SelectableCalendarCell(
         height: height,
@@ -1044,7 +1044,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
-        .colorConfig!;
+        .colorConfig;
     var borderColor = colorConfig.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;
@@ -1181,7 +1181,7 @@ class HourPart extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
-        .colorConfig!;
+        .colorConfig;
     var borderColor = colorConfig.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;

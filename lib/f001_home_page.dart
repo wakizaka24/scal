@@ -29,7 +29,6 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final platformBrightness = MediaQuery.platformBrightnessOf(context);
     final AppLifecycleState? appLifecycleState = useAppLifecycleState();
     final maximumUnsafeAreaBottomHeight = useState(0.0);
 
@@ -38,7 +37,8 @@ class HomePage extends HookConsumerWidget {
 
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
-    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+    // final designConfigState = ref.watch(designConfigNotifierProvider);
+    final designConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
 
     // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
@@ -72,10 +72,9 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       debugPrint('parent useEffect');
 
-      colorConfigNotifier.initState();
-
-      final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
-      calendarNotifier.updateSelectionDayOfHome();
+      // final calendarNotifier = ref.watch(calendarPageNotifierProvider
+      //     .notifier);
+      // await calendarNotifier.updateSelectionDayOfHome();
 
       return () {
       };
@@ -90,6 +89,26 @@ class HomePage extends HookConsumerWidget {
     // }, [homeState.uICover]);
 
     //debugPrint('appLifecycleState=$appLifecycleState');
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        await designConfigNotifier.initState();
+        if (context.mounted) {
+          final Brightness brightness = MediaQuery.platformBrightnessOf(
+              context);
+          if (designConfigNotifier.applyColorConfig(brightness) || true) {
+            await calendarNotifier.updateCalendar(dataExclusion: true);
+            await designConfigNotifier.updateState();
+          }
+        }
+      });
+
+      return () {
+      };
+    }, const []);
+
     useEffect(() {
       // 再開または非活性に変化した場合
       if (appLifecycleState == AppLifecycleState.resumed
@@ -97,10 +116,9 @@ class HomePage extends HookConsumerWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           final Brightness brightness = MediaQuery.platformBrightnessOf(
               context);
-          if (colorConfigNotifier.applyColorConfig(brightness)) {
-            await calendarNotifier.initState();
+          if (designConfigNotifier.applyColorConfig(brightness)) {
             await calendarNotifier.updateCalendar(dataExclusion: true);
-            await colorConfigNotifier.updateState();
+            await designConfigNotifier.updateState();
           }
 
           // Androidの場合、非活性時、フォーカスがあったテキストが、
@@ -170,10 +188,10 @@ class HomePage extends HookConsumerWidget {
               height: appBarHeight,
               radius: appBarHeight / 2,
               onPressed: () async {
-                await colorConfigNotifier.switchColorConfig();
+                await designConfigNotifier.switchColorConfig();
                 await calendarNotifier.initState();
                 await calendarNotifier.updateCalendar(dataExclusion: true);
-                await colorConfigNotifier.updateState();
+                await designConfigNotifier.updateState();
               },
             ),
 

@@ -22,7 +22,7 @@ class EndDrawer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final normalTextColor = ref.read(designConfigNotifierProvider)
-        .colorConfig!.normalTextColor;
+        .colorConfig.normalTextColor;
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
@@ -43,7 +43,7 @@ class EndDrawer extends HookConsumerWidget {
                 )
               );
 
-              await Future.delayed(const Duration(milliseconds: 500));
+              await Future.delayed(const Duration(milliseconds: 100));
 
               // ステータスバーの設定
               SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

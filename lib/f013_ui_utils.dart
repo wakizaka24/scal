@@ -52,7 +52,7 @@ class UIUtils {
                           style: TextStyle(
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight,
-                              color: designConfigState.colorConfig!
+                              color: designConfigState.colorConfig
                               .cardTextColor
                           )
                       ),
@@ -72,7 +72,7 @@ class UIUtils {
                           style: TextStyle(
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight,
-                              color: designConfigState.colorConfig!
+                              color: designConfigState.colorConfig
                               .cardTextColor
                           )
                       )
@@ -94,7 +94,7 @@ class UIUtils {
         context: context,
         builder: (BuildContext context) {
           final colorConfig = ref.watch(designConfigNotifierProvider)
-              .colorConfig!;
+              .colorConfig;
           return Container(
             height: height,
             padding: const EdgeInsets.all(0),

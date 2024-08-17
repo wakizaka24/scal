@@ -33,12 +33,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     // final theme = Theme.of(context);
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
-    final colorConfigNotifier = ref.watch(designConfigNotifierProvider
+    final designConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
 
     final calendarNotifier = ref.watch(calendarPageNotifierProvider
@@ -278,11 +278,11 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   onPressed: () async {
                     await onCommonPressed();
 
-                    await colorConfigNotifier.switchColorConfig();
+                    await designConfigNotifier.switchColorConfig();
                     await calendarNotifier.initState();
                     await calendarNotifier.updateCalendar(
                         dataExclusion: true);
-                    await colorConfigNotifier.updateState();
+                    await designConfigNotifier.updateState();
                   },
                 ),
               ]),

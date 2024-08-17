@@ -396,7 +396,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<WeekdayDisplay> createWeekdayList() {
-    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig
         .normalTextColor;
     return [
       WeekdayDisplay(title: '日',
@@ -417,7 +417,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<List<DayDisplay>> createDayLists(DateTime basisDate, int addingMonth) {
-    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig
         .normalTextColor;
 
     const columnNum = CalendarPageState.weekdayPartColNum;
@@ -509,7 +509,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   List<List<DayDisplay>> addEventsForMonthCalendar(
       List<List<DayDisplay>> dayLists, Map<DateTime, List<Event>> eventsMap,
       Map<String, Calendar> calendarMap) {
-    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig;
 
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
@@ -575,7 +575,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   List<DayAndWeekdayDisplay> createDayAndWeekdayList(DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
     final normalTextColor = ref.read(designConfigNotifierProvider)
-        .colorConfig!.normalTextColor;
+        .colorConfig.normalTextColor;
 
     DateTime day = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day - selectionDay.weekday % weekdayRowNum, 0);
@@ -600,7 +600,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<HourDisplay> createHourList(DateTime selectionDay) {
     const timeColNum = CalendarPageState.timeColNum;
-    final normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
+    final normalTextColor = ref.read(designConfigNotifierProvider).colorConfig
         .normalTextColor;
 
     var timeInterval = 24 ~/ timeColNum;
@@ -695,7 +695,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap,
       Map<String, Calendar> calendarMap) {
-    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig;
 
     for (var hourInfo in hours) {
       hourInfo.eventList.clear();
@@ -889,7 +889,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   setEventList(List<Event> eventList) async {
-    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig;
 
     if (state.eventListIndex != null
         && state.eventListIndex! >= eventList.length) {

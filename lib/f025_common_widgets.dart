@@ -61,7 +61,7 @@ class CWLeftTitle extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final theme = Theme.of(context);
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
     var borderColor = colorConfig.borderColor;
     var highlightAlpha = colorConfig.highlightBgColorAlpha;
 
@@ -132,7 +132,7 @@ class CWTextField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
     var border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(6),
       borderSide: const BorderSide(
@@ -245,7 +245,7 @@ class CWElevatedButton extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
     return ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

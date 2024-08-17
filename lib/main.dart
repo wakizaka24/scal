@@ -4,9 +4,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
+import 'f005_calendar_view_model.dart';
 import 'f016_design_config.dart';
 
-void main() {
+void main() async {
   // 縦向き
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -48,7 +49,7 @@ void main() {
   runApp(const SCalApp());
 }
 
-var colorConfigInitialized = false;
+// var colorConfigInitialized = false;
 
 class SCalApp extends StatelessWidget {
   const SCalApp({super.key});
@@ -60,15 +61,8 @@ class SCalApp extends StatelessWidget {
         child: Consumer(
             builder: ((context, ref, child) {
               final colorConfigState = ref.watch(designConfigNotifierProvider);
-              final colorConfigNotifier = ref.watch(designConfigNotifierProvider
-                  .notifier);
-
-              if (!colorConfigInitialized) {
-                colorConfigInitialized = true;
-                final Brightness brightness = MediaQuery.platformBrightnessOf(
-                    context);
-                colorConfigNotifier.applyColorConfig(brightness);
-              }
+              // final designConfigNotifier = ref.watch(designConfigNotifierProvider
+              //     .notifier);
 
               return MaterialApp(
                 localizationsDelegates: const [
@@ -81,14 +75,14 @@ class SCalApp extends StatelessWidget {
                   Locale('ja'),
                 ],
                 theme: ThemeData(
-                    useMaterial3: colorConfigState.colorConfig!.useMaterial3,
+                    useMaterial3: colorConfigState.colorConfig.useMaterial3,
                     colorScheme: ColorScheme.fromSwatch(
-                      brightness: colorConfigState.colorConfig!.brightness,
-                      primarySwatch: colorConfigState.colorConfig!
+                      brightness: colorConfigState.colorConfig.brightness,
+                      primarySwatch: colorConfigState.colorConfig
                           .primarySwatch,
-                      accentColor: colorConfigState.colorConfig!.accentColor,
-                      cardColor: colorConfigState.colorConfig!.cardColor,
-                      backgroundColor: colorConfigState.colorConfig!
+                      accentColor: colorConfigState.colorConfig.accentColor,
+                      cardColor: colorConfigState.colorConfig.cardColor,
+                      backgroundColor: colorConfigState.colorConfig
                           .backgroundColor
                     ),
                     // appBarTheme: const AppBarTheme(
