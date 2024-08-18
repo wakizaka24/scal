@@ -22,7 +22,7 @@ class EndDrawer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final normalTextColor = ref.read(designConfigNotifierProvider)
-        .colorConfig.normalTextColor;
+        .colorConfig!.normalTextColor;
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),

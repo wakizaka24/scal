@@ -7,13 +7,36 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scal/f006_shared_preferences_repository.dart';
+import 'package:scal/f016_design_config.dart';
 
 import 'package:scal/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    var brightnessMode = await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.brightnessMode,
+        BrightnessMode.values);
+    brightnessMode ??= BrightnessMode.values.first;
+
+    var lightColorConfig = await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.lightColorConfig,
+        ColorConfig.values);
+    lightColorConfig ??= ColorConfig.values.where((config) {
+      return config.brightness == Brightness.light;
+    }).toList().first;
+
+    var darkColorConfig = await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.darkColorConfig,
+        ColorConfig.values);
+    darkColorConfig ??= ColorConfig.values.where((config) {
+      return config.brightness == Brightness.dark;
+    }).toList().first;
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const SCalApp());
+    await tester.pumpWidget(SCalApp(brightnessMode: brightnessMode,
+        lightColorConfig: lightColorConfig,
+        darkColorConfig: darkColorConfig));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

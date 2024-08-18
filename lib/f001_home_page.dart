@@ -16,7 +16,7 @@ import 'f018_event_detail_view_model.dart';
 import 'f025_common_widgets.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
-  = GlobalKey<ScaffoldState>();
+= GlobalKey<ScaffoldState>();
 
 // アプリバーの高さ
 const double appBarHeight = 39;
@@ -37,7 +37,7 @@ class HomePage extends HookConsumerWidget {
 
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
-    // final designConfigState = ref.watch(designConfigNotifierProvider);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
     final designConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
 
@@ -72,10 +72,6 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       debugPrint('parent useEffect');
 
-      // final calendarNotifier = ref.watch(calendarPageNotifierProvider
-      //     .notifier);
-      // await calendarNotifier.updateSelectionDayOfHome();
-
       return () {
       };
     }, const []);
@@ -89,30 +85,8 @@ class HomePage extends HookConsumerWidget {
     // }, [homeState.uICover]);
 
     //debugPrint('appLifecycleState=$appLifecycleState');
-
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        await designConfigNotifier.initState();
-        if (context.mounted) {
-          final Brightness brightness = MediaQuery.platformBrightnessOf(
-              context);
-          if (designConfigNotifier.applyColorConfig(brightness) || true) {
-            await calendarNotifier.updateCalendar(dataExclusion: true);
-            await designConfigNotifier.updateState();
-          }
-        }
-      });
-
-      return () {
-      };
-    }, const []);
-
-    useEffect(() {
-      // 再開または非活性に変化した場合
-      if (appLifecycleState == AppLifecycleState.resumed
-          || appLifecycleState == AppLifecycleState.inactive) {
+      if (appLifecycleState == AppLifecycleState.inactive) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           final Brightness brightness = MediaQuery.platformBrightnessOf(
               context);
@@ -121,6 +95,18 @@ class HomePage extends HookConsumerWidget {
             await designConfigNotifier.updateState();
           }
 
+          debugPrint('home_page $appLifecycleState'
+              ' ${designConfigState.colorConfig}');
+        });
+      }
+
+      return () {
+      };
+    }, [appLifecycleState]);
+
+    useEffect(() {
+      if (appLifecycleState == AppLifecycleState.inactive) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           // Androidの場合、非活性時、フォーカスがあったテキストが、
           // フォーカスがあるがキーボードがでないことがあるので対応する。
           if (Platform.isAndroid) {
@@ -189,9 +175,8 @@ class HomePage extends HookConsumerWidget {
               radius: appBarHeight / 2,
               onPressed: () async {
                 await designConfigNotifier.switchColorConfig();
-                await calendarNotifier.initState();
-                await calendarNotifier.updateCalendar(dataExclusion: true);
                 await designConfigNotifier.updateState();
+                await calendarNotifier.updateCalendar(dataExclusion: true);
               },
             ),
 
@@ -300,7 +285,7 @@ class HomePage extends HookConsumerWidget {
           await homeNotifier.setUICover(true);
           await homeNotifier.setUICoverWidget(
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
-                unsafeAreaBottomHeight: unsafeAreaBottomHeight));
+                  unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await homeNotifier.updateState();
         },
         child: Consumer(

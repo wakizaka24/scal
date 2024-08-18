@@ -4,38 +4,28 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
+import 'f006_shared_preferences_repository.dart';
 import 'f016_design_config.dart';
 
 void main() async {
   // 縦向き
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp
   ]);
 
-  // ステータスバーの設定
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    // iOSの文字を白にする。
-    statusBarBrightness: Brightness.dark,
-    // Androidの文字を白にする。
-    statusBarIconBrightness: Brightness.light,
-    // Androidの背景色を透明にする。
-    statusBarColor: Colors.transparent,
-  ));
-
-  // // Androidのジェスチャーナビゲーションを透明にする。
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-  //     overlays: [SystemUiOverlay.top]).then((_) {
-  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-  //     systemNavigationBarColor: Colors.transparent,
-  //     systemNavigationBarDividerColor: Colors.transparent,
-  //   ));
-  // });
-
-  // // MediaQuery.removePadding removeTopと
-  // // 併用でセーフエリアのボタンを有効にする。
-  // SystemChrome.setEnabledSystemUIMode(
-  //     SystemUiMode.immersiveSticky);
+  // Androidのジェスチャーナビゲーションを透明にする。
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top]).then((_) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      // Androidのステータスバーの背景色を透明にする。
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ));
+  });
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {
@@ -45,13 +35,43 @@ void main() async {
 // ''')]);
 //   });
 
-  runApp(const SCalApp());
+  var brightnessMode = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceKey.brightnessMode,
+      BrightnessMode.values);
+  brightnessMode ??= BrightnessMode.values.first;
+
+  var lightColorConfig = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceKey.lightColorConfig,
+      ColorConfig.values);
+  lightColorConfig ??= ColorConfig.values.where((config) {
+    return config.brightness == Brightness.light;
+  }).toList().first;
+
+  var darkColorConfig = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceKey.darkColorConfig,
+      ColorConfig.values);
+  darkColorConfig ??= ColorConfig.values.where((config) {
+    return config.brightness == Brightness.dark;
+  }).toList().first;
+
+  runApp(SCalApp(brightnessMode: brightnessMode,
+      lightColorConfig: lightColorConfig,
+      darkColorConfig: darkColorConfig));
 }
 
 // var colorConfigInitialized = false;
 
 class SCalApp extends StatelessWidget {
-  const SCalApp({super.key});
+  final BrightnessMode brightnessMode;
+  final ColorConfig lightColorConfig;
+  final ColorConfig darkColorConfig;
+
+  const SCalApp({
+    super.key,
+    required this.brightnessMode,
+    required this.lightColorConfig,
+    required this.darkColorConfig
+  });
 
   // This widget is the root of your application.
   @override
@@ -59,9 +79,28 @@ class SCalApp extends StatelessWidget {
     return ProviderScope(
         child: Consumer(
             builder: ((context, ref, child) {
-              final colorConfigState = ref.watch(designConfigNotifierProvider);
-              // final designConfigNotifier = ref.watch(designConfigNotifierProvider
-              //     .notifier);
+              final Brightness brightness = MediaQuery.platformBrightnessOf(
+                  context);
+              var designConfigState = ref.watch(designConfigNotifierProvider);
+              final designConfigNotifier = ref.watch(
+                  designConfigNotifierProvider.notifier);
+              var colorConfig = designConfigState.colorConfig;
+              if (colorConfig == null) {
+                designConfigNotifier.initState(brightnessMode, brightness,
+                    lightColorConfig, darkColorConfig);
+
+                if (brightness == Brightness.light
+                    && brightnessMode == BrightnessMode.lightAndDark
+                    || brightnessMode == BrightnessMode.light) {
+                  colorConfig ??= lightColorConfig;
+                }
+
+                if (brightness == Brightness.dark
+                    && brightnessMode == BrightnessMode.lightAndDark
+                    || brightnessMode == BrightnessMode.dark) {
+                  colorConfig ??= darkColorConfig;
+                }
+              }
 
               return MaterialApp(
                 localizationsDelegates: const [
@@ -74,26 +113,14 @@ class SCalApp extends StatelessWidget {
                   Locale('ja'),
                 ],
                 theme: ThemeData(
-                    useMaterial3: colorConfigState.colorConfig.useMaterial3,
+                    useMaterial3: colorConfig!.useMaterial3,
                     colorScheme: ColorScheme.fromSwatch(
-                      brightness: colorConfigState.colorConfig.brightness,
-                      primarySwatch: colorConfigState.colorConfig
-                          .primarySwatch,
-                      accentColor: colorConfigState.colorConfig.accentColor,
-                      cardColor: colorConfigState.colorConfig.cardColor,
-                      backgroundColor: colorConfigState.colorConfig
-                          .backgroundColor
-                    ),
-                    // appBarTheme: const AppBarTheme(
-                    //   systemOverlayStyle: SystemUiOverlayStyle(
-                    //     // iOSの文字を白にする。
-                    //     statusBarBrightness: Brightness.light,
-                    //     // Androidの文字を白にする。
-                    //     statusBarIconBrightness: Brightness.light,
-                    //     // Androidの背景色を透明にする。
-                    //     statusBarColor: Colors.transparent,
-                    //   )
-                    // )
+                        brightness: colorConfig.brightness,
+                        primarySwatch: colorConfig.primarySwatch,
+                        accentColor: colorConfig.accentColor,
+                        cardColor: colorConfig.cardColor,
+                        backgroundColor: colorConfig.backgroundColor
+                    )
                 ),
                 home: const HomePage(),
               );

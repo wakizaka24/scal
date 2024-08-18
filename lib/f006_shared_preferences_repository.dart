@@ -2,7 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum SharedPreferenceKey {
   brightnessMode('brightnessMode'),
-  lightAndDarkColorConfig('lightAndDarkColorConfig'),
   lightColorConfig('lightColorConfig'),
   darkColorConfig('darkColorConfig'),
 
@@ -56,7 +55,7 @@ class SharedPreferencesRepository {
     }
   }
 
-  /*
+/*
         await SharedPreferencesRepository().setStringEnum(
         SharedPreferenceKey.brightnessMode, BrightnessMode.light);
 

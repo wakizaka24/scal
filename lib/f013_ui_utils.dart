@@ -52,7 +52,7 @@ class UIUtils {
                           style: TextStyle(
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight,
-                              color: designConfigState.colorConfig
+                              color: designConfigState.colorConfig!
                               .cardTextColor
                           )
                       ),
@@ -72,7 +72,7 @@ class UIUtils {
                           style: TextStyle(
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight,
-                              color: designConfigState.colorConfig
+                              color: designConfigState.colorConfig!
                               .cardTextColor
                           )
                       )
@@ -101,7 +101,7 @@ class UIUtils {
             margin: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            color: colorConfig.backgroundColor,
+            color: colorConfig!.backgroundColor,
             child: SafeArea(
               top: false,
               child: child,

@@ -33,7 +33,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     // final theme = Theme.of(context);
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);

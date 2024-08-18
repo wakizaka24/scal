@@ -360,7 +360,7 @@ class SelectableCalendarCell extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig;
 
-    var borderColor = colorConfig.borderColor;
+    var borderColor = colorConfig!.borderColor;
     var border1 = BorderSide(
         color: !isHighlighted || !isActive ? borderColor
             : colorConfig.accentColor,
@@ -511,7 +511,7 @@ class WeekdayPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfigState = ref.watch(designConfigNotifierProvider);
 
-    var borderColor = colorConfigState.colorConfig.borderColor;
+    var borderColor = colorConfigState.colorConfig!.borderColor;
     var border = BorderSide(
         color: borderColor, width: normalBoarderWidth
     );
@@ -573,7 +573,7 @@ class DayPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig;
-    var borderColor = colorConfig.borderColor;
+    var borderColor = colorConfig!.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;
     var todayBgColor = borderColor.withAlpha(todayAlpha);
@@ -662,7 +662,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: colorConfigState.colorConfig.borderColor,
+                  color: colorConfigState.colorConfig!.borderColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -670,7 +670,7 @@ class EventListPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWeight1,
-                            color: colorConfigState.colorConfig.normalTextColor
+                            color: colorConfigState.colorConfig!.normalTextColor
                         )
                       ),
                     ],
@@ -784,7 +784,7 @@ class EventPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWeight3,
-                            color: colorConfig.normalTextColor
+                            color: colorConfig!.normalTextColor
                           )
                       )
                   )
@@ -849,7 +849,7 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: Text('コピー',
                           style: TextStyle(
-                              color: colorConfig.normalTextColor,
+                              color: colorConfig!.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -880,7 +880,7 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: Text('移動',
                           style: TextStyle(
-                              color: colorConfig.normalTextColor,
+                              color: colorConfig!.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -902,7 +902,7 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: Text('取消',
                           style: TextStyle(
-                              color: colorConfig.normalTextColor,
+                              color: colorConfig!.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -946,7 +946,7 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: Text('削除',
                           style: TextStyle(
-                              color: colorConfig.normalTextColor,
+                              color: colorConfig!.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -968,7 +968,7 @@ class EventPart extends HookConsumerWidget {
                       ),
                       child: Text('固定',
                           style: TextStyle(
-                              color: colorConfig.normalTextColor,
+                              color: colorConfig!.normalTextColor,
                               fontSize: buttonFontSize,
                               fontWeight: buttonFontWeight
                           )
@@ -1045,7 +1045,7 @@ class DayAndWeekdayPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig;
-    var borderColor = colorConfig.borderColor;
+    var borderColor = colorConfig!.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;
     var todayBgColor = borderColor.withAlpha(todayAlpha);
@@ -1182,7 +1182,7 @@ class HourPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig;
-    var borderColor = colorConfig.borderColor;
+    var borderColor = colorConfig!.borderColor;
     var todayAlpha = colorConfig.calendarTodayBgColorAlpha;
     var lineAlpha = colorConfig.calendarLineBgColorAlpha;
     var todayBgColor = borderColor.withAlpha(todayAlpha);

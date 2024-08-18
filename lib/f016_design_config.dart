@@ -51,57 +51,57 @@ const MaterialColor originalLightBlue = MaterialColor(
       700: Color(0xFF99B6FF),
       800: Color(0xFF90AFFF),
       900: Color(0xFF7FA2FF),
-});
+    });
 const int _originalLightBluePrimary = 0xFFAAC4FF;
 
 const MaterialColor originalBrown = MaterialColor(
     _originalBrownPrimary, <int, Color>{
-      50: Color(0xFFF7F6F5),
-      100: Color(0xFFECE8E6),
-      200: Color(0xFFDFD9D6),
-      300: Color(0xFFD2C9C6),
-      400: Color(0xFFC8BEB9),
-      500: Color(_originalBrownPrimary),
-      600: Color(0xFFB8ABA6),
-      700: Color(0xFFAFA29C),
-      800: Color(0xFFA79993),
-      900: Color(0xFF998A83),
+  50: Color(0xFFF7F6F5),
+  100: Color(0xFFECE8E6),
+  200: Color(0xFFDFD9D6),
+  300: Color(0xFFD2C9C6),
+  400: Color(0xFFC8BEB9),
+  500: Color(_originalBrownPrimary),
+  600: Color(0xFFB8ABA6),
+  700: Color(0xFFAFA29C),
+  800: Color(0xFFA79993),
+  900: Color(0xFF998A83),
 });
 const int _originalBrownPrimary = 0xFFBEB2AD;
 
 const MaterialColor originalLightGray = MaterialColor(
     _originalLightGrayPrimary, <int, Color>{
-      50: Color(0xFFF2F2F2),
-      100: Color(0xFFDEDEDE),
-      200: Color(0xFFC8C8C8),
-      300: Color(0xFFB1B1B1),
-      400: Color(0xFFA1A1A1),
-      500: Color(_originalLightGrayPrimary),
-      600: Color(0xFF888888),
-      700: Color(0xFF7D7D7D),
-      800: Color(0xFF737373),
-      900: Color(0xFF616161),
+  50: Color(0xFFF2F2F2),
+  100: Color(0xFFDEDEDE),
+  200: Color(0xFFC8C8C8),
+  300: Color(0xFFB1B1B1),
+  400: Color(0xFFA1A1A1),
+  500: Color(_originalLightGrayPrimary),
+  600: Color(0xFF888888),
+  700: Color(0xFF7D7D7D),
+  800: Color(0xFF737373),
+  900: Color(0xFF616161),
 });
 const int _originalLightGrayPrimary = 0xFF909090;
 
 abstract final class BackgroundColors {
-    static const Color extraLightGrey = Color(0xFFD3D3D3);
-    static const Color cream = Color(0xFFF3ECD8);
-    static const Color cream3 = Color(0xFFEAE1CF);
-    static const Color darkModeGrey = Color(0xFF313131);
+  static const Color extraLightGrey = Color(0xFFD3D3D3);
+  static const Color cream = Color(0xFFF3ECD8);
+  static const Color cream3 = Color(0xFFEAE1CF);
+  static const Color darkModeGrey = Color(0xFF313131);
 }
 
 abstract final class BorderColors {
-    static const Color gold = Color(0xCCC4B8A5);
-    static const Color pink = Color(0xFFFFCCD4);
-    static const Color indigo = Color(0xFFC4DDFF);
-    static const Color darkModeGrey = Color(0xFF212121);
+  static const Color gold = Color(0xCCC4B8A5);
+  static const Color pink = Color(0xFFFFCCD4);
+  static const Color indigo = Color(0xFFC4DDFF);
+  static const Color darkModeGrey = Color(0xFF212121);
 }
 
 abstract final class CardColors {
-    static const Color grey = Color(0xFFE5E5E5);
-    static const Color cream = Color(0xFFF8F5EB);
-    static const Color darkModeBlack = Colors.black26;
+  static const Color grey = Color(0xFFE5E5E5);
+  static const Color cream = Color(0xFFF8F5EB);
+  static const Color darkModeBlack = Colors.black26;
 }
 
 enum BrightnessMode implements SharedPreferenceStringValue {
@@ -215,10 +215,8 @@ enum ColorConfig implements SharedPreferenceStringValue {
 class DesignConfigState {
   BrightnessMode? brightnessMode;
   Brightness? brightness;
-  ColorConfig colorConfig = ColorConfig.values/*.where((config) {
-    return config.brightness == Brightness.dark;
-  }).toList()*/.first;
-  ColorConfig? lightAndDarkColorConfig;
+  ColorConfig? colorConfig;
+  ColorConfig? preColorConfig;
   ColorConfig? lightColorConfig;
   ColorConfig? darkColorConfig;
 
@@ -241,7 +239,7 @@ class DesignConfigState {
     nState.brightnessMode = state.brightnessMode;
     nState.brightness = state.brightness;
     nState.colorConfig = state.colorConfig;
-    nState.lightAndDarkColorConfig = state.colorConfig;
+    nState.preColorConfig = state.preColorConfig;
     nState.lightColorConfig = state.lightColorConfig;
     nState.darkColorConfig = state.darkColorConfig;
     return nState;
@@ -249,118 +247,100 @@ class DesignConfigState {
 }
 
 class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
-    final Ref ref;
-    DesignConfigNotifier(this.ref, DesignConfigState state) : super(state);
+  final Ref ref;
+  DesignConfigNotifier(this.ref, DesignConfigState state) : super(state);
 
-    initState(/*Future<void> Function() completion*/) async {
-      state.brightnessMode = await SharedPreferencesRepository()
-          .getStringEnum(SharedPreferenceKey.brightnessMode,
-          BrightnessMode.values);
-      state.brightnessMode ??= BrightnessMode.values.first;
+  initState(BrightnessMode brightnessMode, Brightness brightness,
+      ColorConfig lightColorConfig, ColorConfig darkColorConfig) async {
+    state.brightnessMode = brightnessMode;
+    state.brightness = brightness;
+    state.lightColorConfig = lightColorConfig;
+    state.darkColorConfig = darkColorConfig;
 
-      state.lightAndDarkColorConfig = await SharedPreferencesRepository()
-          .getStringEnum(SharedPreferenceKey.lightAndDarkColorConfig,
-          ColorConfig.values);
-      state.lightAndDarkColorConfig ??= ColorConfig.values.first;
+    setColorConfig();
+  }
 
-      state.lightColorConfig = await SharedPreferencesRepository()
-          .getStringEnum(SharedPreferenceKey.lightColorConfig,
-          ColorConfig.values);
-      state.lightColorConfig ??= ColorConfig.values.where((config) {
-        return config.brightness == Brightness.light;
-      }).toList().first;
-
-      state.darkColorConfig = await SharedPreferencesRepository()
-          .getStringEnum(SharedPreferenceKey.darkColorConfig,
-          ColorConfig.values);
-      state.darkColorConfig ??= ColorConfig.values.where((config) {
-        return config.brightness == Brightness.dark;
-      }).toList().first;
-
-      switch(state.brightnessMode!) {
-        case BrightnessMode.lightAndDark:
-          state.colorConfig = state.lightAndDarkColorConfig!;
-          break;
-        case BrightnessMode.light:
-          state.colorConfig = state.lightColorConfig!;
-          break;
-        case BrightnessMode.dark:
-          state.colorConfig = state.darkColorConfig!;
-          break;
-      }
-      // await completion();
+  bool applyColorConfig(Brightness brightness) {
+    state.brightness = brightness;
+    if (state.brightnessMode == null) {
+      return false;
     }
-
-    bool applyColorConfig(Brightness brightness) {
-      state.brightness = brightness;
-
-      if (state.brightnessMode == null) {
-        return false;
-      }
-
-      var preColorConfig = state.colorConfig;
-
-      switch(state.brightnessMode!) {
-        case BrightnessMode.lightAndDark:
-          state.colorConfig = state.lightAndDarkColorConfig!;
-          break;
-        case BrightnessMode.light:
-          state.colorConfig = state.lightColorConfig!;
-          break;
-        case BrightnessMode.dark:
-          state.colorConfig = state.darkColorConfig!;
-          break;
-      }
-
-      return preColorConfig != state.colorConfig;
+    setColorConfig();
+    if (state.preColorConfig == state.colorConfig) {
+      return false;
     }
+    state.preColorConfig = state.colorConfig;
+    return true;
+  }
 
-    switchColorConfig() async {
-      // var index = (state.colorConfig!.index + 1) % ColorConfig.values.length;
-      // state.colorConfig = ColorConfig.values[index];
-
-      ColorConfig config = state.colorConfig;
-      BrightnessMode mode = state.brightnessMode!;
-
-      var num = ColorConfig.values.length;
-      var i = (config.index + 1) % num;
-      while (i != config.index) {
-        var config = ColorConfig.values[i];
-        if (mode == BrightnessMode.lightAndDark) {
-          SharedPreferencesRepository().setStringEnum(
-              SharedPreferenceKey.lightAndDarkColorConfig, config);
-          state.lightAndDarkColorConfig = config;
-          state.colorConfig = config;
-          break;
-        }
-        if (mode == BrightnessMode.light
-            && config.brightness == Brightness.light) {
-          SharedPreferencesRepository().setStringEnum(
-              SharedPreferenceKey.darkColorConfig, config);
-          state.lightColorConfig = config;
-          state.colorConfig = config;
-          break;
-        }
-        if (mode == BrightnessMode.dark
-            && config.brightness == Brightness.dark) {
-          SharedPreferencesRepository().setStringEnum(
-              SharedPreferenceKey.lightColorConfig, config);
-          state.darkColorConfig = config;
-          state.colorConfig = config;
-          break;
-        }
-        i = (i + 1) % num;
+  setColorConfig() {
+    if (state.brightness == Brightness.light
+        && state.brightnessMode == BrightnessMode.lightAndDark
+        || state.brightnessMode == BrightnessMode.light) {
+      if (state.colorConfig != state.lightColorConfig) {
+        state.colorConfig = state.lightColorConfig!;
       }
     }
 
-    updateState() async {
-        state = DesignConfigState.copy(state);
-        debugPrint('updateState(DesignConfigState)!!');
+    if (state.brightness == Brightness.dark
+        && state.brightnessMode == BrightnessMode.lightAndDark
+        || state.brightnessMode == BrightnessMode.dark) {
+      if (state.colorConfig != state.darkColorConfig) {
+        state.colorConfig = state.darkColorConfig!;
+      }
     }
+  }
+
+  switchColorConfig() async {
+    // var index = (state.colorConfig!.index + 1) % ColorConfig.values.length;
+    // state.colorConfig = ColorConfig.values[index];
+
+    ColorConfig config = state.colorConfig!;
+    BrightnessMode mode = state.brightnessMode!;
+    Brightness brightness = state.brightness!;
+
+    var num = ColorConfig.values.length;
+    var i = (config.index + 1) % num;
+    while (i != config.index) {
+      var config = ColorConfig.values[i];
+      if (mode == BrightnessMode.lightAndDark
+          && brightness == Brightness.light
+          && config.brightness == Brightness.light
+          || mode == BrightnessMode.light
+              && config.brightness == Brightness.light
+      ) {
+        SharedPreferencesRepository().setStringEnum(
+            SharedPreferenceKey.lightColorConfig, config);
+        state.lightColorConfig = config;
+        state.colorConfig = config;
+        break;
+      }
+
+      if (mode == BrightnessMode.lightAndDark
+          && brightness == Brightness.dark
+          && config.brightness == Brightness.dark
+          || mode == BrightnessMode.dark
+              && config.brightness == Brightness.dark
+      ) {
+        SharedPreferencesRepository().setStringEnum(
+            SharedPreferenceKey.darkColorConfig, config);
+        state.lightColorConfig = config;
+        state.colorConfig = config;
+        break;
+      }
+
+      i = (i + 1) % num;
+    }
+  }
+
+  updateState() async {
+    state = DesignConfigState.copy(state);
+    debugPrint('updateState(design config)');
+  }
 }
 
 final designConfigNotifierProvider = StateNotifierProvider
     .autoDispose<DesignConfigNotifier, DesignConfigState>((ref) {
-      var state = DesignConfigState();
-    return DesignConfigNotifier(ref, state);
+  var state = DesignConfigState();
+  return DesignConfigNotifier(ref, state);
 });
