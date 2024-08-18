@@ -1,5 +1,4 @@
 import 'package:device_calendar/device_calendar.dart';
-import 'package:universal_io/io.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -35,6 +34,7 @@ class HomePage extends HookConsumerWidget {
     final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
+    final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     final designConfigState = ref.watch(designConfigNotifierProvider);
@@ -49,7 +49,7 @@ class HomePage extends HookConsumerWidget {
     // アンセーフエリア上の高さ
     double unsafeAreaTopHeight = MediaQuery.of(context).padding.top;
     // if (Platform.isIOS) {
-    unsafeAreaTopHeight += -17;
+    unsafeAreaTopHeight += -11;
     // }
     if (unsafeAreaTopHeight < 21) {
       unsafeAreaTopHeight = 21;
@@ -72,6 +72,7 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       debugPrint('parent useEffect');
 
+      homeNotifier.initState();
       return () {
       };
     }, const []);
@@ -86,11 +87,12 @@ class HomePage extends HookConsumerWidget {
 
     //debugPrint('appLifecycleState=$appLifecycleState');
     useEffect(() {
-      if (appLifecycleState == AppLifecycleState.inactive) {
+      if (appLifecycleState == AppLifecycleState.resumed) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           final Brightness brightness = MediaQuery.platformBrightnessOf(
               context);
-          if (designConfigNotifier.applyColorConfig(brightness)) {
+          if (calendarState.initialized && designConfigNotifier
+              .applyColorConfig(brightness)) {
             await calendarNotifier.updateCalendar(dataExclusion: true);
             await designConfigNotifier.updateState();
           }
@@ -107,14 +109,14 @@ class HomePage extends HookConsumerWidget {
     useEffect(() {
       if (appLifecycleState == AppLifecycleState.inactive) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          // Androidの場合、非活性時、フォーカスがあったテキストが、
-          // フォーカスがあるがキーボードがでないことがあるので対応する。
-          if (Platform.isAndroid) {
-            primaryFocus?.unfocus();
-            // ハイライト解除
-            await eventDetailNotifier.updateHighlightItem(
-                HighlightItem.none);
-          }
+          // Androidの場合、非活性時、キーボード表示中のテキストが、
+          // 選択状態だがキーボードが表示されないので選択を外す。
+          // iOSの場合、その後活性化時に再度選択される。
+          primaryFocus?.unfocus();
+
+          // ハイライト解除
+          await eventDetailNotifier.updateHighlightItem(
+              HighlightItem.none);
         });
       }
 
@@ -159,12 +161,20 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              assetName: 'images/icon_light_and_dark@3x.png',
+              assetName: homeState.brightnessModeAssetName,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
               onPressed: () async {
-
+                var colorChanged = designConfigNotifier.switchBrightnessMode();
+                homeNotifier.setBrightnessMode(
+                    designConfigState.brightnessMode!);
+                if (colorChanged) {
+                  await designConfigNotifier.updateState();
+                  await calendarNotifier.updateCalendar(dataExclusion: true);
+                } else {
+                  await homeNotifier.updateState();
+                }
               },
             ),
 
@@ -174,9 +184,10 @@ class HomePage extends HookConsumerWidget {
               height: appBarHeight,
               radius: appBarHeight / 2,
               onPressed: () async {
-                await designConfigNotifier.switchColorConfig();
-                await designConfigNotifier.updateState();
-                await calendarNotifier.updateCalendar(dataExclusion: true);
+                if (designConfigNotifier.switchColorConfig()) {
+                  await designConfigNotifier.updateState();
+                  await calendarNotifier.updateCalendar(dataExclusion: true);
+                }
               },
             ),
 

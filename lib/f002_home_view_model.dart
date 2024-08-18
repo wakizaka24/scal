@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'f016_design_config.dart';
+
 class HomePageState {
   // Data
   String appBarTitle = '';
   bool uICover = false;
   Widget? uICoverWidget;
+  String? brightnessModeAssetName;
 
   static HomePageState copy(HomePageState state) {
     var nState = HomePageState();
@@ -15,6 +18,7 @@ class HomePageState {
     nState.appBarTitle = state.appBarTitle;
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
+    nState.brightnessModeAssetName = state.brightnessModeAssetName;
     return nState;
   }
 }
@@ -26,10 +30,24 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
       : super(state);
 
   initState() async {
+    final designConfigState = ref.read(designConfigNotifierProvider);
+    setBrightnessMode(designConfigState.brightnessMode!);
   }
 
-  setHomePageIndex(int index) async {
-    updateState();
+  setBrightnessMode(BrightnessMode brightnessMode) {
+    state.brightnessModeAssetName = getBrightnessModeAssetName(
+        brightnessMode);
+  }
+
+  getBrightnessModeAssetName(BrightnessMode brightnessMode) {
+    switch(brightnessMode) {
+      case BrightnessMode.lightAndDark:
+        return 'images/icon_light_and_dark@3x.png';
+      case BrightnessMode.light:
+        return 'images/icon_bright@3x.png';
+      case BrightnessMode.dark:
+        return 'images/icon_dark@3x.png';
+    }
   }
 
   setAppBarTitle(DateTime date, bool update) async {
@@ -47,6 +65,7 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   setUICoverWidget(Widget? widget) async {
     state.uICoverWidget = widget;
   }
+
   updateState() async {
     state = HomePageState.copy(state);
     debugPrint('updateState(home)');

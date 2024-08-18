@@ -257,7 +257,8 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     state.lightColorConfig = lightColorConfig;
     state.darkColorConfig = darkColorConfig;
 
-    setColorConfig();
+    confirmColorConfig();
+    state.preColorConfig = state.colorConfig;
   }
 
   bool applyColorConfig(Brightness brightness) {
@@ -265,7 +266,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     if (state.brightnessMode == null) {
       return false;
     }
-    setColorConfig();
+    confirmColorConfig();
     if (state.preColorConfig == state.colorConfig) {
       return false;
     }
@@ -273,7 +274,19 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     return true;
   }
 
-  setColorConfig() {
+  bool switchBrightnessMode() {
+    var brightnessMode = state.brightnessMode!;
+    var modes = BrightnessMode.values;
+    state.brightnessMode = modes[(brightnessMode.index + 1) % modes.length];
+    confirmColorConfig();
+    if (state.preColorConfig == state.colorConfig) {
+      return false;
+    }
+    state.preColorConfig = state.colorConfig;
+    return true;
+  }
+
+  confirmColorConfig() {
     if (state.brightness == Brightness.light
         && state.brightnessMode == BrightnessMode.lightAndDark
         || state.brightnessMode == BrightnessMode.light) {
@@ -291,7 +304,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     }
   }
 
-  switchColorConfig() async {
+  bool switchColorConfig() {
     // var index = (state.colorConfig!.index + 1) % ColorConfig.values.length;
     // state.colorConfig = ColorConfig.values[index];
 
@@ -302,35 +315,36 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     var num = ColorConfig.values.length;
     var i = (config.index + 1) % num;
     while (i != config.index) {
-      var config = ColorConfig.values[i];
+      var nextConfig = ColorConfig.values[i];
       if (mode == BrightnessMode.lightAndDark
           && brightness == Brightness.light
-          && config.brightness == Brightness.light
+          && nextConfig.brightness == Brightness.light
           || mode == BrightnessMode.light
-              && config.brightness == Brightness.light
+              && nextConfig.brightness == Brightness.light
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceKey.lightColorConfig, config);
-        state.lightColorConfig = config;
-        state.colorConfig = config;
-        break;
+            SharedPreferenceKey.lightColorConfig, nextConfig);
+        state.lightColorConfig = nextConfig;
+        state.colorConfig = nextConfig;
+        return config != nextConfig;
       }
 
       if (mode == BrightnessMode.lightAndDark
           && brightness == Brightness.dark
-          && config.brightness == Brightness.dark
+          && nextConfig.brightness == Brightness.dark
           || mode == BrightnessMode.dark
-              && config.brightness == Brightness.dark
+              && nextConfig.brightness == Brightness.dark
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceKey.darkColorConfig, config);
-        state.lightColorConfig = config;
-        state.colorConfig = config;
-        break;
+            SharedPreferenceKey.darkColorConfig, nextConfig);
+        state.lightColorConfig = nextConfig;
+        state.colorConfig = nextConfig;
+        return config != nextConfig;
       }
 
       i = (i + 1) % num;
     }
+    return false;
   }
 
   updateState() async {
