@@ -186,7 +186,7 @@ class CWIconButton extends HookConsumerWidget {
   final String? assetName;
   final double? assetIconSize;
   final IconData? icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double width;
   final double height;
   final double radius;

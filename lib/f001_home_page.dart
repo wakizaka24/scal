@@ -183,7 +183,8 @@ class HomePage extends HookConsumerWidget {
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
-              onPressed: () async {
+              onPressed: designConfigNotifier.getColorConfigs().length <= 1
+                  ? null : () async {
                 if (designConfigNotifier.switchColorConfig()) {
                   await designConfigNotifier.updateState();
                   await calendarNotifier.updateCalendar(dataExclusion: true);

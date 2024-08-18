@@ -278,6 +278,8 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     var brightnessMode = state.brightnessMode!;
     var modes = BrightnessMode.values;
     state.brightnessMode = modes[(brightnessMode.index + 1) % modes.length];
+    SharedPreferencesRepository().setStringEnum(
+        SharedPreferenceKey.brightnessMode, state.brightnessMode);
     confirmColorConfig();
     if (state.preColorConfig == state.colorConfig) {
       return false;
@@ -345,6 +347,23 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
       i = (i + 1) % num;
     }
     return false;
+  }
+
+  List<ColorConfig> getColorConfigs() {
+    switch (state.brightnessMode!) {
+      case BrightnessMode.lightAndDark:
+        return ColorConfig.values.where((config) {
+          return config.brightness == state.brightness;
+        }).toList();
+      case BrightnessMode.light:
+        return ColorConfig.values.where((config) {
+          return config.brightness == Brightness.light;
+        }).toList();
+      case BrightnessMode.dark:
+        return ColorConfig.values.where((config) {
+          return config.brightness == Brightness.dark;
+        }).toList();
+    }
   }
 
   updateState() async {
