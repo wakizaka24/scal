@@ -619,9 +619,10 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(CalendarUtils().convertCharWrapString(
-                        day.eventList[i].title),
+                      Text(/*CalendarUtils().convertCharWrapString(*/
+                        day.eventList[i].title/*)*/,
                         maxLines: 1,
+                        softWrap: false,
                         style: TextStyle(
                             height: 1,
                             fontSize: calendarFontSize2,
@@ -816,8 +817,9 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(CalendarUtils().convertCharWrapString(
-                          event!.title),
+                      child: Text(/*CalendarUtils().convertCharWrapString(*/
+                          event!.title/*)*/,
+                          softWrap: false,
                           maxLines: 2, style: TextStyle(
                               height: 1,
                               fontSize: eventListFontSize3,
@@ -1228,8 +1230,9 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(CalendarUtils().convertCharWrapString(
-                              hour.eventList[i].title),
+                          Text(/*CalendarUtils().convertCharWrapString(*/
+                              hour.eventList[i].title/*)*/,
+                            softWrap: false,
                             maxLines: 1,
                             style: TextStyle(
                                 height: 1,

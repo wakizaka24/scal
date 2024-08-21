@@ -39,8 +39,8 @@ class CalendarUtils {
     //   var _ = 0;
     // }
 
-    var otherReg = '[^ -~\'’‘]+';
-    var targetReg = '[ -~\'’‘]+';
+    var otherReg = '[^ -~\'’‘、]+';
+    var targetReg = '[ -~\'’‘、]+';
     String charWrapStr;
     if (RegExp(otherReg).hasMatch(str)) {
       charWrapStr = '';

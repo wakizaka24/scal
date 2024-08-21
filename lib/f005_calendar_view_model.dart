@@ -987,7 +987,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     // }
 
     return calendars.where((cal) {
-      return cal.isDefault!;
+      return cal.isDefault! || true;
     }).toList();
   }
 
