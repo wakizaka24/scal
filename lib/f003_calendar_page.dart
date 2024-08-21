@@ -6,7 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
-import 'f015_calendar_utils.dart';
 import 'f016_design_config.dart';
 import 'f025_common_widgets.dart';
 
@@ -830,153 +829,112 @@ class EventPart extends HookConsumerWidget {
                   )
                 ),
               if (event != null && event!.editing && event!.sameCell)
-                SizedBox(width: 41, height: 32,
-                    child: TextButton(
-                      onPressed: () async {
-                        await calendarNotifier.selectEventListPart(index);
+                CWIconButton(
+                  assetName: 'images/icon_copy_event@3x.png',
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
+                  foregroundColor: colorConfig!.accentColor,
+                  onPressed: () async {
+                    await calendarNotifier.selectEventListPart(index);
 
-                        if (!await calendarNotifier.copyIndexEvent(index)) {
-                          if (context.mounted) {
-                            await UIUtils().showMessageDialog(context, ref,
-                                'コピー', 'コピーに失敗しました');
-                          }
-                        }
+                    if (!await calendarNotifier.copyIndexEvent(index)) {
+                      if (context.mounted) {
+                        await UIUtils().showMessageDialog(context, ref,
+                            'コピー', 'コピーに失敗しました');
+                      }
+                    }
 
-                        await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          padding: const EdgeInsets.all(0)
-                      ),
-                      child: Text('コピー',
-                          style: TextStyle(
-                              color: colorConfig!.normalTextColor,
-                              fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight
-                          )
-                      ),
-                    )
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateState();
+                  },
                 ),
               if (event != null && event!.editing && !event!.sameCell)
-                SizedBox(width: 41, height: 32,
-                    child: TextButton(
-                      onPressed: () async {
-                        await calendarNotifier.selectEventListPart(index);
+                CWIconButton(
+                  assetName: 'images/icon_move_event@3x.png',
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
+                  foregroundColor: colorConfig!.accentColor,
+                  onPressed: () async {
+                    await calendarNotifier.selectEventListPart(index);
 
-                        if (!await calendarNotifier.moveIndexEvent(index)) {
-                          if (context.mounted) {
-                            await UIUtils().showMessageDialog(context, ref,
-                                '移動', '移動に失敗しました');
-                          }
-                        } else {
-                          await calendarNotifier.editingCancel(index);
-                        }
+                    if (!await calendarNotifier.moveIndexEvent(index)) {
+                      if (context.mounted) {
+                        await UIUtils().showMessageDialog(context, ref,
+                            '移動', '移動に失敗しました');
+                      }
+                    } else {
+                      await calendarNotifier.editingCancel(index);
+                    }
 
-                        await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          padding: const EdgeInsets.all(0)
-                      ),
-                      child: Text('移動',
-                          style: TextStyle(
-                              color: colorConfig!.normalTextColor,
-                              fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight
-                          )
-                      ),
-                    )
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateState();
+                  },
                 ),
               if (event != null && event!.editing)
-                SizedBox(width: 41, height: 32,
-                    child: TextButton(
-                      onPressed: () async {
-                        await calendarNotifier.selectEventListPart(index);
-                        await calendarNotifier.editingCancel(index);
-                        await calendarNotifier.updateEventList();
-                        await calendarNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          padding: const EdgeInsets.all(0)
-                      ),
-                      child: Text('取消',
-                          style: TextStyle(
-                              color: colorConfig!.normalTextColor,
-                              fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight
-                          )
-                      ),
-                    )
+                CWIconButton(
+                  assetName: 'images/icon_lock_locking_tool@3x.png',
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
+                  foregroundColor: colorConfig!.accentColor,
+                  onPressed: () async {
+                    await calendarNotifier.selectEventListPart(index);
+                    await calendarNotifier.editingCancel(index);
+                    await calendarNotifier.updateEventList();
+                    await calendarNotifier.updateState();
+                  },
                 ),
               if (event != null && !event!.editing && !event!.readOnly)
-                SizedBox(width: 41, height: 32,
-                    child: TextButton(
-                      onPressed: () async {
-                        // await Future.delayed(const Duration(
-                        // milliseconds: 500));
+                CWIconButton(
+                  assetName: 'images/icon_trash@3x.png',
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
+                  foregroundColor: colorConfig!.accentColor,
+                  onPressed: () async {
+                    // await Future.delayed(const Duration(
+                    // milliseconds: 500));
 
-                        await calendarNotifier.selectEventListPart(index);
-                        await calendarNotifier.updateState();
+                    await calendarNotifier.selectEventListPart(index);
+                    await calendarNotifier.updateState();
 
-                        if (context.mounted) {
-                          var result = await UIUtils().showMessageDialog(
-                              context, ref, '削除', 'イベントを削除しますか?', 'はい',
-                              'いいえ');
-                          if (result != 'positive') {
-                            return;
-                          }
-                        }
+                    if (context.mounted) {
+                      var result = await UIUtils().showMessageDialog(
+                          context, ref, '削除', 'イベントを削除しますか?', 'はい',
+                          'いいえ');
+                      if (result != 'positive') {
+                        return;
+                      }
+                    }
 
-                        if (!await calendarNotifier.deleteEvent(event!)) {
-                          if (context.mounted) {
-                            await UIUtils().showMessageDialog(context, ref,
-                                '削除', '削除に失敗しました');
-                          }
-                          return;
-                        }
+                    if (!await calendarNotifier.deleteEvent(event!)) {
+                      if (context.mounted) {
+                        await UIUtils().showMessageDialog(context, ref,
+                            '削除', '削除に失敗しました');
+                      }
+                      return;
+                    }
 
-                        await calendarNotifier.updateCalendar();
-                        await calendarNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          padding: const EdgeInsets.all(0),
-                          // splashFactory: NoSplash.splashFactory
-                      ),
-                      child: Text('削除',
-                          style: TextStyle(
-                              color: colorConfig!.normalTextColor,
-                              fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight
-                          )
-                      ),
-                    )
+                    await calendarNotifier.updateCalendar();
+                    await calendarNotifier.updateState();
+                  },
                 ),
               if (event != null && !event!.editing && !event!.readOnly)
-                SizedBox(width: 41, height: 32,
-                    child: TextButton(
-                      onPressed: () async {
-                        await calendarNotifier.selectEventListPart(index);
-                        await calendarNotifier.fixedEvent(
-                            index);
-                        await calendarNotifier.updateState();
-                      },
-                      style: TextButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          padding: const EdgeInsets.all(0)
-                      ),
-                      child: Text('固定',
-                          style: TextStyle(
-                              color: colorConfig!.normalTextColor,
-                              fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight
-                          )
-                      ),
-                    )
-              )
+                CWIconButton(
+                  assetName: 'images/icon_unlock_locking_tool@3x.png',
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
+                  foregroundColor: colorConfig!.accentColor,
+                  onPressed: () async {
+                    await calendarNotifier.selectEventListPart(index);
+                    await calendarNotifier.fixedEvent(
+                        index);
+                    await calendarNotifier.updateState();
+                  },
+                )
             ],
             )
         )

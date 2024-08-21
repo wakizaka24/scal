@@ -186,22 +186,22 @@ class CWIconButton extends HookConsumerWidget {
   final String? assetName;
   final double? assetIconSize;
   final IconData? icon;
-  final VoidCallback? onPressed;
   final double width;
   final double height;
   final double radius;
   final Color foregroundColor;
+  final VoidCallback? onPressed;
 
   const CWIconButton({
     super.key,
     this.assetName,
     this.assetIconSize = 21,
     this.icon,
-    required this.onPressed,
     this.width = 32,
     this.height = 32,
     this.radius = 16,
-    this.foregroundColor = Colors.white
+    this.foregroundColor = Colors.white,
+    required this.onPressed
   });
 
   @override
