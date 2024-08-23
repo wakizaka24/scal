@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 import 'f005_calendar_view_model.dart';
 import 'f013_ui_utils.dart';
+import 'f015_calendar_utils.dart';
 import 'f016_design_config.dart';
 import 'f025_common_widgets.dart';
 
@@ -618,10 +619,9 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(/*CalendarUtils().convertCharWrapString(*/
-                        day.eventList[i].title/*)*/,
+                      Text(CalendarUtils().convertCharWrapString(
+                        day.eventList[i].title),
                         maxLines: 1,
-                        softWrap: false,
                         style: TextStyle(
                             height: 1,
                             fontSize: calendarFontSize2,
@@ -816,9 +816,8 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(/*CalendarUtils().convertCharWrapString(*/
-                          event!.title/*)*/,
-                          softWrap: false,
+                      child: Text(CalendarUtils().convertCharWrapString(
+                          event!.title),
                           maxLines: 2, style: TextStyle(
                               height: 1,
                               fontSize: eventListFontSize3,
@@ -1188,9 +1187,8 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(/*CalendarUtils().convertCharWrapString(*/
-                              hour.eventList[i].title/*)*/,
-                            softWrap: false,
+                          Text(CalendarUtils().convertCharWrapString(
+                              hour.eventList[i].title),
                             maxLines: 1,
                             style: TextStyle(
                                 height: 1,
