@@ -925,10 +925,11 @@ class EventPart extends HookConsumerWidget {
                 for (int i=0; i < event!.movingHourChoices.length; i++)
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: CWElevatedButton(
-                        title: '${event!.movingHourChoices[i]}h',
-                        width: 32,
+                        title: '${event!.movingHourChoices[i]}:00',
+                        width: 39,
                         height: 32,
                         radius: 16,
+                        fontSize: 11,
                         backgroundColor: colorConfig.cardColor,
                         color: colorConfig.cardTextColor,
                         onPressed: () async {

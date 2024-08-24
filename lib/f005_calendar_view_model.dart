@@ -571,8 +571,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap) async {
     var timeInterval = 24 ~/ CalendarPageState.timeColNum;
-    var dateUntil = date.add(Duration(hours:timeInterval - 1));
-    var hourStr = '${date.hour}h〜${dateUntil.hour}h'; // 0h〜4h
+    var dateUntil = date.add(Duration(hours:timeInterval));
+    var hourStr = '${date.hour}:00〜${dateUntil.hour}:00'; // 0:00〜5:00
     state.eventListTitle = '${DateFormat.MMMEd('ja') // 6月12日(月)
         .format(date)} ${allDay ? '終日' : hourStr}';
     var eventList = (allDay ? allDayEventsMap[date] : hourEventsMap[date])
@@ -627,7 +627,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             state.now.day);
         DateTime currentDay = DateTime(id.year, id.month, id.day);
 
-        var title = '${id.hour}h';
+        var title = '${id.hour}時';
         if (colIndex == timeColNum) {
           title = '終日';
         }
