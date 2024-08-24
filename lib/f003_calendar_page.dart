@@ -33,7 +33,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
     final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider
         .notifier);
-    // final designConfigState = ref.watch(designConfigNotifierProvider);
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
 
     // Month Calendar/Week Calendar
     // 画面の幅
@@ -141,6 +141,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
           const Spacer(),
           CWElevatedButton(
               title: calendarNotifier.getCalendarSwitchingButtonTitle(),
+              color: colorConfig.cardTextColor,
+              backgroundColor: colorConfig.cardColor,
               onPressed: () async {
                 final calendarState = ref.watch(calendarPageNotifierProvider);
                 double prePage = calendarState.calendarSwitchingController
@@ -713,7 +715,7 @@ class EventListPart extends HookConsumerWidget {
                       bottomBorderWide: i == calendarState.eventList.length - 1,
                       leftBorderWide: true,
                       event: calendarState.eventList[i],
-                    )
+                    ),
                   }
                 ]
             )
@@ -831,7 +833,7 @@ class EventPart extends HookConsumerWidget {
                       )
                   )
                 ),
-              if (event != null && event!.editing)
+              if (event != null && event!.editing && !event!.hourChoiceMode)
                 Container(
                   padding: const EdgeInsets.all(8),
                   height: labelHeight,
@@ -851,7 +853,8 @@ class EventPart extends HookConsumerWidget {
                 ),
               // if (event != null && event!.editing)
               //   const SizedBox(width: 8),
-              if (event != null && event!.editing && event!.sameCell)
+              if (event != null && event!.editing && event!.sameCell
+                  && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_copy_event@3x.png',
                   assetIconSize: iconHeight,
@@ -874,7 +877,8 @@ class EventPart extends HookConsumerWidget {
                   },
                 ),
               if (event != null && event!.editing
-                && (event!.hourMoving || !event!.sameCell))
+                  && (event!.hourMoving || !event!.sameCell)
+                  && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_move_event@3x.png',
                   assetIconSize: iconHeight,
@@ -885,22 +889,24 @@ class EventPart extends HookConsumerWidget {
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
-
-
-                    if (!await calendarNotifier.moveIndexEvent(index)) {
-                      if (context.mounted) {
-                        await UIUtils().showMessageDialog(context, ref,
-                            '移動', '移動に失敗しました');
+                    if (!await calendarNotifier.isWeekCalendar()) {
+                      if (!await calendarNotifier.moveIndexEvent(index)) {
+                        if (context.mounted) {
+                          await UIUtils().showMessageDialog(context, ref,
+                              '移動', '移動に失敗しました');
+                        }
+                      } else {
+                        await calendarNotifier.editingCancel(index);
                       }
                     } else {
-                      await calendarNotifier.editingCancel(index);
+                      await calendarNotifier.setHourChoiceMode(true);
                     }
 
                     await calendarNotifier.updateCalendar();
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && event!.editing)
+              if (event != null && event!.editing && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_lock_locking_tool@3x.png',
                   assetIconSize: iconHeight,
@@ -912,6 +918,49 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.selectEventListPart(index);
                     await calendarNotifier.editingCancel(index);
                     await calendarNotifier.updateEventList();
+                    await calendarNotifier.updateState();
+                  },
+                ),
+              if (event != null && event!.editing && event!.hourChoiceMode)
+                for (int i=0; i < event!.movingHourChoices.length; i++)
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: CWElevatedButton(
+                        title: '${event!.movingHourChoices[i]}h',
+                        width: 32,
+                        height: 32,
+                        radius: 16,
+                        backgroundColor: colorConfig.cardColor,
+                        color: colorConfig.cardTextColor,
+                        onPressed: () async {
+                          // debugPrint('${event!.movingHourChoices[i]}');
+
+                          if (!await calendarNotifier.moveIndexEvent(index,
+                              hour: i)) {
+                            if (context.mounted) {
+                              await UIUtils().showMessageDialog(context, ref,
+                                  '移動', '移動に失敗しました');
+                            }
+                          } else {
+                            await calendarNotifier.editingCancel(index);
+                          }
+
+                          await calendarNotifier.setHourChoiceMode(false);
+                          await calendarNotifier.updateCalendar();
+                          await calendarNotifier.updateState();
+                        }
+                    )
+                  ),
+              if (event != null && event!.editing && event!.hourChoiceMode)
+                CWIconButton(
+                  assetName: 'images/icon_close@3x.png',
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
+                  onPressed: () async {
+                    await calendarNotifier.setHourChoiceMode(false);
+                    await calendarNotifier.updateCalendar();
                     await calendarNotifier.updateState();
                   },
                 ),

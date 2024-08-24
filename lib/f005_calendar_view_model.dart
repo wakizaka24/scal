@@ -118,6 +118,8 @@ class EventDisplay {
   Color fontColor;
   String fixedTitle;
   bool hourMoving;
+  bool hourChoiceMode;
+  List<int> movingHourChoices;
   Event? event;
 
   EventDisplay({
@@ -132,6 +134,8 @@ class EventDisplay {
     required this.fontColor,
     required this.fixedTitle,
     required this.hourMoving,
+    required this.hourChoiceMode,
+    required this.movingHourChoices,
     this.event
   });
 }
@@ -786,7 +790,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             editing: true, sameCell: false, readOnly: ed.readOnly,
             head: ed.head, lineColor: ed.lineColor, title: ed.title,
             fontColor: ed.fontColor, fixedTitle: ed.fixedTitle,
-            hourMoving: ed.hourMoving, event: event)
+            hourMoving: ed.hourMoving, hourChoiceMode: false,
+            movingHourChoices: [], event: event)
     );
   }
 
@@ -816,7 +821,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return await calendarRepo.createOrUpdateEvent(editingEvent);
   }
 
-  Future<bool> moveIndexEvent(int index) async {
+  Future<bool> moveIndexEvent(int index, {int hour = 0}) async {
     Event event = state.eventList[index].event!;
 
     var endPeriod = event.end!.difference(event.start!);
@@ -827,23 +832,21 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
 
     DateTime selectionDate;
-    int timeInterval;
     if (state.calendarSwitchingIndex == 0) {
       selectionDate = state.selectionDate;
 
-      timeInterval = 24;
+      int timeInterval = 24;
+      var addingHours = event.start!.difference(selectionDate).inHours
+          % timeInterval;
+      selectionDate = selectionDate.add(Duration(hours: addingHours));
     } else if (state.calendarSwitchingIndex == 1) {
       selectionDate = state.selectionHour;
       event.allDay = state.selectionAllDay;
 
-      timeInterval = 24 ~/ CalendarPageState.timeColNum;
+      selectionDate = selectionDate.add(Duration(hours: hour));
     } else {
       return false;
     }
-
-    var addingHours = event.start!.difference(selectionDate).inHours
-      % timeInterval;
-    selectionDate = selectionDate.add(Duration(hours: addingHours));
 
     event.start = calendarRepo.convertTZDateTime(selectionDate);
     event.end = calendarRepo.convertTZDateTime(
@@ -898,33 +901,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   setEventList(List<Event> eventList) async {
-    const hourMovingAssetAllNames = [
-      'images/icon_move_event_0h@3x.png',
-      'images/icon_move_event_1h@3x.png',
-      'images/icon_move_event_2h@3x.png',
-      'images/icon_move_event_3h@3x.png',
-      'images/icon_move_event_4h@3x.png',
-      'images/icon_move_event_5h@3x.png',
-      'images/icon_move_event_6h@3x.png',
-      'images/icon_move_event_7h@3x.png',
-      'images/icon_move_event_8h@3x.png',
-      'images/icon_move_event_9h@3x.png',
-      'images/icon_move_event_10h@3x.png',
-      'images/icon_move_event_11h@3x.png',
-      'images/icon_move_event_12h@3x.png',
-      'images/icon_move_event_13h@3x.png',
-      'images/icon_move_event_14h@3x.png',
-      'images/icon_move_event_15h@3x.png',
-      'images/icon_move_event_16h@3x.png',
-      'images/icon_move_event_17h@3x.png',
-      'images/icon_move_event_18h@3x.png',
-      'images/icon_move_event_19h@3x.png',
-      'images/icon_move_event_20h@3x.png',
-      'images/icon_move_event_21h@3x.png',
-      'images/icon_move_event_22h@3x.png',
-      'images/icon_move_event_23h@3x.png',
-    ];
-
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     if (state.eventListIndex != null
@@ -975,22 +951,39 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       creatingEventList.add(EventDisplay(eventId: eventId,
           calendarId: calendar.id!, editing: editing,
           sameCell: sameCell, readOnly: calendar.isReadOnly!,
-          head: head, lineColor: lineColor, title: title,
-          fontColor: fontColor, fixedTitle: DateFormat.yMd('ja')
-              .format(event.start!), hourMoving: state
-              .calendarSwitchingIndex == 1, event: event
+          head: head, lineColor: lineColor, title: title, fontColor: fontColor,
+          fixedTitle: DateFormat.yMd('ja').format(event.start!),
+          hourMoving: false, hourChoiceMode: false, movingHourChoices: [],
+          event: event
       ));
     }
 
     var otherEventList = state.editingEventList
       .where((event) => creatingEventList
         .where((ce) => ce.eventId == event.eventId
-    ).firstOrNull == null).map((event) {
+        ).firstOrNull == null);
+
+    state.eventList = [...otherEventList, ...creatingEventList].map((event) {
+      var editingEvent = state.editingEventList
+          .where((e)=>e.eventId == event.eventId).firstOrNull;
+      if (state.calendarSwitchingIndex == 1) {
+        List<int> choices = [];
+        var exclusionHour = event.event!.start!.hour;
+        var hour = state.selectionHour.hour;
+        for (int i = 0; i < 4; i++) {
+          if (!event.sameCell || hour + i != exclusionHour) {
+            choices.add(hour + i);
+          }
+        }
+
+        event.movingHourChoices = choices;
+      }
       event.hourMoving = state.calendarSwitchingIndex == 1;
+      event.hourChoiceMode = state.calendarSwitchingIndex == 1
+        && (editingEvent?.hourChoiceMode ?? false);
+      // event.hourChoiceMode = true;
       return event;
     }).toList();
-
-    state.eventList = [...otherEventList, ...creatingEventList];
   }
 
   selectEventListPart(int index) async {
@@ -1001,6 +994,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     state.cellActive = false;
     state.eventListIndex = index;
+  }
+
+  setHourChoiceMode(bool mode) async {
+    var eventId = state.eventList[state.eventListIndex!].eventId;
+    var event = state.editingEventList.where((event)=>event.eventId == eventId)
+        .firstOrNull;
+    event?.hourChoiceMode = mode;
   }
 
   // Common
@@ -1059,6 +1059,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.dayLists.length == 3) {
       await homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
     }
+  }
+
+  Future<bool> isWeekCalendar() async {
+    return state.calendarSwitchingIndex == 1;
   }
 
   updateState() async {

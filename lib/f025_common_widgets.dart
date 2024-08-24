@@ -231,42 +231,48 @@ class CWIconButton extends HookConsumerWidget {
 
 class CWElevatedButton extends HookConsumerWidget {
   final String title;
-  final double fixedWidth;
-  final double fixedHeight;
+  final double width;
+  final double height;
+  final double radius;
   final double fontSize;
   final Color? backgroundColor;
+  final Color? color;
   final VoidCallback? onPressed;
 
   const CWElevatedButton({
     super.key,
     required this.title,
-    this.fixedWidth = 32,
-    this.fixedHeight = 32,
+    this.width = 70,
+    this.height = 32,
+    this.radius = 16,
     this.fontSize = 13,
     this.backgroundColor,
+    this.color,
     this.onPressed
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
-    return ElevatedButton(
+    return SizedBox(width: width, height: height,
+      child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          fixedSize: Size(fixedWidth, fixedHeight),
+          // fixedSize: Size(width, height),
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(radius),
           ),
           textStyle: TextStyle(fontSize: fontSize),
-          padding: const EdgeInsets.all(0),
+          minimumSize: Size.zero,
+          padding: EdgeInsets.zero,
         ),
         child: Text(title,
             style: TextStyle(
                 fontWeight: buttonFontWeight,
-                color: colorConfig.cardTextColor
+                color: color
             )
         )
+      )
     );
   }
 }

@@ -607,9 +607,10 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWElevatedButton(
                   title: '保存する',
-                  fixedWidth: 110,
-                  fixedHeight: 35,
+                  width: 110,
+                  height: 35,
                   fontSize: 15,
+                  color: colorConfig.normalTextColor,
                   backgroundColor: colorConfig.backgroundColor,
                   onPressed: !eventDetailState.saveButtonEnabled! ? null
                       : () async {
