@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f016_design_config.dart';
 
@@ -108,6 +109,7 @@ class CWTextField extends HookConsumerWidget {
   final bool highlight;
   final TextInputType? keyboardType;
   final int maxLines;
+  final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final ValueChanged<bool>? onFocusChange;
 
@@ -126,6 +128,7 @@ class CWTextField extends HookConsumerWidget {
     required this.highlight,
     this.keyboardType,
     this.maxLines = 1,
+    this.inputFormatters,
     this.onChanged,
     this.onFocusChange
   });
@@ -166,6 +169,7 @@ class CWTextField extends HookConsumerWidget {
         textAlignVertical: textAlignVertical,
         keyboardType: keyboardType,
         maxLines: maxLines,
+        inputFormatters: inputFormatters,
         readOnly: readOnly,
         enabled: enabled,
         onChanged: onChanged

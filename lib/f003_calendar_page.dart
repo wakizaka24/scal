@@ -509,9 +509,9 @@ class WeekdayPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
-    var borderColor = colorConfigState.colorConfig!.borderColor;
+    var borderColor = designConfigState.colorConfig!.borderColor;
     var border = BorderSide(
         color: borderColor, width: normalBoarderWidth
     );
@@ -654,7 +654,7 @@ class EventListPart extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
-    final colorConfigState = ref.watch(designConfigNotifierProvider);
+    final designConfigState = ref.watch(designConfigNotifierProvider);
 
     return Column(
         children: [
@@ -662,7 +662,7 @@ class EventListPart extends HookConsumerWidget {
               height: 24,
               child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  color: colorConfigState.colorConfig!.borderColor,
+                  color: designConfigState.colorConfig!.borderColor,
                   child: Row(
                     children: [
                       Text(calendarState.eventListTitle,
@@ -670,7 +670,8 @@ class EventListPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize1,
                             fontWeight: eventListFontWeight1,
-                            color: colorConfigState.colorConfig!.normalTextColor
+                            color: designConfigState.colorConfig!
+                                .normalTextColor
                         )
                       ),
                     ],
@@ -749,9 +750,12 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final eventInnerHeight = height * 0.9;
+    final labelHeight = eventInnerHeight * 0.7;
+    final iconHeight = eventInnerHeight * 0.65;
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider)
-        .colorConfig;
+        .colorConfig!;
 
     return SelectableCalendarCell(
         height: height,
@@ -784,7 +788,7 @@ class EventPart extends HookConsumerWidget {
                             height: 1,
                             fontSize: eventListFontSize3,
                             fontWeight: eventListFontWeight3,
-                            color: colorConfig!.normalTextColor
+                            color: colorConfig.normalTextColor
                           )
                       )
                   )
@@ -827,13 +831,34 @@ class EventPart extends HookConsumerWidget {
                       )
                   )
                 ),
+              if (event != null && event!.editing)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  height: labelHeight,
+                  decoration: BoxDecoration(
+                    color: colorConfig.borderColor,
+                    borderRadius: BorderRadius.circular(labelHeight / 2),
+                  ),
+                  child: Text(event!.fixedTitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          height: 1,
+                          fontSize: eventListFontSize2,
+                          fontWeight: eventListFontWeight2,
+                          color: colorConfig.cardTextColor
+                      )
+                  ),
+                ),
+              // if (event != null && event!.editing)
+              //   const SizedBox(width: 8),
               if (event != null && event!.editing && event!.sameCell)
                 CWIconButton(
                   assetName: 'images/icon_copy_event@3x.png',
-                  width: appBarHeight,
-                  height: appBarHeight,
-                  radius: appBarHeight / 2,
-                  foregroundColor: colorConfig!.accentColor,
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
@@ -848,15 +873,19 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && event!.editing && !event!.sameCell)
+              if (event != null && event!.editing
+                && (event!.hourMoving || !event!.sameCell))
                 CWIconButton(
                   assetName: 'images/icon_move_event@3x.png',
-                  width: appBarHeight,
-                  height: appBarHeight,
-                  radius: appBarHeight / 2,
-                  foregroundColor: colorConfig!.accentColor,
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
+
+
 
                     if (!await calendarNotifier.moveIndexEvent(index)) {
                       if (context.mounted) {
@@ -874,10 +903,11 @@ class EventPart extends HookConsumerWidget {
               if (event != null && event!.editing)
                 CWIconButton(
                   assetName: 'images/icon_lock_locking_tool@3x.png',
-                  width: appBarHeight,
-                  height: appBarHeight,
-                  radius: appBarHeight / 2,
-                  foregroundColor: colorConfig!.accentColor,
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
                     await calendarNotifier.editingCancel(index);
@@ -888,10 +918,11 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_trash@3x.png',
-                  width: appBarHeight,
-                  height: appBarHeight,
-                  radius: appBarHeight / 2,
-                  foregroundColor: colorConfig!.accentColor,
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     // await Future.delayed(const Duration(
                     // milliseconds: 500));
@@ -923,10 +954,11 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_unlock_locking_tool@3x.png',
-                  width: appBarHeight,
-                  height: appBarHeight,
-                  radius: appBarHeight / 2,
-                  foregroundColor: colorConfig!.accentColor,
+                  assetIconSize: iconHeight,
+                  width: eventInnerHeight,
+                  height: eventInnerHeight,
+                  radius: eventInnerHeight / 2,
+                  foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
                     await calendarNotifier.fixedEvent(

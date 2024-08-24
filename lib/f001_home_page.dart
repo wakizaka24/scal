@@ -19,6 +19,7 @@ final GlobalKey<ScaffoldState> homePageScaffoldKey
 
 // アプリバーの高さ
 const double appBarHeight = 39;
+const double appBarIconHeight = 21;
 
 var uIColorColor = Colors.black.withAlpha(100);
 
@@ -162,6 +163,7 @@ class HomePage extends HookConsumerWidget {
 
             CWIconButton(
               assetName: homeState.brightnessModeAssetName,
+              assetIconSize: appBarIconHeight,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -180,6 +182,7 @@ class HomePage extends HookConsumerWidget {
 
             CWIconButton(
               assetName: 'images/icon_change_calendar_color@3x.png',
+              assetIconSize: appBarIconHeight,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -194,6 +197,7 @@ class HomePage extends HookConsumerWidget {
 
             CWIconButton(
               assetName: 'images/icon_today_selection@3x.png',
+              assetIconSize: appBarIconHeight,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
@@ -204,6 +208,7 @@ class HomePage extends HookConsumerWidget {
 
             CWIconButton(
               assetName: 'images/icon_drawer@3x.png',
+              assetIconSize: appBarIconHeight,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,

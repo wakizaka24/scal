@@ -259,7 +259,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   }
 
   Future<double> getContentsHeight() async {
-    double baseHeight = /*500 + */600;
+    double baseHeight = /*500 + */620;
 
     if (state.repeatingPattern != RepeatingPattern.none) {
       baseHeight += 50;
@@ -330,8 +330,6 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       case TextFieldItem.repeatingEndDate:
         if (value != null) {
           state.repeatingEndDate = value as DateTime?;
-        } else {
-          state.repeatingEndDate = null;
         }
         if (state.repeatingEndDate == null) {
           state.textEditingControllers!
@@ -386,7 +384,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       setTextFieldController(TextFieldItem.startTime);
     }
 
-    if (state.repeatingEnd == true && (
+    if (state.repeatingEndDate != null && state.repeatingEnd == true && (
         endDate.isAfter(state.repeatingEndDate))) {
       state.repeatingEndDate = CalendarUtils().trimDate(endDate, maxTime: true);
       setTextFieldController(TextFieldItem.repeatingEndDate,

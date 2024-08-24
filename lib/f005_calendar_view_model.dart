@@ -116,6 +116,8 @@ class EventDisplay {
   Color lineColor;
   String title;
   Color fontColor;
+  String fixedTitle;
+  bool hourMoving;
   Event? event;
 
   EventDisplay({
@@ -128,6 +130,8 @@ class EventDisplay {
     required this.lineColor,
     required this.title,
     required this.fontColor,
+    required this.fixedTitle,
+    required this.hourMoving,
     this.event
   });
 }
@@ -776,11 +780,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var event = state.eventIdEventMap[ed.eventId];
     ed.editing = true;
     ed.sameCell = await getSameCell(eventId: ed.eventId);
+    ed.fixedTitle = DateFormat.yMd('ja').format(event!.start!);
     state.editingEventList.add(
         EventDisplay(eventId: ed.eventId, calendarId: ed.calendarId,
             editing: true, sameCell: false, readOnly: ed.readOnly,
             head: ed.head, lineColor: ed.lineColor, title: ed.title,
-            fontColor: ed.fontColor, event: event)
+            fontColor: ed.fontColor, fixedTitle: ed.fixedTitle,
+            hourMoving: ed.hourMoving, event: event)
     );
   }
 
@@ -794,8 +800,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     } else if (state.calendarSwitchingIndex == 1) {
       var eventHour = DateTime(startDate.year, startDate.month, startDate.day,
           startDate.hour);
-      sameCell = eventHour == state.selectionHour
-          && mapAllDay == state.selectionAllDay;
+      var sameHour = eventHour == state.selectionHour
+          || eventHour == state.selectionHour.add(const Duration(hours: 1))
+          || eventHour == state.selectionHour.add(const Duration(hours: 2))
+          || eventHour == state.selectionHour.add(const Duration(hours: 3));
+      sameCell = sameHour && mapAllDay == state.selectionAllDay;
     }
     return sameCell;
   }
@@ -889,6 +898,33 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   setEventList(List<Event> eventList) async {
+    const hourMovingAssetAllNames = [
+      'images/icon_move_event_0h@3x.png',
+      'images/icon_move_event_1h@3x.png',
+      'images/icon_move_event_2h@3x.png',
+      'images/icon_move_event_3h@3x.png',
+      'images/icon_move_event_4h@3x.png',
+      'images/icon_move_event_5h@3x.png',
+      'images/icon_move_event_6h@3x.png',
+      'images/icon_move_event_7h@3x.png',
+      'images/icon_move_event_8h@3x.png',
+      'images/icon_move_event_9h@3x.png',
+      'images/icon_move_event_10h@3x.png',
+      'images/icon_move_event_11h@3x.png',
+      'images/icon_move_event_12h@3x.png',
+      'images/icon_move_event_13h@3x.png',
+      'images/icon_move_event_14h@3x.png',
+      'images/icon_move_event_15h@3x.png',
+      'images/icon_move_event_16h@3x.png',
+      'images/icon_move_event_17h@3x.png',
+      'images/icon_move_event_18h@3x.png',
+      'images/icon_move_event_19h@3x.png',
+      'images/icon_move_event_20h@3x.png',
+      'images/icon_move_event_21h@3x.png',
+      'images/icon_move_event_22h@3x.png',
+      'images/icon_move_event_23h@3x.png',
+    ];
+
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     if (state.eventListIndex != null
@@ -940,14 +976,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           calendarId: calendar.id!, editing: editing,
           sameCell: sameCell, readOnly: calendar.isReadOnly!,
           head: head, lineColor: lineColor, title: title,
-          fontColor: fontColor, event: event
+          fontColor: fontColor, fixedTitle: DateFormat.yMd('ja')
+              .format(event.start!), hourMoving: state
+              .calendarSwitchingIndex == 1, event: event
       ));
     }
 
     var otherEventList = state.editingEventList
       .where((event) => creatingEventList
         .where((ce) => ce.eventId == event.eventId
-    ).firstOrNull == null);
+    ).firstOrNull == null).map((event) {
+      event.hourMoving = state.calendarSwitchingIndex == 1;
+      return event;
+    }).toList();
 
     state.eventList = [...otherEventList, ...creatingEventList];
   }

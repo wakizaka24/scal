@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -38,11 +38,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
 
-    final designConfigNotifier = ref.watch(designConfigNotifierProvider
-        .notifier);
-
     final calendarNotifier = ref.watch(calendarPageNotifierProvider
         .notifier);
+
+    // final designConfigState = ref.watch(designConfigNotifierProvider);
+    // final designConfigNotifier = ref.watch(designConfigNotifierProvider
+    //     .notifier);
 
     final safeAreaViewNotifier = ref.watch(bottomSafeAreaViewNotifierProvider
         .notifier);
@@ -254,44 +255,12 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     await homeNotifier.updateState();
                   },
                 ),
-
-                const Spacer(),
-
-                CWIconButton(
-                  icon: Icons.check,
-                  width: closingButtonWidth,
-                  height: closingButtonWidth,
-                  radius: closingButtonWidth / 2,
-                  foregroundColor: normalTextColor,
-                  onPressed: () async {
-                    await onCommonPressed();
-
-                  },
-                ),
-
-                CWIconButton(
-                  icon: Icons.check,
-                  width: closingButtonWidth,
-                  height: closingButtonWidth,
-                  radius: closingButtonWidth / 2,
-                  foregroundColor: normalTextColor,
-                  onPressed: () async {
-                    await onCommonPressed();
-
-                    await designConfigNotifier.switchColorConfig();
-                    await calendarNotifier.initState();
-                    await calendarNotifier.updateCalendar(
-                        dataExclusion: true);
-                    await designConfigNotifier.updateState();
-                  },
-                ),
               ]),
 
               // const SizedBox(height: 500),
 
               CWLeftTitle(
                   title: 'タイト\nル',
-                  fontSize: 13,
                   highlight: eventDetailState.highlightItem
                       == HighlightItem.title,
                   child: CWTextField(
@@ -302,6 +271,28 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       focus: !eventDetailState.readOnly!,
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
+                      maxLines: 2,
+                      inputFormatters: [
+                        TextInputFormatter.withFunction((
+                            TextEditingValue oldValue,
+                            TextEditingValue newValue) {
+                            int numLines = '\n'.allMatches(newValue.text)
+                                .length;
+                            var text = newValue.text;
+                            if (numLines > 1 || text.isNotEmpty
+                                && text.trim().isEmpty) {
+                              primaryFocus?.unfocus();
+
+                              // ハイライト解除
+                              eventDetailNotifier.updateHighlightItem(
+                                  HighlightItem.none);
+
+                              return oldValue;
+                            }
+                            return newValue;
+                          },
+                        ),
+                      ],
                       onFocusChange: createOnTextFocusChange(HighlightItem
                           .title)
                   )
@@ -616,8 +607,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               CWElevatedButton(
                   title: '保存する',
-                  fixedWidth: 120,
-                  fixedHeight: 48,
+                  fixedWidth: 110,
+                  fixedHeight: 35,
                   fontSize: 15,
                   backgroundColor: colorConfig.backgroundColor,
                   onPressed: !eventDetailState.saveButtonEnabled! ? null

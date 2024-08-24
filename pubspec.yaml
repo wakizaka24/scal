@@ -98,7 +98,6 @@ flutter:
     - images/icon_copy_event@3x.png
     - images/icon_dark@3x.png
     - images/icon_drawer@3x.png
-    - images/icon_event_detail@3x.png
     - images/icon_light_and_dark@3x.png
     - images/icon_lock_locking_tool@3x.png
     - images/icon_move_event@3x.png
