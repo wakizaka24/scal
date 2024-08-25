@@ -89,9 +89,6 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - images/IMG_1737.jpeg
-    - images/IMG_3173.jpeg
-    - images/IMG_3173_3.jpeg
     - images/icon_bright@3x.png
     - images/icon_change_calendar_color@3x.png
     - images/icon_close@3x.png
