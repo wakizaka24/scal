@@ -7,6 +7,7 @@ import 'package:scal/f016_design_config.dart';
 import 'f002_home_view_model.dart';
 import 'f008_calendar_repository.dart';
 import 'f015_calendar_utils.dart';
+import 'f018_event_detail_view_model.dart';
 
 class CalendarPageState {
   // Control-Common
@@ -308,6 +309,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         page + 3,
         duration: const Duration(milliseconds: 300),
         curve: Curves.linear);
+
+    // final calendarState = ref.read(calendarPageNotifierProvider);
+    //
+    // if (state.calendarSwitchingIndex != 0) {
+    //   // state.weekdayList
+    //
+    //   await calendarState.calendarSwitchingController
+    //       .animateToPage(0, duration: const Duration(
+    //       milliseconds: 300), curve: Curves.easeIn);
+    // }
+
+
+
   }
 
   onTapDownCalendarDay(int index) async {
@@ -340,9 +354,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         state.selectionDate.month, state.selectionDate.day, state.now.hour);
 
     // UI-Week Calendar
-    var hoursPartCowNum = state.hours.length ~/ CalendarPageState
-        .hoursPartRowNum;
-    var hoursPartTimeInterval = 24 / (hoursPartCowNum - 1);
+    var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
 
     state.hourPartIndex = 0;
     for (int i=0; i < state.hours.length; i++) {
@@ -642,6 +654,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             state.now.day);
         DateTime currentDay = DateTime(id.year, id.month, id.day);
 
+        // AM 0
+        // var title = DateFormat('a h').format(id);
         var title = '${id.hour}時';
         if (colIndex == timeColNum) {
           title = '終日';
@@ -837,6 +851,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   Future<bool> moveIndexEvent(int index, {int hour = 0}) async {
+    var timeInterval = 24 ~/ CalendarPageState.timeColNum;
     Event event = state.eventList[index].event!;
 
     var endPeriod = event.end!.difference(event.start!);
@@ -858,7 +873,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       selectionDate = state.selectionHour;
       event.allDay = state.selectionAllDay;
 
-      selectionDate = selectionDate.add(Duration(hours: hour));
+      selectionDate = selectionDate.add(Duration(hours: hour
+          % timeInterval));
     } else {
       return false;
     }
@@ -917,6 +933,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   setEventList(List<Event> eventList) async {
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
 
     List<EventDisplay> creatingEventList = [];
     for (int i = 0; i < eventList.length; i++) {
@@ -945,7 +962,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         List<int> choices = [];
         var exclusionHour = event.event!.start!.hour;
         var hour = state.selectionHour.hour;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < hoursPartTimeInterval; i++) {
           if (!event.sameCell || hour + i != exclusionHour) {
             choices.add(hour + i);
           }
@@ -989,7 +1006,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         .firstOrNull != null;
     var head = '${DateFormat.jm('ja').format(event.start!)}\n'
         '${DateFormat.jm('ja').format(event.end!)}';
-    if (event.end!.difference(event.start!).inHours > 24) {
+    var rule = event.recurrenceRule;
+    if (rule != null) {
+      var repeat = RepeatingPattern.getType(
+          rule.recurrenceFrequency, rule.interval);
+      head = repeat != RepeatingPattern.other ? repeat.name : '繰返し';
+    } else if (event.end!.difference(event.start!).inHours > 24) {
       head = '連日';
     } else if (event.allDay!) {
       head = '終日';

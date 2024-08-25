@@ -933,7 +933,7 @@ class EventPart extends HookConsumerWidget {
                         onPressed: () async {
                           await calendarNotifier.selectEventListPart(index);
                           if (!await calendarNotifier.moveIndexEvent(index,
-                              hour: i)) {
+                              hour: event!.movingHourChoices[i])) {
                             if (context.mounted) {
                               await UIUtils().showMessageDialog(context, ref,
                                   '移動', '移動に失敗しました');
