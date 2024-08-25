@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -272,27 +271,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       highlight: eventDetailState.highlightItem
                           == HighlightItem.title,
                       maxLines: 2,
-                      inputFormatters: [
-                        TextInputFormatter.withFunction((
-                            TextEditingValue oldValue,
-                            TextEditingValue newValue) {
-                            int numLines = '\n'.allMatches(newValue.text)
-                                .length;
-                            var text = newValue.text;
-                            if (numLines > 1 || text.isNotEmpty
-                                && text.trim().isEmpty) {
-                              primaryFocus?.unfocus();
-
-                              // ハイライト解除
-                              eventDetailNotifier.updateHighlightItem(
-                                  HighlightItem.none);
-
-                              return oldValue;
-                            }
-                            return newValue;
-                          },
-                        ),
-                      ],
                       onFocusChange: createOnTextFocusChange(HighlightItem
                           .title)
                   )
@@ -382,7 +360,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: CWTextField(
                             controller: eventDetailState.textEditingControllers!
                             [TextFieldItem.startDate]!,
-                            focusNode: eventDetailState.startDateFocusNode!,
                             fontSize: 15,
                             textAlign: TextAlign.center,
                             paddingAll: 6,
@@ -401,7 +378,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                         child: CWTextField(
                             controller: eventDetailState.textEditingControllers!
                             [TextFieldItem.startTime]!,
-                            focusNode: eventDetailState.startTimeFocusNode!,
                             fontSize: 15,
                             textAlign: TextAlign.center,
                             paddingAll: 6,
@@ -621,6 +597,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             'カレンダー更新', 'カレンダー更新に失敗しました');
                       }
                     } else {
+                      await calendarNotifier.moveCalendar(
+                          eventDetailState.startDate!);
                       if (eventDetailState.event != null) {
                         await calendarNotifier.updateEditingEvent(
                             eventDetailState.event!.eventId);

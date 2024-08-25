@@ -153,7 +153,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
                   page = page == 0 ? 1: 0;
                   await calendarState.calendarSwitchingController
                       .animateToPage(page, duration: const Duration(
-                      milliseconds: 300), curve: Curves.easeIn);
+                      milliseconds: 150), curve: Curves.easeIn);
                 }
               }
           ),
@@ -752,7 +752,6 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final labelHeight = height * 0.7;
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig!;
@@ -832,22 +831,18 @@ class EventPart extends HookConsumerWidget {
                   )
                 ),
               if (event != null && event!.editing && !event!.hourChoiceMode)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  height: labelHeight,
-                  decoration: BoxDecoration(
-                    color: colorConfig.borderColor,
-                    borderRadius: BorderRadius.circular(labelHeight / 2),
-                  ),
-                  child: Text(event!.fixedTitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          height: 1,
-                          fontSize: eventListFontSize2,
-                          fontWeight: eventListFontWeight2,
-                          color: colorConfig.cardTextColor
-                      )
-                  ),
+                CWElevatedButton(
+                    title: event!.fixedTitle,
+                    height: 32,
+                    width: 85,
+                    radius: 16,
+                    backgroundColor: colorConfig.cardColor,
+                    color: colorConfig.cardTextColor,
+                    onPressed: event!.sameCell ? null : () async {
+                      await calendarNotifier.selectEventListPart(index);
+                      await calendarNotifier.moveCalendar(
+                      event!.fixedDateTime, allDay: event!.event!.allDay!);
+                    }
                 ),
               // if (event != null && event!.editing)
               //   const SizedBox(width: 8),

@@ -82,8 +82,6 @@ class EventDetailPageState {
   // Control
   GlobalKey? contentsKey;
   Map<TextFieldItem, TextEditingController>? textEditingControllers;
-  FocusNode? startDateFocusNode;
-  FocusNode? startTimeFocusNode;
 
   // Data
   double? contentsHeight;
@@ -109,8 +107,6 @@ class EventDetailPageState {
     var nState = EventDetailPageState();
     nState.contentsKey = state.contentsKey;
     nState.textEditingControllers = state.textEditingControllers;
-    nState.startDateFocusNode = state.startDateFocusNode;
-    nState.startTimeFocusNode = state.startTimeFocusNode;
 
     nState.contentsHeight = state.contentsHeight;
 
@@ -174,8 +170,6 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
       }
       return km;
     })();
-    state.startDateFocusNode = FocusNode();
-    state.startTimeFocusNode = FocusNode();
 
     // Data
     state.contentsHeight = await getContentsHeight();
@@ -244,8 +238,6 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     for (var controller in state.textEditingControllers!.values) {
       controller.dispose();
     }
-    state.startDateFocusNode!.dispose();
-    state.startTimeFocusNode!.dispose();
     super.dispose();
   }
 
@@ -411,8 +403,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     event.title = state.title;
     event.location = state.place;
     event.allDay = state.allDay;
-    event.start = calendarRepo.convertTZDateTime(state.startDate);
-    event.end = calendarRepo.convertTZDateTime(state.endDate);
+    event.start = calendarRepo.convertTZDateTime(state.startDate!);
+    event.end = calendarRepo.convertTZDateTime(state.endDate!);
     event.recurrenceRule = null;
     if (state.repeatingPattern != RepeatingPattern.none) {
       var repeatingEndDate = !state.repeatingEnd! ? null

@@ -117,6 +117,7 @@ class EventDisplay {
   Color lineColor;
   String title;
   Color fontColor;
+  DateTime fixedDateTime;
   String fixedTitle;
   bool hourMoving;
   bool hourChoiceMode;
@@ -133,6 +134,7 @@ class EventDisplay {
     required this.lineColor,
     required this.title,
     required this.fontColor,
+    required this.fixedDateTime,
     required this.fixedTitle,
     required this.hourMoving,
     required this.hourChoiceMode,
@@ -304,24 +306,76 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   // Month Calendar
 
   onTapTodayButton() async {
-    var page = state.monthCalendarController.page!.toInt();
-    state.monthCalendarController.animateToPage(
-        page + 3,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.linear);
+    await moveCalendar(DateTime.now());
+  }
 
-    // final calendarState = ref.read(calendarPageNotifierProvider);
-    //
-    // if (state.calendarSwitchingIndex != 0) {
-    //   // state.weekdayList
-    //
-    //   await calendarState.calendarSwitchingController
-    //       .animateToPage(0, duration: const Duration(
-    //       milliseconds: 300), curve: Curves.easeIn);
-    // }
+  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false}) async {
+    Future<bool> moveToday() async {
+      var dayPartIndex = state.dayLists[1].indexWhere((day) {
+        var diffHour = distDateTime.difference(day.id).inHours;
+        return diffHour >= 0 && diffHour < 24;
+      });
+      if (dayPartIndex != -1) {
+        if (state.dayPartIndex != dayPartIndex) {
+          state.dayPartIndex = dayPartIndex;
+          await onTapDownCalendarDay(dayPartIndex);
+        }
 
+        await state.calendarSwitchingController
+            .animateToPage(0, duration: const Duration(
+            milliseconds: 150), curve: Curves.easeIn);
+        return true;
+      }
 
+      return false;
+    }
 
+    var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
+    if (state.calendarSwitchingIndex != 0) {
+      var hourPartIndex = state.hours.indexWhere((hour) {
+        var diffHour = distDateTime.difference(hour.id).inHours;
+        var sameHour = diffHour >= 0 && diffHour < hoursPartTimeInterval;
+        var sameDay = diffHour >= 0 && diffHour < 24;
+        return !allDay && sameHour && !hour.allDay
+            || allDay && sameDay && hour.allDay;
+      });
+      if (hourPartIndex != -1) {
+        if (state.hourPartIndex != hourPartIndex) {
+          state.hourPartIndex = hourPartIndex;
+          await onTapDownCalendarHour(hourPartIndex);
+        }
+        return;
+      }
+    }
+
+    if (await moveToday()) {
+      return;
+    }
+
+    await state.calendarSwitchingController
+        .animateToPage(0, duration: const Duration(
+    milliseconds: 150), curve: Curves.easeIn);
+
+    var basisDate = state.basisMonthDate;
+    var calendarMonth = basisDate.year * 12 + basisDate.month
+    + state.addingMonth;
+    var destMonth = distDateTime.year * 12 + distDateTime.month;
+
+    var addingMonth = destMonth - calendarMonth;
+
+    var page = state.monthCalendarController.page!.toInt() + addingMonth;
+
+    var ms = addingMonth.abs() * 100;
+    if (ms <= 2400) {
+      await state.monthCalendarController.animateToPage(
+      page,
+      duration: Duration(milliseconds: ms),
+      curve: Curves.linear);
+    } else {
+      state.monthCalendarController.jumpToPage(page);
+    }
+
+    await moveToday();
   }
 
   onTapDownCalendarDay(int index) async {
@@ -798,6 +852,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     } else {
       return false;
     }
+    deletionDate = deletionDate.add(const Duration(minutes: -1));
 
     var deletionTZDate = calendarRepo.convertTZDateTime(deletionDate);
 
@@ -818,9 +873,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         EventDisplay(eventId: ed.eventId, calendarId: ed.calendarId,
             editing: true, sameCell: false, readOnly: ed.readOnly,
             head: ed.head, lineColor: ed.lineColor, title: ed.title,
-            fontColor: ed.fontColor, fixedTitle: ed.fixedTitle,
-            hourMoving: ed.hourMoving, hourChoiceMode: false,
-            movingHourChoices: [], event: event)
+            fontColor: ed.fontColor, fixedDateTime: ed.fixedDateTime,
+            fixedTitle: ed.fixedTitle, hourMoving: ed.hourMoving,
+            hourChoiceMode: false, movingHourChoices: [], event: event)
     );
   }
 
@@ -950,6 +1005,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var editingEvent = state.editingEventList
           .where((e)=>e.eventId == event.eventId).firstOrNull;
 
+      editingEvent?.fixedDateTime = event.fixedDateTime;
+      editingEvent?.fixedTitle = event.fixedTitle;
+
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
 
@@ -970,7 +1028,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
         event.movingHourChoices = choices;
       }
-      event.hourMoving = state.calendarSwitchingIndex == 1;
+      event.hourMoving = state.calendarSwitchingIndex == 1
+          && !state.selectionAllDay;
       event.hourChoiceMode = state.calendarSwitchingIndex == 1
           && !state.selectionAllDay && (editingEvent?.hourChoiceMode ?? false);
       // event.hourChoiceMode = true;
@@ -1011,6 +1070,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var repeat = RepeatingPattern.getType(
           rule.recurrenceFrequency, rule.interval);
       head = repeat != RepeatingPattern.other ? repeat.name : '繰返し';
+      head += DateFormat.jm('ja').format(event.start!);
     } else if (event.end!.difference(event.start!).inHours > 24) {
       head = '連日';
     } else if (event.allDay!) {
@@ -1023,14 +1083,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         : colorConfig.disabledTextColor;
     var sameCell = await getSameCell(eventId: event.eventId,
         allDay: event.allDay);
-
+    var startDate = state.eventIdStartDateMap[eventId]!;
     return EventDisplay(eventId: eventId,
         calendarId: calendar.id!, editing: editing,
         sameCell: sameCell, readOnly: calendar.isReadOnly!,
         head: head, lineColor: lineColor, title: title, fontColor: fontColor,
-        fixedTitle: DateFormat.yMd('ja').format(event.start!),
-        hourMoving: false, hourChoiceMode: false, movingHourChoices: [],
-        event: event
+        fixedDateTime: startDate, fixedTitle: DateFormat.yMd('ja')
+            .format(startDate), hourMoving: false, hourChoiceMode: false,
+        movingHourChoices: [], event: event
     );
   }
 
@@ -1061,8 +1121,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.eventListIndex == null || state.eventList.isEmpty) {
       return null;
     }
-    var eventId = state.eventList[state.eventListIndex!].eventId;
-    return state.eventIdEventMap[eventId];
+    // var event = state.eventList[state.eventListIndex!];
+    // return CalendarRepository().getEvent(event.calendarId, event.eventId);
+    return state.eventList[state.eventListIndex!].event;
   }
 
   Future<List<Calendar>> getCalendars() async {
