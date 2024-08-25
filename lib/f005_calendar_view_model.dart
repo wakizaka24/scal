@@ -980,7 +980,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
       event.hourMoving = state.calendarSwitchingIndex == 1;
       event.hourChoiceMode = state.calendarSwitchingIndex == 1
-        && (editingEvent?.hourChoiceMode ?? false);
+        && !state.selectionAllDay && (editingEvent?.hourChoiceMode ?? false);
       // event.hourChoiceMode = true;
       return event;
     }).toList();
@@ -1001,6 +1001,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var event = state.editingEventList.where((event)=>event.eventId == eventId)
         .firstOrNull;
     event?.hourChoiceMode = mode;
+  }
+
+  Future<bool> isHourMove() async {
+    return state.calendarSwitchingIndex == 1 && !state.selectionAllDay;
   }
 
   // Common
@@ -1059,10 +1063,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.dayLists.length == 3) {
       await homeNotifier.setAppBarTitle(state.dayLists[1][6].id, true);
     }
-  }
-
-  Future<bool> isWeekCalendar() async {
-    return state.calendarSwitchingIndex == 1;
   }
 
   updateState() async {

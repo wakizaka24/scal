@@ -317,7 +317,10 @@ class HomePage extends HookConsumerWidget {
 
     var stack = Stack(children: [
       Container(color: designConfigState.colorConfig!.backgroundColor),
-      // Image.asset('images/IMG_3173.jpeg'),
+      // Image.asset('images/icon_change_calendar_color@3x.png'),
+      // SizedBox(width: 100, height: 100, child: Container(
+      //     color: Colors.blueAccent)),
+      // Image.asset('images/IMG_3173_3.jpeg'),
       SizedBox(width: deviceWidth, height: unsafeAreaTopHeight + appBarHeight,
           child: Container(color: theme.primaryColor)
       ),

@@ -752,9 +752,7 @@ class EventPart extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventInnerHeight = height * 0.9;
-    final labelHeight = eventInnerHeight * 0.7;
-    final iconHeight = eventInnerHeight * 0.65;
+    final labelHeight = height * 0.7;
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig!;
@@ -857,10 +855,10 @@ class EventPart extends HookConsumerWidget {
                   && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_copy_event@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
@@ -881,15 +879,15 @@ class EventPart extends HookConsumerWidget {
                   && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_move_event@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
-                    if (!await calendarNotifier.isWeekCalendar()) {
+                    if (!await calendarNotifier.isHourMove()) {
                       if (!await calendarNotifier.moveIndexEvent(index)) {
                         if (context.mounted) {
                           await UIUtils().showMessageDialog(context, ref,
@@ -909,10 +907,10 @@ class EventPart extends HookConsumerWidget {
               if (event != null && event!.editing && !event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_lock_locking_tool@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
@@ -933,8 +931,7 @@ class EventPart extends HookConsumerWidget {
                         backgroundColor: colorConfig.cardColor,
                         color: colorConfig.cardTextColor,
                         onPressed: () async {
-                          // debugPrint('${event!.movingHourChoices[i]}');
-
+                          await calendarNotifier.selectEventListPart(index);
                           if (!await calendarNotifier.moveIndexEvent(index,
                               hour: i)) {
                             if (context.mounted) {
@@ -954,12 +951,13 @@ class EventPart extends HookConsumerWidget {
               if (event != null && event!.editing && event!.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_close@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
+                    await calendarNotifier.selectEventListPart(index);
                     await calendarNotifier.setHourChoiceMode(false);
                     await calendarNotifier.updateCalendar();
                     await calendarNotifier.updateState();
@@ -968,10 +966,10 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_trash@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     // await Future.delayed(const Duration(
@@ -1004,10 +1002,10 @@ class EventPart extends HookConsumerWidget {
               if (event != null && !event!.editing && !event!.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_unlock_locking_tool@3x.png',
-                  assetIconSize: iconHeight,
-                  width: eventInnerHeight,
-                  height: eventInnerHeight,
-                  radius: eventInnerHeight / 2,
+                  assetIconSize: appBarIconHeight,
+                  width: appBarHeight,
+                  height: appBarHeight,
+                  radius: appBarHeight / 2,
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
