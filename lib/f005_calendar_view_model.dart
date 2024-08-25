@@ -362,6 +362,21 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
   }
 
+  updateEditingEvent(eventId) async {
+    var event = state.editingEventList.where((event) {
+      return event.eventId == eventId;
+    }).firstOrNull;
+    if (event == null) {
+      return;
+    }
+
+    var updateEvent = await createEventDisplay(state.eventIdEventMap[
+    event.eventId]!);
+    event.head = updateEvent.head;
+    event.title = updateEvent.title;
+    event.fixedTitle = DateFormat.yMd('ja').format(event.event!.start!);
+  }
+
   updateCalendar({bool dataExclusion = false}) async {
     if (!dataExclusion) {
       state.now = DateTime.now();
@@ -903,59 +918,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   setEventList(List<Event> eventList) async {
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
-    if (state.eventListIndex != null
-        && state.eventListIndex! >= eventList.length) {
-      if (eventList.isNotEmpty) {
-        state.eventListIndex = eventList.length - 1;
-      } else {
-        state.eventListIndex = 0;
-      }
-    }
-
-    var calendars = await calendarRepo.getCalendars();
-    for (int i = 0; i < state.editingEventList.length; i++) {
-      var event = state.editingEventList[i];
-      var calendar = calendars.firstWhere((calendar) =>
-      calendar.id == event.calendarId);
-
-      event.lineColor = Color(calendar.color!);
-      event.fontColor = calendar.isDefault!
-          ? colorConfig.normalTextColor
-          : colorConfig.disabledTextColor;
-    }
-
     List<EventDisplay> creatingEventList = [];
     for (int i = 0; i < eventList.length; i++) {
-      var event = eventList[i];
-      var calendar = calendars.firstWhere((calendar) =>
-      calendar.id == event.calendarId);
-      var eventId = event.eventId!;
-      var editing = state.editingEventList
-          .where((editingEvent) => editingEvent.eventId == event.eventId)
-          .firstOrNull != null;
-      var head = '${DateFormat.jm('ja').format(event.start!)}\n'
-          '${DateFormat.jm('ja').format(event.end!)}';
-      if (event.end!.difference(event.start!).inHours > 24) {
-        head = '連日';
-      } else if (event.allDay!) {
-        head = '終日';
-      }
-      var lineColor = Color(calendar.color!);
-      var title = event.title!;
-      var fontColor = calendar.isDefault!
-          ? colorConfig.normalTextColor
-          : colorConfig.disabledTextColor;
-      var sameCell = await getSameCell(eventId: event.eventId,
-          allDay: event.allDay);
-
-      creatingEventList.add(EventDisplay(eventId: eventId,
-          calendarId: calendar.id!, editing: editing,
-          sameCell: sameCell, readOnly: calendar.isReadOnly!,
-          head: head, lineColor: lineColor, title: title, fontColor: fontColor,
-          fixedTitle: DateFormat.yMd('ja').format(event.start!),
-          hourMoving: false, hourChoiceMode: false, movingHourChoices: [],
-          event: event
-      ));
+      creatingEventList.add(await createEventDisplay(eventList[i]));
     }
 
     var otherEventList = state.editingEventList
@@ -963,9 +928,19 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         .where((ce) => ce.eventId == event.eventId
         ).firstOrNull == null);
 
-    state.eventList = [...otherEventList, ...creatingEventList].map((event) {
+    var calendars = await calendarRepo.getCalendars();
+    var displayEventList = [...otherEventList, ...creatingEventList].map((event) {
       var editingEvent = state.editingEventList
           .where((e)=>e.eventId == event.eventId).firstOrNull;
+
+      var calendar = calendars.firstWhere((calendar) =>
+      calendar.id == event.calendarId);
+
+      event.lineColor = Color(calendar.color!);
+      event.fontColor = calendar.isDefault!
+          ? colorConfig.normalTextColor
+          : colorConfig.disabledTextColor;
+
       if (state.calendarSwitchingIndex == 1) {
         List<int> choices = [];
         var exclusionHour = event.event!.start!.hour;
@@ -980,10 +955,61 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
       event.hourMoving = state.calendarSwitchingIndex == 1;
       event.hourChoiceMode = state.calendarSwitchingIndex == 1
-        && !state.selectionAllDay && (editingEvent?.hourChoiceMode ?? false);
+          && !state.selectionAllDay && (editingEvent?.hourChoiceMode ?? false);
       // event.hourChoiceMode = true;
       return event;
     }).toList();
+    displayEventList.sort((event1, event2) {
+      if (event1.event!.start != event2.event!.start) {
+        return event1.event!.start!.compareTo(event2.event!.start!);
+      } else {
+        return event1.event!.eventId!.compareTo(event2.event!.eventId!);
+      }
+    });
+    state.eventList = displayEventList;
+
+    if (state.eventListIndex != null
+        && state.eventListIndex! >= displayEventList.length) {
+      if (displayEventList.isNotEmpty) {
+        state.eventListIndex = displayEventList.length - 1;
+      } else {
+        state.eventListIndex = 0;
+      }
+    }
+  }
+
+  Future<EventDisplay> createEventDisplay(Event event) async {
+    var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var calendars = await calendarRepo.getCalendars();
+    var calendar = calendars.firstWhere((calendar) =>
+    calendar.id == event.calendarId);
+    var eventId = event.eventId!;
+    var editing = state.editingEventList
+        .where((editingEvent) => editingEvent.eventId == event.eventId)
+        .firstOrNull != null;
+    var head = '${DateFormat.jm('ja').format(event.start!)}\n'
+        '${DateFormat.jm('ja').format(event.end!)}';
+    if (event.end!.difference(event.start!).inHours > 24) {
+      head = '連日';
+    } else if (event.allDay!) {
+      head = '終日';
+    }
+    var lineColor = Color(calendar.color!);
+    var title = event.title!;
+    var fontColor = calendar.isDefault!
+        ? colorConfig.normalTextColor
+        : colorConfig.disabledTextColor;
+    var sameCell = await getSameCell(eventId: event.eventId,
+        allDay: event.allDay);
+
+    return EventDisplay(eventId: eventId,
+        calendarId: calendar.id!, editing: editing,
+        sameCell: sameCell, readOnly: calendar.isReadOnly!,
+        head: head, lineColor: lineColor, title: title, fontColor: fontColor,
+        fixedTitle: DateFormat.yMd('ja').format(event.start!),
+        hourMoving: false, hourChoiceMode: false, movingHourChoices: [],
+        event: event
+    );
   }
 
   selectEventListPart(int index) async {

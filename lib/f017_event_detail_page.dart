@@ -621,6 +621,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             'カレンダー更新', 'カレンダー更新に失敗しました');
                       }
                     } else {
+                      await calendarNotifier.updateEditingEvent(
+                          eventDetailState.event!.eventId);
                       await calendarNotifier.updateCalendar();
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
