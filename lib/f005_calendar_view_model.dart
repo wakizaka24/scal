@@ -1070,7 +1070,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var repeat = RepeatingPattern.getType(
           rule.recurrenceFrequency, rule.interval);
       head = repeat != RepeatingPattern.other ? repeat.name : '繰返し';
-      head += DateFormat.jm('ja').format(event.start!);
+      if (!event.allDay!) {
+        head += '\n${DateFormat.jm('ja').format(event.start!)}';
+      }
     } else if (event.end!.difference(event.start!).inHours > 24) {
       head = '連日';
     } else if (event.allDay!) {
