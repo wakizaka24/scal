@@ -836,8 +836,8 @@ class EventPart extends HookConsumerWidget {
                     height: 32,
                     width: 85,
                     radius: 16,
-                    backgroundColor: colorConfig.cardColor,
-                    color: colorConfig.cardTextColor,
+                    backgroundColor: colorConfig.backgroundColor,
+                    color: colorConfig.normalTextColor,
                     onPressed: event!.sameCell ? null : () async {
                       await calendarNotifier.selectEventListPart(index);
                       await calendarNotifier.moveCalendar(
@@ -923,8 +923,8 @@ class EventPart extends HookConsumerWidget {
                         height: 32,
                         radius: 16,
                         fontSize: 11,
-                        backgroundColor: colorConfig.cardColor,
-                        color: colorConfig.cardTextColor,
+                        backgroundColor: colorConfig.backgroundColor,
+                        color: colorConfig.normalTextColor,
                         onPressed: () async {
                           await calendarNotifier.selectEventListPart(index);
                           if (!await calendarNotifier.moveIndexEvent(index,

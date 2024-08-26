@@ -309,7 +309,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await moveCalendar(DateTime.now());
   }
 
-  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false}) async {
+  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false,
+    String? eventId}) async {
+
+    Future<void> selectEventList(String eventId) async {
+      for(int i=0; i<state.eventList.length; i++) {
+        var event = state.eventList[i];
+        if (eventId == event.eventId) {
+          state.eventListIndex = i;
+        }
+      }
+    }
+
     Future<bool> moveToday() async {
       var dayPartIndex = state.dayLists[1].indexWhere((day) {
         var diffHour = distDateTime.difference(day.id).inHours;
@@ -324,6 +335,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         await state.calendarSwitchingController
             .animateToPage(0, duration: const Duration(
             milliseconds: 150), curve: Curves.easeIn);
+
+        if (eventId != null) {
+          await selectEventList(eventId);
+        }
+
         return true;
       }
 
@@ -343,6 +359,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         if (state.hourPartIndex != hourPartIndex) {
           state.hourPartIndex = hourPartIndex;
           await onTapDownCalendarHour(hourPartIndex);
+        }
+
+        if (eventId != null) {
+          await selectEventList(eventId);
         }
         return;
       }
