@@ -308,8 +308,9 @@ class HomePage extends HookConsumerWidget {
         child: Consumer(
             builder: ((context, ref, child) {
               final calendarState = ref.watch(calendarPageNotifierProvider);
-              return Icon(calendarState.cellActive
-                  ? Icons.add : Icons.add_circle_outline,
+              return ImageIcon(AssetImage(calendarState.cellActive ?
+                  'images/icon_add_event@3x.png'
+                  : 'images/icon_edit_event@3x.png'),
                   color: Colors.white);
             })
         )

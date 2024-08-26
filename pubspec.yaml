@@ -101,6 +101,8 @@ flutter:
     - images/icon_today_selection@3x.png
     - images/icon_trash@3x.png
     - images/icon_unlock_locking_tool@3x.png
+    - images/icon_add_event@3x.png
+    - images/icon_edit_event@3x.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
