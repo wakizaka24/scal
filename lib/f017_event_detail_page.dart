@@ -599,11 +599,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     } else {
                       await calendarNotifier.moveCalendar(
                           eventDetailState.startDate!);
+                      await calendarNotifier.updateCalendar();
                       if (eventDetailState.event != null) {
                         await calendarNotifier.updateEditingEvent(
-                            eventDetailState.event!.eventId);
+                            eventDetailState.event!.eventId!);
+                        await calendarNotifier.selectEventList(
+                            eventDetailState.event!.eventId!);
                       }
-                      await calendarNotifier.updateCalendar();
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
                       await homeNotifier.updateState();

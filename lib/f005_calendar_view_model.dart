@@ -309,18 +309,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await moveCalendar(DateTime.now());
   }
 
-  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false,
-    String? eventId}) async {
-
-    Future<void> selectEventList(String eventId) async {
-      for(int i=0; i<state.eventList.length; i++) {
-        var event = state.eventList[i];
-        if (eventId == event.eventId) {
-          state.eventListIndex = i;
-        }
-      }
-    }
-
+  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false}) async {
     Future<bool> moveToday() async {
       var dayPartIndex = state.dayLists[1].indexWhere((day) {
         var diffHour = distDateTime.difference(day.id).inHours;
@@ -335,11 +324,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         await state.calendarSwitchingController
             .animateToPage(0, duration: const Duration(
             milliseconds: 150), curve: Curves.easeIn);
-
-        if (eventId != null) {
-          await selectEventList(eventId);
-        }
-
         return true;
       }
 
@@ -361,9 +345,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           await onTapDownCalendarHour(hourPartIndex);
         }
 
-        if (eventId != null) {
-          await selectEventList(eventId);
-        }
         return;
       }
     }
@@ -448,7 +429,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }
   }
 
-  updateEditingEvent(eventId) async {
+  updateEditingEvent(String eventId) async {
     var event = state.editingEventList.where((event) {
       return event.eventId == eventId;
     }).firstOrNull;
@@ -461,6 +442,16 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     event.head = updateEvent.head;
     event.title = updateEvent.title;
     event.fixedTitle = DateFormat.yMd('ja').format(event.event!.start!);
+  }
+
+  selectEventList(String eventId) async {
+    for(int i=0; i<state.eventList.length; i++) {
+      var event = state.eventList[i];
+      if (eventId == event.eventId) {
+        selectEventListPart(i);
+        return;
+      }
+    }
   }
 
   updateCalendar({bool dataExclusion = false}) async {
@@ -1117,8 +1108,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   selectEventListPart(int index) async {
-    if (!state.cellActive
-        && state.eventListIndex == index) {
+    if (!state.cellActive && state.eventListIndex == index) {
       return;
     }
 
