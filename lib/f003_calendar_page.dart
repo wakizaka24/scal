@@ -832,18 +832,21 @@ class EventPart extends HookConsumerWidget {
                 ),
               if (event != null && event!.editing && !event!.hourChoiceMode)
                 CWElevatedButton(
-                    title: event!.fixedTitle,
+                    title: event!.fixedTitle!,
                     height: 32,
                     width: 85,
                     radius: 16,
                     backgroundColor: colorConfig.backgroundColor,
+                    disabledBackgroundColor: colorConfig.borderColor,
+                    disabledForegroundColor: Colors.transparent,
+                    elevation: 0,
                     color: colorConfig.normalTextColor,
                     onPressed: event!.sameCell ? null : () async {
                       await calendarNotifier.selectEventListPart(index);
                       await calendarNotifier.moveCalendar(
-                      event!.fixedDateTime, allDay: event!.event!.allDay!);
-                      await calendarNotifier.selectEventList(
-                          event!.event!.eventId!);
+                      event!.fixedDateTime!, allDay: event!.event!.allDay!);
+                      // await calendarNotifier.selectEventList(
+                      //     event!.event!.eventId!);
                     }
                 ),
               // if (event != null && event!.editing)
@@ -926,6 +929,7 @@ class EventPart extends HookConsumerWidget {
                         radius: 16,
                         fontSize: 11,
                         backgroundColor: colorConfig.backgroundColor,
+                        elevation: 0,
                         color: colorConfig.normalTextColor,
                         onPressed: () async {
                           await calendarNotifier.selectEventListPart(index);

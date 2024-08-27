@@ -236,6 +236,9 @@ class CWElevatedButton extends HookConsumerWidget {
   final double radius;
   final double fontSize;
   final Color? backgroundColor;
+  final Color? disabledBackgroundColor;
+  final Color? disabledForegroundColor;
+  final double? elevation;
   final Color? color;
   final VoidCallback? onPressed;
 
@@ -247,6 +250,9 @@ class CWElevatedButton extends HookConsumerWidget {
     this.radius = 18,
     this.fontSize = 13,
     this.backgroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
+    this.elevation,
     this.color,
     this.onPressed
   });
@@ -259,9 +265,12 @@ class CWElevatedButton extends HookConsumerWidget {
         style: ElevatedButton.styleFrom(
           // fixedSize: Size(width, height),
           backgroundColor: backgroundColor,
+          disabledBackgroundColor: disabledBackgroundColor,
+          disabledForegroundColor: disabledForegroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
           ),
+          elevation: elevation,
           textStyle: TextStyle(fontSize: fontSize),
           minimumSize: Size.zero,
           padding: EdgeInsets.zero,

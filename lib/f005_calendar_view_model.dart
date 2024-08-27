@@ -117,8 +117,8 @@ class EventDisplay {
   Color lineColor;
   String title;
   Color fontColor;
-  DateTime fixedDateTime;
-  String fixedTitle;
+  DateTime? fixedDateTime;
+  String? fixedTitle;
   bool hourMoving;
   bool hourChoiceMode;
   List<int> movingHourChoices;
@@ -309,7 +309,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await moveCalendar(DateTime.now());
   }
 
-  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false}) async {
+  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false,
+    bool noneUpdate=false}) async {
     Future<bool> moveToday() async {
       var dayPartIndex = state.dayLists[1].indexWhere((day) {
         var diffHour = distDateTime.difference(day.id).inHours;
@@ -318,7 +319,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       if (dayPartIndex != -1) {
         if (state.dayPartIndex != dayPartIndex) {
           state.dayPartIndex = dayPartIndex;
-          await onTapDownCalendarDay(dayPartIndex);
+          await onTapDownCalendarDay(dayPartIndex, noneUpdate: noneUpdate);
         }
 
         await state.calendarSwitchingController
@@ -342,7 +343,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       if (hourPartIndex != -1) {
         if (state.hourPartIndex != hourPartIndex) {
           state.hourPartIndex = hourPartIndex;
-          await onTapDownCalendarHour(hourPartIndex);
+          await onTapDownCalendarHour(hourPartIndex, noneUpdate: noneUpdate);
         }
 
         return;
@@ -379,11 +380,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await moveToday();
   }
 
-  onTapDownCalendarDay(int index) async {
+  onTapDownCalendarDay(int index, {bool noneUpdate=false}) async {
     await selectDay(index: index);
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
-    await updateState();
+    if (!noneUpdate) {
+      await updateState();
+    }
   }
 
   onCalendarPageChanged(int monthIndex) async {
@@ -647,9 +650,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Week Calendar
 
-  onTapDownCalendarHour(int index) async {
+  onTapDownCalendarHour(int index, {bool noneUpdate=false}) async {
     await selectHour(index: index);
-    await updateState();
+    if (!noneUpdate) {
+      await updateState();
+    }
   }
 
   updateWeekCalendarState() async {
@@ -879,7 +884,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var event = state.eventIdEventMap[ed.eventId];
     ed.editing = true;
     ed.sameCell = await getSameCell(eventId: ed.eventId);
-    ed.fixedTitle = DateFormat.yMd('ja').format(event!.start!);
+    var startDate = state.eventIdStartDateMap[ed.eventId];
+    if (startDate != null) {
+      ed.fixedDateTime = startDate;
+      ed.fixedTitle = DateFormat.yMd('ja').format(startDate);
+    }
     state.editingEventList.add(
         EventDisplay(eventId: ed.eventId, calendarId: ed.calendarId,
             editing: true, sameCell: false, readOnly: ed.readOnly,
@@ -1016,8 +1025,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var editingEvent = state.editingEventList
           .where((e)=>e.eventId == event.eventId).firstOrNull;
 
-      editingEvent?.fixedDateTime = event.fixedDateTime;
-      editingEvent?.fixedTitle = event.fixedTitle;
+      event.fixedDateTime = editingEvent?.fixedDateTime;
+      event.fixedTitle = editingEvent?.fixedTitle;
 
       var calendar = calendars.firstWhere((calendar) =>
       calendar.id == event.calendarId);
@@ -1047,8 +1056,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       return event;
     }).toList();
     displayEventList.sort((event1, event2) {
-      if (event1.event!.start != event2.event!.start) {
-        return event1.event!.start!.compareTo(event2.event!.start!);
+      var editing1 = event1.editing ? 1 : 0;
+      var editing2 = event2.editing ? 1 : 0;
+      var start1 = event1.fixedDateTime ?? event1.event!.start!;
+      var start2 = event2.fixedDateTime ?? event2.event!.start!;
+      if (editing1 != editing2) {
+        return editing2 - editing1;
+      } else if (start1 != start2) {
+        return start1.compareTo(start2);
       } else {
         return event1.event!.eventId!.compareTo(event2.event!.eventId!);
       }
@@ -1096,14 +1111,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         : colorConfig.disabledTextColor;
     var sameCell = await getSameCell(eventId: event.eventId,
         allDay: event.allDay);
-    var startDate = state.eventIdStartDateMap[eventId]!;
+
     return EventDisplay(eventId: eventId,
         calendarId: calendar.id!, editing: editing,
         sameCell: sameCell, readOnly: calendar.isReadOnly!,
         head: head, lineColor: lineColor, title: title, fontColor: fontColor,
-        fixedDateTime: startDate, fixedTitle: DateFormat.yMd('ja')
-            .format(startDate), hourMoving: false, hourChoiceMode: false,
-        movingHourChoices: [], event: event
+        fixedDateTime: null, fixedTitle: null, hourMoving: false,
+        hourChoiceMode: false, movingHourChoices: [], event: event
     );
   }
 

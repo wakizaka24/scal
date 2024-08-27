@@ -598,13 +598,14 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       }
                     } else {
                       await calendarNotifier.moveCalendar(
-                          eventDetailState.startDate!);
+                          eventDetailState.startDate!, noneUpdate: true);
                       await calendarNotifier.updateCalendar();
-                      if (eventDetailState.event != null) {
+                      final event = eventDetailState.event;
+                      if (event != null) {
                         await calendarNotifier.updateEditingEvent(
-                            eventDetailState.event!.eventId!);
+                            event.eventId!);
                         await calendarNotifier.selectEventList(
-                            eventDetailState.event!.eventId!);
+                            event.eventId!);
                       }
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
