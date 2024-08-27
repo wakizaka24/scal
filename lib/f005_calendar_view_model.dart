@@ -883,11 +883,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var ed = state.eventList[index];
     var event = state.eventIdEventMap[ed.eventId];
     ed.editing = true;
-    ed.sameCell = await getSameCell(eventId: ed.eventId);
     var startDate = state.eventIdStartDateMap[ed.eventId];
     if (startDate != null) {
       ed.fixedDateTime = startDate;
       ed.fixedTitle = DateFormat.yMd('ja').format(startDate);
+      ed.sameCell = await getSameCell(ed.fixedDateTime!, ed.event!.allDay!);
     }
     state.editingEventList.add(
         EventDisplay(eventId: ed.eventId, calendarId: ed.calendarId,
@@ -899,9 +899,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     );
   }
 
-  getSameCell({String? eventId, bool? allDay}) async {
-    var mapAllDay = allDay ?? state.eventIdEventMap[eventId]!.allDay;
-    var startDate = state.eventIdStartDateMap[eventId]!;
+  getSameCell(DateTime startDate, bool allDay) async {
     var sameCell = true;
     if (state.calendarSwitchingIndex == 0) {
       var eventDay = DateTime(startDate.year, startDate.month, startDate.day);
@@ -913,7 +911,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           || eventHour == state.selectionHour.add(const Duration(hours: 1))
           || eventHour == state.selectionHour.add(const Duration(hours: 2))
           || eventHour == state.selectionHour.add(const Duration(hours: 3));
-      sameCell = sameHour && mapAllDay == state.selectionAllDay;
+      sameCell = sameHour && allDay == state.selectionAllDay;
     }
     return sameCell;
   }
@@ -1109,8 +1107,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var fontColor = calendar.isDefault!
         ? colorConfig.normalTextColor
         : colorConfig.disabledTextColor;
-    var sameCell = await getSameCell(eventId: event.eventId,
-        allDay: event.allDay);
+
+    var editingEvent = state.editingEventList
+        .where((e)=>e.eventId == event.eventId).firstOrNull;
+    var startDate = editingEvent?.fixedDateTime
+        ?? state.eventIdStartDateMap[eventId]!;
+    var sameCell = await getSameCell(startDate, event.allDay!);
 
     return EventDisplay(eventId: eventId,
         calendarId: calendar.id!, editing: editing,
