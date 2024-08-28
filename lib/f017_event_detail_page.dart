@@ -598,7 +598,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       }
                     } else {
                       await calendarNotifier.moveCalendar(
-                          eventDetailState.startDate!, noneUpdate: true);
+                          eventDetailState.startDate!);
                       await calendarNotifier.updateCalendar();
                       final event = eventDetailState.event;
                       if (event != null) {

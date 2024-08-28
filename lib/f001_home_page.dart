@@ -203,6 +203,7 @@ class HomePage extends HookConsumerWidget {
               radius: appBarHeight / 2,
               onPressed: () async {
                 await calendarNotifier.onTapTodayButton();
+                await calendarNotifier.updateState();
               },
             ),
 

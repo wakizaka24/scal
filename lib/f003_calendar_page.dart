@@ -847,6 +847,7 @@ class EventPart extends HookConsumerWidget {
                       event!.fixedDateTime!, allDay: event!.event!.allDay!);
                       // await calendarNotifier.selectEventList(
                       //     event!.event!.eventId!);
+                      await calendarNotifier.updateState();
                     }
                 ),
               // if (event != null && event!.editing)
