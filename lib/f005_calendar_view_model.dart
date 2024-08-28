@@ -317,13 +317,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       });
       if (dayPartIndex != -1) {
         if (state.dayPartIndex != dayPartIndex) {
-          state.dayPartIndex = dayPartIndex;
           await onTapDownCalendarDay(dayPartIndex, noneUpdate: true);
         }
-
-        await state.calendarSwitchingController
-            .animateToPage(0, duration: const Duration(
-            milliseconds: 150), curve: Curves.easeIn);
         return true;
       }
 
@@ -341,7 +336,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       });
       if (hourPartIndex != -1) {
         if (state.hourPartIndex != hourPartIndex) {
-          state.hourPartIndex = hourPartIndex;
           await onTapDownCalendarHour(hourPartIndex, noneUpdate: true);
         }
 
@@ -369,8 +363,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var ms = addingMonth.abs() * 100;
     if (ms <= 2400) {
       await state.monthCalendarController.animateToPage(
-      page,
-      duration: Duration(milliseconds: ms),
+      page, duration: Duration(milliseconds: ms),
       curve: Curves.linear);
     } else {
       state.monthCalendarController.jumpToPage(page);
@@ -1049,7 +1042,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           && !state.selectionAllDay;
       event.hourChoiceMode = state.calendarSwitchingIndex == 1
           && !state.selectionAllDay && (editingEvent?.hourChoiceMode ?? false);
-      // event.hourChoiceMode = true;
       return event;
     }).toList();
     displayEventList.sort((event1, event2) {
@@ -1066,15 +1058,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
     });
     state.eventList = displayEventList;
-
-    if (state.eventListIndex != null
-        && state.eventListIndex! >= displayEventList.length) {
-      if (displayEventList.isNotEmpty) {
-        state.eventListIndex = displayEventList.length - 1;
-      } else {
-        state.eventListIndex = 0;
-      }
-    }
   }
 
   Future<EventDisplay> createEventDisplay(Event event) async {
