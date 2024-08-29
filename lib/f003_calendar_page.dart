@@ -102,6 +102,23 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
       };
     }, const []);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var scrollEventListIndex = calendarState.scrollEventListIndex;
+      if (scrollEventListIndex != null) {
+        calendarState.scrollEventListIndex = null;
+        var context = calendarState.eventListCellKeyList[scrollEventListIndex]
+            .currentContext;
+        if (context != null) {
+          Scrollable.ensureVisible(
+            context,
+            alignment: 0,
+            // duration: const Duration(milliseconds: 50),
+            curve: Curves.linear,
+          );
+        }
+      }
+    });
+
     return Stack(children: [
       Column(children: [
         Expanded(
@@ -681,9 +698,8 @@ class EventListPart extends HookConsumerWidget {
               )
           ),
           Expanded(child:
-            ListView(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, eventListBottomSafeArea
-                    + unsafeAreaBottomHeight),
+          SingleChildScrollView(
+            child: Column(
                 children: [
                   if (calendarState.eventList.isEmpty)
                     EventPart(
@@ -702,6 +718,7 @@ class EventListPart extends HookConsumerWidget {
                     ),
                   for (int i=0; i < calendarState.eventList.length; i++) ... {
                     EventPart(
+                      key: calendarState.eventListCellKeyList[i],
                       height: 45,
                       index: i,
                       isHighlighted: calendarState.eventListIndex == i,
@@ -716,8 +733,11 @@ class EventListPart extends HookConsumerWidget {
                       leftBorderWide: true,
                       event: calendarState.eventList[i],
                     ),
-                  }
+                  },
+                  SizedBox(height: eventListBottomSafeArea
+                      + unsafeAreaBottomHeight)
                 ]
+              )
             )
           )
         ]
@@ -778,8 +798,7 @@ class EventPart extends HookConsumerWidget {
               if (emptyMessage != null)
                 Expanded(child:
                   Container(
-                      padding: const EdgeInsets
-                          .symmetric(horizontal: 8,
+                      padding: const EdgeInsets.symmetric(horizontal: 8,
                           vertical: 0),
                       child: Text(emptyMessage!,
                           maxLines: 2,
@@ -888,13 +907,16 @@ class EventPart extends HookConsumerWidget {
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
+                    String? eventId;
                     if (!await calendarNotifier.isHourMove()) {
-                      if (!await calendarNotifier.moveIndexEvent(index)) {
+                      eventId = await calendarNotifier.moveIndexEvent(index);
+                      if (eventId == null) {
                         if (context.mounted) {
                           await UIUtils().showMessageDialog(context, ref,
                               '移動', '移動に失敗しました');
                         }
                       } else {
+                        await calendarNotifier.updateEditingEvent(eventId);
                         await calendarNotifier.editingCancel(index);
                       }
                     } else {
@@ -902,6 +924,9 @@ class EventPart extends HookConsumerWidget {
                     }
 
                     await calendarNotifier.updateCalendar();
+                    if (eventId != null) {
+                      await calendarNotifier.selectEventList(eventId);
+                    }
                     await calendarNotifier.updateState();
                   },
                 ),
@@ -934,18 +959,24 @@ class EventPart extends HookConsumerWidget {
                         color: colorConfig.normalTextColor,
                         onPressed: () async {
                           await calendarNotifier.selectEventListPart(index);
-                          if (!await calendarNotifier.moveIndexEvent(index,
-                              hour: event!.movingHourChoices[i])) {
+
+                          var eventId = await calendarNotifier.moveIndexEvent(
+                              index, hour: event!.movingHourChoices[i]);
+                          if (eventId == null) {
                             if (context.mounted) {
                               await UIUtils().showMessageDialog(context, ref,
                                   '移動', '移動に失敗しました');
                             }
                           } else {
+                            await calendarNotifier.updateEditingEvent(eventId);
                             await calendarNotifier.editingCancel(index);
                           }
 
                           await calendarNotifier.setHourChoiceMode(false);
                           await calendarNotifier.updateCalendar();
+                          if (eventId != null) {
+                            await calendarNotifier.selectEventList(eventId);
+                          }
                           await calendarNotifier.updateState();
                         }
                     )

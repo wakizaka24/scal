@@ -22,6 +22,9 @@ class CalendarPageState {
   PageController monthCalendarController = PageController(
       initialPage: pseudoUnlimitedCenterIndex);
 
+  // Control-Event List
+  List<GlobalKey> eventListCellKeyList = [];
+
   // Data-Month Calendar/Week Calendar
   bool initialized = false;
   late DateTime now;
@@ -57,6 +60,7 @@ class CalendarPageState {
   String eventListTitle = '';
   List<EventDisplay> eventList = [];
   int? eventListIndex;
+  int? scrollEventListIndex;
   List<EventDisplay> editingEventList = [];
 
   static CalendarPageState copy(CalendarPageState state) {
@@ -67,6 +71,9 @@ class CalendarPageState {
 
     // Control-Month Calendar
     nState.monthCalendarController = state.monthCalendarController;
+
+    // Control-Event List
+    nState.eventListCellKeyList = state.eventListCellKeyList;
 
     // Data-Month Calendar/Week Calendar
     nState.initialized = state.initialized;
@@ -100,6 +107,7 @@ class CalendarPageState {
     nState.eventListTitle = state.eventListTitle;
     nState.eventList = state.eventList;
     nState.eventListIndex = state.eventListIndex;
+    nState.scrollEventListIndex = state.scrollEventListIndex;
     nState.editingEventList = state.editingEventList;
 
     return nState;
@@ -444,6 +452,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       var event = state.eventList[i];
       if (eventId == event.eventId) {
         selectEventListPart(i);
+        state.scrollEventListIndex = i;
         return;
       }
     }
@@ -915,7 +924,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return await calendarRepo.createOrUpdateEvent(editingEvent);
   }
 
-  Future<bool> moveIndexEvent(int index, {int hour = 0}) async {
+  Future<String?> moveIndexEvent(int index, {int hour = 0}) async {
     var timeInterval = 24 ~/ CalendarPageState.timeColNum;
     Event event = state.eventList[index].event!;
 
@@ -941,7 +950,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       selectionDate = selectionDate.add(Duration(hours: hour
           % timeInterval));
     } else {
-      return false;
+      return null;
     }
 
     event.start = calendarRepo.convertTZDateTime(selectionDate);
@@ -952,7 +961,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           selectionDate.add(repeatEndPeriod));
     }
 
-    return await calendarRepo.createOrUpdateEvent(event);
+    var success = await calendarRepo.createOrUpdateEvent(event);
+
+    return success ? event.eventId : null;
   }
 
   Event copyEvent(Event event) {
@@ -1057,6 +1068,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         return event1.event!.eventId!.compareTo(event2.event!.eventId!);
       }
     });
+    state.eventListCellKeyList = List.generate(
+        displayEventList.length, (i)=>GlobalKey());
     state.eventList = displayEventList;
   }
 
