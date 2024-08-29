@@ -316,7 +316,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         return diffHour >= 0 && diffHour < 24;
       });
       if (dayPartIndex != -1) {
-        if (state.dayPartIndex != dayPartIndex) {
+        if (!state.cellActive || state.dayPartIndex != dayPartIndex) {
           await onTapDownCalendarDay(dayPartIndex, noneUpdate: true);
         }
         return true;
@@ -335,21 +335,21 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             || allDay && sameDay && hour.allDay;
       });
       if (hourPartIndex != -1) {
-        if (state.hourPartIndex != hourPartIndex) {
+        if (!state.cellActive || state.hourPartIndex != hourPartIndex) {
           await onTapDownCalendarHour(hourPartIndex, noneUpdate: true);
         }
 
         return;
       }
+
+      await state.calendarSwitchingController
+          .animateToPage(0, duration: const Duration(
+          milliseconds: 150), curve: Curves.easeIn);
     }
 
     if (await moveToday()) {
       return;
     }
-
-    await state.calendarSwitchingController
-        .animateToPage(0, duration: const Duration(
-    milliseconds: 150), curve: Curves.easeIn);
 
     var basisDate = state.basisMonthDate;
     var calendarMonth = basisDate.year * 12 + basisDate.month
