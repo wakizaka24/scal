@@ -856,7 +856,7 @@ class EventPart extends HookConsumerWidget {
                     width: 85,
                     radius: 16,
                     backgroundColor: colorConfig.backgroundColor,
-                    disabledBackgroundColor: colorConfig.borderColor,
+                    disabledBackgroundColor: Colors.transparent,
                     disabledForegroundColor: Colors.transparent,
                     elevation: 0,
                     color: colorConfig.normalTextColor,
@@ -891,6 +891,7 @@ class EventPart extends HookConsumerWidget {
                     }
 
                     await calendarNotifier.updateCalendar();
+                    await calendarNotifier.selectEventList(event!.eventId);
                     await calendarNotifier.updateState();
                   },
                 ),

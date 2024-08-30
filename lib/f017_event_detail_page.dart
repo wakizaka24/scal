@@ -36,7 +36,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
-
+    final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider
         .notifier);
 
@@ -110,7 +110,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     }
 
     Function (bool hasFocus) createOnBottomPopTextFocusChange(
-        HighlightItem item, Widget child) {
+        HighlightItem item, Future<Widget> Function() useWidget) {
       return (bool hasFocus) async {
         reset() async {
           await safeAreaViewNotifier.downBottomSheet();
@@ -121,6 +121,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
           await safeAreaViewNotifier.setSafeAreaAdjustment(10 + 6);
           await safeAreaViewNotifier.setSafeAreaHeight(215);
           await safeAreaViewNotifier.updateState();
+          var child = await useWidget();
           showBottomArea(child);
         } else {
           // 他のテキストにフォーカス時は動かない
@@ -139,94 +140,118 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
       await safeAreaViewNotifier.downBottomSheet();
     }
 
-    var startDatePicker = CupertinoDatePicker(
-      initialDateTime: eventDetailState.startDate,
-      mode: CupertinoDatePickerMode.date,
-      minimumYear: minimumYear,
-      maximumYear: maximumYear,
-      onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(TextFieldItem.startDate,
-            value: CalendarUtils().copyDate(eventDetailState.startDate!,
-                newDate));
-      },
-    );
+    Future<Widget> Function() useStartDatePicker() {
+      return () async {
+        return CupertinoDatePicker(
+          initialDateTime: eventDetailState.startDate,
+          mode: CupertinoDatePickerMode.date,
+          minimumYear: minimumYear,
+          maximumYear: maximumYear,
+          onDateTimeChanged: (DateTime newDate) {
+            eventDetailNotifier.setTextFieldController(TextFieldItem.startDate,
+                value: CalendarUtils().copyDate(eventDetailState.startDate!,
+                    newDate));
+          },
+        );
+      };
+    }
 
-    var endDatePicker = CupertinoDatePicker(
-      initialDateTime: eventDetailState.endDate,
-      mode: CupertinoDatePickerMode.date,
-      minimumYear: minimumYear,
-      maximumYear: maximumYear,
-      onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(TextFieldItem.endDate,
-            value: CalendarUtils().copyDate(eventDetailState
-                .endDate!, newDate));
-      },
-    );
+    Future<Widget> Function() useEndDatePicker() {
+      return () async {
+        return CupertinoDatePicker(
+          initialDateTime: eventDetailState.endDate,
+          mode: CupertinoDatePickerMode.date,
+          minimumYear: minimumYear,
+          maximumYear: maximumYear,
+          onDateTimeChanged: (DateTime newDate) {
+            eventDetailNotifier.setTextFieldController(TextFieldItem.endDate,
+                value: CalendarUtils().copyDate(eventDetailState
+                    .endDate!, newDate));
+          },
+        );
+      };
+    }
 
-    var startTimePicker = CupertinoDatePicker(
-      initialDateTime: eventDetailState.startDate,
-      mode: CupertinoDatePickerMode.time,
-      // 初期値が設定できない値の場合落ちる
-      minuteInterval: 1,
-      use24hFormat: true,
-      onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(
-            TextFieldItem.startTime,
-            value: CalendarUtils()
-                .copyTime(eventDetailState.startDate!,
-                newDate));
-      },
-    );
+    Future<Widget> Function() useStartTimePicker() {
+      return () async {
+        return CupertinoDatePicker(
+          initialDateTime: eventDetailState.startDate,
+          mode: CupertinoDatePickerMode.time,
+          // 初期値が設定できない値の場合落ちる
+          minuteInterval: 1,
+          use24hFormat: true,
+          onDateTimeChanged: (DateTime newDate) {
+            eventDetailNotifier.setTextFieldController(
+                TextFieldItem.startTime,
+                value: CalendarUtils()
+                    .copyTime(eventDetailState.startDate!,
+                    newDate));
+          },
+        );
+      };
+    }
 
-    var endTimePicker = CupertinoDatePicker(
-      initialDateTime: eventDetailState.endDate,
-      mode: CupertinoDatePickerMode.time,
-      // 初期値が設定できない値の場合落ちる
-      minuteInterval: 1,
-      use24hFormat: true,
-      onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(
-            TextFieldItem.endTime,
-            value: CalendarUtils().copyTime(eventDetailState
-                .endDate!, newDate));
-      },
-    );
+    Future<Widget> Function() useEndTimePicker() {
+      return () async {
+        return CupertinoDatePicker(
+          initialDateTime: eventDetailState.endDate,
+          mode: CupertinoDatePickerMode.time,
+          // 初期値が設定できない値の場合落ちる
+          minuteInterval: 1,
+          use24hFormat: true,
+          onDateTimeChanged: (DateTime newDate) {
+            eventDetailNotifier.setTextFieldController(
+                TextFieldItem.endTime,
+                value: CalendarUtils().copyTime(eventDetailState
+                    .endDate!, newDate));
+          },
+        );
+      };
+    }
 
-    var repeatPicker = CupertinoPicker(
-        itemExtent: 32,
-        scrollController:
-        FixedExtentScrollController(
-          initialItem: RepeatingPattern.getDisplayList(eventDetailState
-              .repeatingEndWithOther!).indexOf(eventDetailState
-              .repeatingPattern!),
-        ),
-        onSelectedItemChanged: (int index) async {
-          var repeatingPattern =
-          RepeatingPattern.getDisplayList(eventDetailState
-              .repeatingEndWithOther!)[index];
-          await eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
-              value: repeatingPattern);
-          if (repeatingPattern == RepeatingPattern.none) {
-            eventDetailNotifier.setRepeatingEnd(false);
-          }
-          await eventDetailNotifier.setContentsHeight();
-          await eventDetailNotifier.updateState();
-        },
-        children: List<Widget>.generate(RepeatingPattern.getDisplayList(
-            eventDetailState.repeatingEndWithOther!).length, (int index) {
-          return Center(child: Text(RepeatingPattern.values[index].name));
-        })
-    );
+    Future<Widget> Function() useRepeatPicker() {
+      return () async {
+        return CupertinoPicker(
+            itemExtent: 32,
+            scrollController:
+            FixedExtentScrollController(
+              initialItem: RepeatingPattern.getDisplayList(eventDetailState
+                  .repeatingEndWithOther!).indexOf(eventDetailState
+                  .repeatingPattern!),
+            ),
+            onSelectedItemChanged: (int index) async {
+              var repeatingPattern =
+              RepeatingPattern.getDisplayList(eventDetailState
+                  .repeatingEndWithOther!)[index];
+              await eventDetailNotifier.setTextFieldController(TextFieldItem.repeat,
+                  value: repeatingPattern);
+              if (repeatingPattern == RepeatingPattern.none) {
+                eventDetailNotifier.setRepeatingEnd(false);
+              }
+              await eventDetailNotifier.setContentsHeight();
+              await eventDetailNotifier.updateState();
+            },
+            children: List<Widget>.generate(RepeatingPattern.getDisplayList(
+                eventDetailState.repeatingEndWithOther!).length, (int index) {
+              return Center(child: Text(RepeatingPattern.values[index].name));
+            })
+        );
+      };
+    }
 
-    var repeatingEndDatePicker = CupertinoDatePicker(
-      initialDateTime: eventDetailState.repeatingEndDate,
-      mode: CupertinoDatePickerMode.date,
-      onDateTimeChanged: (DateTime newDate) {
-        eventDetailNotifier.setTextFieldController(
-            TextFieldItem.repeatingEndDate,
-            value: CalendarUtils().trimDate(newDate, maxTime: true));
-      },
-    );
+    Future<Widget> Function() useRepeatingEndDatePicker() {
+      return () async {
+        return CupertinoDatePicker(
+          initialDateTime: eventDetailState.repeatingEndDate,
+          mode: CupertinoDatePickerMode.date,
+          onDateTimeChanged: (DateTime newDate) {
+            eventDetailNotifier.setTextFieldController(
+                TextFieldItem.repeatingEndDate,
+                value: CalendarUtils().trimDate(newDate, maxTime: true));
+          },
+        );
+      };
+    }
 
     var contents = Padding(
         padding: const EdgeInsets.symmetric(
@@ -368,7 +393,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.startDate,
                             onFocusChange: createOnBottomPopTextFocusChange(
-                                HighlightItem.startDate, startDatePicker)
+                                HighlightItem.startDate, useStartDatePicker())
                         )
                     ),
 
@@ -386,7 +411,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.startTime,
                             onFocusChange: createOnBottomPopTextFocusChange(
-                                HighlightItem.startTime, startTimePicker)
+                                HighlightItem.startTime, useStartTimePicker())
                         )
                       )
                   ])
@@ -416,7 +441,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.endDate,
                             onFocusChange: createOnBottomPopTextFocusChange(
-                                HighlightItem.endDate, endDatePicker)
+                                HighlightItem.endDate, useEndDatePicker())
                         )
                     ),
 
@@ -434,7 +459,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                               highlight: eventDetailState.highlightItem
                                   == HighlightItem.endTime,
                               onFocusChange: createOnBottomPopTextFocusChange(
-                                HighlightItem.endTime, endTimePicker)
+                                HighlightItem.endTime, useEndTimePicker())
                           )
                       ),
                   ])
@@ -461,7 +486,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                             highlight: eventDetailState.highlightItem
                                 == HighlightItem.repeat,
                             onFocusChange: createOnBottomPopTextFocusChange(
-                                HighlightItem.repeat, repeatPicker)
+                                HighlightItem.repeat, useRepeatPicker())
                         )
                     )
                   ])
@@ -520,7 +545,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                                     == HighlightItem.repeatEndDate,
                                 onFocusChange: createOnBottomPopTextFocusChange(
                                     HighlightItem.repeatEndDate,
-                                    repeatingEndDatePicker)
+                                    useRepeatingEndDatePicker())
                             )
                         ),
                     ])
@@ -599,13 +624,24 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     } else {
                       await calendarNotifier.moveCalendar(
                           eventDetailState.startDate!);
-                      await calendarNotifier.updateCalendar();
+                      Set<String> eventIdSet = {};
                       final event = eventDetailState.event;
+                      if (event == null) {
+                        eventIdSet = Set.from(calendarState.eventList.map(
+                                (event) => event.eventId));
+                      }
+                      await calendarNotifier.updateCalendar();
                       if (event != null) {
                         await calendarNotifier.updateEditingEvent(
                             event.eventId!);
                         await calendarNotifier.selectEventList(
                             event.eventId!);
+                      } else {
+                        var event = calendarState.eventList
+                            .where((event)=>!eventIdSet.contains(
+                            event.eventId)).first;
+                        await calendarNotifier.selectEventList(
+                            event.eventId);
                       }
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
