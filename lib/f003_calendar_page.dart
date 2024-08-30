@@ -112,7 +112,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
           Scrollable.ensureVisible(
             context,
             alignment: 0,
-            // duration: const Duration(milliseconds: 50),
+            duration: const Duration(milliseconds: 150),
             curve: Curves.linear,
           );
         }
