@@ -698,8 +698,8 @@ class EventListPart extends HookConsumerWidget {
               )
           ),
           Expanded(child:
-          SingleChildScrollView(
-            child: Column(
+            SingleChildScrollView(
+              child: Column(
                 children: [
                   if (calendarState.eventList.isEmpty)
                     EventPart(
@@ -745,7 +745,9 @@ class EventListPart extends HookConsumerWidget {
   }
 }
 
-class EventPart extends HookConsumerWidget {
+
+
+class EventPart extends StatefulHookConsumerWidget {
   final double height;
   final int index;
   final bool isHighlighted;
@@ -771,10 +773,31 @@ class EventPart extends HookConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState()
+  => _EventPartState();
+}
+
+class _EventPartState extends ConsumerState<EventPart>
+    with AutomaticKeepAliveClientMixin {
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig!;
+
+    var height = widget.height;
+    var index = widget.index;
+    var isHighlighted = widget.isHighlighted;
+    var onTapDown = widget.onTapDown;
+    var topBorderWide = widget.topBorderWide;
+    var rightBorderWide = widget.rightBorderWide;
+    var bottomBorderWide = widget.bottomBorderWide;
+    var leftBorderWide = widget.leftBorderWide;
+    var emptyMessage = widget.emptyMessage;
+    var event = widget.event;
 
     return SelectableCalendarCell(
         height: height,
@@ -800,7 +823,7 @@ class EventPart extends HookConsumerWidget {
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8,
                           vertical: 0),
-                      child: Text(emptyMessage!,
+                      child: Text(emptyMessage,
                           maxLines: 2,
                           style: TextStyle(
                             height: 1,
@@ -813,13 +836,13 @@ class EventPart extends HookConsumerWidget {
                 ),
               if (event != null)
                 SizedBox(width: 45, child:
-                  Text(event!.head,
+                  Text(event.head,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           height: 1,
                           fontSize: eventListFontSize2,
                           fontWeight: eventListFontWeight2,
-                          color: event!.fontColor
+                          color: event.fontColor
                       )
                   )
                 ),
@@ -830,7 +853,7 @@ class EventPart extends HookConsumerWidget {
                         vertical: 0),
                     child: Container(
                         width: normalBoarderWidth * 2,
-                        color: event!.lineColor
+                        color: event.lineColor
                     )
                 ),
               if (event != null)
@@ -839,19 +862,19 @@ class EventPart extends HookConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
                       child: Text(CalendarUtils().convertCharWrapString(
-                          event!.title),
+                          event.title),
                           maxLines: 2, style: TextStyle(
                               height: 1,
                               fontSize: eventListFontSize3,
                               fontWeight: eventListFontWeight3,
-                              color: event!.fontColor
+                              color: event.fontColor
                           )
                       )
                   )
                 ),
-              if (event != null && event!.editing && !event!.hourChoiceMode)
+              if (event != null && event.editing && !event.hourChoiceMode)
                 CWElevatedButton(
-                    title: event!.fixedTitle!,
+                    title: event.fixedTitle!,
                     height: 32,
                     width: 85,
                     radius: 16,
@@ -860,10 +883,10 @@ class EventPart extends HookConsumerWidget {
                     disabledForegroundColor: Colors.transparent,
                     elevation: 0,
                     color: colorConfig.normalTextColor,
-                    onPressed: event!.sameCell ? null : () async {
+                    onPressed: event.sameCell ? null : () async {
                       await calendarNotifier.selectEventListPart(index);
                       await calendarNotifier.moveCalendar(
-                      event!.fixedDateTime!, allDay: event!.event!.allDay!);
+                      event.fixedDateTime!, allDay: event.event!.allDay!);
                       // await calendarNotifier.selectEventList(
                       //     event!.event!.eventId!);
                       await calendarNotifier.updateState();
@@ -871,8 +894,8 @@ class EventPart extends HookConsumerWidget {
                 ),
               // if (event != null && event!.editing)
               //   const SizedBox(width: 8),
-              if (event != null && event!.editing && event!.sameCell
-                  && !event!.hourChoiceMode)
+              if (event != null && event.editing && event.sameCell
+                  && !event.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_copy_event@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -891,13 +914,13 @@ class EventPart extends HookConsumerWidget {
                     }
 
                     await calendarNotifier.updateCalendar();
-                    await calendarNotifier.selectEventList(event!.eventId);
+                    await calendarNotifier.selectEventList(event.eventId);
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && event!.editing
-                  && (event!.hourMoving || !event!.sameCell)
-                  && !event!.hourChoiceMode)
+              if (event != null && event.editing
+                  && (event.hourMoving || !event.sameCell)
+                  && !event.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_move_event@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -931,7 +954,7 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && event!.editing && !event!.hourChoiceMode)
+              if (event != null && event.editing && !event.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_lock_locking_tool@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -946,11 +969,11 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && event!.editing && event!.hourChoiceMode)
-                for (int i=0; i < event!.movingHourChoices.length; i++)
+              if (event != null && event.editing && event.hourChoiceMode)
+                for (int i=0; i < event.movingHourChoices.length; i++)
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: CWElevatedButton(
-                        title: '${event!.movingHourChoices[i]}:00',
+                        title: '${event.movingHourChoices[i]}:00',
                         width: 39,
                         height: 32,
                         radius: 16,
@@ -962,7 +985,7 @@ class EventPart extends HookConsumerWidget {
                           await calendarNotifier.selectEventListPart(index);
 
                           var eventId = await calendarNotifier.moveIndexEvent(
-                              index, hour: event!.movingHourChoices[i]);
+                              index, hour: event.movingHourChoices[i]);
                           if (eventId == null) {
                             if (context.mounted) {
                               await UIUtils().showMessageDialog(context, ref,
@@ -982,7 +1005,7 @@ class EventPart extends HookConsumerWidget {
                         }
                     )
                   ),
-              if (event != null && event!.editing && event!.hourChoiceMode)
+              if (event != null && event.editing && event.hourChoiceMode)
                 CWIconButton(
                   assetName: 'images/icon_close@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -997,7 +1020,7 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && !event!.editing && !event!.readOnly)
+              if (event != null && !event.editing && !event.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_trash@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -1021,7 +1044,7 @@ class EventPart extends HookConsumerWidget {
                       }
                     }
 
-                    if (!await calendarNotifier.deleteEvent(event!)) {
+                    if (!await calendarNotifier.deleteEvent(event)) {
                       if (context.mounted) {
                         await UIUtils().showMessageDialog(context, ref,
                             '削除', '削除に失敗しました');
@@ -1033,7 +1056,7 @@ class EventPart extends HookConsumerWidget {
                     await calendarNotifier.updateState();
                   },
                 ),
-              if (event != null && !event!.editing && !event!.readOnly)
+              if (event != null && !event.editing && !event.readOnly)
                 CWIconButton(
                   assetName: 'images/icon_unlock_locking_tool@3x.png',
                   assetIconSize: appBarIconHeight,
@@ -1053,6 +1076,9 @@ class EventPart extends HookConsumerWidget {
         )
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 // Week Calendar
