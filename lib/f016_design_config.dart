@@ -109,8 +109,8 @@ enum BrightnessMode implements SharedPreferenceStringValue {
   light('light'),
   dark('dark');
   @override
-  final String id;
-  const BrightnessMode(this.id);
+  final String configValue;
+  const BrightnessMode(this.configValue);
 }
 
 enum ColorConfig implements SharedPreferenceStringValue {
@@ -180,7 +180,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
   );
 
   @override
-  final String id;
+  final String configValue;
   final bool useMaterial3;
   final Brightness brightness;
   final MaterialColor primarySwatch;
@@ -196,7 +196,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
   final Color cardTextColor;
 
   const ColorConfig(
-      this.id,
+      this.configValue,
       this.useMaterial3,
       this.brightness,
       this.primarySwatch,
@@ -279,7 +279,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
     var modes = BrightnessMode.values;
     state.brightnessMode = modes[(brightnessMode.index + 1) % modes.length];
     SharedPreferencesRepository().setStringEnum(
-        SharedPreferenceKey.brightnessMode, state.brightnessMode);
+        SharedPreferenceStringKey.brightnessMode, state.brightnessMode);
     confirmColorConfig();
     if (state.preColorConfig == state.colorConfig) {
       return false;
@@ -325,7 +325,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
               && nextConfig.brightness == Brightness.light
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceKey.lightColorConfig, nextConfig);
+            SharedPreferenceStringKey.lightColorConfig, nextConfig);
         state.lightColorConfig = nextConfig;
         state.colorConfig = nextConfig;
         return config != nextConfig;
@@ -338,7 +338,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
               && nextConfig.brightness == Brightness.dark
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceKey.darkColorConfig, nextConfig);
+            SharedPreferenceStringKey.darkColorConfig, nextConfig);
         state.lightColorConfig = nextConfig;
         state.colorConfig = nextConfig;
         return config != nextConfig;

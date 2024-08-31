@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:scal/f017_event_detail_page.dart';
 
 import 'f002_home_view_model.dart';
@@ -253,9 +254,12 @@ class HomePage extends HookConsumerWidget {
           Calendar? calendar;
           if (calendarList.isEmpty) {
             if (context.mounted) {
+              PackageInfo packageInfo = await PackageInfo.fromPlatform();
               await UIUtils().showMessageDialog(context, ref,
                   '登録', 'イベントの登録には、OS標準のカレンダーアプリで'
-                      'カレンダー情報を設定する必要があります。');
+                      'カレンダー情報を設定する必要があります。\n\nまた、'
+                      'OSの${packageInfo.appName}の設定でカレンダーへの'
+                      'アクセスを許可する必要があります。');
               return;
             }
           } else {

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:scal/f016_design_config.dart';
 
 import 'f002_home_view_model.dart';
-import 'f008_calendar_repository.dart';
+import 'f007_calendar_repository.dart';
 import 'f015_calendar_utils.dart';
 import 'f018_event_detail_view_model.dart';
 

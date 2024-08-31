@@ -15,19 +15,19 @@ import 'package:scal/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     var brightnessMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceKey.brightnessMode,
+        .getStringEnum(SharedPreferenceStringKey.brightnessMode,
         BrightnessMode.values);
     brightnessMode ??= BrightnessMode.values.first;
 
     var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceKey.lightColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.lightColorConfig,
         ColorConfig.values);
     lightColorConfig ??= ColorConfig.values.where((config) {
       return config.brightness == Brightness.light;
     }).toList().first;
 
     var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceKey.darkColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.darkColorConfig,
         ColorConfig.values);
     darkColorConfig ??= ColorConfig.values.where((config) {
       return config.brightness == Brightness.dark;

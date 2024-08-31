@@ -1,20 +1,34 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SharedPreferenceKey {
+enum SharedPreferenceStringKey {
   brightnessMode('brightnessMode'),
   lightColorConfig('lightColorConfig'),
   darkColorConfig('darkColorConfig'),
-
-
-
+  calendarHolidaySundayConfig('calendarHolidaySundayConfig'),
+  calendarSwitchMode('calendarSwitchMode'),
+  calendar1DefaultCalendarId('calendar1DefaultCalendarId'),
+  calendar1EditingCalendarIds('calendar1EditingCalendarIds'),
+  calendar1NotEditableCalendarIds('calendar1NotEditableCalendarIds'),
+  calendar1HolidayCalendarIds('calendar1HolidayCalendarIds'),
+  calendar2DefaultCalendarId('calendar2DefaultCalendarId'),
+  calendar2EditingCalendarIds('calendar2EditingCalendarIds'),
+  calendar2NotEditableCalendarIds('calendar2NotEditableCalendarIds'),
+  calendar2HolidayCalendarIds('calendar2HolidayCalendarIds'),
   ;
+
   final String id;
-  const SharedPreferenceKey(this.id);
+  const SharedPreferenceStringKey(this.id);
 }
 
 abstract interface class SharedPreferenceStringValue implements Enum {
+  final String configValue;
+  const SharedPreferenceStringValue(this.configValue);
+}
+
+enum SharedPreferenceStringListKey {
+  calendarHolidaySundayConfig('calendarHolidaySundayConfig');
   final String id;
-  const SharedPreferenceStringValue(this.id);
+  const SharedPreferenceStringListKey(this.id);
 }
 
 class SharedPreferencesRepository {
@@ -32,42 +46,40 @@ class SharedPreferencesRepository {
   }
 
   Future<bool> setStringEnum<T extends SharedPreferenceStringValue>(
-      SharedPreferenceKey key, T? value) async {
+      SharedPreferenceStringKey key, T? value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value != null) {
-      return await prefs.setString(key.id, value.id);
+      return await prefs.setString(key.id, value.configValue);
     } else {
       return await prefs.remove(key.id);
     }
   }
 
   Future<T?> getStringEnum<T extends SharedPreferenceStringValue>(
-      SharedPreferenceKey key, List<T> values) async {
+      SharedPreferenceStringKey key, List<T> values) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var id = prefs.getString(key.id);
     if (id == null) {
       return null;
     } else {
-      var list = values.where((mode) {
-        return mode.id == id;
+      var list = values.where((value) {
+        return value.configValue == id;
       }).toList();
       return list.isEmpty ? null : list.first;
     }
   }
 
-/*
-        await SharedPreferencesRepository().setStringEnum(
-        SharedPreferenceKey.brightnessMode, BrightnessMode.light);
+  Future<bool> setString(SharedPreferenceStringKey key, String? value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (value != null) {
+      return await prefs.setString(key.id, value);
+    } else {
+      return await prefs.remove(key.id);
+    }
+  }
 
-      var a = await SharedPreferencesRepository().getStringEnum(
-          BrightnessMode.values,
-          SharedPreferenceKey.brightnessMode);
-
-      await SharedPreferencesRepository().setStringEnum(
-          SharedPreferenceKey.brightnessMode, null);
-
-      var b = await SharedPreferencesRepository().getStringEnum(
-          BrightnessMode.values,
-          SharedPreferenceKey.brightnessMode);
-   */
+  Future<String?> getString(SharedPreferenceStringKey key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key.id);
+  }
 }
