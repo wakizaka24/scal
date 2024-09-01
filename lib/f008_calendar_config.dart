@@ -122,12 +122,6 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     var configList = CalendarBaseConfig.values.where(
             (config)=>!readOnly || readOnly
                 && config != CalendarBaseConfig.display).toList();
-    var hidden = state.calendar1NonDisplayCalendarIds.where((id)=>id
-        == calendarId).firstOrNull != null;
-    var config = hidden ? CalendarBaseConfig.nonDisplay : CalendarBaseConfig
-        .display;
-    config = configList[(config.index + 1) % configList.length];
-
     List<String> nonDisplayCalendarIds;
     List<String> notEditableCalendarIds;
     if (configNo == 1) {
@@ -137,6 +131,15 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       nonDisplayCalendarIds = state.calendar2NonDisplayCalendarIds;
       notEditableCalendarIds = state.calendar2NotEditableCalendarIds;
     }
+    var nonDisplay = nonDisplayCalendarIds.where((id)=>id == calendarId)
+        .firstOrNull != null;
+    var notEditable = notEditableCalendarIds.where((id)=>id == calendarId)
+        .firstOrNull != null;
+    var config = nonDisplay ? CalendarBaseConfig.nonDisplay
+        : notEditable ? CalendarBaseConfig.notEditable
+        : CalendarBaseConfig.display;
+    config = configList[(config.index + 1) % configList.length];
+
     nonDisplayCalendarIds.remove(calendarId);
     notEditableCalendarIds.remove(calendarId);
     switch(config) {
