@@ -253,8 +253,8 @@ class HomePage extends HookConsumerWidget {
               .where((cal) => cal.isDefault!).toList();
           Calendar? calendar;
           if (calendarList.isEmpty) {
+            PackageInfo packageInfo = await PackageInfo.fromPlatform();
             if (context.mounted) {
-              PackageInfo packageInfo = await PackageInfo.fromPlatform();
               await UIUtils().showMessageDialog(context, ref,
                   '登録', 'イベントの登録には、OS標準のカレンダーアプリで'
                       'カレンダー情報を設定する必要があります。\n\nまた、'

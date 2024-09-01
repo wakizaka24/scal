@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'f001_home_page.dart';
 import 'f006_shared_preferences_repository.dart';
+import 'f008_calendar_config.dart';
 import 'f016_design_config.dart';
 
 void main() async {
@@ -38,39 +39,93 @@ void main() async {
   var brightnessMode = await SharedPreferencesRepository()
       .getStringEnum(SharedPreferenceStringKey.brightnessMode,
       BrightnessMode.values);
-  brightnessMode ??= BrightnessMode.values.first;
 
   var lightColorConfig = await SharedPreferencesRepository()
       .getStringEnum(SharedPreferenceStringKey.lightColorConfig,
       ColorConfig.values);
-  lightColorConfig ??= ColorConfig.values.where((config) {
-    return config.brightness == Brightness.light;
-  }).toList().first;
 
   var darkColorConfig = await SharedPreferencesRepository()
       .getStringEnum(SharedPreferenceStringKey.darkColorConfig,
       ColorConfig.values);
-  darkColorConfig ??= ColorConfig.values.where((config) {
-    return config.brightness == Brightness.dark;
-  }).toList().first;
 
-  runApp(SCalApp(brightnessMode: brightnessMode,
-      lightColorConfig: lightColorConfig,
-      darkColorConfig: darkColorConfig));
+  var calendarHolidaySundayConfig = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarHolidaySundayConfig);
+
+  var calendarSwitchMode = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceStringKey.calendarSwitchMode,
+      CalendarSwitchMode.values);
+
+  var calendar1EditingCalendarId = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar1EditingCalendarId);
+
+  var calendar1NonDisplayCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar1NonDisplayCalendarIds);
+
+  var calendar1NotEditableCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar1NotEditableCalendarIds);
+
+  var calendar1HolidayCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar1HolidayCalendarIds);
+
+  var calendar2EditingCalendarId = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar2EditingCalendarId);
+
+  var calendar2NonDisplayCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar2NonDisplayCalendarIds);
+
+  var calendar2NotEditableCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar2NotEditableCalendarIds);
+
+  var calendar2HolidayCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendar2HolidayCalendarIds);
+
+  runApp(SCalApp(
+    brightnessMode: brightnessMode,
+    lightColorConfig: lightColorConfig,
+    darkColorConfig: darkColorConfig,
+    calendarHolidaySundayConfig: calendarHolidaySundayConfig,
+    calendarSwitchMode: calendarSwitchMode,
+    calendar1EditingCalendarId: calendar1EditingCalendarId,
+    calendar1NonDisplayCalendarIds: calendar1NonDisplayCalendarIds,
+    calendar1NotEditableCalendarIds: calendar1NotEditableCalendarIds,
+    calendar1HolidayCalendarIds: calendar1HolidayCalendarIds,
+    calendar2EditingCalendarId: calendar2EditingCalendarId,
+    calendar2NonDisplayCalendarIds: calendar2NonDisplayCalendarIds,
+    calendar2NotEditableCalendarIds: calendar2NotEditableCalendarIds,
+    calendar2HolidayCalendarIds: calendar2HolidayCalendarIds,
+  ));
 }
 
-// var colorConfigInitialized = false;
-
 class SCalApp extends StatelessWidget {
-  final BrightnessMode brightnessMode;
-  final ColorConfig lightColorConfig;
-  final ColorConfig darkColorConfig;
+  final BrightnessMode? brightnessMode;
+  final ColorConfig? lightColorConfig;
+  final ColorConfig? darkColorConfig;
+  final String? calendarHolidaySundayConfig;
+  final CalendarSwitchMode? calendarSwitchMode;
+  final String? calendar1EditingCalendarId;
+  final String? calendar1NonDisplayCalendarIds;
+  final String? calendar1NotEditableCalendarIds;
+  final String? calendar1HolidayCalendarIds;
+  final String? calendar2EditingCalendarId;
+  final String? calendar2NonDisplayCalendarIds;
+  final String? calendar2NotEditableCalendarIds;
+  final String? calendar2HolidayCalendarIds;
 
   const SCalApp({
     super.key,
     required this.brightnessMode,
     required this.lightColorConfig,
-    required this.darkColorConfig
+    required this.darkColorConfig,
+    required this.calendarHolidaySundayConfig,
+    required this.calendarSwitchMode,
+    required this.calendar1EditingCalendarId,
+    required this.calendar1NonDisplayCalendarIds,
+    required this.calendar1NotEditableCalendarIds,
+    required this.calendar1HolidayCalendarIds,
+    required this.calendar2EditingCalendarId,
+    required this.calendar2NonDisplayCalendarIds,
+    required this.calendar2NotEditableCalendarIds,
+    required this.calendar2HolidayCalendarIds,
   });
 
   // This widget is the root of your application.
@@ -101,6 +156,8 @@ class SCalApp extends StatelessWidget {
                   colorConfig ??= darkColorConfig;
                 }
               }
+
+
 
               return MaterialApp(
                 localizationsDelegates: const [

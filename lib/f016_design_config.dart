@@ -250,12 +250,18 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
   final Ref ref;
   DesignConfigNotifier(this.ref, DesignConfigState state) : super(state);
 
-  initState(BrightnessMode brightnessMode, Brightness brightness,
-      ColorConfig lightColorConfig, ColorConfig darkColorConfig) async {
-    state.brightnessMode = brightnessMode;
+  initState(BrightnessMode? brightnessMode, Brightness brightness,
+      ColorConfig? lightColorConfig, ColorConfig? darkColorConfig) async {
+    state.brightnessMode = brightnessMode ??= BrightnessMode.values.first;
     state.brightness = brightness;
-    state.lightColorConfig = lightColorConfig;
-    state.darkColorConfig = darkColorConfig;
+    state.lightColorConfig = lightColorConfig ??= ColorConfig.values
+        .where((config) {
+      return config.brightness == Brightness.light;
+    }).toList().first;
+    state.darkColorConfig = darkColorConfig ??= ColorConfig.values
+        .where((config) {
+      return config.brightness == Brightness.dark;
+    }).toList().first;
 
     confirmColorConfig();
     state.preColorConfig = state.colorConfig;
