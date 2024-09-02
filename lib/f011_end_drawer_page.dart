@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f016_design_config.dart';
+import 'package:scal/f017_design_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'f013_end_drawer_view_model.dart';
 import 'f025_common_widgets.dart';
 
 enum EndDrawerMenuType {
@@ -12,17 +15,25 @@ enum EndDrawerMenuType {
   const EndDrawerMenuType({required this.title});
 }
 
-class EndDrawer extends HookConsumerWidget {
+class EndDrawerPage extends HookConsumerWidget {
   final double unsafeAreaTopHeight;
 
-  const EndDrawer({super.key,
+  const EndDrawerPage({super.key,
     required this.unsafeAreaTopHeight
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
+    final endDrawerNotifier = ref.watch(endDrawerPageNotifierProvider.notifier);
     final normalTextColor = ref.read(designConfigNotifierProvider)
         .colorConfig!.normalTextColor;
+
+    useEffect(() {
+      endDrawerNotifier.initState();
+      return () {
+      };
+    }, const []);
 
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),

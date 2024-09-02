@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scal/f013_ui_utils.dart';
+import 'package:scal/f015_ui_utils.dart';
 
 import 'f001_home_page.dart';
 import 'f002_home_view_model.dart';
 import 'f005_calendar_view_model.dart';
-import 'f015_calendar_utils.dart';
-import 'f016_design_config.dart';
-import 'f018_event_detail_view_model.dart';
-import 'f021_bottom_safe_area_view.dart';
+import 'f016_calendar_utils.dart';
+import 'f017_design_config.dart';
+import 'f021_event_detail_view_model.dart';
+import 'f023_bottom_safe_area_view.dart';
 import 'f024_bottom_safe_area_view_model.dart';
 import 'f025_common_widgets.dart';
 

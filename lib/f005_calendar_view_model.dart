@@ -2,12 +2,12 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:scal/f016_design_config.dart';
+import 'package:scal/f017_design_config.dart';
 
 import 'f002_home_view_model.dart';
 import 'f007_calendar_repository.dart';
-import 'f015_calendar_utils.dart';
-import 'f018_event_detail_view_model.dart';
+import 'f016_calendar_utils.dart';
+import 'f021_event_detail_view_model.dart';
 
 class CalendarPageState {
   // Control-Common

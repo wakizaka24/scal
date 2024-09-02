@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f001_home_page.dart';
 import 'f006_shared_preferences_repository.dart';
 import 'f008_calendar_config.dart';
-import 'f016_design_config.dart';
+import 'f017_design_config.dart';
 
 void main() async {
   // 縦向き

@@ -117,6 +117,20 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     );
   }
 
+  setEditingCalendarId(int configNo, String calendarId) async {
+    if (configNo != 2) {
+      await SharedPreferencesRepository().setString(
+          SharedPreferenceStringKey.calendar1EditingCalendarId,
+          calendarId
+      );
+    } else {
+      await SharedPreferencesRepository().setString(
+          SharedPreferenceStringKey.calendar2EditingCalendarId,
+          calendarId
+      );
+    }
+  }
+
   switchCalendarBaseConfig(int configNo, String calendarId, bool readOnly
       ) async {
     var configList = CalendarBaseConfig.values.where(
@@ -124,13 +138,14 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
                 && config != CalendarBaseConfig.display).toList();
     List<String> nonDisplayCalendarIds;
     List<String> notEditableCalendarIds;
-    if (configNo == 1) {
+    if (configNo != 2) {
       nonDisplayCalendarIds = state.calendar1NonDisplayCalendarIds;
       notEditableCalendarIds = state.calendar1NotEditableCalendarIds;
     } else {
       nonDisplayCalendarIds = state.calendar2NonDisplayCalendarIds;
       notEditableCalendarIds = state.calendar2NotEditableCalendarIds;
     }
+
     var nonDisplay = nonDisplayCalendarIds.where((id)=>id == calendarId)
         .firstOrNull != null;
     var notEditable = notEditableCalendarIds.where((id)=>id == calendarId)
@@ -153,7 +168,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
         break;
     }
 
-    if (configNo == 1) {
+    if (configNo != 2) {
       if (nonDisplayCalendarIds != state.calendar1NonDisplayCalendarIds) {
         state.calendar1NonDisplayCalendarIds = nonDisplayCalendarIds;
         await SharedPreferencesRepository().setString(
@@ -183,6 +198,45 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
             listToCalendarConfig(nonDisplayCalendarIds)
         );
       }
+    }
+  }
+
+  switchCalendarHolidayConfig(int configNo, String calendarId) async {
+    var configList = CalendarHolidayConfig.values;
+    List<String> holidayCalendarIds;
+    if (configNo != 2) {
+      holidayCalendarIds = state.calendar1HolidayCalendarIds;
+    } else {
+      holidayCalendarIds = state.calendar2HolidayCalendarIds;
+    }
+
+    var holiday = holidayCalendarIds.where((id)=>id == calendarId)
+        .firstOrNull != null;
+    var config = holiday ? CalendarHolidayConfig.holiday
+        : CalendarHolidayConfig.none;
+    config = configList[(config.index + 1) % configList.length];
+
+    holidayCalendarIds.remove(calendarId);
+    switch(config) {
+      case CalendarHolidayConfig.none:
+        break;
+      case CalendarHolidayConfig.holiday:
+        holidayCalendarIds.add(calendarId);
+        break;
+    }
+
+    if (configNo != 2) {
+      state.calendar1HolidayCalendarIds = holidayCalendarIds;
+      await SharedPreferencesRepository().setString(
+          SharedPreferenceStringKey.calendar1HolidayCalendarIds,
+          listToCalendarConfig(holidayCalendarIds)
+      );
+    } else {
+      state.calendar2HolidayCalendarIds = holidayCalendarIds;
+      await SharedPreferencesRepository().setString(
+          SharedPreferenceStringKey.calendar2HolidayCalendarIds,
+          listToCalendarConfig(holidayCalendarIds)
+      );
     }
   }
 

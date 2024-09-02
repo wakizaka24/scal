@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:scal/f017_event_detail_page.dart';
+import 'package:scal/f018_event_detail_page.dart';
 
 import 'f002_home_view_model.dart';
-import 'f011_end_drawer.dart';
+import 'f011_end_drawer_page.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
-import 'f013_ui_utils.dart';
-import 'f016_design_config.dart';
-import 'f018_event_detail_view_model.dart';
+import 'f015_ui_utils.dart';
+import 'f017_design_config.dart';
+import 'f021_event_detail_view_model.dart';
 import 'f025_common_widgets.dart';
 
 final GlobalKey<ScaffoldState> homePageScaffoldKey
@@ -364,7 +364,7 @@ class HomePage extends HookConsumerWidget {
       scaffold = Scaffold(
           key: homePageScaffoldKey,
           resizeToAvoidBottomInset: false,
-          endDrawer: EndDrawer(unsafeAreaTopHeight: unsafeAreaTopHeight),
+          endDrawer: EndDrawerPage(unsafeAreaTopHeight: unsafeAreaTopHeight),
           body: stack
       );
     } else {
