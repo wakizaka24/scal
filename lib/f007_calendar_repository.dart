@@ -102,12 +102,12 @@ class CalendarRepository {
     return events;
   }
 
-  // Future<Event?> getEvent(String calendarId, String eventId) async {
-  //   var params = RetrieveEventsParams(eventIds: [eventId]);
-  //   var result = await _plugin.retrieveEvents(calendarId, params);
-  //   List<Event> events = [...result.data ?? []];
-  //   return events.firstOrNull;
-  // }
+  Future<Event?> getEvent(String calendarId, String eventId) async {
+    var params = RetrieveEventsParams(eventIds: [eventId]);
+    var result = await _plugin.retrieveEvents(calendarId, params);
+    List<Event> events = [...result.data ?? []];
+    return events.firstOrNull;
+  }
 
   TZDateTime convertTZDateTime(DateTime date) {
     return TZDateTime.from(date, _location);

@@ -433,18 +433,24 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   updateEditingEvent(String eventId) async {
-    var event = state.editingEventList.where((event) {
+    var eventDisplay = state.editingEventList.where((event) {
       return event.eventId == eventId;
     }).firstOrNull;
+    if (eventDisplay == null) {
+      return;
+    }
+
+    var event = state.eventIdEventMap[eventDisplay.eventId];
+    event ??= await CalendarRepository().getEvent(eventDisplay.calendarId,
+          eventDisplay.eventId);
     if (event == null) {
       return;
     }
 
-    var updateEvent = await createEventDisplay(state.eventIdEventMap[
-    event.eventId]!);
-    event.head = updateEvent.head;
-    event.title = updateEvent.title;
-    event.fixedTitle = DateFormat.yMd('ja').format(event.event!.start!);
+    var updateEvent = await createEventDisplay(event);
+    eventDisplay.head = updateEvent.head;
+    eventDisplay.title = updateEvent.title;
+    eventDisplay.fixedTitle = DateFormat.yMd('ja').format(eventDisplay.event!.start!);
   }
 
   selectEventList(String eventId) async {

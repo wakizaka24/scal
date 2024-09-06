@@ -566,7 +566,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                           == HighlightItem.memo,
                       maxLines: 6,
                       onFocusChange: createOnTextFocusChange(HighlightItem
-                          .memo, bottomSpace: 8 + 64, forceScroll: true)
+                          .memo, bottomSpace: 8 + 62, forceScroll: true)
                   )
               ),
 
