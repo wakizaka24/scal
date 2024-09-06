@@ -140,23 +140,39 @@ class SCalApp extends StatelessWidget {
               final designConfigNotifier = ref.watch(
                   designConfigNotifierProvider.notifier);
               var colorConfig = designConfigState.colorConfig;
-              if (colorConfig == null) {
+              if (!designConfigState.init) {
                 designConfigNotifier.initState(brightnessMode, brightness,
                     lightColorConfig, darkColorConfig);
 
+                var editingBrightnessMode = brightnessMode
+                    ?? BrightnessMode.lightAndDark;
+                var editingLightColorConfig = lightColorConfig
+                    ?? ColorConfig.values.where((config) {
+                  return config.brightness == Brightness.light;
+                }).toList().first;
+                var editingDarkColorConfig = darkColorConfig
+                    ?? ColorConfig.values.where((config) {
+                  return config.brightness == Brightness.dark;
+                }).toList().first;
+
                 if (brightness == Brightness.light
-                    && brightnessMode == BrightnessMode.lightAndDark
-                    || brightnessMode == BrightnessMode.light) {
-                  colorConfig ??= lightColorConfig;
+                    && editingBrightnessMode == BrightnessMode.lightAndDark
+                    || editingBrightnessMode == BrightnessMode.light) {
+                  colorConfig ??= editingLightColorConfig;
                 }
 
                 if (brightness == Brightness.dark
-                    && brightnessMode == BrightnessMode.lightAndDark
-                    || brightnessMode == BrightnessMode.dark) {
-                  colorConfig ??= darkColorConfig;
+                    && editingBrightnessMode == BrightnessMode.lightAndDark
+                    || editingBrightnessMode == BrightnessMode.dark) {
+                  colorConfig ??= editingDarkColorConfig;
                 }
               }
 
+              var calendarConfigState = ref.watch(
+                  calendarConfigNotifierProvider);
+              var calendarConfigNotifier = ref.watch(
+                  calendarConfigNotifierProvider.notifier);
+              // if (calendarConfigState.calendarSwitchMode)
 
 
               return MaterialApp(

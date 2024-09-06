@@ -213,6 +213,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
 }
 
 class DesignConfigState {
+  bool init = false;
   BrightnessMode? brightnessMode;
   Brightness? brightness;
   ColorConfig? colorConfig;
@@ -236,6 +237,7 @@ class DesignConfigState {
 
   static DesignConfigState copy(DesignConfigState state) {
     var nState = DesignConfigState();
+    nState.init = state.init;
     nState.brightnessMode = state.brightnessMode;
     nState.brightness = state.brightness;
     nState.colorConfig = state.colorConfig;
@@ -252,6 +254,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
 
   initState(BrightnessMode? brightnessMode, Brightness brightness,
       ColorConfig? lightColorConfig, ColorConfig? darkColorConfig) async {
+    state.init = true;
     state.brightnessMode = brightnessMode ??= BrightnessMode.values.first;
     state.brightness = brightness;
     state.lightColorConfig = lightColorConfig ??= ColorConfig.values

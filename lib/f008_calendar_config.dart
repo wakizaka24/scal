@@ -256,3 +256,8 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
   }
 }
 
+final calendarConfigNotifierProvider = StateNotifierProvider
+    .autoDispose<CalendarConfigNotifier, CalendarConfigState>((ref) {
+  var state = CalendarConfigState();
+  return CalendarConfigNotifier(ref, state);
+});
