@@ -96,6 +96,8 @@ void main() async {
   ));
 }
 
+var appInit = false;
+
 class SCalApp extends StatelessWidget {
   final BrightnessMode? brightnessMode;
   final ColorConfig? lightColorConfig;
@@ -140,12 +142,10 @@ class SCalApp extends StatelessWidget {
               final designConfigNotifier = ref.watch(
                   designConfigNotifierProvider.notifier);
               var colorConfig = designConfigState.colorConfig;
-              if (!designConfigState.init) {
-                designConfigNotifier.initState(brightnessMode, brightness,
-                    lightColorConfig, darkColorConfig);
-
+              if (!appInit) {
+                appInit = true;
                 var editingBrightnessMode = brightnessMode
-                    ?? BrightnessMode.lightAndDark;
+                    ?? BrightnessMode.values.first;
                 var editingLightColorConfig = lightColorConfig
                     ?? ColorConfig.values.where((config) {
                   return config.brightness == Brightness.light;
@@ -154,18 +154,9 @@ class SCalApp extends StatelessWidget {
                     ?? ColorConfig.values.where((config) {
                   return config.brightness == Brightness.dark;
                 }).toList().first;
-
-                if (brightness == Brightness.light
-                    && editingBrightnessMode == BrightnessMode.lightAndDark
-                    || editingBrightnessMode == BrightnessMode.light) {
-                  colorConfig ??= editingLightColorConfig;
-                }
-
-                if (brightness == Brightness.dark
-                    && editingBrightnessMode == BrightnessMode.lightAndDark
-                    || editingBrightnessMode == BrightnessMode.dark) {
-                  colorConfig ??= editingDarkColorConfig;
-                }
+                colorConfig = designConfigNotifier.initState(
+                    editingBrightnessMode, brightness, editingLightColorConfig,
+                    editingDarkColorConfig);
               }
 
               var calendarConfigState = ref.watch(
