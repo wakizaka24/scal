@@ -325,7 +325,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         return diffHour >= 0 && diffHour < 24;
       });
       if (dayPartIndex != -1) {
-        if (!state.cellActive || state.dayPartIndex != dayPartIndex) {
+        if (state.dayPartIndex != dayPartIndex) {
           await onTapDownCalendarDay(dayPartIndex, noneUpdate: true);
         }
         return true;
@@ -344,8 +344,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             || allDay && sameDay && hour.allDay;
       });
       if (hourPartIndex != -1) {
-        if (!state.cellActive || state.hourPartIndex != hourPartIndex) {
-          await onTapDownCalendarHour(hourPartIndex, noneUpdate: true);
+        if (state.hourPartIndex != hourPartIndex) {
+          await onTapDownCalendarHour(hourPartIndex, nonUpdate: true);
         }
 
         return;
@@ -658,9 +658,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Week Calendar
 
-  onTapDownCalendarHour(int index, {bool noneUpdate=false}) async {
+  onTapDownCalendarHour(int index, {bool nonUpdate=false}) async {
     await selectHour(index: index);
-    if (!noneUpdate) {
+    if (!nonUpdate) {
       await updateState();
     }
   }
