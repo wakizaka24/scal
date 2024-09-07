@@ -931,9 +931,9 @@ class _EventPartState extends ConsumerState<EventPart>
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
-                    String? eventId;
+                    var eventId = await calendarNotifier.moveIndexEvent(
+                        index);
                     if (!await calendarNotifier.isHourMove()) {
-                      eventId = await calendarNotifier.moveIndexEvent(index);
                       if (eventId == null) {
                         if (context.mounted) {
                           await UIUtils().showMessageDialog(context, ref,
@@ -964,8 +964,12 @@ class _EventPartState extends ConsumerState<EventPart>
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
+                    var eventId = await calendarNotifier.moveIndexEvent(index);
                     await calendarNotifier.editingCancel(index);
                     await calendarNotifier.updateEventList();
+                    if (eventId != null) {
+                      await calendarNotifier.selectEventList(eventId);
+                    }
                     await calendarNotifier.updateState();
                   },
                 ),
@@ -1066,8 +1070,7 @@ class _EventPartState extends ConsumerState<EventPart>
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
-                    await calendarNotifier.fixedEvent(
-                        index);
+                    await calendarNotifier.fixedEvent(index);
                     await calendarNotifier.updateState();
                   },
                 )

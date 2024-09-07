@@ -250,7 +250,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     if (state.initialized) {
       return;
     }
-    state.initialized = true;
 
     // Data-Month Calendar/Week Calendar
     state.now = DateTime.now();
@@ -271,6 +270,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await setDayEventList(state.selectionDate, state.dayEventsMap);
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
+
+    state.initialized = true;
   }
 
   @override

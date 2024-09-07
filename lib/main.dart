@@ -141,6 +141,10 @@ class SCalApp extends StatelessWidget {
               var designConfigState = ref.watch(designConfigNotifierProvider);
               final designConfigNotifier = ref.watch(
                   designConfigNotifierProvider.notifier);
+              // var calendarConfigState = ref.watch(
+              //     calendarConfigNotifierProvider);
+              var calendarConfigNotifier = ref.watch(
+                  calendarConfigNotifierProvider.notifier);
               var colorConfig = designConfigState.colorConfig;
               if (!appInit) {
                 appInit = true;
@@ -157,12 +161,18 @@ class SCalApp extends StatelessWidget {
                 colorConfig = designConfigNotifier.initState(
                     editingBrightnessMode, brightness, editingLightColorConfig,
                     editingDarkColorConfig);
+                calendarConfigNotifier.initState(
+                    calendarHolidaySundayConfig, calendarSwitchMode,
+                    calendar1EditingCalendarId, calendar1NonDisplayCalendarIds,
+                    calendar1NotEditableCalendarIds,
+                    calendar1HolidayCalendarIds, calendar2EditingCalendarId,
+                    calendar2NonDisplayCalendarIds,
+                    calendar2NotEditableCalendarIds,
+                    calendar2HolidayCalendarIds);
+
               }
 
-              var calendarConfigState = ref.watch(
-                  calendarConfigNotifierProvider);
-              var calendarConfigNotifier = ref.watch(
-                  calendarConfigNotifierProvider.notifier);
+
               // if (calendarConfigState.calendarSwitchMode)
 
 

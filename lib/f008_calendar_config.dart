@@ -71,11 +71,11 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       String? calendarHolidaySundayConfig,
       CalendarSwitchMode? calendarSwitchMode,
       String? calendar1EditingCalendarId,
-      String? calendar1NoneDisplayCalendarIds,
+      String? calendar1NonDisplayCalendarIds,
       String? calendar1NotEditableCalendarIds,
       String? calendar1HolidayCalendarIds,
       String? calendar2EditingCalendarId,
-      String? calendar2NoneDisplayCalendarIds,
+      String? calendar2NonDisplayCalendarIds,
       String? calendar2NotEditableCalendarIds,
       String? calendar2HolidayCalendarIds) async {
     state.calendarHolidayList = calendarHolidaySundayConfig
@@ -88,14 +88,14 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       CalendarHoliday.blue];
     state.calendarSwitchMode = calendarSwitchMode;
     state.calendar1EditingCalendarId = calendar1EditingCalendarId;
-    state.calendar1NonDisplayCalendarIds = calendar1NoneDisplayCalendarIds
+    state.calendar1NonDisplayCalendarIds = calendar1NonDisplayCalendarIds
       ?.split(calendarConfigDelimiter).toList() ?? [];
     state.calendar1NotEditableCalendarIds = calendar1NotEditableCalendarIds
         ?.split(calendarConfigDelimiter).toList() ?? [];
     state.calendar1HolidayCalendarIds = calendar1HolidayCalendarIds
         ?.split(calendarConfigDelimiter).toList() ?? [];
     state.calendar2EditingCalendarId = calendar2EditingCalendarId;
-    state.calendar2NonDisplayCalendarIds = calendar2NoneDisplayCalendarIds
+    state.calendar2NonDisplayCalendarIds = calendar2NonDisplayCalendarIds
         ?.split(calendarConfigDelimiter).toList() ?? [];
     state.calendar2NotEditableCalendarIds = calendar2NotEditableCalendarIds
         ?.split(calendarConfigDelimiter).toList() ?? [];

@@ -35,39 +35,46 @@ class EndDrawerPage extends HookConsumerWidget {
       };
     }, const []);
 
+    softwareLicenseOnPress() async {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      if (!context.mounted) return;
+      await Navigator.push(context, MaterialPageRoute(
+          builder: (context) => LicensePage(
+              applicationName: packageInfo.appName,
+              applicationVersion: packageInfo.version
+          )
+      )
+      );
+
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // ステータスバーの設定
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        // iOSの文字を白にする。
+        statusBarBrightness: Brightness.dark,
+        // Androidの文字を白にする。
+        statusBarIconBrightness: Brightness.light,
+        // Androidの背景色を透明にする。
+        statusBarColor: Colors.transparent,
+      ));
+    }
+
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
       children: [
         for (int i=0; i < EndDrawerMenuType.values.length; i++) ... {
-        Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: CWTextButton(
-            title: 'ソフトウェアライセンス',
-            onPressed: () async {
-              PackageInfo packageInfo = await PackageInfo.fromPlatform();
-              if (!context.mounted) return;
-              await Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => LicensePage(
-                    applicationName: packageInfo.appName,
-                    applicationVersion: packageInfo.version
-                  )
-                )
-              );
-
-              await Future.delayed(const Duration(milliseconds: 100));
-
-              // ステータスバーの設定
-              SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-                // iOSの文字を白にする。
-                statusBarBrightness: Brightness.dark,
-                // Androidの文字を白にする。
-                statusBarIconBrightness: Brightness.light,
-                // Androidの背景色を透明にする。
-                statusBarColor: Colors.transparent,
-              ));
-            }
+          Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: CWTextButton(
+              title: EndDrawerMenuType.values[i].title,
+              onPressed: () async {
+                switch (EndDrawerMenuType.values[i]) {
+                  case EndDrawerMenuType.softwareLicense:
+                    await softwareLicenseOnPress();
+                }
+              }
+            )
           )
-        )
         }
       ],
     );
@@ -90,6 +97,7 @@ class EndDrawerPage extends HookConsumerWidget {
                     },
                   )
               ),
+
               Expanded(
                   child: menuList
               ),
