@@ -58,7 +58,7 @@ class EndDrawerPage extends HookConsumerWidget {
       ));
     }
 
-    const double buttonWidth = 39;
+    const double weekButtonWidth = 35;
     var weekdayList = endDrawerState.weekdayList;
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
@@ -95,12 +95,15 @@ class EndDrawerPage extends HookConsumerWidget {
                   for (int i=0; i<weekdayList.length; i++) ... {
                     CWElevatedButton(
                         title: weekdayList[i].title,
-                        width: buttonWidth,
-                        height: buttonWidth,
-                        radius: buttonWidth / 2,
+                        width: weekButtonWidth,
+                        height: weekButtonWidth,
+                        radius: weekButtonWidth / 2,
+                        elevation: 0,
                         color: weekdayList[i].titleColor,
                         backgroundColor: colorConfig.cardColor,
-                        onPressed: () async {}
+                        onPressed: () async {
+                          
+                        }
                     ),
                   }
                 ])
@@ -111,6 +114,7 @@ class EndDrawerPage extends HookConsumerWidget {
       ],
     );
 
+    const double closingButtonWidth = 39;
     var drawer = Drawer(
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +123,9 @@ class EndDrawerPage extends HookConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: CWIconButton(
                     assetName: 'images/icon_close@3x.png',
-                    width: buttonWidth,
-                    height: buttonWidth,
-                    radius: buttonWidth / 2,
+                    width: closingButtonWidth,
+                    height: closingButtonWidth,
+                    radius: closingButtonWidth / 2,
                     foregroundColor: colorConfig.normalTextColor,
                     onPressed: () async {
                       Navigator.pop(context);
