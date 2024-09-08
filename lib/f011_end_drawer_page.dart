@@ -24,10 +24,9 @@ class EndDrawerPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
+    final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
     final endDrawerNotifier = ref.watch(endDrawerPageNotifierProvider.notifier);
-    final normalTextColor = ref.read(designConfigNotifierProvider)
-        .colorConfig!.normalTextColor;
+    final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
 
     useEffect(() {
       endDrawerNotifier.initState();
@@ -59,6 +58,8 @@ class EndDrawerPage extends HookConsumerWidget {
       ));
     }
 
+    const double buttonWidth = 39;
+    var weekdayList = endDrawerState.weekdayList;
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -75,11 +76,41 @@ class EndDrawerPage extends HookConsumerWidget {
               }
             )
           )
-        }
+        },
+
+        Padding(padding: const EdgeInsets.all(8),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('祝日曜日設定',
+                    style: TextStyle(
+                        height: 1,
+                        fontSize: eventListFontSize1,
+                        fontWeight: eventListFontWeight1,
+                        color: colorConfig.normalTextColor
+                    )
+                ),
+                const SizedBox(height: 8),
+                Row(children: [
+                  for (int i=0; i<weekdayList.length; i++) ... {
+                    CWElevatedButton(
+                        title: weekdayList[i].title,
+                        width: buttonWidth,
+                        height: buttonWidth,
+                        radius: buttonWidth / 2,
+                        color: weekdayList[i].titleColor,
+                        backgroundColor: colorConfig.cardColor,
+                        onPressed: () async {}
+                    ),
+                  }
+                ])
+              ]
+          ),
+
+        )
       ],
     );
 
-    const double buttonWidth = 39;
     var drawer = Drawer(
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,13 +122,12 @@ class EndDrawerPage extends HookConsumerWidget {
                     width: buttonWidth,
                     height: buttonWidth,
                     radius: buttonWidth / 2,
-                    foregroundColor: normalTextColor,
+                    foregroundColor: colorConfig.normalTextColor,
                     onPressed: () async {
                       Navigator.pop(context);
                     },
                   )
               ),
-
               Expanded(
                   child: menuList
               ),

@@ -9,111 +9,6 @@ import 'f007_calendar_repository.dart';
 import 'f016_calendar_utils.dart';
 import 'f021_event_detail_view_model.dart';
 
-class CalendarPageState {
-  // Control-Common
-  // 擬似無制限中央インデックス
-  static const int pseudoUnlimitedCenterIndex = 36001;
-
-  // Control-Month Calendar/Week Calendar
-  PageController calendarSwitchingController = PageController(
-    initialPage: 0);
-
-  // Control-Month Calendar
-  PageController monthCalendarController = PageController(
-      initialPage: pseudoUnlimitedCenterIndex);
-
-  // Control-Event List
-  List<GlobalKey> eventListCellKeyList = [];
-
-  // Data-Month Calendar/Week Calendar
-  bool initialized = false;
-  late DateTime now;
-  Map<String, Calendar> calendarMap = {};
-  List<Event> calendarEvents = [];
-  Map<String, Event> eventIdEventMap = {};
-  Map<String, DateTime> eventIdStartDateMap = {};
-  bool cellActive = true;
-  int calendarSwitchingIndex = 0;
-
-  // Data-Month Calendar
-  static const int weekdayPartColNum = 7;
-  DateTime basisMonthDate = DateTime.now();
-  int addingMonth = 0;
-  Map<DateTime, List<Event>> dayEventsMap = {};
-  List<WeekdayDisplay> weekdayList = [];
-  List<List<DayDisplay>> dayLists = [];
-  late DateTime selectionDate;
-  int dayPartIndex = 0;
-
-  // Data-Week Calendar
-  static const int timeColNum = 6;
-  static const int hoursPartRowNum = 7;
-  late bool selectionAllDay;
-  Map<DateTime, List<Event>> allDayEventsMap = {};
-  Map<DateTime, List<Event>> hourEventsMap = {};
-  List<DayAndWeekdayDisplay> dayAndWeekdayList = [];
-  List<HourDisplay> hours = [];
-  late DateTime selectionHour;
-  int hourPartIndex = 0;
-
-  // Data-Event List
-  String eventListTitle = '';
-  List<EventDisplay> eventList = [];
-  int? eventListIndex;
-  int? scrollEventListIndex;
-  List<EventDisplay> editingEventList = [];
-
-  static CalendarPageState copy(CalendarPageState state) {
-    var nState = CalendarPageState();
-
-    // Control-Month Calendar/Week Calendar
-    nState.calendarSwitchingController = state.calendarSwitchingController;
-
-    // Control-Month Calendar
-    nState.monthCalendarController = state.monthCalendarController;
-
-    // Control-Event List
-    nState.eventListCellKeyList = state.eventListCellKeyList;
-
-    // Data-Month Calendar/Week Calendar
-    nState.initialized = state.initialized;
-    nState.now = state.now;
-    nState.calendarMap = state.calendarMap;
-    nState.calendarEvents = state.calendarEvents;
-    nState.eventIdEventMap = state.eventIdEventMap;
-    nState.eventIdStartDateMap = state.eventIdStartDateMap;
-    nState.cellActive = state.cellActive;
-    nState.calendarSwitchingIndex = state.calendarSwitchingIndex;
-
-    // Data-Month Calendar
-    nState.basisMonthDate = state.basisMonthDate;
-    nState.addingMonth = state.addingMonth;
-    nState.dayEventsMap = state.dayEventsMap;
-    nState.weekdayList = state.weekdayList;
-    nState.dayLists = state.dayLists;
-    nState.selectionDate = state.selectionDate;
-    nState.dayPartIndex = state.dayPartIndex;
-
-    // Data-Week Calendar
-    nState.selectionAllDay = state.selectionAllDay;
-    nState.allDayEventsMap = state.allDayEventsMap;
-    nState.hourEventsMap = state.hourEventsMap;
-    nState.dayAndWeekdayList = state.dayAndWeekdayList;
-    nState.hours = state.hours;
-    nState.selectionHour = state.selectionHour;
-    nState.hourPartIndex = state.hourPartIndex;
-
-    // Data-Event List
-    nState.eventListTitle = state.eventListTitle;
-    nState.eventList = state.eventList;
-    nState.eventListIndex = state.eventListIndex;
-    nState.scrollEventListIndex = state.scrollEventListIndex;
-    nState.editingEventList = state.editingEventList;
-
-    return nState;
-  }
-}
-
 // Type-Month Calendar/Week Calendar
 class EventDisplay {
   String eventId;
@@ -237,6 +132,111 @@ class HourEventDisplay {
     required this.title,
     required this.titleColor
   });
+}
+
+class CalendarPageState {
+  // Control-Common
+  // 擬似無制限中央インデックス
+  static const int pseudoUnlimitedCenterIndex = 36001;
+
+  // Control-Month Calendar/Week Calendar
+  PageController calendarSwitchingController = PageController(
+    initialPage: 0);
+
+  // Control-Month Calendar
+  PageController monthCalendarController = PageController(
+      initialPage: pseudoUnlimitedCenterIndex);
+
+  // Control-Event List
+  List<GlobalKey> eventListCellKeyList = [];
+
+  // Data-Month Calendar/Week Calendar
+  bool initialized = false;
+  late DateTime now;
+  Map<String, Calendar> calendarMap = {};
+  List<Event> calendarEvents = [];
+  Map<String, Event> eventIdEventMap = {};
+  Map<String, DateTime> eventIdStartDateMap = {};
+  bool cellActive = true;
+  int calendarSwitchingIndex = 0;
+
+  // Data-Month Calendar
+  static const int weekdayPartColNum = 7;
+  DateTime basisMonthDate = DateTime.now();
+  int addingMonth = 0;
+  Map<DateTime, List<Event>> dayEventsMap = {};
+  List<WeekdayDisplay> weekdayList = [];
+  List<List<DayDisplay>> dayLists = [];
+  late DateTime selectionDate;
+  int dayPartIndex = 0;
+
+  // Data-Week Calendar
+  static const int timeColNum = 6;
+  static const int hoursPartRowNum = 7;
+  late bool selectionAllDay;
+  Map<DateTime, List<Event>> allDayEventsMap = {};
+  Map<DateTime, List<Event>> hourEventsMap = {};
+  List<DayAndWeekdayDisplay> dayAndWeekdayList = [];
+  List<HourDisplay> hours = [];
+  late DateTime selectionHour;
+  int hourPartIndex = 0;
+
+  // Data-Event List
+  String eventListTitle = '';
+  List<EventDisplay> eventList = [];
+  int? eventListIndex;
+  int? scrollEventListIndex;
+  List<EventDisplay> editingEventList = [];
+
+  static CalendarPageState copy(CalendarPageState state) {
+    var nState = CalendarPageState();
+
+    // Control-Month Calendar/Week Calendar
+    nState.calendarSwitchingController = state.calendarSwitchingController;
+
+    // Control-Month Calendar
+    nState.monthCalendarController = state.monthCalendarController;
+
+    // Control-Event List
+    nState.eventListCellKeyList = state.eventListCellKeyList;
+
+    // Data-Month Calendar/Week Calendar
+    nState.initialized = state.initialized;
+    nState.now = state.now;
+    nState.calendarMap = state.calendarMap;
+    nState.calendarEvents = state.calendarEvents;
+    nState.eventIdEventMap = state.eventIdEventMap;
+    nState.eventIdStartDateMap = state.eventIdStartDateMap;
+    nState.cellActive = state.cellActive;
+    nState.calendarSwitchingIndex = state.calendarSwitchingIndex;
+
+    // Data-Month Calendar
+    nState.basisMonthDate = state.basisMonthDate;
+    nState.addingMonth = state.addingMonth;
+    nState.dayEventsMap = state.dayEventsMap;
+    nState.weekdayList = state.weekdayList;
+    nState.dayLists = state.dayLists;
+    nState.selectionDate = state.selectionDate;
+    nState.dayPartIndex = state.dayPartIndex;
+
+    // Data-Week Calendar
+    nState.selectionAllDay = state.selectionAllDay;
+    nState.allDayEventsMap = state.allDayEventsMap;
+    nState.hourEventsMap = state.hourEventsMap;
+    nState.dayAndWeekdayList = state.dayAndWeekdayList;
+    nState.hours = state.hours;
+    nState.selectionHour = state.selectionHour;
+    nState.hourPartIndex = state.hourPartIndex;
+
+    // Data-Event List
+    nState.eventListTitle = state.eventListTitle;
+    nState.eventList = state.eventList;
+    nState.eventListIndex = state.eventListIndex;
+    nState.scrollEventListIndex = state.scrollEventListIndex;
+    nState.editingEventList = state.editingEventList;
+
+    return nState;
+  }
 }
 
 class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
