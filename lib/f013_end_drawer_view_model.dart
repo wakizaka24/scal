@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
 
 class WeekdayDisplay {
@@ -36,25 +37,39 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     state.weekdayList = createWeekdayList();
   }
 
+  updateWeekdayList() async {
+    state.weekdayList = createWeekdayList();
+  }
+
   List<WeekdayDisplay> createWeekdayList() {
+    const titleList = ['日', '月', '火', '水', '木', '金', '土'];
     var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
         .normalTextColor;
-    return [
-      WeekdayDisplay(title: '日',
-          titleColor: Colors.pink),
-      WeekdayDisplay(title: '月',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '火',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '水',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '木',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '金',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '土',
-          titleColor: Colors.blueAccent),
-    ];
+    final calendarConfig = ref.read(calendarConfigNotifierProvider);
+    var holidayList = calendarConfig.calendarHolidayList;
+
+    var titleColors = holidayList.map((holiday) {
+      switch(holiday) {
+        case CalendarHoliday.none:
+          return normalTextColor;
+        case CalendarHoliday.red:
+          return Colors.pink;
+        case CalendarHoliday.blue:
+          return Colors.blueAccent;
+        case CalendarHoliday.brown:
+          return Colors.brown;
+      }
+    }).toList();
+
+    List<WeekdayDisplay> weekdayDisplayList = [];
+    for(int i=0; i<titleList.length; i++) {
+      var title = titleList[i];
+      var titleColor = titleColors[i];
+      weekdayDisplayList.add(WeekdayDisplay(title: title,
+          titleColor: titleColor));
+    }
+
+    return weekdayDisplayList;
   }
 
   updateState() async {

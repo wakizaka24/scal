@@ -6,7 +6,8 @@ const calendarConfigDelimiter = ',';
 enum CalendarHoliday {
   none('none'),
   red('red'),
-  blue('blue');
+  blue('blue'),
+  brown('green');
   final String configValue;
   const CalendarHoliday(this.configValue);
 }

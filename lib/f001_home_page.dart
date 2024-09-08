@@ -190,8 +190,8 @@ class HomePage extends HookConsumerWidget {
               onPressed: designConfigNotifier.getColorConfigs().length <= 1
                   ? null : () async {
                 if (designConfigNotifier.switchColorConfig()) {
-                  await designConfigNotifier.updateState();
                   await calendarNotifier.updateCalendar(dataExclusion: true);
+                  await designConfigNotifier.updateState();
                 }
               },
             ),

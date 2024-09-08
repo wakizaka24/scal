@@ -6,6 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f017_design_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'f005_calendar_view_model.dart';
+import 'f008_calendar_config.dart';
 import 'f013_end_drawer_view_model.dart';
 import 'f025_common_widgets.dart';
 
@@ -27,6 +29,10 @@ class EndDrawerPage extends HookConsumerWidget {
     final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
     final endDrawerNotifier = ref.watch(endDrawerPageNotifierProvider.notifier);
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
+    // final calendarConfigState = ref.watch(calendarConfigNotifierProvider);
+    final calendarConfigNotifier = ref.watch(calendarConfigNotifierProvider
+        .notifier);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     useEffect(() {
       endDrawerNotifier.initState();
@@ -102,7 +108,13 @@ class EndDrawerPage extends HookConsumerWidget {
                         color: weekdayList[i].titleColor,
                         backgroundColor: colorConfig.cardColor,
                         onPressed: () async {
-                          
+                          await calendarConfigNotifier
+                              .switchCalendarHolidaySunday(i);
+                          await endDrawerNotifier.updateWeekdayList();
+                          await endDrawerNotifier.updateState();
+                          await calendarNotifier.updateCalendar(
+                              dataExclusion: true);
+                          await calendarNotifier.updateState();
                         }
                     ),
                   }

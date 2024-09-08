@@ -6,6 +6,7 @@ import 'package:scal/f017_design_config.dart';
 
 import 'f002_home_view_model.dart';
 import 'f007_calendar_repository.dart';
+import 'f008_calendar_config.dart';
 import 'f016_calendar_utils.dart';
 import 'f021_event_detail_view_model.dart';
 
@@ -507,30 +508,40 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   List<WeekdayDisplay> createWeekdayList() {
+    const titleList = ['日', '月', '火', '水', '木', '金', '土'];
+    var titleColors = holidayTitleColors();
+    List<WeekdayDisplay> weekdayDisplayList = [];
+    for(int i=0; i<titleList.length; i++) {
+      var title = titleList[i];
+      var titleColor = titleColors[i];
+      weekdayDisplayList.add(WeekdayDisplay(title: title,
+          titleColor: titleColor));
+    }
+    return weekdayDisplayList;
+  }
+
+  List<Color> holidayTitleColors() {
     var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
         .normalTextColor;
-    return [
-      WeekdayDisplay(title: '日',
-          titleColor: Colors.pink),
-      WeekdayDisplay(title: '月',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '火',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '水',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '木',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '金',
-          titleColor: normalTextColor),
-      WeekdayDisplay(title: '土',
-          titleColor: Colors.blueAccent),
-    ];
+    final calendarConfig = ref.read(calendarConfigNotifierProvider);
+    var holidayList = calendarConfig.calendarHolidayList;
+
+    var titleColors = holidayList.map((holiday) {
+      switch(holiday) {
+        case CalendarHoliday.none:
+          return normalTextColor;
+        case CalendarHoliday.red:
+          return Colors.pink;
+        case CalendarHoliday.blue:
+          return Colors.blueAccent;
+        case CalendarHoliday.brown:
+          return Colors.brown;
+      }
+    }).toList();
+    return titleColors;
   }
 
   List<List<DayDisplay>> createDayLists(DateTime basisDate, int addingMonth) {
-    var normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
-        .normalTextColor;
-
     const columnNum = CalendarPageState.weekdayPartColNum;
 
     DateTime prevMonth = DateTime(basisDate.year, basisDate.month
@@ -547,6 +558,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         DateTime(prevMonth.year, prevMonth.month + i, 1)
       }
     ];
+
+    var titleColors = holidayTitleColors();
 
     List<List<DayDisplay>> list = [];
     for (int i=0; i < 3; i++) {
@@ -568,9 +581,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             || currentDay.month != months[i].month && j % columnNum != 0; j++,
         currentDay = currentDay.add(const Duration(days: 1))) ... {
           DayDisplay(id: currentDay, title: currentDay.day.toString(),
-              titleColor: j % columnNum == 0 ? Colors.pink
-                  : j % columnNum == columnNum - 1
-                  ? Colors.blueAccent : normalTextColor, eventList: [],
+              titleColor: titleColors[j % columnNum], eventList: [],
               today: currentDay == now)
         }
       ]);
@@ -578,6 +589,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
     return list;
   }
+
+
 
   Map<String, Event> createEventIdEventMap(List<Event> events) {
     Map<String, Event> eventsMap = {};
@@ -687,11 +700,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<DayAndWeekdayDisplay> createDayAndWeekdayList(DateTime selectionDay) {
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
-    final normalTextColor = ref.read(designConfigNotifierProvider)
-        .colorConfig!.normalTextColor;
 
     DateTime day = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day - selectionDay.weekday % weekdayRowNum, 0);
+
+    var titleColors = holidayTitleColors();
 
     List<DayAndWeekdayDisplay> dayAndWeekdayList = [];
     for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
@@ -701,9 +714,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           day.year, day.month, day.day + rowIndex);
       dayAndWeekdayList.add(DayAndWeekdayDisplay(
           dayAndWeekTitle: DateFormat('M/d\n(E)', 'ja').format(currentDay),
-          dayAndWeekTitleColor: rowIndex % weekdayRowNum == 0 ? Colors.pink
-              : rowIndex % weekdayRowNum == weekdayRowNum - 1
-              ? Colors.blueAccent : normalTextColor,
+          dayAndWeekTitleColor: titleColors[rowIndex % weekdayRowNum],
           today: currentDay == now
       ));
     }
@@ -713,8 +724,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<HourDisplay> createHourList(DateTime selectionDay) {
     const timeColNum = CalendarPageState.timeColNum;
-    final normalTextColor = ref.read(designConfigNotifierProvider).colorConfig!
-        .normalTextColor;
 
     var timeInterval = 24 ~/ timeColNum;
     const weekdayRowNum = CalendarPageState.hoursPartRowNum;
@@ -722,6 +731,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     DateTime week = DateTime(selectionDay.year, selectionDay.month,
         selectionDay.day - selectionDay.weekday % weekdayRowNum, 0);
 
+    var titleColors = holidayTitleColors();
     List<HourDisplay> wholeTimeList = [];
     for (int rowIndex = 0; rowIndex < weekdayRowNum; rowIndex++) {
       for (int colIndex = 0; colIndex < timeColNum + 1; colIndex++) {
@@ -739,9 +749,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           title = '終日';
         }
 
-        var titleColor = rowIndex % weekdayRowNum == 0 ? Colors.pink
-            : rowIndex % weekdayRowNum == weekdayRowNum - 1
-            ? Colors.blueAccent : normalTextColor;
+        var titleColor = titleColors[rowIndex % weekdayRowNum];
 
         wholeTimeList.add(
             HourDisplay(
