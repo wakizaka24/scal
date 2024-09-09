@@ -745,8 +745,6 @@ class EventListPart extends HookConsumerWidget {
   }
 }
 
-
-
 class EventPart extends StatefulHookConsumerWidget {
   final double height;
   final int index;
@@ -964,7 +962,8 @@ class _EventPartState extends ConsumerState<EventPart>
                   foregroundColor: colorConfig.accentColor,
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
-                    var eventId = await calendarNotifier.moveIndexEvent(index);
+                    var eventId = (await calendarNotifier.getSelectionEvent())!
+                        .eventId;
                     await calendarNotifier.editingCancel(index);
                     await calendarNotifier.updateEventList();
                     if (eventId != null) {

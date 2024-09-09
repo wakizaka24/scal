@@ -892,7 +892,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       event.end = deletionTZDate;
     }
 
-    return await calendarRepo.createOrUpdateEvent(event);
+    return await calendarRepo.createOrUpdateEvent(event) != null;
   }
 
   fixedEvent(int index) async {
@@ -936,7 +936,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     Event event = state.eventList[index].event!;
 
     var editingEvent = copyEvent(event);
-    return await calendarRepo.createOrUpdateEvent(editingEvent);
+    return await calendarRepo.createOrUpdateEvent(editingEvent) != null;
   }
 
   Future<String?> moveIndexEvent(int index, {int hour = 0}) async {
@@ -976,9 +976,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           selectionDate.add(repeatEndPeriod));
     }
 
-    var success = await calendarRepo.createOrUpdateEvent(event);
-
-    return success ? event.eventId : null;
+    return await calendarRepo.createOrUpdateEvent(event);
   }
 
   Event copyEvent(Event event) {

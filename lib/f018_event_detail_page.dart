@@ -616,7 +616,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   onPressed: !eventDetailState.saveButtonEnabled! ? null
                       : () async {
                     await onCommonPressed();
-                    if (!(await eventDetailNotifier.saveEvent())) {
+                    var eventId = await eventDetailNotifier.saveEvent();
+                    if (eventId == null) {
                       if (context.mounted) {
                         await UIUtils().showMessageDialog(context, ref,
                             'カレンダー更新', 'カレンダー更新に失敗しました');
@@ -625,25 +626,9 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                       await calendarNotifier.moveCalendar(
                           eventDetailState.startDate!,
                           allDay: eventDetailState.allDay!);
-                      Set<String> eventIdSet = {};
-                      final event = eventDetailState.event;
-                      if (event == null) {
-                        eventIdSet = Set.from(calendarState.eventList.map(
-                                (event) => event.eventId));
-                      }
                       await calendarNotifier.updateCalendar();
-                      if (event != null) {
-                        await calendarNotifier.updateEditingEvent(
-                            event.eventId!);
-                        await calendarNotifier.selectEventList(
-                            event.eventId!);
-                      } else {
-                        var event = calendarState.eventList
-                            .where((event)=>!eventIdSet.contains(
-                            event.eventId)).first;
-                        await calendarNotifier.selectEventList(
-                            event.eventId);
-                      }
+                      await calendarNotifier.updateEditingEvent(eventId);
+                      await calendarNotifier.selectEventList(eventId);
                       await homeNotifier.setUICover(false);
                       await homeNotifier.setUICoverWidget(null);
                       await homeNotifier.updateState();

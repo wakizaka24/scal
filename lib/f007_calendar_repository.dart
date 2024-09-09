@@ -113,9 +113,9 @@ class CalendarRepository {
     return TZDateTime.from(date, _location);
   }
 
-  Future<bool> createOrUpdateEvent(Event event) async {
+  Future<String?> createOrUpdateEvent(Event event) async {
     var result = await _plugin.createOrUpdateEvent(event);
-    return result?.isSuccess ?? false;
+    return result?.isSuccess ?? false ? result?.data : null;
   }
 
   Future<bool> deleteEvent(String calendarId, String eventId) async {

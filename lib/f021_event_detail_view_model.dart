@@ -397,7 +397,7 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
     state.repeatingEnd = repeatingEnd;
   }
 
-  Future<bool> saveEvent() async {
+  Future<String?> saveEvent() async {
     var event = state.event ?? Event(state.calendar!.id);
 
     event.title = state.title;
