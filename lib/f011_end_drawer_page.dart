@@ -13,7 +13,10 @@ import 'f013_end_drawer_view_model.dart';
 import 'f025_common_widgets.dart';
 
 enum EndDrawerMenuType {
-  softwareLicense(title: 'ソフトウェアライセンス');
+  softwareLicense(title: 'ソフトウェアライセンス'),
+  privacyPolicyAndTermsOfUse(title: 'プライバシーポリシー/利用規約'),
+  initialSettingsMethod(title: '初期設定方法'),
+  ;
   final String title;
   const EndDrawerMenuType({required this.title});
 }
@@ -51,8 +54,7 @@ class EndDrawerPage extends HookConsumerWidget {
               applicationName: packageInfo.appName,
               applicationVersion: packageInfo.version
           )
-      )
-      );
+      ));
 
       await Future.delayed(const Duration(milliseconds: 100));
 
@@ -76,14 +78,18 @@ class EndDrawerPage extends HookConsumerWidget {
           Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
               child: CWTextButton(
-              title: EndDrawerMenuType.values[i].title,
-              onPressed: () async {
-                switch (EndDrawerMenuType.values[i]) {
-                  case EndDrawerMenuType.softwareLicense:
-                    await softwareLicenseOnPress();
-                }
-              }
-            )
+                  title: EndDrawerMenuType.values[i].title,
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                  onPressed: () async {
+                    switch (EndDrawerMenuType.values[i]) {
+                      case EndDrawerMenuType.softwareLicense:
+                        await softwareLicenseOnPress();
+                      case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
+                        break;
+                      case EndDrawerMenuType.initialSettingsMethod:
+                        break;
+                    }
+                  })
           )
         },
 

@@ -288,14 +288,16 @@ class CWElevatedButton extends HookConsumerWidget {
 
 class CWTextButton extends HookConsumerWidget {
   final String title;
-  final VoidCallback onPressed;
   final double fontSize;
+  final EdgeInsetsGeometry padding;
+  final VoidCallback onPressed;
 
   const CWTextButton({
     super.key,
     required this.title,
+    this.fontSize = 15,
+    this.padding = EdgeInsets.zero,
     required this.onPressed,
-    this.fontSize = 15
   });
 
   @override
@@ -308,7 +310,9 @@ class CWTextButton extends HookConsumerWidget {
       style: TextButton.styleFrom(
         foregroundColor: normalTextColor,
         textStyle: TextStyle(fontSize: fontSize),
-        padding: const EdgeInsets.all(0),
+        minimumSize: Size.zero,
+        padding: padding,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: Text(title),
     );
