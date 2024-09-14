@@ -175,7 +175,9 @@ class _BottomSafeAreaView extends ConsumerState<BottomSafeAreaView> {
           keyboardMovingCompletion.value = false;
           // debugPrint('keyboard stating to move $keyboardHeight');
         } else {
-          keyboardMovingCount.value++;
+          try {
+            keyboardMovingCount.value++;
+          } catch(_) {}
           // debugPrint('keyboard moving $keyboardHeight');
         }
       });

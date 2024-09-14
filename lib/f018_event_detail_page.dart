@@ -553,6 +553,8 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
               const SizedBox(height: 3),
 
+              // const SizedBox(height: 300),
+
               CWLeftTitle(
                   title: 'メモ',
                   highlight: eventDetailState.highlightItem

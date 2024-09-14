@@ -314,3 +314,21 @@ class CWTextButton extends HookConsumerWidget {
     );
   }
 }
+
+class CWCell extends HookConsumerWidget {
+  final String? title;
+  final Widget? child;
+
+  const CWCell({
+    super.key,
+    this.title,
+    this.child
+  });
+
+
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container();
+  }
+}

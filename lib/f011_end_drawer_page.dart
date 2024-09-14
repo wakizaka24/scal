@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
@@ -19,9 +20,11 @@ enum EndDrawerMenuType {
 
 class EndDrawerPage extends HookConsumerWidget {
   final double unsafeAreaTopHeight;
+  final double unsafeAreaBottomHeight;
 
   const EndDrawerPage({super.key,
-    required this.unsafeAreaTopHeight
+    required this.unsafeAreaTopHeight,
+    required this.unsafeAreaBottomHeight
   });
 
   @override
@@ -118,11 +121,103 @@ class EndDrawerPage extends HookConsumerWidget {
                         }
                     ),
                   }
-                ])
+                ]),
+                const SizedBox(height: 16),
+                Text('カレンダー表示設定',
+                    style: TextStyle(
+                        height: 1,
+                        fontSize: eventListFontSize1,
+                        fontWeight: eventListFontWeight1,
+                        color: colorConfig.normalTextColor
+                    )
+                ),
+                const SizedBox(height: 8),
+                Text('表示切り替え',
+                    style: TextStyle(
+                        height: 1,
+                        fontSize: eventListFontSize1,
+                        fontWeight: eventListFontWeight1,
+                        color: colorConfig.normalTextColor
+                    )
+                ),
+                const SizedBox(height: 2),
+                CupertinoSwitch(
+                  value: false,
+                  onChanged: (value) async {
+                  },
+                ),
+                const SizedBox(height: 2),
+
+                Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: colorConfig.borderColor,
+                          width: normalBoarderWidth),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(children: [
+                      Expanded(child:
+                        Container(
+                            // width: 80,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: colorConfig
+                                  .borderColor,
+                                  width: normalBoarderWidth),
+                            ),
+                            alignment: Alignment.center,
+                            child: Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: Text('アカウント',
+                                    style: TextStyle(
+                                        height: 1,
+                                        fontSize: eventListFontSize1,
+                                        fontWeight: eventListFontWeight1,
+                                        color: colorConfig.normalTextColor
+                                    ),
+                                    strutStyle: const StrutStyle(
+                                        height: 1.5,
+                                        fontSize: eventListFontSize1)
+                                )
+                            )
+                        )
+                      ),
+                      Expanded(child:
+                        Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: colorConfig
+                                  .borderColor,
+                                  width: normalBoarderWidth),
+                            ),
+                            alignment: Alignment.center,
+                            child: Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: Text('カレンダー',
+                                    style: TextStyle(
+                                        height: 1,
+                                        fontSize: eventListFontSize1,
+                                        fontWeight: eventListFontWeight1,
+                                        color: colorConfig.normalTextColor
+                                    ),
+                                    strutStyle: const StrutStyle(
+                                        height: 1.5,
+                                        fontSize: eventListFontSize1)
+
+                                )
+                            )
+                        )
+                      )
+                    ])
+                )
+
+
+
+
+
               ]
           ),
 
-        )
+        ),
+        SizedBox(height: eventListBottomSafeArea
+            + unsafeAreaBottomHeight)
       ],
     );
 
@@ -144,9 +239,7 @@ class EndDrawerPage extends HookConsumerWidget {
                     },
                   )
               ),
-              Expanded(
-                  child: menuList
-              ),
+              Expanded(child: menuList),
             ]
         )
     );
