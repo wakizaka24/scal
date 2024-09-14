@@ -61,7 +61,7 @@ class HomePage extends HookConsumerWidget {
     // アンセーフエリア下の高さ
     // キーボード表示時セーフエリアが小さくなるので最大の値を使用する。
     double bottomHeight = MediaQuery.of(context).padding.bottom;
-    var navigationBarGestureMode = Platform.isAndroid && MediaQuery.of(context)
+    var navigationBarGestureMode = Platform.isIOS || MediaQuery.of(context)
         .systemGestureInsets.left > 0;
     // セーフエリア下がない場合は15以上確保する。
     if (bottomHeight < 15) {
