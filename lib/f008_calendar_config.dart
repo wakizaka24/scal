@@ -12,13 +12,14 @@ enum CalendarHoliday {
   const CalendarHoliday(this.configValue);
 }
 
-enum CalendarSwitchMode implements SharedPreferenceStringValue {
-  off('off'),
-  setting1('setting1'),
-  setting2('setting2');
+enum CalendarDisplayMode implements SharedPreferenceStringValue {
+  display('display'), // 表示
+  hidden('hidden'), // 隠し表示
+  both('both'), // 両方表示
+  invisible('invisible'); // 非表示
   @override
   final String configValue;
-  const CalendarSwitchMode(this.configValue);
+  const CalendarDisplayMode(this.configValue);
 }
 
 enum CalendarBaseConfig {
@@ -34,7 +35,7 @@ enum CalendarHolidayConfig {
 
 class CalendarConfigState {
   List<CalendarHoliday> calendarHolidayList = [];
-  CalendarSwitchMode? calendarSwitchMode;
+  CalendarDisplayMode? calendarDisplayMode;
   String? calendar1EditingCalendarId;
   List<String> calendar1NonDisplayCalendarIds = [];
   List<String> calendar1NotEditableCalendarIds = [];
@@ -47,7 +48,7 @@ class CalendarConfigState {
   static CalendarConfigState copy(CalendarConfigState state) {
     var nState = CalendarConfigState();
     nState.calendarHolidayList = state.calendarHolidayList;
-    nState.calendarSwitchMode = state.calendarSwitchMode;
+    nState.calendarDisplayMode = state.calendarDisplayMode;
     nState.calendar1EditingCalendarId = state.calendar1EditingCalendarId;
     nState.calendar1NonDisplayCalendarIds = state
         .calendar1NonDisplayCalendarIds;
@@ -70,7 +71,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
   CalendarConfigNotifier(this.ref, CalendarConfigState state) : super(state);
   initState(
       String? calendarHolidaySundayConfig,
-      CalendarSwitchMode? calendarSwitchMode,
+      CalendarDisplayMode? calendarSwitchMode,
       String? calendar1EditingCalendarId,
       String? calendar1NonDisplayCalendarIds,
       String? calendar1NotEditableCalendarIds,
@@ -87,7 +88,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       CalendarHoliday.none, CalendarHoliday.none,
       CalendarHoliday.none, CalendarHoliday.none,
       CalendarHoliday.blue];
-    state.calendarSwitchMode = calendarSwitchMode;
+    state.calendarDisplayMode = calendarSwitchMode;
     state.calendar1EditingCalendarId = calendar1EditingCalendarId;
     state.calendar1NonDisplayCalendarIds = calendar1NonDisplayCalendarIds
       ?.split(calendarConfigDelimiter).toList() ?? [];

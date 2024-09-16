@@ -51,9 +51,9 @@ void main() async {
   var calendarHolidaySundayConfig = await SharedPreferencesRepository()
       .getString(SharedPreferenceStringKey.calendarHolidaySundayConfig);
 
-  var calendarSwitchMode = await SharedPreferencesRepository()
-      .getStringEnum(SharedPreferenceStringKey.calendarSwitchMode,
-      CalendarSwitchMode.values);
+  var calendarDisplayMode = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceStringKey.calendarDisplayMode,
+      CalendarDisplayMode.values);
 
   var calendar1EditingCalendarId = await SharedPreferencesRepository()
       .getString(SharedPreferenceStringKey.calendar1EditingCalendarId);
@@ -84,7 +84,7 @@ void main() async {
     lightColorConfig: lightColorConfig,
     darkColorConfig: darkColorConfig,
     calendarHolidaySundayConfig: calendarHolidaySundayConfig,
-    calendarSwitchMode: calendarSwitchMode,
+    calendarDisplayMode: calendarDisplayMode,
     calendar1EditingCalendarId: calendar1EditingCalendarId,
     calendar1NonDisplayCalendarIds: calendar1NonDisplayCalendarIds,
     calendar1NotEditableCalendarIds: calendar1NotEditableCalendarIds,
@@ -103,7 +103,7 @@ class SCalApp extends StatelessWidget {
   final ColorConfig? lightColorConfig;
   final ColorConfig? darkColorConfig;
   final String? calendarHolidaySundayConfig;
-  final CalendarSwitchMode? calendarSwitchMode;
+  final CalendarDisplayMode? calendarDisplayMode;
   final String? calendar1EditingCalendarId;
   final String? calendar1NonDisplayCalendarIds;
   final String? calendar1NotEditableCalendarIds;
@@ -119,7 +119,7 @@ class SCalApp extends StatelessWidget {
     required this.lightColorConfig,
     required this.darkColorConfig,
     required this.calendarHolidaySundayConfig,
-    required this.calendarSwitchMode,
+    required this.calendarDisplayMode,
     required this.calendar1EditingCalendarId,
     required this.calendar1NonDisplayCalendarIds,
     required this.calendar1NotEditableCalendarIds,
@@ -162,7 +162,7 @@ class SCalApp extends StatelessWidget {
                     editingBrightnessMode, brightness, editingLightColorConfig,
                     editingDarkColorConfig);
                 calendarConfigNotifier.initState(
-                    calendarHolidaySundayConfig, calendarSwitchMode,
+                    calendarHolidaySundayConfig, calendarDisplayMode,
                     calendar1EditingCalendarId, calendar1NonDisplayCalendarIds,
                     calendar1NotEditableCalendarIds,
                     calendar1HolidayCalendarIds, calendar2EditingCalendarId,

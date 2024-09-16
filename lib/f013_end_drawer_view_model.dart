@@ -14,6 +14,21 @@ class WeekdayDisplay {
   });
 }
 
+class CalendarDisplayDisplay {
+  String account;
+  String calendar;
+
+
+  CalendarDisplayDisplay({
+    required this.account,
+    required this.calendar,
+    // required this.,
+    // required this.,
+    // required this.,
+    // required this.
+  });
+}
+
 class EndDrawerPageState {
   List<WeekdayDisplay> weekdayList = [];
 

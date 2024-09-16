@@ -5,7 +5,7 @@ enum SharedPreferenceStringKey {
   lightColorConfig('lightColorConfig'),
   darkColorConfig('darkColorConfig'),
   calendarHolidaySundayConfig('calendarHolidaySundayConfig'),
-  calendarSwitchMode('calendarSwitchMode'),
+  calendarDisplayMode('calendarDisplayMode'),
   calendar1EditingCalendarId('calendar1EditingCalendarId'),
   calendar1NonDisplayCalendarIds('calendar1NonDisplayCalendarIds'),
   calendar1NotEditableCalendarIds('calendar1NotEditableCalendarIds'),

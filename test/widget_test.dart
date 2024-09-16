@@ -30,9 +30,9 @@ void main() {
     var calendarHolidaySundayConfig = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendarHolidaySundayConfig);
 
-    var calendarSwitchMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.calendarSwitchMode,
-        CalendarSwitchMode.values);
+    var calendarDisplayMode = await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceStringKey.calendarDisplayMode,
+        CalendarDisplayMode.values);
 
     var calendar1EditingCalendarId = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendar1EditingCalendarId);
@@ -64,7 +64,7 @@ void main() {
       lightColorConfig: lightColorConfig,
       darkColorConfig: darkColorConfig,
       calendarHolidaySundayConfig: calendarHolidaySundayConfig,
-      calendarSwitchMode: calendarSwitchMode,
+      calendarDisplayMode: calendarDisplayMode,
       calendar1EditingCalendarId: calendar1EditingCalendarId,
       calendar1NonDisplayCalendarIds: calendar1NonDisplayCalendarIds,
       calendar1NotEditableCalendarIds: calendar1NotEditableCalendarIds,
