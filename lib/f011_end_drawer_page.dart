@@ -97,7 +97,7 @@ class EndDrawerPage extends HookConsumerWidget {
           children: [
             const SizedBox(height: 3),
             CWTextButton(
-                title: '表示',
+                title: '両方表示', // 表示 or 隠し表示 or 両方表示 or 非表示
                 fontSize: drawerSettingItemFontSize,
                 color: colorConfig.normalTextColor,
                 padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
@@ -199,24 +199,12 @@ class EndDrawerPage extends HookConsumerWidget {
                   }
                 ]),
                 const SizedBox(height: 15),
-                CWText('カレンダー表示設定(設定1)',
+                CWText('カレンダー表示設定',
                     fontSize: drawerSettingTitleFontSize,
                     fontWeight: eventListFontWeight1,
                     color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),
-                // CWText('表示切り替え',
-                //     fontSize: drawerSettingTitleFontSize,
-                //     fontWeight: eventListFontWeight1,
-                //     color: colorConfig.normalTextColor
-                // ),
-                // const SizedBox(height: 3),
-                // CupertinoSwitch(
-                //   value: false,
-                //   onChanged: (value) async {
-                //   },
-                // ),
-                // const SizedBox(height: 3),
 
                 CWCell(
                     borderColor: colorConfig.borderColor,
