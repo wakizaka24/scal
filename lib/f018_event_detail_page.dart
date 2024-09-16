@@ -36,7 +36,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
     var normalTextColor = colorConfig.normalTextColor;
     // final homeState = ref.watch(homePageNotifierProvider);
     final homeNotifier = ref.watch(homePageNotifierProvider.notifier);
-    final calendarState = ref.watch(calendarPageNotifierProvider);
+    // final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider
         .notifier);
 

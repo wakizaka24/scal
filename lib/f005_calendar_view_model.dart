@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -371,7 +373,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var page = state.monthCalendarController.page!.toInt() + addingMonth;
 
     var ms = addingMonth.abs() * 100;
-    if (ms <= 2400) {
+    if (Platform.isIOS && ms <= 2400) {
       await state.monthCalendarController.animateToPage(
       page, duration: Duration(milliseconds: ms),
       curve: Curves.linear);
