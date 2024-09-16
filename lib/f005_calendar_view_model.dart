@@ -366,8 +366,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
 
       await state.calendarSwitchingController
-          .animateToPage(0, duration: Duration(microseconds: animation
-          ? 150 * 1000 : 1), curve: Curves.easeIn);
+          .animateToPage(0, duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn);
     }
 
     if (await moveToday()) {
