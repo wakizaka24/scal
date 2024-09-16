@@ -156,6 +156,7 @@ class CalendarPageState {
   // Data-Month Calendar/Week Calendar
   bool initialized = false;
   late DateTime now;
+  bool preEventDataLoading = false;
   Map<String, Calendar> calendarMap = {};
   List<Event> calendarEvents = [];
   Map<String, Event> eventIdEventMap = {};
@@ -206,6 +207,7 @@ class CalendarPageState {
     // Data-Month Calendar/Week Calendar
     nState.initialized = state.initialized;
     nState.now = state.now;
+    nState.preEventDataLoading = state.preEventDataLoading;
     nState.calendarMap = state.calendarMap;
     nState.calendarEvents = state.calendarEvents;
     nState.eventIdEventMap = state.eventIdEventMap;
@@ -337,6 +339,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       return false;
     }
 
+    var basisDate = state.basisMonthDate;
+    var calendarMonth = basisDate.year * 12 + basisDate.month
+        + state.addingMonth;
+    var destMonth = distDateTime.year * 12 + distDateTime.month;
+
+    var addingMonth = destMonth - calendarMonth;
+    var ms = addingMonth.abs() * 100;
+    var animation = Platform.isIOS && ms <= 2400;
+
     var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
     if (state.calendarSwitchingIndex != 0) {
       var hourPartIndex = state.hours.indexWhere((hour) {
@@ -355,31 +366,25 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       }
 
       await state.calendarSwitchingController
-          .animateToPage(0, duration: const Duration(
-          milliseconds: 150), curve: Curves.easeIn);
+          .animateToPage(0, duration: Duration(microseconds: animation
+          ? 150 * 1000 : 1), curve: Curves.easeIn);
     }
 
     if (await moveToday()) {
       return;
     }
 
-    var basisDate = state.basisMonthDate;
-    var calendarMonth = basisDate.year * 12 + basisDate.month
-    + state.addingMonth;
-    var destMonth = distDateTime.year * 12 + distDateTime.month;
-
-    var addingMonth = destMonth - calendarMonth;
-
     var page = state.monthCalendarController.page!.toInt() + addingMonth;
 
-    var ms = addingMonth.abs() * 100;
-    if (Platform.isIOS && ms <= 2400) {
-      await state.monthCalendarController.animateToPage(
-      page, duration: Duration(milliseconds: ms),
-      curve: Curves.linear);
-    } else {
-      state.monthCalendarController.jumpToPage(page);
+    if (!animation) {
+      if (Platform.isIOS) {
+        await updateMonthCalendarState(preLoadingAddingMonth: addingMonth);
+        state.preEventDataLoading = true;
+      }
     }
+    await state.monthCalendarController.animateToPage(
+        page, duration: Duration(microseconds: animation ? ms * 1000 : 1),
+        curve: Curves.linear);
 
     await moveToday();
   }
@@ -454,7 +459,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var updateEvent = await createEventDisplay(event);
     eventDisplay.head = updateEvent.head;
     eventDisplay.title = updateEvent.title;
-    eventDisplay.fixedTitle = DateFormat.yMd('ja').format(eventDisplay.event!.start!);
+    eventDisplay.fixedTitle = DateFormat.yMd('ja').format(eventDisplay.event!
+        .start!);
   }
 
   selectEventList(String eventId) async {
@@ -477,29 +483,38 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await updateEventList();
   }
 
-  updateMonthCalendarState({bool dataExclusion = false}) async {
-    state.weekdayList = createWeekdayList();
-    state.dayLists = createDayLists(state.basisMonthDate, state.addingMonth);
+  updateMonthCalendarState({bool dataExclusion = false,
+    int preLoadingAddingMonth = 0}) async {
+    if (!state.preEventDataLoading) {
+      state.weekdayList = createWeekdayList();
+      state.dayLists = createDayLists(state.basisMonthDate,
+          state.addingMonth + preLoadingAddingMonth);
 
-    if (!dataExclusion) {
-      var calendars = await getCalendars();
-      state.calendarMap = convertCalendarMap(calendars);
-
-      var startDate = state.dayLists.first.first.id;
-      var endDate = state.dayLists.last.last.id;
-      state.calendarEvents = await getEvents(calendars, startDate,
-          endDate);
-      state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
-      state.eventIdStartDateMap =
-          createEventIdStartDateMap(state.calendarEvents);
-      state.dayEventsMap = createDayEventsMap(state.calendarEvents);
-
-      state.allDayEventsMap = createAllDayEventsMap(state.calendarEvents);
-      state.hourEventsMap = createHourEventsMap(state.calendarEvents);
+      if (!dataExclusion) {
+        await loadMonthCalendarData();
+      }
     }
+    state.preEventDataLoading = false;
 
     state.dayLists = addEventsForMonthCalendar(state.dayLists,
         state.dayEventsMap, state.calendarMap);
+  }
+
+  loadMonthCalendarData() async {
+    var calendars = await getCalendars();
+    state.calendarMap = convertCalendarMap(calendars);
+
+    var startDate = state.dayLists.first.first.id;
+    var endDate = state.dayLists.last.last.id;
+    state.calendarEvents = await getEvents(calendars, startDate,
+        endDate);
+    state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
+    state.eventIdStartDateMap =
+        createEventIdStartDateMap(state.calendarEvents);
+    state.dayEventsMap = createDayEventsMap(state.calendarEvents);
+
+    state.allDayEventsMap = createAllDayEventsMap(state.calendarEvents);
+    state.hourEventsMap = createHourEventsMap(state.calendarEvents);
   }
 
   setDayEventList(DateTime date, Map<DateTime, List<Event>> eventsMap) async {
