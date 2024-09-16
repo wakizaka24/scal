@@ -34,7 +34,10 @@ class CalendarUtils {
     return allHours;
   }
 
-  String convertCharWrapString(String str) {
+  String? convertCharWrapString(String? str) {
+    if (str == null) {
+      return null;
+    }
     // if (str.contains('')) {
     //   var _ = 0;
     // }

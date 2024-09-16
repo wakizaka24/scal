@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'f005_calendar_view_model.dart';
 import 'f008_calendar_config.dart';
 import 'f013_end_drawer_view_model.dart';
+import 'f016_calendar_utils.dart';
 import 'f025_common_widgets.dart';
 
 enum EndDrawerMenuType {
@@ -69,47 +70,116 @@ class EndDrawerPage extends HookConsumerWidget {
       ));
     }
 
+    double cellHeaderHeight = 24;
+    double cellSettingWidth = 62;
+    final createCell = useCallback(({String? title, double? width,
+      double? height = 80, Widget? child}) {
+      Widget? widget = child;
+      widget ??= Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: CWText(CalendarUtils().convertCharWrapString(title) ?? ' ',
+              structHeight: 1.3,
+              fontSize: drawerSettingItemFontSize,
+              color: colorConfig.normalTextColor
+          )
+      );
+      return SizedBox(
+          width: width, height: height,
+          child: CWCell(
+              borderColor: colorConfig.borderColor,
+              child: widget
+          )
+      );
+    });
+
+    final createDisplayButtonColumn = useCallback((int i) {
+      return ListView(physics: const NeverScrollableScrollPhysics(),
+          children: [
+            const SizedBox(height: 3),
+            CWTextButton(
+                title: '表示',
+                fontSize: drawerSettingItemFontSize,
+                color: colorConfig.normalTextColor,
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                onPressed: () async {
+                }),
+            CWTextButton(
+                title: '編集不可',
+                fontSize: drawerSettingItemFontSize,
+                color: colorConfig.normalTextColor,
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                onPressed: null),
+            CWTextButton(
+                title: '使用',
+                fontSize: drawerSettingItemFontSize,
+                color: colorConfig.normalTextColor,
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                onPressed: () async {
+                }),
+            const SizedBox(height: 3),
+          ]);
+    });
+
+    final createHolidayButtonColumn = useCallback((int i) {
+      return ListView(physics: const NeverScrollableScrollPhysics(),
+          children: [
+            const SizedBox(height: 3),
+            CWTextButton(
+                title: '非祝日表示',
+                fontSize: drawerSettingItemFontSize,
+                color: colorConfig.normalTextColor,
+                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                onPressed: () async {
+                }),
+            const SizedBox(height: 3),
+          ]);
+    });
+
     const double weekButtonWidth = 35;
     var weekdayList = endDrawerState.weekdayList;
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
       children: [
         for (int i=0; i < EndDrawerMenuType.values.length; i++) ... {
-          Padding(
+          CWTextButton(
+              title: EndDrawerMenuType.values[i].title,
+              fontSize: drawerMenuFontSize,
+              color: colorConfig.normalTextColor,
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-              child: CWTextButton(
-                  title: EndDrawerMenuType.values[i].title,
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                  onPressed: () async {
-                    switch (EndDrawerMenuType.values[i]) {
-                      case EndDrawerMenuType.softwareLicense:
-                        await softwareLicenseOnPress();
-                      case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
-                        break;
-                      case EndDrawerMenuType.initialSettingsMethod:
-                        break;
-                    }
-                  })
-          )
+              textPadding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              onPressed: () async {
+                switch (EndDrawerMenuType.values[i]) {
+                  case EndDrawerMenuType.softwareLicense:
+                    await softwareLicenseOnPress();
+                  case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
+                    break;
+                  case EndDrawerMenuType.initialSettingsMethod:
+                    break;
+                }
+              }),
         },
 
         Padding(padding: const EdgeInsets.all(8),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('祝日曜日設定',
-                    style: TextStyle(
-                        height: 1,
-                        fontSize: eventListFontSize1,
-                        fontWeight: eventListFontWeight1,
-                        color: colorConfig.normalTextColor
-                    )
+                CWText('祝日曜日設定',
+                    fontSize: drawerSettingTitleFontSize,
+                    fontWeight: eventListFontWeight1,
+                    color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),
                 Row(children: [
                   for (int i=0; i<weekdayList.length; i++) ... {
+                    if (i>0)
+                      const SizedBox(width: 3),
                     CWElevatedButton(
                         title: weekdayList[i].title,
+                        fontSize: drawerWeekButtonFontSize,
                         width: weekButtonWidth,
                         height: weekButtonWidth,
                         radius: weekButtonWidth / 2,
@@ -128,96 +198,71 @@ class EndDrawerPage extends HookConsumerWidget {
                     ),
                   }
                 ]),
-                const SizedBox(height: 16),
-                Text('カレンダー表示設定',
-                    style: TextStyle(
-                        height: 1,
-                        fontSize: eventListFontSize1,
-                        fontWeight: eventListFontWeight1,
-                        color: colorConfig.normalTextColor
-                    )
+                const SizedBox(height: 15),
+                CWText('カレンダー表示設定(設定1)',
+                    fontSize: drawerSettingTitleFontSize,
+                    fontWeight: eventListFontWeight1,
+                    color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),
-                Text('表示切り替え',
-                    style: TextStyle(
-                        height: 1,
-                        fontSize: eventListFontSize1,
-                        fontWeight: eventListFontWeight1,
-                        color: colorConfig.normalTextColor
-                    )
-                ),
-                const SizedBox(height: 2),
-                CupertinoSwitch(
-                  value: false,
-                  onChanged: (value) async {
-                  },
-                ),
-                const SizedBox(height: 2),
+                // CWText('表示切り替え',
+                //     fontSize: drawerSettingTitleFontSize,
+                //     fontWeight: eventListFontWeight1,
+                //     color: colorConfig.normalTextColor
+                // ),
+                // const SizedBox(height: 3),
+                // CupertinoSwitch(
+                //   value: false,
+                //   onChanged: (value) async {
+                //   },
+                // ),
+                // const SizedBox(height: 3),
 
-                Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: colorConfig.borderColor,
-                          width: normalBoarderWidth),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(children: [
-                      Expanded(child:
-                        Container(
-                            // width: 80,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: colorConfig
-                                  .borderColor,
-                                  width: normalBoarderWidth),
-                            ),
-                            alignment: Alignment.center,
-                            child: Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: Text('アカウント',
-                                    style: TextStyle(
-                                        height: 1,
-                                        fontSize: eventListFontSize1,
-                                        fontWeight: eventListFontWeight1,
-                                        color: colorConfig.normalTextColor
-                                    ),
-                                    strutStyle: const StrutStyle(
-                                        height: 1.5,
-                                        fontSize: eventListFontSize1)
-                                )
-                            )
-                        )
-                      ),
-                      Expanded(child:
-                        Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: colorConfig
-                                  .borderColor,
-                                  width: normalBoarderWidth),
-                            ),
-                            alignment: Alignment.center,
-                            child: Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: Text('カレンダー',
-                                    style: TextStyle(
-                                        height: 1,
-                                        fontSize: eventListFontSize1,
-                                        fontWeight: eventListFontWeight1,
-                                        color: colorConfig.normalTextColor
-                                    ),
-                                    strutStyle: const StrutStyle(
-                                        height: 1.5,
-                                        fontSize: eventListFontSize1)
-
-                                )
-                            )
-                        )
-                      )
+                CWCell(
+                    borderColor: colorConfig.borderColor,
+                    child: Column(children: [
+                      Row(children: [
+                        Expanded(child: createCell(title: 'アカウント',
+                            height: cellHeaderHeight)),
+                        Expanded(child: createCell(title: 'カレンダー',
+                            height: cellHeaderHeight)),
+                        createCell(title: '表示/編集', width: cellSettingWidth,
+                            height: cellHeaderHeight),
+                        createCell(title: '祝日', width: cellSettingWidth,
+                            height: cellHeaderHeight),
+                      ]),
+                      Row(children: [
+                        Expanded(child: createCell(
+                            title: 'wakizaka24@gmail.com')),
+                        Expanded(child: createCell(
+                            title: 'wakizaka24@gmail.com(デフォルト)')),
+                        createCell(width: cellSettingWidth,
+                            child: createDisplayButtonColumn(0)),
+                        createCell(width: cellSettingWidth,
+                            child: createHolidayButtonColumn(0)),
+                      ]),
+                      Row(children: [
+                        Expanded(child: createCell(
+                            title: 'wakizaka24@gmail.com')),
+                        Expanded(child: createCell(
+                            title: '日本の祝日')),
+                        createCell(width: cellSettingWidth,
+                            child: createDisplayButtonColumn(0)),
+                        createCell(width: cellSettingWidth,
+                            child: createHolidayButtonColumn(0)),
+                      ]),
+                      Row(children: [
+                        Expanded(child: createCell(
+                            title: 'iCloud')),
+                        Expanded(child: createCell(
+                            title: '細田4ごみ収集')),
+                        createCell(width: cellSettingWidth,
+                            child: createDisplayButtonColumn(0)),
+                        createCell(width: cellSettingWidth,
+                            child: createHolidayButtonColumn(0)),
+                      ]),
                     ])
-                )
-
-
-
-
-
+                ),
               ]
           ),
 

@@ -544,14 +544,11 @@ class WeekdayPart extends HookConsumerWidget {
               left: border),
         ),
         alignment: Alignment.center,
-        child: Text(weekday.title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              height: 1,
-              fontSize: calendarFontSize1,
-              fontWeight: calendarFontWeight1,
-              color: weekday.titleColor,
-            )
+        child: CWText(weekday.title,
+          textAlign: TextAlign.center,
+          fontSize: calendarFontSize1,
+          fontWeight: calendarFontWeight1,
+          color: weekday.titleColor,
         )
     );
   }
@@ -620,13 +617,10 @@ class DayPart extends HookConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(day.title,
-              style: TextStyle(
-                height: 1,
-                fontSize: calendarFontSize1,
-                fontWeight: calendarFontWeight1,
-                color: day.titleColor,
-              )
+          CWText(day.title,
+            fontSize: calendarFontSize1,
+            fontWeight: calendarFontWeight1,
+            color: day.titleColor,
           ),
           SizedBox(width: width, height: 1),
           Expanded(child:
@@ -638,15 +632,12 @@ class DayPart extends HookConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     for(int i = 0; i < day.eventList.length; i++) ... {
-                      Text(CalendarUtils().convertCharWrapString(
-                        day.eventList[i].title),
-                        maxLines: 1,
-                        style: TextStyle(
-                            height: 1,
-                            fontSize: calendarFontSize2,
-                            fontWeight: calendarFontWeight2,
-                            color: day.eventList[i].titleColor
-                        ),
+                      CWText(CalendarUtils().convertCharWrapString(
+                          day.eventList[i].title)!,
+                          maxLines: 1,
+                          fontSize: calendarFontSize2,
+                          fontWeight: calendarFontWeight2,
+                          color: day.eventList[i].titleColor
                       ),
                     }
                   ],
@@ -684,14 +675,11 @@ class EventListPart extends HookConsumerWidget {
                   color: designConfigState.colorConfig!.borderColor,
                   child: Row(
                     children: [
-                      Text(calendarState.eventListTitle,
-                        style: TextStyle(
-                            height: 1,
-                            fontSize: eventListFontSize1,
-                            fontWeight: eventListFontWeight1,
-                            color: designConfigState.colorConfig!
-                                .normalTextColor
-                        )
+                      CWText(calendarState.eventListTitle,
+                          fontSize: eventListFontSize1,
+                          fontWeight: eventListFontWeight1,
+                          color: designConfigState.colorConfig!
+                              .normalTextColor
                       ),
                     ],
                   )
@@ -821,27 +809,21 @@ class _EventPartState extends ConsumerState<EventPart>
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8,
                           vertical: 0),
-                      child: Text(emptyMessage,
+                      child: CWText(emptyMessage,
                           maxLines: 2,
-                          style: TextStyle(
-                            height: 1,
-                            fontSize: eventListFontSize3,
-                            fontWeight: eventListFontWeight3,
-                            color: colorConfig.normalTextColor
-                          )
+                          fontSize: eventListFontSize3,
+                          fontWeight: eventListFontWeight3,
+                          color: colorConfig.normalTextColor
                       )
                   )
                 ),
               if (event != null)
                 SizedBox(width: 45, child:
-                  Text(event.head,
+                  CWText(event.head,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                          height: 1,
-                          fontSize: eventListFontSize2,
-                          fontWeight: eventListFontWeight2,
-                          color: event.fontColor
-                      )
+                      fontSize: eventListFontSize2,
+                      fontWeight: eventListFontWeight2,
+                      color: event.fontColor
                   )
                 ),
               if (event != null)
@@ -859,14 +841,12 @@ class _EventPartState extends ConsumerState<EventPart>
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4,
                           vertical: 0),
-                      child: Text(CalendarUtils().convertCharWrapString(
-                          event.title),
-                          maxLines: 2, style: TextStyle(
-                              height: 1,
-                              fontSize: eventListFontSize3,
-                              fontWeight: eventListFontWeight3,
-                              color: event.fontColor
-                          )
+                      child: CWText(CalendarUtils().convertCharWrapString(
+                          event.title)!,
+                          maxLines: 2,
+                          fontSize: eventListFontSize3,
+                          fontWeight: eventListFontWeight3,
+                          color: event.fontColor
                       )
                   )
                 ),
@@ -1176,14 +1156,11 @@ class DayAndWeekdayPart extends HookConsumerWidget {
           ),
         ),
         alignment: Alignment.center,
-        child: Text(dayAndWeekday.dayAndWeekTitle,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              height: 1,
-              fontSize: calendarFontSize1,
-              fontWeight: calendarFontWeight1,
-              color: dayAndWeekday.dayAndWeekTitleColor,
-            )
+        child: CWText(dayAndWeekday.dayAndWeekTitle,
+          textAlign: TextAlign.center,
+          fontSize: calendarFontSize1,
+          fontWeight: calendarFontWeight1,
+          color: dayAndWeekday.dayAndWeekTitleColor,
         )
     );
   }
@@ -1310,14 +1287,11 @@ class HourPart extends HookConsumerWidget {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(hour.title,
-                  style: TextStyle(
-                  height: 1,
-                  fontSize: !hour.allDay ? calendarFontSize1
+              CWText(hour.title,
+                fontSize: !hour.allDay ? calendarFontSize1
                     : calendarFontSize1Down1,
-                  fontWeight: calendarFontWeight1,
-                  color: hour.titleColor,
-                )
+                fontWeight: calendarFontWeight1,
+                color: hour.titleColor,
               ),
               SizedBox(width: width, height: 1),
               Expanded(child:
@@ -1329,15 +1303,12 @@ class HourPart extends HookConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         for(int i = 0; i < hour.eventList.length; i++) ... {
-                          Text(CalendarUtils().convertCharWrapString(
-                              hour.eventList[i].title),
+                          CWText(CalendarUtils().convertCharWrapString(
+                              hour.eventList[i].title)!,
                             maxLines: 1,
-                            style: TextStyle(
-                                height: 1,
-                                fontSize: calendarFontSize2,
-                                fontWeight: calendarFontWeight2,
-                                color: hour.eventList[i].titleColor
-                            ),
+                            fontSize: calendarFontSize2,
+                            fontWeight: calendarFontWeight2,
+                            color: hour.eventList[i].titleColor
                           ),
                         }
                       ]

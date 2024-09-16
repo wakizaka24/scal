@@ -21,6 +21,10 @@ const double buttonFontSize = 13;
 const FontWeight buttonFontWeight = FontWeight.w300;
 const FontWeight dialogFontWeight = FontWeight.w300;
 const double eventListBottomSafeArea = 56;
+const double drawerMenuFontSize = 15;
+const double drawerWeekButtonFontSize = 13;
+const double drawerSettingTitleFontSize = 13.5;
+const double drawerSettingItemFontSize = 11;
 
 const MaterialColor originalLightPink = MaterialColor(
     _originalLightPinkPrimary,
@@ -92,7 +96,8 @@ abstract final class BackgroundColors {
 }
 
 abstract final class BorderColors {
-  static const Color gold = Color(0xCCC4B8A5);
+  // static const Color gold = Color(0xCCC4B8A5);
+  static const Color naturalTitanium = Color(0xFFBDC2C2);
   static const Color pink = Color(0xFFFFCCD4);
   static const Color indigo = Color(0xFFC4DDFF);
   static const Color darkModeGrey = Color(0xFF212121);
@@ -124,7 +129,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
       CardColors.grey, // cardColor
       Colors.black, // normalTextColor
       Colors.black54, // disabledTextColor
-      BorderColors.gold, // borderColor
+      BorderColors.naturalTitanium, // borderColor
       80, // calendarTodayBgColorAlpha
       50, // calendarLineBgColorAlpha
       135, // highlightBgColorAlpha

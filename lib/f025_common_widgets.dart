@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'f016_calendar_utils.dart';
 import 'f017_design_config.dart';
 
 // class CWx extends HookConsumerWidget {
@@ -76,14 +77,11 @@ class CWLeftTitle extends HookConsumerWidget {
           child: Row(children: [
             SizedBox(
                 width: 65,
-                child: Text(title, textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.w300,
-                        color: !highlight ? colorConfig.normalTextColor
-                            : colorConfig.disabledTextColor
-                    )
-                )
+                child: CWText(
+                    title, textAlign: TextAlign.center, fontSize: fontSize,
+                    fontWeight: FontWeight.w300,
+                    color: !highlight ? colorConfig.normalTextColor
+                        : colorConfig.disabledTextColor)
             ),
             Visibility(visible: !expanded, child: child),
             Visibility(visible: expanded, child: Expanded(child: child)),
@@ -91,6 +89,45 @@ class CWLeftTitle extends HookConsumerWidget {
                 child: SizedBox(width: rightPaddingWidth))
           ])
       ),
+    );
+  }
+}
+
+class CWText extends HookConsumerWidget {
+  final String data;
+  final int? maxLines;
+  final TextAlign? textAlign;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final Color? color;
+  final double textHeight;
+  final double structHeight;
+
+  const CWText(this.data, {
+    super.key,
+    this.maxLines,
+    this.textAlign,
+    this.fontSize,
+    this.fontWeight,
+    this.color,
+    this.textHeight = 1,
+    this.structHeight = 1
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Text(data,
+        maxLines: maxLines,
+        textAlign: textAlign,
+        style: TextStyle(
+            height: textHeight,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            color: color
+        ),
+        strutStyle: StrutStyle(
+            height: structHeight,
+            fontSize: fontSize)
     );
   }
 }
@@ -212,7 +249,7 @@ class CWIconButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var child = assetName != null ? ImageIcon(AssetImage(assetName!),
         size: assetIconSize) : Icon(icon);
-    
+
     return SizedBox(width: width, height: height,
         child: TextButton(
           onPressed: onPressed,
@@ -275,7 +312,7 @@ class CWElevatedButton extends HookConsumerWidget {
           minimumSize: Size.zero,
           padding: EdgeInsets.zero,
         ),
-        child: Text(title,
+        child: Text(CalendarUtils().convertCharWrapString(title)!,
             style: TextStyle(
                 fontWeight: buttonFontWeight,
                 color: color
@@ -289,15 +326,19 @@ class CWElevatedButton extends HookConsumerWidget {
 class CWTextButton extends HookConsumerWidget {
   final String title;
   final double fontSize;
+  final Color? color;
   final EdgeInsetsGeometry padding;
-  final VoidCallback onPressed;
+  final EdgeInsetsGeometry textPadding;
+  final VoidCallback? onPressed;
 
   const CWTextButton({
     super.key,
     required this.title,
     this.fontSize = 15,
-    this.padding = EdgeInsets.zero,
-    required this.onPressed,
+    this.color,
+    this.padding = const EdgeInsets.all(0),
+    this.textPadding = const EdgeInsets.all(6),
+    this.onPressed,
   });
 
   @override
@@ -305,34 +346,46 @@ class CWTextButton extends HookConsumerWidget {
     final normalTextColor = ref.read(designConfigNotifierProvider)
         .colorConfig!.normalTextColor;
 
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: normalTextColor,
-        textStyle: TextStyle(fontSize: fontSize),
-        minimumSize: Size.zero,
-        padding: padding,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    return Padding(
+      padding: padding,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          foregroundColor: normalTextColor,
+          textStyle: TextStyle(fontSize: fontSize),
+          minimumSize: Size.zero,
+          padding: textPadding,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(CalendarUtils().convertCharWrapString(title)!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: buttonFontWeight,
+              color: color,
+            )
+        ),
       ),
-      child: Text(title),
     );
   }
 }
 
 class CWCell extends HookConsumerWidget {
-  final String? title;
-  final Widget? child;
+  final Color borderColor;
+  final Widget child;
 
   const CWCell({
     super.key,
-    this.title,
-    this.child
+    required this.borderColor,
+    required this.child
   });
-
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container();
+    return Container(decoration: BoxDecoration(
+      border: Border.all(color: borderColor,
+          width: normalBoarderWidth)),
+      alignment: Alignment.center,
+      child: child
+    );
   }
 }
