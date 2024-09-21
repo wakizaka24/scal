@@ -771,7 +771,7 @@ class _EventPartState extends ConsumerState<EventPart>
     super.build(context);
 
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
-    final calendarState = ref.watch(calendarPageNotifierProvider);
+    // final calendarState = ref.watch(calendarPageNotifierProvider);
     final colorConfig = ref.watch(designConfigNotifierProvider)
         .colorConfig!;
 
