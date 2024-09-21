@@ -98,6 +98,7 @@ void main() async {
     var calendar2HolidayCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendar2HolidayCalendarIds);
 
+    FirebaseCrashlytics.instance.log('Test aaaaa');
     runApp(SCalApp(
       brightnessMode: brightnessMode,
       lightColorConfig: lightColorConfig,
@@ -114,9 +115,7 @@ void main() async {
       calendar2HolidayCalendarIds: calendar2HolidayCalendarIds,
     ));
   }, (error, stackTrace) {
-    var log = 'error={$error} stack={$stackTrace}';
-    FirebaseCrashlytics.instance.log(log);
-    debugPrint(log);
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
   });
 }
 
