@@ -202,6 +202,8 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				B139373EAB8133168759CC67 /* [CP] Embed Pods Frameworks */,
 				C723AE758582788F0AA320E1 /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
+				1C61C0FE2C9EF39300249987 /* ShellScript */,
+				1C61C0FF2C9EF4E000249987 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -273,6 +275,40 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1C61C0FE2C9EF39300249987 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n${PODS_ROOT}/FirebaseCrashlytics/run\n";
+		};
+		1C61C0FF2C9EF4E000249987 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n${PODS_ROOT}/FirebaseCrashlytics/upload-symbols -gsp ${PROJECT_DIR}/Runner/GoogleService-Info.plist -p ios ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\n";
+		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
