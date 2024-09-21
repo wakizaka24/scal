@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -187,12 +185,7 @@ class SCalApp extends StatelessWidget {
                     calendar2NonDisplayCalendarIds,
                     calendar2NotEditableCalendarIds,
                     calendar2HolidayCalendarIds);
-
               }
-
-
-              // if (calendarConfigState.calendarSwitchMode)
-
 
               return MaterialApp(
                 localizationsDelegates: const [

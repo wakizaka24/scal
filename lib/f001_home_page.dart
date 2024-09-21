@@ -226,8 +226,9 @@ class HomePage extends HookConsumerWidget {
                 homePageScaffoldKey.currentState!
                     .openEndDrawer();
 
-                FirebaseCrashlytics.instance.log('CrashLog');
-                FirebaseCrashlytics.instance.crash();
+                FirebaseCrashlytics.instance.log('意図的に落とす');
+                List<int>? a;
+                var i = a![0];
 
               },
             ),
