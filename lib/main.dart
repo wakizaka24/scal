@@ -38,14 +38,14 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // FlutterのエラーをFirebase Crashlyticsに送る
-    WidgetsFlutterBinding.ensureInitialized();
-    FlutterError.onError = (errorDetails) {
-      // 致命的なエラーを送る
-      // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-      // 致命的ではないエラーも送る
-      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    };
+    // // FlutterのエラーをFirebase Crashlyticsに送る
+    // WidgetsFlutterBinding.ensureInitialized();
+    // FlutterError.onError = (errorDetails) {
+    //   // 致命的なエラーを送る
+    //   // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    //   // 致命的ではないエラーも送る
+    //   FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+    // };
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {
