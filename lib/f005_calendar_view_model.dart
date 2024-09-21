@@ -331,22 +331,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       });
       if (dayPartIndex != -1) {
         if (state.dayPartIndex != dayPartIndex) {
-          await onTapDownCalendarDay(dayPartIndex, noneUpdate: true);
+          await onTapDownCalendarDay(dayPartIndex);
         }
         return true;
       }
 
       return false;
     }
-
-    var basisDate = state.basisMonthDate;
-    var calendarMonth = basisDate.year * 12 + basisDate.month
-        + state.addingMonth;
-    var destMonth = distDateTime.year * 12 + distDateTime.month;
-
-    var addingMonth = destMonth - calendarMonth;
-    var ms = addingMonth.abs() * 100;
-    var animation = Platform.isIOS && ms <= 2400;
 
     var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
     if (state.calendarSwitchingIndex != 0) {
@@ -359,7 +350,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       });
       if (hourPartIndex != -1) {
         if (state.hourPartIndex != hourPartIndex) {
-          await onTapDownCalendarHour(hourPartIndex, nonUpdate: true);
+          await onTapDownCalendarHour(hourPartIndex);
         }
 
         return;
@@ -374,6 +365,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       return;
     }
 
+    var basisDate = state.basisMonthDate;
+    var calendarMonth = basisDate.year * 12 + basisDate.month
+        + state.addingMonth;
+    var destMonth = distDateTime.year * 12 + distDateTime.month;
+    var addingMonth = destMonth - calendarMonth;
+    var ms = addingMonth.abs() * 100;
+    var animation = Platform.isIOS && ms <= 2400;
     var page = state.monthCalendarController.page!.toInt() + addingMonth;
 
     if (!animation) {
@@ -389,13 +387,11 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     await moveToday();
   }
 
-  onTapDownCalendarDay(int index, {bool noneUpdate=false}) async {
+  onTapDownCalendarDay(int index) async {
     await selectDay(index: index);
     await updateWeekCalendarState();
     await initSelectionWeekCalendar();
-    if (!noneUpdate) {
-      await updateState();
-    }
+    await updateState();
   }
 
   onCalendarPageChanged(int monthIndex) async {
@@ -688,11 +684,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   // Week Calendar
 
-  onTapDownCalendarHour(int index, {bool nonUpdate=false}) async {
+  onTapDownCalendarHour(int index) async {
     await selectHour(index: index);
-    if (!nonUpdate) {
-      await updateState();
-    }
+    await updateState();
   }
 
   updateWeekCalendarState() async {
@@ -1181,10 +1175,9 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   Future<List<Calendar>> getCalendars() async {
     List<Calendar> calendars = [];
-    if (await calendarRepo.hasPermissions()) {
-      calendars = await calendarRepo.getCalendars();
-      // debugPrint('カレンダー数 ${calendars.length}');
-    }
+    await calendarRepo.hasPermissions();
+    calendars = await calendarRepo.getCalendars();
+    // debugPrint('カレンダー数 ${calendars.length}');
 
     // debugPrint('カレンダー一覧');
     // for (var cal in calendars) {

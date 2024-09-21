@@ -6,6 +6,7 @@ class CalendarRepository {
   static final CalendarRepository _instance = CalendarRepository._internal();
   final DeviceCalendarPlugin _plugin = DeviceCalendarPlugin();
   Location _location = local;
+  bool calendarPermission = false;
 
   factory CalendarRepository() {
     return _instance;
@@ -25,22 +26,25 @@ class CalendarRepository {
     }
   }
 
-  Future<bool> hasPermissions() async {
+  Future<void> hasPermissions() async {
     var permissions = await _plugin.hasPermissions();
-
-    // カレンダーアクセスの未リクエスト
-    if (permissions.isSuccess && !permissions.data!) {
-      // カレンダーアクセスをリクエスト
-      permissions = await _plugin.requestPermissions();
-      // アクセス権を得られなかった
-      if (!permissions.isSuccess || !permissions.data!) {
+    if (permissions.isSuccess) {
+      calendarPermission = permissions.data!;
+      if (!calendarPermission) {
+        // カレンダーアクセスをリクエスト
+        permissions = await _plugin.requestPermissions();
+        if (permissions.isSuccess) {
+          calendarPermission = permissions.data!;
+        }
       }
     }
-
-    return permissions.isSuccess;
   }
 
   Future<List<Calendar>> getCalendars() async {
+    if (!calendarPermission) {
+      return [];
+    }
+
     var result = await _plugin.retrieveCalendars();
     List<Calendar> calendars = result.data ?? [];
 
@@ -66,6 +70,10 @@ class CalendarRepository {
 
   Future<List<Event>> getEvents(String calendarId,
       DateTime startDate, DateTime endDate) async {
+    if (!calendarPermission) {
+      return [];
+    }
+
     var params = RetrieveEventsParams(startDate: startDate, endDate: endDate);
     var result = await _plugin.retrieveEvents(calendarId, params);
     List<Event> events = [...result.data ?? []];
@@ -103,6 +111,10 @@ class CalendarRepository {
   }
 
   Future<Event?> getEvent(String calendarId, String eventId) async {
+    if (!calendarPermission) {
+      return null;
+    }
+
     var params = RetrieveEventsParams(eventIds: [eventId]);
     var result = await _plugin.retrieveEvents(calendarId, params);
     List<Event> events = [...result.data ?? []];
@@ -119,6 +131,10 @@ class CalendarRepository {
   }
 
   Future<bool> deleteEvent(String calendarId, String eventId) async {
+    if (!calendarPermission) {
+      return false;
+    }
+
     var result =  await _plugin.deleteEvent(calendarId, eventId);
     return result.isSuccess;
   }
