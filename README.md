@@ -40,6 +40,11 @@ android:label="Starlight"
 % cd scal
 % fvm flutter build appbundle --release
 
+# iOS
+### CocoaPods
+sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
+sudo gem uninstall cocoapods
+
 # Firebase
 ### Firebase CLI
 % curl -sL https://firebase.tools | bash
