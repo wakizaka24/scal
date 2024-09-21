@@ -7,6 +7,8 @@ import 'f001_home_page.dart';
 import 'f006_shared_preferences_repository.dart';
 import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // 縦向き
@@ -27,6 +29,10 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
     ));
   });
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {

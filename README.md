@@ -39,3 +39,30 @@ android:label="Starlight"
 
 % cd scal
 % fvm flutter build appbundle --release
+
+# Firebase
+### Firebase CLI
+% curl -sL https://firebase.tools | bash
+
+### ログイン
+% firebase login
+〜
+? Allow Firebase to collect CLI and Emulator Suite usage and error reporting information? Yes
+〜
+✔  Success! Logged in as wakizaka24@gmail.com
+
+### FlutterFire CLI
+% fvm dart pub global activate flutterfire_cli
+
+### Firebase Coreをプロジェクトに適用する
+% cd ~/pc\_data/project/scal
+% fvm flutter pub add firebase_core
+
+### プロジェクトにFirebaseを適用/初期化する
+% sudo fvm dart pub global run flutterfire_cli:flutterfire configure
+
+### Firebaseサービスを追加する
+% fvm flutter pub add firebase_crashlytics
+% fvm flutter pub add firebase_analytics
+? You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.jso✔ You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.json` file to configure your project? · yes
+% sudo fvm dart pub global run flutterfire_cli:flutterfire configure
