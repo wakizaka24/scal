@@ -379,10 +379,12 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         await updateMonthCalendarState(preLoadingAddingMonth: addingMonth);
         state.preEventDataLoading = true;
       }
+      state.monthCalendarController.jumpToPage(page);
+    } else {
+      await state.monthCalendarController.animateToPage(
+          page, duration: Duration(milliseconds: ms),
+          curve: Curves.linear);
     }
-    await state.monthCalendarController.animateToPage(
-        page, duration: Duration(microseconds: animation ? ms * 1000 : 1),
-        curve: Curves.linear);
 
     await moveToday();
   }
