@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -61,7 +62,7 @@ class HomePage extends HookConsumerWidget {
     // アンセーフエリア下の高さ
     // キーボード表示時セーフエリアが小さくなるので最大の値を使用する。
     double bottomHeight = MediaQuery.of(context).padding.bottom;
-    var navigationBarGestureMode = Platform.isIOS || MediaQuery.of(context)
+    var navigationBarGestureMode = !kIsWeb && Platform.isIOS || MediaQuery.of(context)
         .systemGestureInsets.left > 0;
     // セーフエリア下がない場合は15以上確保する。
     if (bottomHeight < 15) {

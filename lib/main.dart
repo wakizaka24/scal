@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -38,14 +39,16 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // FlutterのエラーをFirebase Crashlyticsに送る
-    WidgetsFlutterBinding.ensureInitialized();
-    FlutterError.onError = (errorDetails) {
-      // 致命的なエラーを送る
-      // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-      // 致命的ではないエラーも送る
-      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    };
+    if (!kIsWeb) {
+      // FlutterのエラーをFirebase Crashlyticsに送る
+      WidgetsFlutterBinding.ensureInitialized();
+      FlutterError.onError = (errorDetails) {
+        // 致命的なエラーを送る
+        // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+        // 致命的ではないエラーも送る
+        FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+      };
+    }
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {
@@ -116,7 +119,9 @@ void main() async {
   }, (error, stackTrace) {
     var log = 'Crashlyticsへログ送信 error={$error} stackTrace={$stackTrace}';
     debugPrint(log);
-    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    if (!kIsWeb) {
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
   });
 }
 
