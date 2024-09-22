@@ -114,8 +114,9 @@ void main() async {
       calendar2HolidayCalendarIds: calendar2HolidayCalendarIds,
     ));
   }, (error, stackTrace) {
+    var log = 'Crashlyticsへログ送信 error={$error} stackTrace={$stackTrace}';
+    debugPrint(log);
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
-    // FirebaseCrashlytics.instance.crash();
   });
 }
 

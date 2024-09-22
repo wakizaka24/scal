@@ -224,12 +224,6 @@ class HomePage extends HookConsumerWidget {
               onPressed: () async {
                 homePageScaffoldKey.currentState!
                     .openEndDrawer();
-
-                FirebaseCrashlytics.instance.log('クラッシュログ、あああああ');
-                FirebaseCrashlytics.instance.crash();
-                // List<int>? a;
-                // var i = a![0];
-
               },
             ),
 
@@ -323,6 +317,9 @@ class HomePage extends HookConsumerWidget {
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                   unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await homeNotifier.updateState();
+
+          List<int>? a = [0, 1];
+          var i = a[3];
         },
         child: Consumer(
             builder: ((context, ref, child) {
