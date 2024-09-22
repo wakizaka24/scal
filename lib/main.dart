@@ -38,14 +38,14 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // // FlutterのエラーをFirebase Crashlyticsに送る
-    // WidgetsFlutterBinding.ensureInitialized();
-    // FlutterError.onError = (errorDetails) {
-    //   // 致命的なエラーを送る
-    //   // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    //   // 致命的ではないエラーも送る
-    //   FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    // };
+    // FlutterのエラーをFirebase Crashlyticsに送る
+    WidgetsFlutterBinding.ensureInitialized();
+    FlutterError.onError = (errorDetails) {
+      // 致命的なエラーを送る
+      // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      // 致命的ではないエラーも送る
+      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+    };
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {
@@ -98,7 +98,6 @@ void main() async {
     var calendar2HolidayCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendar2HolidayCalendarIds);
 
-    FirebaseCrashlytics.instance.log('Test aaaaa');
     runApp(SCalApp(
       brightnessMode: brightnessMode,
       lightColorConfig: lightColorConfig,
@@ -116,6 +115,7 @@ void main() async {
     ));
   }, (error, stackTrace) {
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    // FirebaseCrashlytics.instance.crash();
   });
 }
 
