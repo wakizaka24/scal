@@ -641,6 +641,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
         return events;
       });
     }
+    for (int i = 0; i < eventsMap.keys.length; i++) {
+      var key = List.from(eventsMap.keys)[i];
+      eventsMap[key]!.sort((event1, event2) {
+        var start1 = event1.start!;
+        var start2 = event2.start!;
+        if (start1 != start2) {
+          return start1.compareTo(start2);
+        } else {
+          return event1.eventId!.compareTo(event2.eventId!);
+        }
+      });
+    }
     // debugPrint('日付ごとのイベント数 ${eventsMap.length}');
 
     return eventsMap;
