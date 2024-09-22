@@ -2,18 +2,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum SharedPreferenceStringKey {
   brightnessMode('brightnessMode'),
-  lightColorConfig('lightColorConfig'),
-  darkColorConfig('darkColorConfig'),
-  calendarHolidaySundayConfig('calendarHolidaySundayConfig'),
-  calendarDisplayMode('calendarDisplayMode'),
-  calendar1EditingCalendarId('calendar1EditingCalendarId'),
-  calendar1NonDisplayCalendarIds('calendar1NonDisplayCalendarIds'),
-  calendar1NotEditableCalendarIds('calendar1NotEditableCalendarIds'),
-  calendar1HolidayCalendarIds('calendar1HolidayCalendarIds'),
-  calendar2EditingCalendarId('calendar2EditingCalendarId'),
-  calendar2NonDisplayCalendarIds('calendar2NonDisplayCalendarIds'),
-  calendar2NotEditableCalendarIds('calendar2NotEditableCalendarIds'),
-  calendar2HolidayCalendarIds('calendar2HolidayCalendarIds'),
+  lightColorMode('lightColorMode'),
+  darkColorMode('darkColorMode'),
+  calendarHolidayList('calendarHolidayList'),
+  calendarHiddenCalendarIds('calendarHiddenCalendarIds'),
+  calendarBothCalendarIds('calendarBothCalendarIds'),
+  calendarInvisibleCalendarIds('calendarInvisibleCalendarIds'),
+  calendarNotEditableCalendarIds('calendarNotEditableCalendarIds'),
+  calendarHolidayCalendarIds('calendarHolidayCalendarIds'),
+
   ;
 
   final String id;

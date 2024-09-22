@@ -8,7 +8,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scal/f006_shared_preferences_repository.dart';
-import 'package:scal/f008_calendar_config.dart';
 import 'package:scal/f017_design_config.dart';
 
 import 'package:scal/main.dart';
@@ -20,59 +19,42 @@ void main() {
         BrightnessMode.values);
 
     var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.lightColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.lightColorMode,
         ColorConfig.values);
 
     var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.darkColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.darkColorMode,
         ColorConfig.values);
 
-    var calendarHolidaySundayConfig = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidaySundayConfig);
+    var calendarHolidayList = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHolidayList);
 
-    var calendarDisplayMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.calendarDisplayMode,
-        CalendarDisplayMode.values);
+    var calendarHiddenCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
 
-    var calendar1EditingCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1EditingCalendarId);
+    var calendarBothCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
 
-    var calendar1NonDisplayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1NonDisplayCalendarIds);
+    var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
 
-    var calendar1NotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1NotEditableCalendarIds);
+    var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
 
-    var calendar1HolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1HolidayCalendarIds);
-
-    var calendar2EditingCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2EditingCalendarId);
-
-    var calendar2NonDisplayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2NonDisplayCalendarIds);
-
-    var calendar2NotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2NotEditableCalendarIds);
-
-    var calendar2HolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2HolidayCalendarIds);
+    var calendarHolidayCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(SCalApp(
       brightnessMode: brightnessMode,
       lightColorConfig: lightColorConfig,
       darkColorConfig: darkColorConfig,
-      calendarHolidaySundayConfig: calendarHolidaySundayConfig,
-      calendarDisplayMode: calendarDisplayMode,
-      calendar1EditingCalendarId: calendar1EditingCalendarId,
-      calendar1NonDisplayCalendarIds: calendar1NonDisplayCalendarIds,
-      calendar1NotEditableCalendarIds: calendar1NotEditableCalendarIds,
-      calendar1HolidayCalendarIds: calendar1HolidayCalendarIds,
-      calendar2EditingCalendarId: calendar2EditingCalendarId,
-      calendar2NonDisplayCalendarIds: calendar2NonDisplayCalendarIds,
-      calendar2NotEditableCalendarIds: calendar2NotEditableCalendarIds,
-      calendar2HolidayCalendarIds: calendar2HolidayCalendarIds,
+      calendarHolidayList: calendarHolidayList,
+      calendarHiddenCalendarIds: calendarHiddenCalendarIds,
+      calendarBothCalendarIds: calendarBothCalendarIds,
+      calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
+      calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
+      calendarHolidayCalendarIds: calendarHolidayCalendarIds,
     ));
 
     // Verify that our counter starts at 0.

@@ -329,7 +329,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
               && nextConfig.brightness == Brightness.light
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceStringKey.lightColorConfig, nextConfig);
+            SharedPreferenceStringKey.lightColorMode, nextConfig);
         state.lightColorConfig = nextConfig;
         state.colorConfig = nextConfig;
         return config != nextConfig;
@@ -342,7 +342,7 @@ class DesignConfigNotifier extends StateNotifier<DesignConfigState> {
               && nextConfig.brightness == Brightness.dark
       ) {
         SharedPreferencesRepository().setStringEnum(
-            SharedPreferenceStringKey.darkColorConfig, nextConfig);
+            SharedPreferenceStringKey.darkColorMode, nextConfig);
         state.lightColorConfig = nextConfig;
         state.colorConfig = nextConfig;
         return config != nextConfig;

@@ -631,7 +631,7 @@ class DayPart extends HookConsumerWidget {
                 child: ListView(
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    for(int i = 0; i < day.eventList.length; i++) ... {
+                    for (int i = 0; i < day.eventList.length; i++) ... {
                       CWText(CalendarUtils().convertCharWrapString(
                           day.eventList[i].title)!,
                           maxLines: 1,
@@ -1303,7 +1303,7 @@ class HourPart extends HookConsumerWidget {
                     child: ListView(
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        for(int i = 0; i < hour.eventList.length; i++) ... {
+                        for (int i = 0; i < hour.eventList.length; i++) ... {
                           CWText(CalendarUtils().convertCharWrapString(
                               hour.eventList[i].title)!,
                             maxLines: 1,

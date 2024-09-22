@@ -63,58 +63,41 @@ void main() async {
         BrightnessMode.values);
 
     var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.lightColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.lightColorMode,
         ColorConfig.values);
 
     var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.darkColorConfig,
+        .getStringEnum(SharedPreferenceStringKey.darkColorMode,
         ColorConfig.values);
 
-    var calendarHolidaySundayConfig = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidaySundayConfig);
+    var calendarHolidayList = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHolidayList);
 
-    var calendarDisplayMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.calendarDisplayMode,
-        CalendarDisplayMode.values);
+    var calendarHiddenCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
 
-    var calendar1EditingCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1EditingCalendarId);
+    var calendarBothCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
 
-    var calendar1NonDisplayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1NonDisplayCalendarIds);
+    var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
 
-    var calendar1NotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1NotEditableCalendarIds);
+    var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
 
-    var calendar1HolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar1HolidayCalendarIds);
-
-    var calendar2EditingCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2EditingCalendarId);
-
-    var calendar2NonDisplayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2NonDisplayCalendarIds);
-
-    var calendar2NotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2NotEditableCalendarIds);
-
-    var calendar2HolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendar2HolidayCalendarIds);
+    var calendarHolidayCalendarIds = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
 
     runApp(SCalApp(
       brightnessMode: brightnessMode,
       lightColorConfig: lightColorConfig,
       darkColorConfig: darkColorConfig,
-      calendarHolidaySundayConfig: calendarHolidaySundayConfig,
-      calendarDisplayMode: calendarDisplayMode,
-      calendar1EditingCalendarId: calendar1EditingCalendarId,
-      calendar1NonDisplayCalendarIds: calendar1NonDisplayCalendarIds,
-      calendar1NotEditableCalendarIds: calendar1NotEditableCalendarIds,
-      calendar1HolidayCalendarIds: calendar1HolidayCalendarIds,
-      calendar2EditingCalendarId: calendar2EditingCalendarId,
-      calendar2NonDisplayCalendarIds: calendar2NonDisplayCalendarIds,
-      calendar2NotEditableCalendarIds: calendar2NotEditableCalendarIds,
-      calendar2HolidayCalendarIds: calendar2HolidayCalendarIds,
+      calendarHolidayList: calendarHolidayList,
+      calendarHiddenCalendarIds: calendarHiddenCalendarIds,
+      calendarBothCalendarIds: calendarBothCalendarIds,
+      calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
+      calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
+      calendarHolidayCalendarIds: calendarHolidayCalendarIds,
     ));
   }, (error, stackTrace) {
     var log = 'error={$error} stackTrace={$stackTrace}';
@@ -132,32 +115,24 @@ class SCalApp extends StatelessWidget {
   final BrightnessMode? brightnessMode;
   final ColorConfig? lightColorConfig;
   final ColorConfig? darkColorConfig;
-  final String? calendarHolidaySundayConfig;
-  final CalendarDisplayMode? calendarDisplayMode;
-  final String? calendar1EditingCalendarId;
-  final String? calendar1NonDisplayCalendarIds;
-  final String? calendar1NotEditableCalendarIds;
-  final String? calendar1HolidayCalendarIds;
-  final String? calendar2EditingCalendarId;
-  final String? calendar2NonDisplayCalendarIds;
-  final String? calendar2NotEditableCalendarIds;
-  final String? calendar2HolidayCalendarIds;
+  final String? calendarHolidayList;
+  final String? calendarHiddenCalendarIds;
+  final String? calendarBothCalendarIds;
+  final String? calendarInvisibleCalendarIds;
+  final String? calendarNotEditableCalendarIds;
+  final String? calendarHolidayCalendarIds;
 
   const SCalApp({
     super.key,
     required this.brightnessMode,
     required this.lightColorConfig,
     required this.darkColorConfig,
-    required this.calendarHolidaySundayConfig,
-    required this.calendarDisplayMode,
-    required this.calendar1EditingCalendarId,
-    required this.calendar1NonDisplayCalendarIds,
-    required this.calendar1NotEditableCalendarIds,
-    required this.calendar1HolidayCalendarIds,
-    required this.calendar2EditingCalendarId,
-    required this.calendar2NonDisplayCalendarIds,
-    required this.calendar2NotEditableCalendarIds,
-    required this.calendar2HolidayCalendarIds,
+    required this.calendarHolidayList,
+    required this.calendarHiddenCalendarIds,
+    required this.calendarBothCalendarIds,
+    required this.calendarInvisibleCalendarIds,
+    required this.calendarNotEditableCalendarIds,
+    required this.calendarHolidayCalendarIds
   });
 
   // This widget is the root of your application.
@@ -192,13 +167,9 @@ class SCalApp extends StatelessWidget {
                     editingBrightnessMode, brightness, editingLightColorConfig,
                     editingDarkColorConfig);
                 calendarConfigNotifier.initState(
-                    calendarHolidaySundayConfig, calendarDisplayMode,
-                    calendar1EditingCalendarId, calendar1NonDisplayCalendarIds,
-                    calendar1NotEditableCalendarIds,
-                    calendar1HolidayCalendarIds, calendar2EditingCalendarId,
-                    calendar2NonDisplayCalendarIds,
-                    calendar2NotEditableCalendarIds,
-                    calendar2HolidayCalendarIds);
+                    calendarHolidayList, calendarHiddenCalendarIds,
+                    calendarBothCalendarIds, calendarInvisibleCalendarIds,
+                    calendarNotEditableCalendarIds, calendarHolidayCalendarIds);
               }
 
               return MaterialApp(

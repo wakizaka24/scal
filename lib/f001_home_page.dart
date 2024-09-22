@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:device_calendar/device_calendar.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -318,6 +317,10 @@ class HomePage extends HookConsumerWidget {
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                   unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await homeNotifier.updateState();
+
+
+          List<int>? a = [0, 1];
+          var i = a[3];
         },
         child: Consumer(
             builder: ((context, ref, child) {

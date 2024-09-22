@@ -463,7 +463,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   selectEventList(String eventId) async {
-    for(int i=0; i<state.eventList.length; i++) {
+    for (int i=0; i<state.eventList.length; i++) {
       var event = state.eventList[i];
       if (eventId == event.eventId) {
         selectEventListPart(i);
@@ -527,7 +527,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     const titleList = ['日', '月', '火', '水', '木', '金', '土'];
     var titleColors = holidayTitleColors();
     List<WeekdayDisplay> weekdayDisplayList = [];
-    for(int i=0; i<titleList.length; i++) {
+    for (int i=0; i<titleList.length; i++) {
       var title = titleList[i];
       var titleColor = titleColors[i];
       weekdayDisplayList.add(WeekdayDisplay(title: title,

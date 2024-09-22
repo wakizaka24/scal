@@ -1,3 +1,4 @@
+import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,19 +16,30 @@ class WeekdayDisplay {
 }
 
 class CalendarDisplayDisplay {
-  String account;
-  String calendar;
-
+  String accountName;
+  String calendarName;
+  String displayModeTitle;
+  String editingModeTitle;
+  String useTitle;
+  Calendar calendar;
+  CalendarDisplayMode displayMode;
+  CalendarEditingMode editingMode;
+  CalendarHolidayDisplayMode holidayDisplayMode;
 
   CalendarDisplayDisplay({
-    required this.account,
+    required this.accountName,
+    required this.calendarName,
+    required this.displayModeTitle,
+    required this.editingModeTitle,
+    required this.useTitle,
     required this.calendar,
-    // required this.,
-    // required this.,
-    // required this.,
-    // required this.
+    required this.displayMode,
+    required this.editingMode,
+    required this.holidayDisplayMode
   });
 }
+
+
 
 class EndDrawerPageState {
   List<WeekdayDisplay> weekdayList = [];
@@ -74,7 +86,7 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     }).toList();
 
     List<WeekdayDisplay> weekdayDisplayList = [];
-    for(int i=0; i<titleList.length; i++) {
+    for (int i=0; i<titleList.length; i++) {
       var title = titleList[i];
       var titleColor = titleColors[i];
       weekdayDisplayList.add(WeekdayDisplay(title: title,
@@ -83,6 +95,13 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
 
     return weekdayDisplayList;
   }
+
+  // Future<List<CalendarDisplayDisplay>> createCalendarDisplayList() async {
+  //
+  //
+  // }
+
+
 
   updateState() async {
     state = EndDrawerPageState.copy(state);
