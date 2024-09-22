@@ -318,9 +318,6 @@ class HomePage extends HookConsumerWidget {
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                   unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await homeNotifier.updateState();
-
-          List<int>? a = [0, 1];
-          var i = a[3];
         },
         child: Consumer(
             builder: ((context, ref, child) {
