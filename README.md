@@ -2,11 +2,11 @@
 ## FVMバージョン合わせ
 % fvm releases
 % fvm list
-% fvm install 3.24.2
+% fvm install 3.24.3
 インストール先は~/fvm/versions
 % fvm remove 2.10.4
 % cd ~/pc_data/project/scal
-% fvm use 3.24.2
+% fvm use 3.24.3
 
 
 ## Android
