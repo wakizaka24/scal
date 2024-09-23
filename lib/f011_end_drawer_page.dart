@@ -218,36 +218,36 @@ class EndDrawerPage extends HookConsumerWidget {
                         createCell(title: '祝日', width: cellSettingWidth,
                             height: cellHeaderHeight),
                       ]),
-                      Row(children: [
-                        Expanded(child: createCell(
-                            title: 'wakizaka24@gmail.com')),
-                        Expanded(child: createCell(
-                            title: 'wakizaka24@gmail.com(デフォルト)')),
-                        createCell(width: cellSettingWidth,
-                            child: createDisplayButtonColumn(0)),
-                        createCell(width: cellSettingWidth,
-                            child: createHolidayButtonColumn(0)),
-                      ]),
-                      Row(children: [
-                        Expanded(child: createCell(
-                            title: 'wakizaka24@gmail.com')),
-                        Expanded(child: createCell(
-                            title: '日本の祝日')),
-                        createCell(width: cellSettingWidth,
-                            child: createDisplayButtonColumn(0)),
-                        createCell(width: cellSettingWidth,
-                            child: createHolidayButtonColumn(0)),
-                      ]),
-                      Row(children: [
-                        Expanded(child: createCell(
-                            title: 'iCloud')),
-                        Expanded(child: createCell(
-                            title: '細田4ごみ収集')),
-                        createCell(width: cellSettingWidth,
-                            child: createDisplayButtonColumn(0)),
-                        createCell(width: cellSettingWidth,
-                            child: createHolidayButtonColumn(0)),
-                      ]),
+                      // Row(children: [
+                      //   Expanded(child: createCell(
+                      //       title: 'wakizaka24@gmail.com')),
+                      //   Expanded(child: createCell(
+                      //       title: 'wakizaka24@gmail.com(デフォルト)')),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createDisplayButtonColumn(0)),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createHolidayButtonColumn(0)),
+                      // ]),
+                      // Row(children: [
+                      //   Expanded(child: createCell(
+                      //       title: 'wakizaka24@gmail.com')),
+                      //   Expanded(child: createCell(
+                      //       title: '日本の祝日')),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createDisplayButtonColumn(0)),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createHolidayButtonColumn(0)),
+                      // ]),
+                      // Row(children: [
+                      //   Expanded(child: createCell(
+                      //       title: 'iCloud')),
+                      //   Expanded(child: createCell(
+                      //       title: '細田4ごみ収集')),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createDisplayButtonColumn(0)),
+                      //   createCell(width: cellSettingWidth,
+                      //       child: createHolidayButtonColumn(0)),
+                      // ]),
                     ])
                 ),
               ]
