@@ -98,9 +98,21 @@ Archive(Zipに圧縮してアップロード)
 
 ### iOSのdSYMの自動アップロード
 iOSのプロジェクトのTARGETSを選択し、+からNew Run Script PhaseでスクリプトとInput Filesを追加する。
-iOSのdSYMの自動アップロードするスクリプト
+Firebase Crashlyticsを実行するスクリプト
+#!/bin/bash
+$PODS_ROOT/FirebaseCrashlytics/run
+iOSのdSYMの自動アップロードするスクリプト1
 #!/bin/bash
 $PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase --validate -ai "1:1058866964717:ios:90aa21e9065b20eb84c4e4" -- $DWARF_DSYM_FOLDER_PATH/App.framework.dSYM
+Input Filesを追加する
+${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}
+${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}
+${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist
+$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist
+$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)
+iOSのdSYMの自動アップロードするスクリプト2
+#!/bin/bash
+$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase -ai "1:1058866964717:ios:90aa21e9065b20eb84c4e4" --
 Input Filesを追加する
 ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}
 ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}

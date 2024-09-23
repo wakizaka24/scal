@@ -546,8 +546,8 @@ class WeekdayPart extends HookConsumerWidget {
         alignment: Alignment.center,
         child: CWText(weekday.title,
           textAlign: TextAlign.center,
-          fontSize: calendarFontSize1,
-          fontWeight: calendarFontWeight1,
+          fontSize: calendarDayFontSize,
+          fontWeight: calendarDayFontWeight,
           color: weekday.titleColor,
         )
     );
@@ -618,8 +618,8 @@ class DayPart extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CWText(day.title,
-            fontSize: calendarFontSize1,
-            fontWeight: calendarFontWeight1,
+            fontSize: calendarDayFontSize,
+            fontWeight: calendarDayFontWeight,
             color: day.titleColor,
           ),
           SizedBox(width: width, height: 1),
@@ -635,8 +635,8 @@ class DayPart extends HookConsumerWidget {
                       CWText(CalendarUtils().convertCharWrapString(
                           day.eventList[i].title)!,
                           maxLines: 1,
-                          fontSize: calendarFontSize2,
-                          fontWeight: calendarFontWeight2,
+                          fontSize: calendarEventFontSize,
+                          fontWeight: calendarEventFontWeight,
                           color: day.eventList[i].titleColor
                       ),
                     }
@@ -676,8 +676,8 @@ class EventListPart extends HookConsumerWidget {
                   child: Row(
                     children: [
                       CWText(calendarState.eventListTitle,
-                          fontSize: eventListFontSize1,
-                          fontWeight: eventListFontWeight1,
+                          fontSize: eventListTitleFontSize,
+                          fontWeight: eventListTitleFontWeight,
                           color: designConfigState.colorConfig!
                               .normalTextColor
                       ),
@@ -812,8 +812,8 @@ class _EventPartState extends ConsumerState<EventPart>
                           vertical: 0),
                       child: CWText(emptyMessage,
                           maxLines: 2,
-                          fontSize: eventListFontSize3,
-                          fontWeight: eventListFontWeight3,
+                          fontSize: eventListItemFontSize,
+                          fontWeight: eventListItemFontWeight,
                           color: colorConfig.normalTextColor
                       )
                   )
@@ -822,8 +822,8 @@ class _EventPartState extends ConsumerState<EventPart>
                 SizedBox(width: 45, child:
                   CWText(event.head,
                       textAlign: TextAlign.center,
-                      fontSize: eventListFontSize2,
-                      fontWeight: eventListFontWeight2,
+                      fontSize: eventListItemFontSize,
+                      fontWeight: eventListItemFontWeight,
                       color: event.fontColor
                   )
                 ),
@@ -845,8 +845,8 @@ class _EventPartState extends ConsumerState<EventPart>
                       child: CWText(CalendarUtils().convertCharWrapString(
                           event.title)!,
                           maxLines: 2,
-                          fontSize: eventListFontSize3,
-                          fontWeight: eventListFontWeight3,
+                          fontSize: eventListItemFontSize,
+                          fontWeight: eventListItemFontWeight,
                           color: event.fontColor
                       )
                   )
@@ -1159,8 +1159,8 @@ class DayAndWeekdayPart extends HookConsumerWidget {
         alignment: Alignment.center,
         child: CWText(dayAndWeekday.dayAndWeekTitle,
           textAlign: TextAlign.center,
-          fontSize: calendarFontSize1,
-          fontWeight: calendarFontWeight1,
+          fontSize: calendarDayFontSize,
+          fontWeight: calendarDayFontWeight,
           color: dayAndWeekday.dayAndWeekTitleColor,
         )
     );
@@ -1289,9 +1289,8 @@ class HourPart extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CWText(hour.title,
-                fontSize: !hour.allDay ? calendarFontSize1
-                    : calendarFontSize1Down1,
-                fontWeight: calendarFontWeight1,
+                fontSize: calendarDayFontSize,
+                fontWeight: calendarDayFontWeight,
                 color: hour.titleColor,
               ),
               SizedBox(width: width, height: 1),
@@ -1307,8 +1306,8 @@ class HourPart extends HookConsumerWidget {
                           CWText(CalendarUtils().convertCharWrapString(
                               hour.eventList[i].title)!,
                             maxLines: 1,
-                            fontSize: calendarFontSize2,
-                            fontWeight: calendarFontWeight2,
+                            fontSize: calendarEventFontSize,
+                            fontWeight: calendarEventFontWeight,
                             color: hour.eventList[i].titleColor
                           ),
                         }

@@ -202,8 +202,9 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				B139373EAB8133168759CC67 /* [CP] Embed Pods Frameworks */,
 				C723AE758582788F0AA320E1 /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
-				1C65FA932CA10AD20085A1CD /* ShellScript */,
-				1C3E3B572CA1612F00952E11 /* ShellScript */,
+				1C3E3B582CA1639900952E11 /* ShellScript */,
+				1C3E3B592CA163A700952E11 /* ShellScript */,
+				1C3E3B5A2CA163FA00952E11 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -275,7 +276,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1C3E3B572CA1612F00952E11 /* ShellScript */ = {
+		1C3E3B582CA1639900952E11 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -283,11 +284,6 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputFileListPaths = (
 			);
@@ -295,9 +291,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase -ai \"1:1058866964717:ios:90aa21e9065b20eb84c4e4\" -- $DWARF_DSYM_FOLDER_PATH/App.framework.dSYM\n";
+			shellScript = "#!/bin/bash\n$PODS_ROOT/FirebaseCrashlytics/run\n";
 		};
-		1C65FA932CA10AD20085A1CD /* ShellScript */ = {
+		1C3E3B592CA163A700952E11 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,6 +314,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/bash\n$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase --validate -ai \"1:1058866964717:ios:90aa21e9065b20eb84c4e4\" -- $DWARF_DSYM_FOLDER_PATH/App.framework.dSYM\n";
+		};
+		1C3E3B5A2CA163FA00952E11 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase -ai \"1:1058866964717:ios:90aa21e9065b20eb84c4e4\" --\n";
 		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
