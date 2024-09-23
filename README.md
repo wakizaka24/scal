@@ -91,15 +91,16 @@ sudo gem uninstall cocoapods
 
 ## dSYM(iOSのデバッグシンボル)
 ### dSYMの場所
-1. ローカル実行(Zipに圧縮してアップロード)
+ローカル実行(Zipに圧縮してアップロード)
 /Users/ryota24/pc_data/project/scal/build/ios/Debug-iphonesimulator/Runner.app.dSYM
-2. Archive(Zipに圧縮してアップロード)
+Archive(Zipに圧縮してアップロード)
 ~/Library/Developer/Xcode/Archives/2024-09-21/Runner\ 2024-09-21\,\ 15.58.xcarchive/dSYMs
 
 ### iOSのdSYMの自動アップロード
-1. iOSのプロジェクトのTARGETSを選択し、+からNew Run Script PhaseでスクリプトとInput Filesを追加する。
+iOSのプロジェクトのTARGETSを選択し、+からNew Run Script PhaseでスクリプトとInput Filesを追加する。
 iOSのdSYMの自動アップロードするスクリプト
-${PODS_ROOT}/FirebaseCrashlytics/upload-symbols --build-phase --validate -ai "1:1058866964717:ios:90aa21e9065b20eb84c4e4" -- ${DWARF_DSYM_FOLDER_PATH}/App.framework.dSYM
+#!/bin/bash
+$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase --validate -ai "1:1058866964717:ios:90aa21e9065b20eb84c4e4" -- $DWARF_DSYM_FOLDER_PATH/App.framework.dSYM
 Input Filesを追加する
 ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}
 ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}

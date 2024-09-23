@@ -85,6 +85,9 @@ void main() async {
     var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
 
+    var calendarUseCalendarId = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarUseCalendarId);
+
     var calendarHolidayCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
 
@@ -97,6 +100,7 @@ void main() async {
       calendarBothCalendarIds: calendarBothCalendarIds,
       calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
       calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
+      calendarUseCalendarId: calendarUseCalendarId,
       calendarHolidayCalendarIds: calendarHolidayCalendarIds,
     ));
   }, (error, stackTrace) {
@@ -120,6 +124,7 @@ class SCalApp extends StatelessWidget {
   final String? calendarBothCalendarIds;
   final String? calendarInvisibleCalendarIds;
   final String? calendarNotEditableCalendarIds;
+  final String? calendarUseCalendarId;
   final String? calendarHolidayCalendarIds;
 
   const SCalApp({
@@ -132,6 +137,7 @@ class SCalApp extends StatelessWidget {
     required this.calendarBothCalendarIds,
     required this.calendarInvisibleCalendarIds,
     required this.calendarNotEditableCalendarIds,
+    required this.calendarUseCalendarId,
     required this.calendarHolidayCalendarIds
   });
 
@@ -169,7 +175,8 @@ class SCalApp extends StatelessWidget {
                 calendarConfigNotifier.initState(
                     calendarHolidayList, calendarHiddenCalendarIds,
                     calendarBothCalendarIds, calendarInvisibleCalendarIds,
-                    calendarNotEditableCalendarIds, calendarHolidayCalendarIds);
+                    calendarNotEditableCalendarIds, calendarUseCalendarId,
+                    calendarHolidayCalendarIds);
               }
 
               return MaterialApp(

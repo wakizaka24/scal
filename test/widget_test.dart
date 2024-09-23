@@ -41,6 +41,9 @@ void main() {
     var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
 
+    var calendarUseCalendarId = await SharedPreferencesRepository()
+        .getString(SharedPreferenceStringKey.calendarUseCalendarId);
+
     var calendarHolidayCalendarIds = await SharedPreferencesRepository()
         .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
 
@@ -54,6 +57,7 @@ void main() {
       calendarBothCalendarIds: calendarBothCalendarIds,
       calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
       calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
+      calendarUseCalendarId: calendarUseCalendarId,
       calendarHolidayCalendarIds: calendarHolidayCalendarIds,
     ));
 

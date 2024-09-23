@@ -140,6 +140,7 @@ class EndDrawerPage extends HookConsumerWidget {
 
     const double weekButtonWidth = 35;
     var weekdayList = endDrawerState.weekdayList;
+    var calendarList = endDrawerState.calendarList;
     ListView menuList = ListView(
       // physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -173,7 +174,7 @@ class EndDrawerPage extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Row(children: [
-                  for (int i=0; i<weekdayList.length; i++) ... {
+                  for (int i=0; i < weekdayList.length; i++) ... {
                     if (i>0)
                       const SizedBox(width: 3),
                     CWElevatedButton(
@@ -218,36 +219,19 @@ class EndDrawerPage extends HookConsumerWidget {
                         createCell(title: '祝日', width: cellSettingWidth,
                             height: cellHeaderHeight),
                       ]),
-                      // Row(children: [
-                      //   Expanded(child: createCell(
-                      //       title: 'wakizaka24@gmail.com')),
-                      //   Expanded(child: createCell(
-                      //       title: 'wakizaka24@gmail.com(デフォルト)')),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createDisplayButtonColumn(0)),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createHolidayButtonColumn(0)),
-                      // ]),
-                      // Row(children: [
-                      //   Expanded(child: createCell(
-                      //       title: 'wakizaka24@gmail.com')),
-                      //   Expanded(child: createCell(
-                      //       title: '日本の祝日')),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createDisplayButtonColumn(0)),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createHolidayButtonColumn(0)),
-                      // ]),
-                      // Row(children: [
-                      //   Expanded(child: createCell(
-                      //       title: 'iCloud')),
-                      //   Expanded(child: createCell(
-                      //       title: '細田4ごみ収集')),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createDisplayButtonColumn(0)),
-                      //   createCell(width: cellSettingWidth,
-                      //       child: createHolidayButtonColumn(0)),
-                      // ]),
+
+                      for (int i=0; i < calendarList.length; i++) ... {
+                        Row(children: [
+                          Expanded(child: createCell(
+                              title: calendarList[i].accountName)),
+                          Expanded(child: createCell(
+                              title: calendarList[i].calendarName)),
+                          createCell(width: cellSettingWidth,
+                              child: createDisplayButtonColumn(0)),
+                          createCell(width: cellSettingWidth,
+                              child: createHolidayButtonColumn(0)),
+                        ]),
+                      }
                     ])
                 ),
               ]

@@ -9,6 +9,7 @@ enum SharedPreferenceStringKey {
   calendarBothCalendarIds('calendarBothCalendarIds'),
   calendarInvisibleCalendarIds('calendarInvisibleCalendarIds'),
   calendarNotEditableCalendarIds('calendarNotEditableCalendarIds'),
+  calendarUseCalendarId('calendarUseCalendarId'),
   calendarHolidayCalendarIds('calendarHolidayCalendarIds'),
 
   ;
