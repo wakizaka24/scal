@@ -233,8 +233,8 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
       controller: calendarState.monthCalendarController,
       physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
           damping: 0.85),
-      onPageChanged: (int index) {
-        calendarNotifier.onCalendarPageChanged(index);
+      onPageChanged: (int index) async {
+        await calendarNotifier.onCalendarPageChanged(index);
       },
       itemBuilder: (context, index) {
         var adjustmentIndex = index - calendarState.addingMonth;

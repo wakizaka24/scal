@@ -75,7 +75,7 @@ class EndDrawerPage extends HookConsumerWidget {
       double? height = 80, Widget? child}) {
       Widget? widget = child;
       widget ??= Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: CWText(CalendarUtils().convertCharWrapString(title) ?? ' ',
               structHeight: 1.3,
               fontSize: drawerSettingItemFontSize,
@@ -214,7 +214,7 @@ class EndDrawerPage extends HookConsumerWidget {
                             height: cellHeaderHeight)),
                         Expanded(child: createCell(title: 'カレンダー',
                             height: cellHeaderHeight)),
-                        createCell(title: '表示/編集', width: cellSettingWidth,
+                        createCell(title: '設定', width: cellSettingWidth,
                             height: cellHeaderHeight),
                         createCell(title: '祝日', width: cellSettingWidth,
                             height: cellHeaderHeight),
