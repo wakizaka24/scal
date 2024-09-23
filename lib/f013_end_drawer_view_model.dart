@@ -116,6 +116,17 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
       );
     }
 
+    calendarDisplayList.sort((calendar1, calendar2) {
+      if (calendar1.accountName.compareTo(calendar2.accountName) != 0) {
+        return calendar1.accountName.compareTo(calendar2.accountName);
+      } else if (calendar1.calendarName.compareTo(calendar2.calendarName) != 0) {
+        return calendar1.calendarName.compareTo(calendar2.calendarName);
+      } else {
+        return calendar1.calendarAndAddInfo.calendar.id!
+            .compareTo(calendar2.calendarAndAddInfo.calendar.id!);
+      }
+    });
+
     return calendarDisplayList;
   }
 
