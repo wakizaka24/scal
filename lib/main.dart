@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,40 +13,39 @@ import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
 
 void main() async {
-  await runZonedGuarded(() async {
-    // 縦向き
+  // 縦向き
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp
+  ]);
+
+  // Androidのジェスチャーナビゲーションを透明にする。
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top]).then((_) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      // Androidのステータスバーの背景色を透明にする。
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ));
+  });
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  if (!kIsWeb) {
+    // FlutterのエラーをFirebase Crashlyticsに送る
     WidgetsFlutterBinding.ensureInitialized();
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp
-    ]);
-
-    // Androidのジェスチャーナビゲーションを透明にする。
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-        overlays: [SystemUiOverlay.top]).then((_) {
-      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
-        // Androidのステータスバーの背景色を透明にする。
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-      ));
-    });
-
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-
-    if (!kIsWeb) {
-      // FlutterのエラーをFirebase Crashlyticsに送る
-      WidgetsFlutterBinding.ensureInitialized();
-      FlutterError.onError = (errorDetails) {
-        // 致命的なエラーを送る
-        // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-        // 致命的ではないエラーも送る
-        FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-      };
-    }
+    FlutterError.onError = (errorDetails) {
+      // 致命的なエラーを送る
+      // FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      // 致命的ではないエラーも送る
+      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+    };
+  }
 
 //   // ライセンス表記を追加する
 //   LicenseRegistry.addLicense(() {
@@ -58,59 +55,51 @@ void main() async {
 // ''')]);
 //   });
 
-    var brightnessMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.brightnessMode,
-        BrightnessMode.values);
+  var brightnessMode = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceStringKey.brightnessMode,
+      BrightnessMode.values);
 
-    var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.lightColorMode,
-        ColorConfig.values);
+  var lightColorConfig = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceStringKey.lightColorMode,
+      ColorConfig.values);
 
-    var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.darkColorMode,
-        ColorConfig.values);
+  var darkColorConfig = await SharedPreferencesRepository()
+      .getStringEnum(SharedPreferenceStringKey.darkColorMode,
+      ColorConfig.values);
 
-    var calendarHolidayList = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayList);
+  var calendarHolidayList = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarHolidayList);
 
-    var calendarHiddenCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
+  var calendarHiddenCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
 
-    var calendarBothCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
+  var calendarBothCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
 
-    var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
+  var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
 
-    var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
+  var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
 
-    var calendarUseCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarUseCalendarId);
+  var calendarUseCalendarId = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarUseCalendarId);
 
-    var calendarHolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
+  var calendarHolidayCalendarIds = await SharedPreferencesRepository()
+      .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
 
-    runApp(SCalApp(
-      brightnessMode: brightnessMode,
-      lightColorConfig: lightColorConfig,
-      darkColorConfig: darkColorConfig,
-      calendarHolidayList: calendarHolidayList,
-      calendarHiddenCalendarIds: calendarHiddenCalendarIds,
-      calendarBothCalendarIds: calendarBothCalendarIds,
-      calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
-      calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
-      calendarUseCalendarId: calendarUseCalendarId,
-      calendarHolidayCalendarIds: calendarHolidayCalendarIds,
-    ));
-  }, (error, stackTrace) {
-    var log = 'error={$error} stackTrace={$stackTrace}';
-    debugPrint(log);
-    if (!kIsWeb) {
-      FirebaseCrashlytics.instance.log(log);
-      FirebaseCrashlytics.instance.recordError(error, stackTrace);
-    }
-  });
+  runApp(SCalApp(
+    brightnessMode: brightnessMode,
+    lightColorConfig: lightColorConfig,
+    darkColorConfig: darkColorConfig,
+    calendarHolidayList: calendarHolidayList,
+    calendarHiddenCalendarIds: calendarHiddenCalendarIds,
+    calendarBothCalendarIds: calendarBothCalendarIds,
+    calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
+    calendarNotEditableCalendarIds: calendarNotEditableCalendarIds,
+    calendarUseCalendarId: calendarUseCalendarId,
+    calendarHolidayCalendarIds: calendarHolidayCalendarIds,
+  ));
 }
 
 var appInit = false;
