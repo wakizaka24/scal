@@ -86,8 +86,8 @@ abstract final class BackgroundColors {
 }
 
 abstract final class BorderColors {
-  // static const Color gold = Color(0xCCC4B8A5);
-  static const Color naturalTitanium = Color(0xFFBDC2C2);
+  static const Color gold = Color(0xCCC4B8A5);
+  // static const Color naturalTitanium = Color(0xFFBDC2C2);
   static const Color pink = Color(0xFFFFCCD4);
   static const Color indigo = Color(0xFFC4DDFF);
   static const Color darkModeGrey = Color(0xFF212121);
@@ -119,7 +119,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
       CardColors.grey, // cardColor
       Colors.black, // normalTextColor
       Colors.black54, // disabledTextColor
-      BorderColors.naturalTitanium, // borderColor
+      BorderColors.gold, // borderColor
       80, // calendarTodayBgColorAlpha
       50, // calendarLineBgColorAlpha
       135, // highlightBgColorAlpha
