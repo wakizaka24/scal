@@ -26,13 +26,11 @@ class UIUtils {
                 title: Text(title,
                     style: const TextStyle(
                       fontSize: 21,
-                      fontWeight: dialogFontWeight,
                     )
                 ),
                 content: Text(message,
                     style: const TextStyle(
                       fontSize: 15,
-                      fontWeight: dialogFontWeight,
                     )
                 ),
                 actions: <Widget>[
@@ -51,7 +49,6 @@ class UIUtils {
                       child: Text(negativeTitle ?? "",
                           style: TextStyle(
                               fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight,
                               color: designConfigState.colorConfig!
                               .cardTextColor
                           )
@@ -71,7 +68,6 @@ class UIUtils {
                       child: Text(positiveTitle,
                           style: TextStyle(
                               fontSize: buttonFontSize,
-                              fontWeight: buttonFontWeight,
                               color: designConfigState.colorConfig!
                               .cardTextColor
                           )

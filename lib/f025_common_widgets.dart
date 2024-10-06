@@ -314,7 +314,6 @@ class CWElevatedButton extends HookConsumerWidget {
         ),
         child: Text(CalendarUtils().convertCharWrapString(title)!,
             style: TextStyle(
-                fontWeight: buttonFontWeight,
                 color: color
             )
         )
@@ -360,7 +359,6 @@ class CWTextButton extends HookConsumerWidget {
         child: Text(CalendarUtils().convertCharWrapString(title)!,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontWeight: buttonFontWeight,
               color: color,
             )
         ),

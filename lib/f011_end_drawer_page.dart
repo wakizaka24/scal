@@ -170,7 +170,6 @@ class EndDrawerPage extends HookConsumerWidget {
               children: [
                 CWText('祝日曜日設定',
                     fontSize: drawerSettingTitleFontSize,
-                    fontWeight: eventListTitleFontWeight,
                     color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),
@@ -202,7 +201,6 @@ class EndDrawerPage extends HookConsumerWidget {
                 const SizedBox(height: 15),
                 CWText('カレンダー表示設定',
                     fontSize: drawerSettingTitleFontSize,
-                    fontWeight: eventListTitleFontWeight,
                     color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),

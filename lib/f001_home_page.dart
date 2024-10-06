@@ -148,7 +148,6 @@ class HomePage extends HookConsumerWidget {
                       style: const TextStyle(
                           height: 1.3,
                           color: Colors.white,
-                          fontWeight: appBarTitleFontWeight,
                           fontSize: 24
                       )
                   ),
@@ -317,10 +316,6 @@ class HomePage extends HookConsumerWidget {
               EventDetailPage(unsafeAreaTopHeight: unsafeAreaTopHeight,
                   unsafeAreaBottomHeight: unsafeAreaBottomHeight));
           await homeNotifier.updateState();
-
-
-          List<int>? a = [0, 1];
-          var i = a[3];
         },
         child: Consumer(
             builder: ((context, ref, child) {
