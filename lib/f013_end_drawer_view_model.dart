@@ -91,6 +91,10 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     return weekdayDisplayList;
   }
 
+  updateCalendarDisplayList() async {
+    state.calendarList = await createCalendarDisplayList();
+  }
+
   Future<List<CalendarDisplayDisplay>> createCalendarDisplayList(
       ) async {
     final calendarConfigNotifier = ref.read(calendarConfigNotifierProvider

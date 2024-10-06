@@ -7,6 +7,7 @@ import 'package:scal/f017_design_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'f005_calendar_view_model.dart';
+import 'f007_calendar_repository.dart';
 import 'f008_calendar_config.dart';
 import 'f013_end_drawer_view_model.dart';
 import 'f016_calendar_utils.dart';
@@ -15,7 +16,7 @@ import 'f025_common_widgets.dart';
 enum EndDrawerMenuType {
   softwareLicense(title: 'ソフトウェアライセンス'),
   privacyPolicyAndTermsOfUse(title: 'プライバシーポリシー/利用規約'),
-  initialSettingsMethod(title: '初期設定方法'),
+  // initialSettingsMethod(title: '初期設定方法'),
   ;
   final String title;
   const EndDrawerMenuType({required this.title});
@@ -72,7 +73,7 @@ class EndDrawerPage extends HookConsumerWidget {
 
     double cellHeaderHeight = 24;
     double cellSettingWidth = 62;
-    final createCell = useCallback(({String? title, double? width,
+    createCell({String? title, double? width,
       double? height = 80, Widget? child}) {
       Widget? widget = child;
       widget ??= Padding(
@@ -90,54 +91,80 @@ class EndDrawerPage extends HookConsumerWidget {
               child: widget
           )
       );
-    });
+    }
 
-    final createDisplayButtonColumn = useCallback((int i) {
+    createDisplayButtonColumn(int i) {
+      var calendar = endDrawerState.calendarList[i];
+      var calendarAndAddInfo = calendar.calendarAndAddInfo;
+
       return ListView(physics: const NeverScrollableScrollPhysics(),
           children: [
             const SizedBox(height: 3),
             CWTextButton(
-                title: '両方表示', // 表示 or 隠し表示 or 両方表示 or 非表示
+                title: calendarAndAddInfo.displayMode.title,
                 fontSize: drawerSettingItemFontSize,
                 color: colorConfig.normalTextColor,
                 padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                 textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
                 onPressed: () async {
+                  await calendarConfigNotifier.switchCalendarDisplayMode(
+                      calendar.calendarAndAddInfo.calendar.id!);
+                  await endDrawerNotifier.updateCalendarDisplayList();
+                  await endDrawerNotifier.updateState();
                 }),
-            CWTextButton(
-                title: '編集不可',
-                fontSize: drawerSettingItemFontSize,
-                color: colorConfig.normalTextColor,
-                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
-                onPressed: null),
-            CWTextButton(
-                title: '使用',
-                fontSize: drawerSettingItemFontSize,
-                color: colorConfig.normalTextColor,
-                padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
-                onPressed: () async {
-                }),
+            if (!calendarAndAddInfo.calendar.isReadOnly!)
+              CWTextButton(
+                  title: calendarAndAddInfo.editingMode.title,
+                  fontSize: drawerSettingItemFontSize,
+                  color: colorConfig.normalTextColor,
+                  padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                  textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                  onPressed: () async {
+                    await calendarConfigNotifier.switchCalendarEditingMode(
+                        calendar.calendarAndAddInfo.calendar.id!);
+                    await endDrawerNotifier.updateCalendarDisplayList();
+                    await endDrawerNotifier.updateState();
+                  }),
+            if (!calendarAndAddInfo.calendar.isReadOnly!)
+              CWTextButton(
+                  title: calendarAndAddInfo.useMode.title,
+                  fontSize: drawerSettingItemFontSize,
+                  color: colorConfig.normalTextColor,
+                  padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                  textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+                  onPressed: () async {
+                    await calendarConfigNotifier.switchCalendarUseMode(
+                        await CalendarRepository().getCalendars(),
+                        calendar.calendarAndAddInfo.calendar.id!);
+                    await endDrawerNotifier.updateCalendarDisplayList();
+                    await endDrawerNotifier.updateState();
+                  }),
             const SizedBox(height: 3),
           ]);
-    });
+    }
 
-    final createHolidayButtonColumn = useCallback((int i) {
+    createHolidayButtonColumn(int i) {
+      var calendar = endDrawerState.calendarList[i];
+      var calendarAndAddInfo = calendar.calendarAndAddInfo;
+
       return ListView(physics: const NeverScrollableScrollPhysics(),
           children: [
             const SizedBox(height: 3),
             CWTextButton(
-                title: '非祝日表示',
+                title: calendarAndAddInfo.holidayDisplayMode.title,
                 fontSize: drawerSettingItemFontSize,
                 color: colorConfig.normalTextColor,
                 padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                 textPadding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
                 onPressed: () async {
+                  await calendarConfigNotifier.switchCalendarHolidayDisplayMode(
+                      calendar.calendarAndAddInfo.calendar.id!);
+                  await endDrawerNotifier.updateCalendarDisplayList();
+                  await endDrawerNotifier.updateState();
                 }),
             const SizedBox(height: 3),
           ]);
-    });
+    }
 
     const double weekButtonWidth = 35;
     var weekdayList = endDrawerState.weekdayList;
@@ -158,8 +185,8 @@ class EndDrawerPage extends HookConsumerWidget {
                     await softwareLicenseOnPress();
                   case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
                     break;
-                  case EndDrawerMenuType.initialSettingsMethod:
-                    break;
+                  // case EndDrawerMenuType.initialSettingsMethod:
+                  //   break;
                 }
               }),
         },
@@ -226,9 +253,9 @@ class EndDrawerPage extends HookConsumerWidget {
                           Expanded(child: createCell(
                               title: calendarList[i].calendarName)),
                           createCell(width: cellSettingWidth,
-                              child: createDisplayButtonColumn(0)),
+                              child: createDisplayButtonColumn(i)),
                           createCell(width: cellSettingWidth,
-                              child: createHolidayButtonColumn(0)),
+                              child: createHolidayButtonColumn(i)),
                         ]),
                       }
                     ])
@@ -236,9 +263,7 @@ class EndDrawerPage extends HookConsumerWidget {
               ]
           ),
 
-        ),
-        SizedBox(height: eventListBottomSafeArea
-            + unsafeAreaBottomHeight)
+        )
       ],
     );
 
