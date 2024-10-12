@@ -57,38 +57,14 @@ void main() async {
   // ''')]);
   //   });
 
-    var brightnessMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.brightnessMode,
-        BrightnessMode.values);
+    await initCalendarConfig();
 
-    var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.lightColorMode,
-        ColorConfig.values);
-
-    var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.darkColorMode,
-        ColorConfig.values);
-
-    var calendarHolidayList = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayList);
-
-    var calendarHiddenCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
-
-    var calendarBothCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
-
-    var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
-
-    var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
-
-    var calendarUseCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarUseCalendarId);
-
-    var calendarHolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
+    final (
+      brightnessMode, lightColorConfig, darkColorConfig,
+      calendarHolidayList, calendarHiddenCalendarIds, calendarBothCalendarIds,
+      calendarInvisibleCalendarIds, calendarNotEditableCalendarIds,
+      calendarUseCalendarId, calendarHolidayCalendarIds
+    ) = await getCalendarConfigs();
 
     runApp(SCalApp(
       brightnessMode: brightnessMode,

@@ -40,7 +40,7 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
   }
 
   getBrightnessModeAssetName(BrightnessMode brightnessMode) {
-    switch(brightnessMode) {
+    switch (brightnessMode) {
       case BrightnessMode.lightAndDark:
         return 'images/icon_light_and_dark@3x.png';
       case BrightnessMode.light:

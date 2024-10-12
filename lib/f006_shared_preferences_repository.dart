@@ -1,9 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SharedPreferenceStringKey {
+enum SharedPreferenceKey {
   brightnessMode('brightnessMode'),
   lightColorMode('lightColorMode'),
   darkColorMode('darkColorMode'),
+  initCalendarConfig('initCalendarConfig'),
   calendarHolidayList('calendarHolidayList'),
   calendarHiddenCalendarIds('calendarHiddenCalendarIds'),
   calendarBothCalendarIds('calendarBothCalendarIds'),
@@ -11,11 +12,10 @@ enum SharedPreferenceStringKey {
   calendarNotEditableCalendarIds('calendarNotEditableCalendarIds'),
   calendarUseCalendarId('calendarUseCalendarId'),
   calendarHolidayCalendarIds('calendarHolidayCalendarIds'),
-
   ;
 
   final String id;
-  const SharedPreferenceStringKey(this.id);
+  const SharedPreferenceKey(this.id);
 }
 
 abstract interface class SharedPreferenceStringValue implements Enum {
@@ -44,7 +44,7 @@ class SharedPreferencesRepository {
   }
 
   Future<bool> setStringEnum<T extends SharedPreferenceStringValue>(
-      SharedPreferenceStringKey key, T? value) async {
+      SharedPreferenceKey key, T? value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value != null) {
       return await prefs.setString(key.id, value.configValue);
@@ -54,7 +54,7 @@ class SharedPreferencesRepository {
   }
 
   Future<T?> getStringEnum<T extends SharedPreferenceStringValue>(
-      SharedPreferenceStringKey key, List<T> values) async {
+      SharedPreferenceKey key, List<T> values) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var id = prefs.getString(key.id);
     if (id == null) {
@@ -67,7 +67,21 @@ class SharedPreferencesRepository {
     }
   }
 
-  Future<bool> setString(SharedPreferenceStringKey key, String? value) async {
+  Future<bool> setBool(SharedPreferenceKey key, bool? value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (value != null) {
+      return await prefs.setBool(key.id, value);
+    } else {
+      return await prefs.remove(key.id);
+    }
+  }
+
+  Future<bool?> getBool(SharedPreferenceKey key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key.id);
+  }
+
+  Future<bool> setString(SharedPreferenceKey key, String? value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value != null) {
       return await prefs.setString(key.id, value);
@@ -76,7 +90,7 @@ class SharedPreferencesRepository {
     }
   }
 
-  Future<String?> getString(SharedPreferenceStringKey key) async {
+  Future<String?> getString(SharedPreferenceKey key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key.id);
   }

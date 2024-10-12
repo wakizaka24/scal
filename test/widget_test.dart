@@ -8,44 +8,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scal/f006_shared_preferences_repository.dart';
+import 'package:scal/f008_calendar_config.dart';
 import 'package:scal/f017_design_config.dart';
 
 import 'package:scal/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    var brightnessMode = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.brightnessMode,
-        BrightnessMode.values);
+    await initCalendarConfig();
 
-    var lightColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.lightColorMode,
-        ColorConfig.values);
-
-    var darkColorConfig = await SharedPreferencesRepository()
-        .getStringEnum(SharedPreferenceStringKey.darkColorMode,
-        ColorConfig.values);
-
-    var calendarHolidayList = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayList);
-
-    var calendarHiddenCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHiddenCalendarIds);
-
-    var calendarBothCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarBothCalendarIds);
-
-    var calendarInvisibleCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarInvisibleCalendarIds);
-
-    var calendarNotEditableCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarNotEditableCalendarIds);
-
-    var calendarUseCalendarId = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarUseCalendarId);
-
-    var calendarHolidayCalendarIds = await SharedPreferencesRepository()
-        .getString(SharedPreferenceStringKey.calendarHolidayCalendarIds);
+    final (
+      brightnessMode, lightColorConfig, darkColorConfig,
+      calendarHolidayList, calendarHiddenCalendarIds, calendarBothCalendarIds,
+      calendarInvisibleCalendarIds, calendarNotEditableCalendarIds,
+      calendarUseCalendarId, calendarHolidayCalendarIds
+    ) = await getCalendarConfigs();
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(SCalApp(

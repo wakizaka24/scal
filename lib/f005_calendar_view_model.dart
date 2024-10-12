@@ -543,7 +543,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     var holidayList = calendarConfig.calendarHolidayList;
 
     var titleColors = holidayList.map((holiday) {
-      switch(holiday) {
+      switch (holiday) {
         case CalendarHoliday.none:
           return normalTextColor;
         case CalendarHoliday.red:

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'f006_shared_preferences_repository.dart';
 import 'f007_calendar_repository.dart';
+import 'f017_design_config.dart';
 
 const calendarConfigDelimiter = ',';
 enum CalendarHoliday {
@@ -42,6 +43,98 @@ enum CalendarHolidayDisplayMode {
   holidayDisplay('祝日表示');
   final String title;
   const CalendarHolidayDisplayMode(this.title);
+}
+
+initCalendarConfig() async {
+  var init = await SharedPreferencesRepository().getBool(
+      SharedPreferenceKey.initCalendarConfig) ?? false;
+  if (!init) {
+    await SharedPreferencesRepository().setBool(
+        SharedPreferenceKey.initCalendarConfig, true);
+    const iOSCalendarAccountName = 'Subscribed Calendars';
+    const japaneseHolidayName = '日本の祝日';
+
+    await CalendarRepository().hasPermissions();
+    var calendars = await CalendarRepository().getCalendars();
+
+    var holidayCalendarId = calendars
+        .where((calendar) => calendar.accountName == iOSCalendarAccountName
+        && calendar.name == japaneseHolidayName)
+        .map((calendar) => calendar.id!).firstOrNull;
+    holidayCalendarId ??= calendars
+          .where((calendar) => calendar.name == japaneseHolidayName)
+          .map((calendar) => calendar.id!).firstOrNull;
+    if (holidayCalendarId == null) {
+      return;
+    }
+
+    await SharedPreferencesRepository().setString(
+        SharedPreferenceKey.calendarHolidayCalendarIds,
+        holidayCalendarId
+    );
+
+    var otherHolidayCalendars = calendars
+        .where((calendar) => calendar.name == japaneseHolidayName
+        && calendar.id != holidayCalendarId)
+        .map((calendar) => calendar.id!).toList();
+
+    await SharedPreferencesRepository().setString(
+        SharedPreferenceKey.calendarInvisibleCalendarIds,
+        listToCalendarConfig(otherHolidayCalendars)
+    );
+  }
+}
+
+String? listToCalendarConfig(List<String> list) {
+  if (list.isEmpty) {
+    return null;
+  }
+  return list.reduce((value, configValue) {
+    if (value.isNotEmpty) {
+      value += calendarConfigDelimiter;
+    }
+    value += configValue;
+    return value;
+  });
+}
+
+Future<(
+  BrightnessMode?, // brightnessMode
+  ColorConfig?, // lightColorConfig
+  ColorConfig?, // darkColorConfig
+  String?, // calendarHolidayList
+  String?, // calendarHiddenCalendarIds
+  String?, // calendarBothCalendarIds
+  String?, // calendarInvisibleCalendarIds
+  String?, // calendarNotEditableCalendarIds
+  String?, // calendarUseCalendarId
+  String? // calendarHolidayCalendarIds
+)> getCalendarConfigs() async {
+  return (
+    await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.brightnessMode,
+        BrightnessMode.values),
+    await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.lightColorMode,
+        ColorConfig.values),
+    await SharedPreferencesRepository()
+        .getStringEnum(SharedPreferenceKey.darkColorMode,
+        ColorConfig.values),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarHolidayList),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarHiddenCalendarIds),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarBothCalendarIds),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarInvisibleCalendarIds),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarNotEditableCalendarIds),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarUseCalendarId),
+    await SharedPreferencesRepository()
+        .getString(SharedPreferenceKey.calendarHolidayCalendarIds)
+  );
 }
 
 class CalendarAndAdditionalInfo {
@@ -126,7 +219,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     var sundayConfig = listToCalendarConfig(state.calendarHolidayList
         .map((holiday)=>holiday.value).toList());
     await SharedPreferencesRepository().setString(
-        SharedPreferenceStringKey.calendarHolidayList,
+        SharedPreferenceKey.calendarHolidayList,
         sundayConfig
     );
   }
@@ -177,10 +270,11 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
   Future<CalendarDisplayMode> switchCalendarDisplayMode(String calendarId
       ) async {
     var modeList = CalendarDisplayMode.values.toList();
-    List<String> calendarHiddenCalendarIds = state.calendarHiddenCalendarIds;
-    List<String> calendarBothCalendarIds = state.calendarBothCalendarIds;
-    List<String> calendarInvisibleCalendarIds = state
-        .calendarInvisibleCalendarIds;
+    List<String> calendarHiddenCalendarIds = [...state
+        .calendarHiddenCalendarIds];
+    List<String> calendarBothCalendarIds = [...state.calendarBothCalendarIds];
+    List<String> calendarInvisibleCalendarIds = [...state
+        .calendarInvisibleCalendarIds];
 
     var mode = getCalendarDisplayMode(calendarId);
     mode = modeList[(mode.index + 1) % modeList.length];
@@ -189,7 +283,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     calendarBothCalendarIds.remove(calendarId);
     calendarInvisibleCalendarIds.remove(calendarId);
 
-    switch(mode) {
+    switch (mode) {
       case CalendarDisplayMode.display:
         break;
       case CalendarDisplayMode.hidden:
@@ -206,7 +300,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     if (calendarHiddenCalendarIds != state.calendarHiddenCalendarIds) {
       state.calendarHiddenCalendarIds = calendarHiddenCalendarIds;
       await SharedPreferencesRepository().setString(
-          SharedPreferenceStringKey.calendarHiddenCalendarIds,
+          SharedPreferenceKey.calendarHiddenCalendarIds,
           listToCalendarConfig(calendarHiddenCalendarIds)
       );
     }
@@ -214,7 +308,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     if (calendarBothCalendarIds != state.calendarBothCalendarIds) {
       state.calendarBothCalendarIds = calendarBothCalendarIds;
       await SharedPreferencesRepository().setString(
-          SharedPreferenceStringKey.calendarBothCalendarIds,
+          SharedPreferenceKey.calendarBothCalendarIds,
           listToCalendarConfig(calendarBothCalendarIds)
       );
     }
@@ -222,7 +316,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     if (calendarInvisibleCalendarIds != state.calendarInvisibleCalendarIds) {
       state.calendarInvisibleCalendarIds = calendarInvisibleCalendarIds;
       await SharedPreferencesRepository().setString(
-          SharedPreferenceStringKey.calendarInvisibleCalendarIds,
+          SharedPreferenceKey.calendarInvisibleCalendarIds,
           listToCalendarConfig(calendarInvisibleCalendarIds)
       );
     }
@@ -245,15 +339,15 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
   Future<CalendarEditingMode> switchCalendarEditingMode(String calendarId
       ) async {
     var modeList = CalendarEditingMode.values.toList();
-    List<String> calendarNotEditableCalendarIds = state
-        .calendarNotEditableCalendarIds;
+    List<String> calendarNotEditableCalendarIds = [...state
+        .calendarNotEditableCalendarIds];
 
     var mode = getCalendarEditingMode(calendarId);
     mode = modeList[(mode.index + 1) % modeList.length];
 
     calendarNotEditableCalendarIds.remove(calendarId);
 
-    switch(mode) {
+    switch (mode) {
       case CalendarEditingMode.editable:
         break;
       case CalendarEditingMode.notEditable:
@@ -265,7 +359,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
         .calendarNotEditableCalendarIds) {
       state.calendarNotEditableCalendarIds = calendarNotEditableCalendarIds;
       await SharedPreferencesRepository().setString(
-          SharedPreferenceStringKey.calendarNotEditableCalendarIds,
+          SharedPreferenceKey.calendarNotEditableCalendarIds,
           listToCalendarConfig(calendarNotEditableCalendarIds)
       );
     }
@@ -310,7 +404,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     }
 
     await SharedPreferencesRepository().setString(
-        SharedPreferenceStringKey.calendarHolidayCalendarIds,
+        SharedPreferenceKey.calendarHolidayCalendarIds,
         state.calendarUseCalendarId
     );
 
@@ -333,14 +427,15 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       String calendarId) async {
 
     var modeList = CalendarHolidayDisplayMode.values.toList();
-    List<String> calendarHolidayCalendarIds = state.calendarHolidayCalendarIds;
+    List<String> calendarHolidayCalendarIds = [...state
+        .calendarHolidayCalendarIds];
 
     var mode = getCalendarHolidayDisplayMode(calendarId);
     mode = modeList[(mode.index + 1) % modeList.length];
 
     calendarHolidayCalendarIds.remove(calendarId);
 
-    switch(mode) {
+    switch (mode) {
       case CalendarHolidayDisplayMode.nonHolidayDisplay:
         break;
       case CalendarHolidayDisplayMode.holidayDisplay:
@@ -351,22 +446,12 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     if (calendarHolidayCalendarIds != state.calendarHolidayCalendarIds) {
       state.calendarHolidayCalendarIds = calendarHolidayCalendarIds;
       await SharedPreferencesRepository().setString(
-          SharedPreferenceStringKey.calendarHolidayCalendarIds,
+          SharedPreferenceKey.calendarHolidayCalendarIds,
           listToCalendarConfig(calendarHolidayCalendarIds)
       );
     }
 
     return mode;
-  }
-
-  String listToCalendarConfig(List<String> list) {
-    return list.reduce((value, configValue) {
-      if (value.isNotEmpty) {
-        value += calendarConfigDelimiter;
-      }
-      value += configValue;
-      return value;
-    });
   }
 
   updateState() async {

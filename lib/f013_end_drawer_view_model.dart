@@ -68,7 +68,7 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     var holidayList = calendarConfig.calendarHolidayList;
 
     var titleColors = holidayList.map((holiday) {
-      switch(holiday) {
+      switch (holiday) {
         case CalendarHoliday.none:
           return normalTextColor;
         case CalendarHoliday.red:
@@ -81,7 +81,7 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     }).toList();
 
     List<WeekdayDisplay> weekdayDisplayList = [];
-    for (int i=0; i<titleList.length; i++) {
+    for (int i=0; i < titleList.length; i++) {
       var title = titleList[i];
       var titleColor = titleColors[i];
       weekdayDisplayList.add(WeekdayDisplay(title: title,
@@ -123,7 +123,8 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
     calendarDisplayList.sort((calendar1, calendar2) {
       if (calendar1.accountName.compareTo(calendar2.accountName) != 0) {
         return calendar1.accountName.compareTo(calendar2.accountName);
-      } else if (calendar1.calendarName.compareTo(calendar2.calendarName) != 0) {
+      } else if (calendar1.calendarName.compareTo(calendar2.calendarName
+        ) != 0) {
         return calendar1.calendarName.compareTo(calendar2.calendarName);
       } else {
         return calendar1.calendarAndAddInfo.calendar.id!
