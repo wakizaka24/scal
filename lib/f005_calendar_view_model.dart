@@ -313,17 +313,18 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   String getCalendarSwitchingButtonTitle() {
     return state.calendarSwitchingIndex == 0 ?
-        "Weekly" : state.calendarSwitchingIndex == 1
-        ? "Monthly" : "";
+        "週表示" : state.calendarSwitchingIndex == 1
+        ? "月表示" : "";
   }
 
   // Month Calendar
 
   onTapTodayButton() async {
-    await moveCalendar(DateTime.now());
+    await moveCalendar(DateTime.now(), moveMonthCalendar: true);
   }
 
-  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false}) async {
+  Future<void> moveCalendar(DateTime distDateTime, {bool allDay=false,
+    bool moveMonthCalendar=false}) async {
     Future<bool> moveToday() async {
       var dayPartIndex = state.dayLists[1].indexWhere((day) {
         var diffHour = distDateTime.difference(day.id).inHours;
@@ -339,27 +340,37 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       return false;
     }
 
-    var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
     if (state.calendarSwitchingIndex != 0) {
-      var hourPartIndex = state.hours.indexWhere((hour) {
-        var diffHour = distDateTime.difference(hour.id).inHours;
-        var sameHour = diffHour >= 0 && diffHour < hoursPartTimeInterval;
-        var sameDay = diffHour >= 0 && diffHour < 24;
-        return !allDay && sameHour && !hour.allDay
-            || allDay && sameDay && hour.allDay;
-      });
-      if (hourPartIndex != -1) {
-        if (state.hourPartIndex != hourPartIndex) {
-          await onTapDownCalendarHour(hourPartIndex);
-        }
+      if (!moveMonthCalendar) {
+        var hoursPartTimeInterval = 24 / CalendarPageState.timeColNum;
+        var hourPartIndex = state.hours.indexWhere((hour) {
+          var diffHour = distDateTime
+              .difference(hour.id)
+              .inHours;
+          var sameHour = diffHour >= 0 && diffHour < hoursPartTimeInterval;
+          var sameDay = diffHour >= 0 && diffHour < 24;
+          return !allDay && sameHour && !hour.allDay
+              || allDay && sameDay && hour.allDay;
+        });
+        if (hourPartIndex != -1) {
+          if (state.hourPartIndex != hourPartIndex) {
+            await onTapDownCalendarHour(hourPartIndex);
+          }
 
-        return;
+          return;
+        }
       }
 
       await state.calendarSwitchingController
           .animateToPage(0, duration: const Duration(milliseconds: 150),
           curve: Curves.easeIn);
-      return;
+
+      // スクロール後のロードまで待つ。
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (moveMonthCalendar) {
+        return;
+      }
     }
 
     if (await moveToday()) {

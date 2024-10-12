@@ -632,9 +632,10 @@ class DayPart extends HookConsumerWidget {
                     for (int i = 0; i < day.eventList.length; i++) ... {
                       CWText(CalendarUtils().convertCharWrapString(
                           day.eventList[i].title)!,
-                          maxLines: 1,
-                          fontSize: calendarEventFontSize,
-                          color: day.eventList[i].titleColor
+                        maxLines: 1,
+                        fontSize: calendarEventFontSize,
+                        color: day.eventList[i].titleColor,
+                        structHeight: 1.1,
                       ),
                     }
                   ],
@@ -807,18 +808,20 @@ class _EventPartState extends ConsumerState<EventPart>
                       padding: const EdgeInsets.symmetric(horizontal: 8,
                           vertical: 0),
                       child: CWText(emptyMessage,
-                          maxLines: 2,
-                          fontSize: eventListItemFontSize,
-                          color: colorConfig.normalTextColor
+                        maxLines: 2,
+                        fontSize: eventListItemFontSize,
+                        color: colorConfig.normalTextColor,
+                        structHeight: 1.2,
                       )
                   )
                 ),
               if (event != null)
                 SizedBox(width: 45, child:
                   CWText(event.head,
-                      textAlign: TextAlign.center,
-                      fontSize: eventListItemFontSize,
-                      color: event.fontColor
+                    textAlign: TextAlign.center,
+                    fontSize: eventListItemFontSize,
+                    color: event.fontColor,
+                    structHeight: 1.2,
                   )
                 ),
               if (event != null)
@@ -838,9 +841,10 @@ class _EventPartState extends ConsumerState<EventPart>
                           vertical: 0),
                       child: CWText(CalendarUtils().convertCharWrapString(
                           event.title)!,
-                          maxLines: 2,
-                          fontSize: eventListItemFontSize,
-                          color: event.fontColor
+                        maxLines: 2,
+                        fontSize: eventListItemFontSize,
+                        color: event.fontColor,
+                        structHeight: 1.2,
                       )
                   )
                 ),

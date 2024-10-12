@@ -16,85 +16,41 @@ const double drawerWeekButtonFontSize = 13;
 const double drawerSettingTitleFontSize = 13.5;
 const double drawerSettingItemFontSize = 11;
 
-const MaterialColor originalLightPink = MaterialColor(
-    _originalLightPinkPrimary,
-    {
-      50: Color(0xFFFFF6F8),
-      100: Color(0xFFFFE9EC),
-      200: Color(0xFFFFDBE0),
-      300: Color(0xFFFFCCD4),
-      400: Color(0xFFFFC1CA),
-      500: Color(_originalLightPinkPrimary),
-      600: Color(0xFFFFAFBB),
-      700: Color(0xFFFFA6B3),
-      800: Color(0xFFFF9EAB),
-      900: Color(0xFFFF8E9E),
+MaterialColor createMaterialColor(Color primary) {
+  List<double> strengths = [.05];
+  for (int i = 1; i < 10; i++) {
+    strengths.add(0.1 * i);
+  }
+
+  Map<int, Color> swatch = {};
+  for (var strength in strengths) {
+    double rate = 0.5 - strength;
+    var addValue = ((int value, double rate) {
+      return ((rate < 0 ? value : (255 - value)) * rate).round();
     });
-const int _originalLightPinkPrimary = 0xFFFFB6C1;
-
-const MaterialColor originalLightBlue = MaterialColor(
-    _originalLightBluePrimary,
-    {
-      50: Color(0xFFF5F8FF),
-      100: Color(0xFFE6EDFF),
-      200: Color(0xFFD5E2FF),
-      300: Color(0xFFC4D6FF),
-      400: Color(0xFFB7CDFF),
-      500: Color(_originalLightBluePrimary),
-      600: Color(0xFFA3BEFF),
-      700: Color(0xFF99B6FF),
-      800: Color(0xFF90AFFF),
-      900: Color(0xFF7FA2FF),
-    });
-const int _originalLightBluePrimary = 0xFFAAC4FF;
-
-const MaterialColor originalBrown = MaterialColor(
-    _originalBrownPrimary, <int, Color>{
-  50: Color(0xFFF7F6F5),
-  100: Color(0xFFECE8E6),
-  200: Color(0xFFDFD9D6),
-  300: Color(0xFFD2C9C6),
-  400: Color(0xFFC8BEB9),
-  500: Color(_originalBrownPrimary),
-  600: Color(0xFFB8ABA6),
-  700: Color(0xFFAFA29C),
-  800: Color(0xFFA79993),
-  900: Color(0xFF998A83),
-});
-const int _originalBrownPrimary = 0xFFBEB2AD;
-
-const MaterialColor originalLightGray = MaterialColor(
-    _originalLightGrayPrimary, <int, Color>{
-  50: Color(0xFFF2F2F2),
-  100: Color(0xFFDEDEDE),
-  200: Color(0xFFC8C8C8),
-  300: Color(0xFFB1B1B1),
-  400: Color(0xFFA1A1A1),
-  500: Color(_originalLightGrayPrimary),
-  600: Color(0xFF888888),
-  700: Color(0xFF7D7D7D),
-  800: Color(0xFF737373),
-  900: Color(0xFF616161),
-});
-const int _originalLightGrayPrimary = 0xFF909090;
+    swatch[(strength * 1000).round()] = Color.fromRGBO(
+      primary.red + addValue(primary.red, rate),
+      primary.green + addValue(primary.green, rate),
+      primary.blue + addValue(primary.blue, rate),
+      1,
+    );
+  }
+  return MaterialColor(primary.value, swatch);
+}
 
 abstract final class BackgroundColors {
-  static const Color extraLightGrey = Color(0xFFD3D3D3);
-  static const Color cream = Color(0xFFF3ECD8);
-  static const Color cream3 = Color(0xFFEAE1CF);
+  static const Color white = Colors.white;
   static const Color darkModeGrey = Color(0xFF313131);
 }
 
 abstract final class BorderColors {
-  static const Color gold = Color(0xCCC4B8A5);
-  // static const Color naturalTitanium = Color(0xFFBDC2C2);
+  static const Color green = Color(0xFFB9F6CA);
   static const Color pink = Color(0xFFFFCCD4);
   static const Color indigo = Color(0xFFC4DDFF);
   static const Color darkModeGrey = Color(0xFF212121);
 }
 
 abstract final class CardColors {
-  static const Color grey = Color(0xFFE5E5E5);
   static const Color cream = Color(0xFFF8F5EB);
   static const Color darkModeBlack = Colors.black26;
 }
@@ -109,17 +65,17 @@ enum BrightnessMode implements SharedPreferenceStringValue {
 }
 
 enum ColorConfig implements SharedPreferenceStringValue {
-  normal15Brown(
-      'normal15Brown',
+  normal15White(
+      'normal15Green',
       true, // useMaterial3
       Brightness.light, // brightness
-      originalBrown, // primarySwatch
-      Color(0xFFAFA29C), // accentColor
-      BackgroundColors.extraLightGrey, // backgroundColor
-      CardColors.grey, // cardColor
+      Colors.greenAccent, // primaryColor
+      Color(0xFF00C853), // accentColor
+      BackgroundColors.white, // backgroundColor
+      CardColors.cream, // cardColor
       Colors.black, // normalTextColor
       Colors.black54, // disabledTextColor
-      BorderColors.gold, // borderColor
+      BorderColors.green, // borderColor
       80, // calendarTodayBgColorAlpha
       50, // calendarLineBgColorAlpha
       135, // highlightBgColorAlpha
@@ -129,9 +85,9 @@ enum ColorConfig implements SharedPreferenceStringValue {
       'normal35Pink',
       true, // useMaterial3
       Brightness.light, // brightness
-      originalLightPink, // primarySwatch
+      Color(0xFFFFB6C1), // primaryColor
       Color(0xFFFFA6B3), // accentColor
-      BackgroundColors.cream, // backgroundColor
+      BackgroundColors.white, // backgroundColor
       CardColors.cream, // cardColor
       Colors.black, // normalTextColor
       Colors.black54, // disabledTextColor
@@ -145,9 +101,9 @@ enum ColorConfig implements SharedPreferenceStringValue {
       'normal17LightBlue',
       true, // useMaterial3
       Brightness.light, // brightness
-      originalLightBlue, // primarySwatch
+      Color(0xFFAAC4FF), // primaryColor
       Color(0xFF99B6FF), // accentColor
-      BackgroundColors.cream3, // backgroundColor
+      BackgroundColors.white, // backgroundColor
       CardColors.cream, // cardColor
       Colors.black, // normalTextColor
       Colors.black54, // disabledTextColor
@@ -161,7 +117,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
       'dark11Gray',
       true, // useMaterial3
       Brightness.dark, // brightness
-      originalLightGray, // primarySwatch
+      Color(0xFFC8C8C8), // primaryColor
       Color(0xFFC8C8C8), // accentColor
       BackgroundColors.darkModeGrey, // backgroundColor
       CardColors.darkModeBlack, // cardColor
@@ -178,7 +134,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
   final String configValue;
   final bool useMaterial3;
   final Brightness brightness;
-  final MaterialColor primarySwatch;
+  final Color primaryColor;
   final Color accentColor;
   final Color? cardColor;
   final Color? backgroundColor;
@@ -194,7 +150,7 @@ enum ColorConfig implements SharedPreferenceStringValue {
       this.configValue,
       this.useMaterial3,
       this.brightness,
-      this.primarySwatch,
+      this.primaryColor,
       this.accentColor,
       this.backgroundColor,
       this.cardColor,
@@ -214,20 +170,6 @@ class DesignConfigState {
   ColorConfig? preColorConfig;
   ColorConfig? lightColorConfig;
   ColorConfig? darkColorConfig;
-
-  // ColorConfig? get colorConfig {
-  //   if (brightnessMode == null) {
-  //     return null;
-  //   }
-  //   switch (brightnessMode!) {
-  //     case BrightnessMode.lightAndDark:
-  //       return lightAndDarkColorConfig!;
-  //     case BrightnessMode.light:
-  //       return lightColorConfig!;
-  //     case BrightnessMode.dark:
-  //       return darkColorConfig!;
-  //   }
-  // }
 
   static DesignConfigState copy(DesignConfigState state) {
     var nState = DesignConfigState();

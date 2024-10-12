@@ -116,10 +116,14 @@ Future<(
         BrightnessMode.values),
     await SharedPreferencesRepository()
         .getStringEnum(SharedPreferenceKey.lightColorMode,
-        ColorConfig.values),
+        ColorConfig.values) ??
+        ColorConfig.values.firstWhere((config) => config
+            .brightness == Brightness.light),
     await SharedPreferencesRepository()
         .getStringEnum(SharedPreferenceKey.darkColorMode,
-        ColorConfig.values),
+        ColorConfig.values) ??
+        ColorConfig.values.firstWhere((config) => config
+            .brightness == Brightness.dark),
     await SharedPreferencesRepository()
         .getString(SharedPreferenceKey.calendarHolidayList),
     await SharedPreferencesRepository()

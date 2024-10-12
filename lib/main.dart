@@ -9,7 +9,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'f001_home_page.dart';
-import 'f006_shared_preferences_repository.dart';
 import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
 
@@ -169,7 +168,8 @@ class SCalApp extends StatelessWidget {
                     useMaterial3: colorConfig!.useMaterial3,
                     colorScheme: ColorScheme.fromSwatch(
                         brightness: colorConfig.brightness,
-                        primarySwatch: colorConfig.primarySwatch,
+                        primarySwatch: createMaterialColor(
+                            colorConfig.primaryColor),
                         accentColor: colorConfig.accentColor,
                         cardColor: colorConfig.cardColor,
                         backgroundColor: colorConfig.backgroundColor

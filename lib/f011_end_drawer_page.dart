@@ -58,6 +58,7 @@ class EndDrawerPage extends HookConsumerWidget {
           )
       ));
 
+      // ステータスバーの色の設定外まで待つ。
       await Future.delayed(const Duration(milliseconds: 100));
 
       // ステータスバーの設定
