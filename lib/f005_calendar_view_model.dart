@@ -365,13 +365,13 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           .animateToPage(0, duration: const Duration(milliseconds: 150),
           curve: Curves.easeIn);
 
-      // スクロール後のロードまで待つ。
-      await Future.delayed(const Duration(milliseconds: 100));
-
       if (moveMonthCalendar) {
         return;
       }
     }
+
+    // スクロール後のロードまで待つ。
+    await Future.delayed(const Duration(milliseconds: 100));
 
     if (await moveToday()) {
       return;
