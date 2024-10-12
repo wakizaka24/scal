@@ -157,7 +157,7 @@ class CalendarPageState {
   bool initialized = false;
   late DateTime now;
   bool preEventDataLoading = false;
-  Map<String, Calendar> calendarMap = {};
+  Map<String, CalendarAndAdditionalInfo> calendarMap = {};
   List<Event> calendarEvents = [];
   Map<String, Event> eventIdEventMap = {};
   Map<String, DateTime> eventIdStartDateMap = {};
@@ -511,12 +511,15 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   }
 
   loadMonthCalendarData() async {
-    var calendars = await getCalendars();
-    state.calendarMap = convertCalendarMap(calendars);
+    var calendarConfigNotifier = ref.read(
+        calendarConfigNotifierProvider.notifier);
+    var calendarAndAddInfos = await calendarConfigNotifier
+        .createCalendarAndAddInfoList();
+    state.calendarMap = convertCalendarMap(calendarAndAddInfos);
 
     var startDate = state.dayLists.first.first.id;
     var endDate = state.dayLists.last.last.id;
-    state.calendarEvents = await getEvents(calendars, startDate,
+    state.calendarEvents = await getEvents(calendarAndAddInfos, startDate,
         endDate);
     state.eventIdEventMap = createEventIdEventMap(state.calendarEvents);
     state.eventIdStartDateMap =
@@ -671,22 +674,50 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
 
   List<List<DayDisplay>> addEventsForMonthCalendar(
       List<List<DayDisplay>> dayLists, Map<DateTime, List<Event>> eventsMap,
-      Map<String, Calendar> calendarMap) {
+      Map<String, CalendarAndAdditionalInfo> calendarMap) {
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
+    var calendarConfigState = ref.read(calendarConfigNotifierProvider);
 
     for (int month = 0; month < dayLists.length; month++) {
       for (int day = 0; day < dayLists[month].length; day++) {
         var dayInfo = dayLists[month][day];
+
+        var holiday = false;
         dayInfo.eventList.clear();
         var events = eventsMap[dayInfo.id] ?? [];
         for (int i = 0; i < events.length; i++) {
           var event = events[i];
-          var calendar = calendarMap[event.calendarId]!;
+          var calendarAndAddInfo = calendarMap[event.calendarId]!;
+          if (calendarAndAddInfo.displayMode == CalendarDisplayMode.hidden) {
+            continue;
+          }
+          if (!calendarConfigState.calendarHiddenMode && calendarAndAddInfo
+              .displayMode == CalendarDisplayMode.invisible) {
+            continue;
+          }
+          if (calendarConfigState.calendarHiddenMode && calendarAndAddInfo
+              .displayMode == CalendarDisplayMode.display) {
+            continue;
+          }
+
+          var titleColor = colorConfig.disabledTextColor;
+          if (calendarAndAddInfo.holidayDisplayMode
+              == CalendarHolidayDisplayMode.holidayDisplay) {
+            holiday = true;
+            titleColor = Colors.red;
+          } else if (calendarAndAddInfo.editingMode
+              == CalendarEditingMode.editable
+              && calendarAndAddInfo.useMode == CalendarUseMode.use) {
+            titleColor = colorConfig.normalTextColor;
+          }
+
           dayInfo.eventList.add(DayEventDisplay(
               title: events[i].title!,
-              titleColor: calendar.isDefault!
-                  ? colorConfig.normalTextColor
-                  : colorConfig.disabledTextColor));
+              titleColor: titleColor));
+        }
+
+        if (holiday) {
+          dayInfo.titleColor = Colors.red;
         }
       }
     }
@@ -854,7 +885,7 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
   List<HourDisplay> addEvents(List<HourDisplay> hours,
       Map<DateTime, List<Event>> allDayEventsMap,
       Map<DateTime, List<Event>> hourEventsMap,
-      Map<String, Calendar> calendarMap) {
+      Map<String, CalendarAndAdditionalInfo> calendarMap) {
     var colorConfig = ref.read(designConfigNotifierProvider).colorConfig!;
 
     for (var hourInfo in hours) {
@@ -868,10 +899,10 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
       //     title: dhmStr, titleColor: normalTextColor));
 
       for (var event in events) {
-        var calendar = calendarMap[event.calendarId]!;
+        var calendarAndAddInfo = calendarMap[event.calendarId]!;
         hourInfo.eventList.add(HourEventDisplay(
             title: event.title!,
-            titleColor: calendar.isDefault!
+            titleColor: calendarAndAddInfo.calendar.isDefault!
                 ? colorConfig.normalTextColor
                 : colorConfig.disabledTextColor));
       }
@@ -1217,21 +1248,22 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     }).toList();
   }
 
-  Map<String, Calendar> convertCalendarMap(List<Calendar> calendars) {
-    Map<String, Calendar> calendarMap = {};
-    for (int i = 0; i < calendars.length; i++) {
-      var calendar = calendars[i];
-      calendarMap[calendar.id!] = calendar;
+  Map<String, CalendarAndAdditionalInfo> convertCalendarMap(
+      List<CalendarAndAdditionalInfo> calendarAndAddInfos) {
+    Map<String, CalendarAndAdditionalInfo> calendarMap = {};
+    for (int i = 0; i < calendarAndAddInfos.length; i++) {
+      var calendarAndAddInfo = calendarAndAddInfos[i];
+      calendarMap[calendarAndAddInfo.calendar.id!] = calendarAndAddInfo;
     }
     return calendarMap;
   }
 
-  Future<List<Event>> getEvents(List<Calendar> calendars,
+  Future<List<Event>> getEvents(List<CalendarAndAdditionalInfo> calendarAndAddInfos,
       DateTime startDate, DateTime endDate) async {
     List<Event> events = [];
-    if (calendars.isNotEmpty) {
-      for (int i = 0; i < calendars.length; i++) {
-        var calendar = calendars[i];
+    if (calendarAndAddInfos.isNotEmpty) {
+      for (int i = 0; i < calendarAndAddInfos.length; i++) {
+        var calendar = calendarAndAddInfos[i].calendar;
         events.addAll(await calendarRepo.getEvents(calendar.id!,
             startDate, endDate));
       }

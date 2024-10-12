@@ -59,8 +59,8 @@ void main() async {
     await initCalendarConfig();
 
     final (
-      brightnessMode, lightColorConfig, darkColorConfig,
-      calendarHolidayList, calendarHiddenCalendarIds, calendarBothCalendarIds,
+      brightnessMode, lightColorConfig, darkColorConfig, calendarHolidayList,
+      calendarHiddenMode, calendarHiddenCalendarIds, calendarBothCalendarIds,
       calendarInvisibleCalendarIds, calendarNotEditableCalendarIds,
       calendarUseCalendarId, calendarHolidayCalendarIds
     ) = await getCalendarConfigs();
@@ -70,6 +70,7 @@ void main() async {
       lightColorConfig: lightColorConfig,
       darkColorConfig: darkColorConfig,
       calendarHolidayList: calendarHolidayList,
+      calendarHiddenMode: calendarHiddenMode,
       calendarHiddenCalendarIds: calendarHiddenCalendarIds,
       calendarBothCalendarIds: calendarBothCalendarIds,
       calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
@@ -95,6 +96,7 @@ class SCalApp extends StatelessWidget {
   final ColorConfig? lightColorConfig;
   final ColorConfig? darkColorConfig;
   final String? calendarHolidayList;
+  final bool? calendarHiddenMode;
   final String? calendarHiddenCalendarIds;
   final String? calendarBothCalendarIds;
   final String? calendarInvisibleCalendarIds;
@@ -108,6 +110,7 @@ class SCalApp extends StatelessWidget {
     required this.lightColorConfig,
     required this.darkColorConfig,
     required this.calendarHolidayList,
+    required this.calendarHiddenMode,
     required this.calendarHiddenCalendarIds,
     required this.calendarBothCalendarIds,
     required this.calendarInvisibleCalendarIds,
@@ -127,8 +130,6 @@ class SCalApp extends StatelessWidget {
               var designConfigState = ref.watch(designConfigNotifierProvider);
               final designConfigNotifier = ref.watch(
                   designConfigNotifierProvider.notifier);
-              // var calendarConfigState = ref.watch(
-              //     calendarConfigNotifierProvider);
               var calendarConfigNotifier = ref.watch(
                   calendarConfigNotifierProvider.notifier);
               var colorConfig = designConfigState.colorConfig;
@@ -148,8 +149,9 @@ class SCalApp extends StatelessWidget {
                     editingBrightnessMode, brightness, editingLightColorConfig,
                     editingDarkColorConfig);
                 calendarConfigNotifier.initState(
-                    calendarHolidayList, calendarHiddenCalendarIds,
-                    calendarBothCalendarIds, calendarInvisibleCalendarIds,
+                    calendarHolidayList, calendarHiddenMode,
+                    calendarHiddenCalendarIds, calendarBothCalendarIds,
+                    calendarInvisibleCalendarIds,
                     calendarNotEditableCalendarIds, calendarUseCalendarId,
                     calendarHolidayCalendarIds);
               }

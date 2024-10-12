@@ -94,6 +94,13 @@ class EndDrawerPage extends HookConsumerWidget {
       );
     }
 
+    updateCalendarDisplayListState() async {
+      await endDrawerNotifier.updateCalendarDisplayList();
+      await endDrawerNotifier.updateState();
+      await calendarNotifier.updateCalendar();
+      await calendarNotifier.updateState();
+    }
+
     createDisplayButtonColumn(int i) {
       var calendar = endDrawerState.calendarList[i];
       var calendarAndAddInfo = calendar.calendarAndAddInfo;
@@ -110,8 +117,7 @@ class EndDrawerPage extends HookConsumerWidget {
                 onPressed: () async {
                   await calendarConfigNotifier.switchCalendarDisplayMode(
                       calendar.calendarAndAddInfo.calendar.id!);
-                  await endDrawerNotifier.updateCalendarDisplayList();
-                  await endDrawerNotifier.updateState();
+                  await updateCalendarDisplayListState();
                 }),
             if (!calendarAndAddInfo.calendar.isReadOnly!)
               CWTextButton(
@@ -123,8 +129,7 @@ class EndDrawerPage extends HookConsumerWidget {
                   onPressed: () async {
                     await calendarConfigNotifier.switchCalendarEditingMode(
                         calendar.calendarAndAddInfo.calendar.id!);
-                    await endDrawerNotifier.updateCalendarDisplayList();
-                    await endDrawerNotifier.updateState();
+                    await updateCalendarDisplayListState();
                   }),
             if (!calendarAndAddInfo.calendar.isReadOnly!)
               CWTextButton(
@@ -137,8 +142,7 @@ class EndDrawerPage extends HookConsumerWidget {
                     await calendarConfigNotifier.switchCalendarUseMode(
                         await CalendarRepository().getCalendars(),
                         calendar.calendarAndAddInfo.calendar.id!);
-                    await endDrawerNotifier.updateCalendarDisplayList();
-                    await endDrawerNotifier.updateState();
+                    await updateCalendarDisplayListState();
                   }),
             const SizedBox(height: 3),
           ]);
@@ -203,7 +207,7 @@ class EndDrawerPage extends HookConsumerWidget {
                 const SizedBox(height: 8),
                 Row(children: [
                   for (int i=0; i < weekdayList.length; i++) ... {
-                    if (i>0)
+                    if (i > 0)
                       const SizedBox(width: 3),
                     CWElevatedButton(
                         title: weekdayList[i].title,

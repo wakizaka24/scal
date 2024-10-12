@@ -6,6 +6,7 @@ enum SharedPreferenceKey {
   darkColorMode('darkColorMode'),
   initCalendarConfig('initCalendarConfig'),
   calendarHolidayList('calendarHolidayList'),
+  calendarHiddenMode('calendarHiddenMode'),
   calendarHiddenCalendarIds('calendarHiddenCalendarIds'),
   calendarBothCalendarIds('calendarBothCalendarIds'),
   calendarInvisibleCalendarIds('calendarInvisibleCalendarIds'),

@@ -48,26 +48,32 @@ enum CalendarHolidayDisplayMode {
 initCalendarConfig() async {
   var init = await SharedPreferencesRepository().getBool(
       SharedPreferenceKey.initCalendarConfig) ?? false;
-  if (!init) {
-    await SharedPreferencesRepository().setBool(
-        SharedPreferenceKey.initCalendarConfig, true);
-    const iOSCalendarAccountName = 'Subscribed Calendars';
-    const japaneseHolidayName = '日本の祝日';
+  await SharedPreferencesRepository().setBool(
+      SharedPreferenceKey.initCalendarConfig, true);
+  if (init) {
+    return;
+  }
 
-    await CalendarRepository().hasPermissions();
-    var calendars = await CalendarRepository().getCalendars();
+  const iOSCalendarAccountName = 'Subscribed Calendars';
+  const japaneseHolidayName = '日本の祝日';
 
-    var holidayCalendarId = calendars
-        .where((calendar) => calendar.accountName == iOSCalendarAccountName
-        && calendar.name == japaneseHolidayName)
-        .map((calendar) => calendar.id!).firstOrNull;
-    holidayCalendarId ??= calendars
-          .where((calendar) => calendar.name == japaneseHolidayName)
-          .map((calendar) => calendar.id!).firstOrNull;
-    if (holidayCalendarId == null) {
-      return;
-    }
+  await CalendarRepository().hasPermissions();
+  var calendars = await CalendarRepository().getCalendars();
 
+  var holidayCalendarId = calendars
+      .where((calendar) => calendar.accountName == iOSCalendarAccountName
+      && calendar.name == japaneseHolidayName)
+      .map((calendar) => calendar.id!).firstOrNull;
+  if (holidayCalendarId == null) {
+    var filteredCalendars = calendars
+        .where((calendar) => calendar.name == japaneseHolidayName).toList();
+    filteredCalendars.sort((calendar1, calendar2) => calendar1.accountName!
+        .compareTo(calendar2.accountName!));
+    holidayCalendarId = filteredCalendars.map((calendar) => calendar.id!)
+        .firstOrNull;
+  }
+
+  if (holidayCalendarId != null) {
     await SharedPreferencesRepository().setString(
         SharedPreferenceKey.calendarHolidayCalendarIds,
         holidayCalendarId
@@ -81,6 +87,18 @@ initCalendarConfig() async {
     await SharedPreferencesRepository().setString(
         SharedPreferenceKey.calendarInvisibleCalendarIds,
         listToCalendarConfig(otherHolidayCalendars)
+    );
+  }
+
+  var useCalendar = calendars.where((calendar) => calendar.isDefault!)
+      .map((calendar) => calendar.id!)
+      .firstOrNull;
+  useCalendar ??= calendars.where((calendar) => !calendar.isReadOnly!)
+      .map((calendar) => calendar.id!).firstOrNull;
+  if (useCalendar != null) {
+    await SharedPreferencesRepository().setString(
+        SharedPreferenceKey.calendarUseCalendarId,
+        useCalendar
     );
   }
 }
@@ -103,6 +121,7 @@ Future<(
   ColorConfig?, // lightColorConfig
   ColorConfig?, // darkColorConfig
   String?, // calendarHolidayList
+  bool?, // calendarHiddenMode
   String?, // calendarHiddenCalendarIds
   String?, // calendarBothCalendarIds
   String?, // calendarInvisibleCalendarIds
@@ -126,6 +145,8 @@ Future<(
             .brightness == Brightness.dark),
     await SharedPreferencesRepository()
         .getString(SharedPreferenceKey.calendarHolidayList),
+    await SharedPreferencesRepository()
+        .getBool(SharedPreferenceKey.calendarHiddenMode),
     await SharedPreferencesRepository()
         .getString(SharedPreferenceKey.calendarHiddenCalendarIds),
     await SharedPreferencesRepository()
@@ -159,6 +180,7 @@ class CalendarAndAdditionalInfo {
 
 class CalendarConfigState {
   List<CalendarHoliday> calendarHolidayList = [];
+  bool calendarHiddenMode = false;
   List<String> calendarHiddenCalendarIds = [];
   List<String> calendarBothCalendarIds = [];
   List<String> calendarInvisibleCalendarIds = [];
@@ -169,6 +191,7 @@ class CalendarConfigState {
   static CalendarConfigState copy(CalendarConfigState state) {
     var nState = CalendarConfigState();
     nState.calendarHolidayList = state.calendarHolidayList;
+    nState.calendarHiddenMode = state.calendarHiddenMode;
     nState.calendarHiddenCalendarIds = state.calendarHiddenCalendarIds;
     nState.calendarBothCalendarIds = state.calendarBothCalendarIds;
     nState.calendarInvisibleCalendarIds = state.calendarInvisibleCalendarIds;
@@ -186,6 +209,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
 
   initState(
       String? calendarHolidayList,
+      bool? calendarHiddenMode,
       String? calendarHiddenCalendarIds,
       String? calendarBothCalendarIds,
       String? calendarInvisibleCalendarIds,
@@ -201,6 +225,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
       CalendarHoliday.none, CalendarHoliday.none,
       CalendarHoliday.none, CalendarHoliday.none,
       CalendarHoliday.blue];
+    state.calendarHiddenMode = calendarHiddenMode ?? false;
     state.calendarHiddenCalendarIds = calendarHiddenCalendarIds
         ?.split(calendarConfigDelimiter).toList() ?? [];
     state.calendarBothCalendarIds = calendarBothCalendarIds
@@ -377,9 +402,11 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
         .firstOrNull ?? getUseAbleCalendarId(calendars);
   }
 
-  String? getUseAbleCalendarId(List<Calendar> calendars) {
-    return calendars.where((calendar) => getCalendarEditingMode(
-        calendar.id!) == CalendarEditingMode.editable)
+  String? getUseAbleCalendarId(List<Calendar> calendars,
+      {String? withoutCalendarId}) {
+    return calendars.where((calendar) =>
+      !calendar.isReadOnly! && (withoutCalendarId == null
+          || calendar.id! != withoutCalendarId))
         .map((calendar) => calendar.id).firstOrNull;
   }
 
@@ -398,12 +425,13 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     var mode = getCalendarUseMode(calendars, calendarId);
     mode = modeList[(mode.index + 1) % modeList.length];
 
-    state.calendarUseCalendarId = calendarId;
     switch (mode) {
       case CalendarUseMode.use:
+        state.calendarUseCalendarId = calendarId;
         break;
       case CalendarUseMode.notUse:
-        state.calendarUseCalendarId = getUseAbleCalendarId(calendars);
+        state.calendarUseCalendarId = getUseAbleCalendarId(calendars,
+            withoutCalendarId: calendarId);
         break;
     }
 

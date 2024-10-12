@@ -18,8 +18,8 @@ void main() {
     await initCalendarConfig();
 
     final (
-      brightnessMode, lightColorConfig, darkColorConfig,
-      calendarHolidayList, calendarHiddenCalendarIds, calendarBothCalendarIds,
+      brightnessMode, lightColorConfig, darkColorConfig, calendarHolidayList,
+      calendarHiddenMode, calendarHiddenCalendarIds, calendarBothCalendarIds,
       calendarInvisibleCalendarIds, calendarNotEditableCalendarIds,
       calendarUseCalendarId, calendarHolidayCalendarIds
     ) = await getCalendarConfigs();
@@ -30,6 +30,7 @@ void main() {
       lightColorConfig: lightColorConfig,
       darkColorConfig: darkColorConfig,
       calendarHolidayList: calendarHolidayList,
+      calendarHiddenMode: calendarHiddenMode,
       calendarHiddenCalendarIds: calendarHiddenCalendarIds,
       calendarBothCalendarIds: calendarBothCalendarIds,
       calendarInvisibleCalendarIds: calendarInvisibleCalendarIds,
