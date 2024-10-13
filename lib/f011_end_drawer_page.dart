@@ -102,7 +102,7 @@ class EndDrawerPage extends HookConsumerWidget {
       await calendarNotifier.updateState();
     }
 
-    createDisplayButtonColumn(int i) {
+    createSettingButtonColumn(int i) {
       var calendar = endDrawerState.calendarList[i];
       var calendarAndAddInfo = calendar.calendarAndAddInfo;
 
@@ -149,7 +149,7 @@ class EndDrawerPage extends HookConsumerWidget {
           ]);
     }
 
-    createHolidayButtonColumn(int i) {
+    createDisplayButtonColumn(int i) {
       var calendar = endDrawerState.calendarList[i];
       var calendarAndAddInfo = calendar.calendarAndAddInfo;
 
@@ -247,7 +247,7 @@ class EndDrawerPage extends HookConsumerWidget {
                             height: cellHeaderHeight)),
                         createCell(title: '設定', width: cellSettingWidth,
                             height: cellHeaderHeight),
-                        createCell(title: '祝日', width: cellSettingWidth,
+                        createCell(title: '表示', width: cellSettingWidth,
                             height: cellHeaderHeight),
                       ]),
 
@@ -258,9 +258,9 @@ class EndDrawerPage extends HookConsumerWidget {
                           Expanded(child: createCell(
                               title: calendarList[i].calendarName)),
                           createCell(width: cellSettingWidth,
-                              child: createDisplayButtonColumn(i)),
+                              child: createSettingButtonColumn(i)),
                           createCell(width: cellSettingWidth,
-                              child: createHolidayButtonColumn(i)),
+                              child: createDisplayButtonColumn(i)),
                         ]),
                       }
                     ])

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'f007_calendar_repository.dart';
+import 'f008_calendar_config.dart';
 import 'f016_calendar_utils.dart';
 
 enum RepeatingPattern {
@@ -139,8 +140,10 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
   EventDetailPageNotifier(this.ref, EventDetailPageState state)
       : super(state);
 
-  initState(bool selectDateOrTime, {bool? selectDay,
-    DateTime? selectionDateTime, Calendar? calendar, Event? event}) async {
+  initState(CalendarAndAdditionalInfo calendarAndAddInfo,
+      bool selectDateOrTime, {bool? selectDay, DateTime? selectionDateTime,
+        Event? event}) async {
+    var calendar = calendarAndAddInfo.calendar;
 
     // Control
     state.contentsKey = GlobalKey();
@@ -152,7 +155,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
           switch (item) {
             case TextFieldItem.title:
               state.title = km[item]!.text;
-              if (state.title!.isEmpty == state.saveButtonEnabled) {
+              if (!state.readOnly! && state.title!.isEmpty
+                  == state.saveButtonEnabled) {
                 state.saveButtonEnabled = state.title!.isNotEmpty;
                 updateState();
               }
@@ -176,7 +180,8 @@ class EventDetailPageNotifier extends StateNotifier<EventDetailPageState> {
 
     state.calendar = calendar;
     state.event = event;
-    state.readOnly = calendar != null && calendar.isReadOnly!;
+    state.readOnly = calendar.isReadOnly! || calendarAndAddInfo.editingMode
+        == CalendarEditingMode.notEditable;
     state.title = selectDateOrTime ? '' : event!.title;
     setTextFieldController(TextFieldItem.title);
 

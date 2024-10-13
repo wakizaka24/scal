@@ -32,8 +32,8 @@ enum CalendarEditingMode {
 }
 
 enum CalendarUseMode {
-  use('使用'),
-  notUse('未使用');
+  use('使用中'),
+  notUse('使用する');
   final String title;
   const CalendarUseMode(this.title);
 }

@@ -572,40 +572,6 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                   )
               ),
 
-              // 移動する
-              // CWLeftTitle(
-              //     title: 'カレン\nダー',
-              //     // fontSize: 13,
-              //     highlight: eventDetailState.highlightItem
-              //         == HighlightItem.destinationCalendar,
-              //     expanded: false,
-              //     opacity: startOtherItemOpacity,
-              //     highlightAlpha: !calendarDisplay.value ? null : 0,
-              //     child: Row(children: [
-              //       SizedBox(height: 36, width: 100,
-              //           child: CWTextField(
-              //             controller: eventDetailState.textEditingControllers!
-              //             [TextFieldItem.destinationCalendar]!,
-              //             fontSize: 13,
-              //             textAlign: TextAlign.center,
-              //             paddingAll: 8,
-              //             readOnly: true,
-              //             highlight: eventDetailState.highlightItem
-              //                 == HighlightItem.destinationCalendar,
-              //             onTap: () async {
-              //               await eventDetailNotifier.updateHighlightItem(
-              //                   HighlightItem.destinationCalendar);
-              //               await safeAreaViewNotifier.setSafeAreaAdjustment(5
-              //                   + 8);
-              //               await safeAreaViewNotifier.setSafeAreaHeight(215);
-              //               await safeAreaViewNotifier.updateState();
-              //               showBottomArea(repeatPicker);
-              //             },
-              //           )
-              //       )
-              //     ])
-              // ),
-
               const SizedBox(height: 3),
 
               CWElevatedButton(

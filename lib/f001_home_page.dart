@@ -152,7 +152,7 @@ class HomePage extends HookConsumerWidget {
                       style: const TextStyle(
                           height: 1.3,
                           color: Colors.white,
-                          fontSize: 24
+                          fontSize: 21
                       )
                   ),
                   const Spacer(),
@@ -296,18 +296,18 @@ class HomePage extends HookConsumerWidget {
             }
           }
 
-          if (calendarAndAddInfo!.editingMode == CalendarEditingMode
-              .notEditable) {
+          if (event == null && calendarAndAddInfo!.editingMode
+              == CalendarEditingMode.notEditable) {
             if (context.mounted) {
               await UIUtils().showMessageDialog(context, ref,
-                  '登録', '編集するカレンダーが編集不可に設定されています。');
+                  '登録', '使用するカレンダーが編集不可に設定されています。');
               return;
             }
           }
 
-          await eventDetailNotifier.initState(event == null,
-              selectDay: selectDay, selectionDateTime: selectionDateTime,
-              calendar: calendarAndAddInfo!.calendar, event: event);
+          await eventDetailNotifier.initState(calendarAndAddInfo!,
+              event == null, selectDay: selectDay, selectionDateTime:
+              selectionDateTime, event: event);
 
           // 閉じた時のスピードが遅いので保留
           /*
