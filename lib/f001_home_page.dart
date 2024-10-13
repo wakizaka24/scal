@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -9,6 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:scal/f018_event_detail_page.dart';
 
 import 'f002_home_view_model.dart';
+import 'f008_calendar_config.dart';
 import 'f011_end_drawer_page.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
@@ -41,12 +41,16 @@ class HomePage extends HookConsumerWidget {
     final calendarState = ref.watch(calendarPageNotifierProvider);
     final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
+    // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
+    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+        .notifier);
+
     final designConfigState = ref.watch(designConfigNotifierProvider);
     final designConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
 
-    // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
-    final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
+    // final calendarConfigState = ref.watch(calendarConfigNotifierProvider);
+    final calendarConfigNotifier = ref.watch(calendarConfigNotifierProvider
         .notifier);
 
     // Widgetの一番上で取得可能な項目
@@ -255,10 +259,11 @@ class HomePage extends HookConsumerWidget {
           var selectionDateTime = selectDay == null ? null
               : selectDay ? calendarState.selectionDate
               : calendarState.selectionHour;
-          List<Calendar> calendarList = (await calendarNotifier.getCalendars())
-              .where((cal) => cal.isDefault!).toList();
-          Calendar? calendar;
-          if (calendarList.isEmpty) {
+          List<CalendarAndAdditionalInfo> calendarAndAddInfos
+          = await calendarConfigNotifier.createCalendarAndAddInfoList();
+
+          CalendarAndAdditionalInfo? calendarAndAddInfo;
+          if (calendarAndAddInfos.isEmpty) {
             PackageInfo packageInfo = await PackageInfo.fromPlatform();
             if (context.mounted) {
               await UIUtils().showMessageDialog(context, ref,
@@ -270,16 +275,39 @@ class HomePage extends HookConsumerWidget {
               return;
             }
           } else {
-            calendar = calendarList.first;
+            calendarAndAddInfo = calendarAndAddInfos.first;
           }
 
           if (event != null) {
-            calendar = (await calendarNotifier.getCalendars())
-                .firstWhere((cal) => cal.id == event.calendarId);
+            calendarAndAddInfo = calendarAndAddInfos
+                .firstWhere((calendarAndAddInfo) => calendarAndAddInfo
+                .calendar.id == event.calendarId);
+          } else {
+            calendarAndAddInfo = calendarAndAddInfos
+                .where((calendarAndAddInfo) => calendarAndAddInfo
+                .useMode == CalendarUseMode.use).firstOrNull;
+
+            if (calendarAndAddInfo == null) {
+              if (context.mounted) {
+                await UIUtils().showMessageDialog(context, ref,
+                    '登録', '使用カレンダーが未設定です。');
+                return;
+              }
+            }
           }
+
+          if (calendarAndAddInfo!.editingMode == CalendarEditingMode
+              .notEditable) {
+            if (context.mounted) {
+              await UIUtils().showMessageDialog(context, ref,
+                  '登録', '編集するカレンダーが編集不可に設定されています。');
+              return;
+            }
+          }
+
           await eventDetailNotifier.initState(event == null,
               selectDay: selectDay, selectionDateTime: selectionDateTime,
-              calendar: calendar, event: event);
+              calendar: calendarAndAddInfo!.calendar, event: event);
 
           // 閉じた時のスピードが遅いので保留
           /*

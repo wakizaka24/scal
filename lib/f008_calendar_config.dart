@@ -255,7 +255,16 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
 
   Future<List<CalendarAndAdditionalInfo>> createCalendarAndAddInfoList(
       ) async {
+    await CalendarRepository().hasPermissions();
     var calendars = await CalendarRepository().getCalendars();
+
+    // debugPrint('カレンダー数 ${calendars.length}');
+    // debugPrint('カレンダー一覧');
+    // for (var cal in calendars) {
+    //   debugPrint('name:${cal.name} isReadOnly:${cal.isReadOnly}'
+    //       ' isDefault:${cal.isDefault} accountType:${cal.accountType}'
+    //       ' accountName:${cal.accountName}');
+    // }
 
     List<CalendarAndAdditionalInfo> calendarAndAddInfoList = [];
     for (int i=0; i < calendars.length; i++) {

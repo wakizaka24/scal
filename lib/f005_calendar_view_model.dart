@@ -1230,24 +1230,6 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
     return state.eventList[state.eventListIndex!].event;
   }
 
-  Future<List<Calendar>> getCalendars() async {
-    List<Calendar> calendars = [];
-    await calendarRepo.hasPermissions();
-    calendars = await calendarRepo.getCalendars();
-    // debugPrint('カレンダー数 ${calendars.length}');
-
-    // debugPrint('カレンダー一覧');
-    // for (var cal in calendars) {
-    //   debugPrint('name:${cal.name} isReadOnly:${cal.isReadOnly}'
-    //       ' isDefault:${cal.isDefault} accountType:${cal.accountType}'
-    //       ' accountName:${cal.accountName}');
-    // }
-
-    return calendars.where((cal) {
-      return cal.isDefault! || true;
-    }).toList();
-  }
-
   Map<String, CalendarAndAdditionalInfo> convertCalendarMap(
       List<CalendarAndAdditionalInfo> calendarAndAddInfos) {
     Map<String, CalendarAndAdditionalInfo> calendarMap = {};

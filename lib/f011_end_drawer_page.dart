@@ -35,11 +35,12 @@ class EndDrawerPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
     final endDrawerNotifier = ref.watch(endDrawerPageNotifierProvider.notifier);
+    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
+
     final colorConfig = ref.watch(designConfigNotifierProvider).colorConfig!;
     // final calendarConfigState = ref.watch(calendarConfigNotifierProvider);
     final calendarConfigNotifier = ref.watch(calendarConfigNotifierProvider
         .notifier);
-    final calendarNotifier = ref.watch(calendarPageNotifierProvider.notifier);
 
     useEffect(() {
       endDrawerNotifier.initState();
@@ -164,8 +165,7 @@ class EndDrawerPage extends HookConsumerWidget {
                 onPressed: () async {
                   await calendarConfigNotifier.switchCalendarHolidayDisplayMode(
                       calendar.calendarAndAddInfo.calendar.id!);
-                  await endDrawerNotifier.updateCalendarDisplayList();
-                  await endDrawerNotifier.updateState();
+                  await updateCalendarDisplayListState();
                 }),
             const SizedBox(height: 3),
           ]);
