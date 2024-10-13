@@ -49,7 +49,7 @@ class HomePage extends HookConsumerWidget {
     final designConfigNotifier = ref.watch(designConfigNotifierProvider
         .notifier);
 
-    // final calendarConfigState = ref.watch(calendarConfigNotifierProvider);
+    final calendarConfigState = ref.watch(calendarConfigNotifierProvider);
     final calendarConfigNotifier = ref.watch(calendarConfigNotifierProvider
         .notifier);
 
@@ -173,6 +173,20 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
+              assetName: 'images/icon_change_calendar_data@3x.png',
+              assetIconSize: appBarIconHeight,
+              width: appBarHeight,
+              height: appBarHeight,
+              radius: appBarHeight / 2,
+              onPressed: () async {
+                var hiddenMode = !calendarConfigState.calendarHiddenMode;
+                await calendarConfigNotifier.setCalendarHiddenMode(hiddenMode);
+                await calendarNotifier.updateCalendar();
+                await calendarNotifier.updateState();
+              },
+            ),
+
+            CWIconButton(
               assetName: homeState.brightnessModeAssetName,
               assetIconSize: appBarIconHeight,
               width: appBarHeight,
@@ -290,7 +304,7 @@ class HomePage extends HookConsumerWidget {
             if (calendarAndAddInfo == null) {
               if (context.mounted) {
                 await UIUtils().showMessageDialog(context, ref,
-                    '登録', '使用カレンダーが未設定です。');
+                    '登録', '使用するカレンダーが未設定です。');
                 return;
               }
             }

@@ -79,6 +79,11 @@ initCalendarConfig() async {
         holidayCalendarId
     );
 
+    await SharedPreferencesRepository().setString(
+        SharedPreferenceKey.calendarBothCalendarIds,
+        holidayCalendarId
+    );
+
     var otherHolidayCalendars = calendars
         .where((calendar) => calendar.name == japaneseHolidayName
         && calendar.id != holidayCalendarId)
@@ -253,6 +258,14 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     );
   }
 
+  setCalendarHiddenMode(bool hiddenMode) async {
+    state.calendarHiddenMode = hiddenMode;
+    await SharedPreferencesRepository().setBool(
+        SharedPreferenceKey.calendarHiddenMode,
+        hiddenMode
+    );
+  }
+
   Future<List<CalendarAndAdditionalInfo>> createCalendarAndAddInfoList(
       ) async {
     await CalendarRepository().hasPermissions();
@@ -408,7 +421,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
   String? getUseCalendarId(List<Calendar> calendars) {
     return calendars.map((calendar) => calendar.id)
         .where((id) => id == state.calendarUseCalendarId)
-        .firstOrNull ?? getUseAbleCalendarId(calendars);
+        .firstOrNull;
   }
 
   String? getUseAbleCalendarId(List<Calendar> calendars,
@@ -439,8 +452,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
         state.calendarUseCalendarId = calendarId;
         break;
       case CalendarUseMode.notUse:
-        state.calendarUseCalendarId = getUseAbleCalendarId(calendars,
-            withoutCalendarId: calendarId);
+        state.calendarUseCalendarId = null;
         break;
     }
 
