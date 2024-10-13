@@ -185,7 +185,7 @@ class CalendarAndAdditionalInfo {
 
 class CalendarConfigState {
   List<CalendarHoliday> calendarHolidayList = [];
-  bool calendarHiddenMode = false;
+  bool? calendarHiddenMode;
   List<String> calendarHiddenCalendarIds = [];
   List<String> calendarBothCalendarIds = [];
   List<String> calendarInvisibleCalendarIds = [];

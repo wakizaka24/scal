@@ -1338,14 +1338,14 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
             startDate, endDate);
         calendarEvents = calendarEvents.where((event) {
           var calendarAndAddInfo = calendarMap[event.calendarId]!;
-          var hidden = calendarAndAddInfo.displayMode
-              == CalendarDisplayMode.hidden;
-          hidden |= !calendarConfigState.calendarHiddenMode
+          var invisible = calendarAndAddInfo.displayMode
+              == CalendarDisplayMode.invisible;
+          invisible |= !calendarConfigState.calendarHiddenMode!
               && calendarAndAddInfo.displayMode == CalendarDisplayMode
-                  .invisible;
-          hidden |= calendarConfigState.calendarHiddenMode && calendarAndAddInfo
-              .displayMode == CalendarDisplayMode.display;
-          return !hidden;
+                  .hidden;
+          invisible |= calendarConfigState.calendarHiddenMode!
+              && calendarAndAddInfo.displayMode == CalendarDisplayMode.display;
+          return !invisible;
         }).toList();
         events.addAll(calendarEvents);
       }

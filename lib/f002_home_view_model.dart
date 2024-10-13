@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
 
 class HomePageState {
@@ -9,6 +10,7 @@ class HomePageState {
   String appBarTitle = '';
   bool uICover = false;
   Widget? uICoverWidget;
+  String? hiddenModeAssetName;
   String? brightnessModeAssetName;
 
   static HomePageState copy(HomePageState state) {
@@ -18,6 +20,7 @@ class HomePageState {
     nState.appBarTitle = state.appBarTitle;
     nState.uICover = state.uICover;
     nState.uICoverWidget = state.uICoverWidget;
+    nState.hiddenModeAssetName = state.hiddenModeAssetName;
     nState.brightnessModeAssetName = state.brightnessModeAssetName;
     return nState;
   }
@@ -31,7 +34,26 @@ class HomePageNotifier extends StateNotifier<HomePageState> {
 
   initState() async {
     final designConfigState = ref.read(designConfigNotifierProvider);
+    final calendarConfigState = ref.read(calendarConfigNotifierProvider);
+
+    setHiddenMode(calendarConfigState.calendarHiddenMode!);
     setBrightnessMode(designConfigState.brightnessMode!);
+  }
+
+  setHiddenMode(bool hiddenMode) async {
+    final calendarConfigNotifier = ref.read(calendarConfigNotifierProvider
+        .notifier);
+    await calendarConfigNotifier.setCalendarHiddenMode(hiddenMode);
+    state.hiddenModeAssetName = getHiddenModeAssetName(
+        hiddenMode);
+  }
+
+  getHiddenModeAssetName(bool hiddenMode) {
+    if (!hiddenMode) {
+      return 'images/icon_calendar_hidden_mode_off@3x.png';
+    } else {
+      return 'images/icon_calendar_hidden_mode_on@3x.png';
+    }
   }
 
   setBrightnessMode(BrightnessMode brightnessMode) {

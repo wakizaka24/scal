@@ -173,14 +173,14 @@ class HomePage extends HookConsumerWidget {
             const Spacer(),
 
             CWIconButton(
-              assetName: 'images/icon_change_calendar_data@3x.png',
+              assetName: homeState.hiddenModeAssetName,
               assetIconSize: appBarIconHeight,
               width: appBarHeight,
               height: appBarHeight,
               radius: appBarHeight / 2,
               onPressed: () async {
-                var hiddenMode = !calendarConfigState.calendarHiddenMode;
-                await calendarConfigNotifier.setCalendarHiddenMode(hiddenMode);
+                var hiddenMode = !calendarConfigState.calendarHiddenMode!;
+                await homeNotifier.setHiddenMode(hiddenMode);
                 await calendarNotifier.updateCalendar();
                 await calendarNotifier.updateState();
               },
@@ -310,12 +310,37 @@ class HomePage extends HookConsumerWidget {
             }
           }
 
-          if (event == null && calendarAndAddInfo!.editingMode
-              == CalendarEditingMode.notEditable) {
-            if (context.mounted) {
-              await UIUtils().showMessageDialog(context, ref,
-                  '登録', '使用するカレンダーが編集不可に設定されています。');
-              return;
+          if (event == null) {
+            if (calendarAndAddInfo!.editingMode
+                == CalendarEditingMode.notEditable) {
+              if (context.mounted) {
+                await UIUtils().showMessageDialog(context, ref,
+                    '登録', '使用するカレンダーが編集不可に設定されています。');
+                return;
+              }
+            }
+
+            var invisible = false;
+            if (calendarAndAddInfo.displayMode == CalendarDisplayMode.invisible) {
+              invisible = true;
+            }
+
+            if (!calendarConfigState.calendarHiddenMode! && calendarAndAddInfo
+                .displayMode == CalendarDisplayMode.hidden) {
+              invisible = true;
+            }
+
+            if (calendarConfigState.calendarHiddenMode! && calendarAndAddInfo
+                .displayMode == CalendarDisplayMode.display) {
+              invisible = true;
+            }
+
+            if (invisible) {
+              if (context.mounted) {
+                await UIUtils().showMessageDialog(context, ref,
+                    '登録', '使用するカレンダーが表示されない設定になっています。');
+                return;
+              }
             }
           }
 
