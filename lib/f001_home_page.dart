@@ -147,7 +147,7 @@ class HomePage extends HookConsumerWidget {
               return Row(
                 // crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(width: 8),
+                  Container(width: 16),
                   Text(homeState.appBarTitle,
                       style: const TextStyle(
                           height: 1.3,
