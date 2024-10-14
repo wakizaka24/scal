@@ -62,6 +62,15 @@ sudo gem uninstall cocoapods
 % cd scal
 % fvm flutter build ios
 
+## アプリアイコン設定
+% vi pubspec.yaml
+flutter_launcher_icons:
+android: true
+ios: true
+image_path: "images/app_icon_starlight.png"
+
+% fvm dart run flutter_launcher_icons:main
+
 ## Firebase
 ### Firebase CLI
 % curl -sL https://firebase.tools | bash
