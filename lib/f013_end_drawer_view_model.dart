@@ -75,8 +75,8 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
           return Colors.pink;
         case CalendarHoliday.blue:
           return Colors.blueAccent;
-        case CalendarHoliday.brown:
-          return Colors.brown;
+        case CalendarHoliday.green:
+          return Colors.green;
       }
     }).toList();
 

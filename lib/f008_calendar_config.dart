@@ -10,7 +10,7 @@ enum CalendarHoliday {
   none('none'), // 通常
   red('red'), // 赤表示
   blue('blue'), // 青表示
-  brown('brown'); // ブラウン表示
+  green('green'); // 緑表示
   final String value;
   const CalendarHoliday(this.value);
 }
@@ -457,7 +457,7 @@ class CalendarConfigNotifier extends StateNotifier<CalendarConfigState> {
     }
 
     await SharedPreferencesRepository().setString(
-        SharedPreferenceKey.calendarHolidayCalendarIds,
+        SharedPreferenceKey.calendarUseCalendarId,
         state.calendarUseCalendarId
     );
 

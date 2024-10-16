@@ -591,8 +591,8 @@ class CalendarPageNotifier extends StateNotifier<CalendarPageState> {
           return Colors.pink;
         case CalendarHoliday.blue:
           return Colors.blueAccent;
-        case CalendarHoliday.brown:
-          return Colors.brown;
+        case CalendarHoliday.green:
+          return Colors.green;
       }
     }).toList();
     return titleColors;
