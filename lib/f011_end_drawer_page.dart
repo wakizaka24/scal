@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scal/f017_design_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'f005_calendar_view_model.dart';
 import 'f007_calendar_repository.dart';
@@ -189,9 +190,9 @@ class EndDrawerPage extends HookConsumerWidget {
                   case EndDrawerMenuType.softwareLicense:
                     await softwareLicenseOnPress();
                   case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
-                    
-
-
+                    launchUrl(Uri.https('wakizaka24.github.io',
+                        '/starlight/privacy-policy_terms-of-use.html'),
+                        mode: LaunchMode.externalApplication);
                     break;
                   // case EndDrawerMenuType.initialSettingsMethod:
                   //   break;

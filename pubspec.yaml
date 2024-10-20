@@ -51,6 +51,8 @@ dependencies:
   flutter_native_timezone: ^2.0.0
   # iOS/Android/Webの判定
   universal_io: ^2.2.2
+  # 外部Webブラウザ起動
+  url_launcher: ^6.3.1
   # バージョン情報取得
   package_info_plus: ^8.0.0
   # アプリアイコン
