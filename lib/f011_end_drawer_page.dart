@@ -189,6 +189,9 @@ class EndDrawerPage extends HookConsumerWidget {
                   case EndDrawerMenuType.softwareLicense:
                     await softwareLicenseOnPress();
                   case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
+                    
+
+
                     break;
                   // case EndDrawerMenuType.initialSettingsMethod:
                   //   break;
