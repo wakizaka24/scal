@@ -12,6 +12,7 @@ import 'f008_calendar_config.dart';
 import 'f011_end_drawer_page.dart';
 import 'f003_calendar_page.dart';
 import 'f005_calendar_view_model.dart';
+import 'f013_end_drawer_view_model.dart';
 import 'f015_ui_utils.dart';
 import 'f017_design_config.dart';
 import 'f021_event_detail_view_model.dart';
@@ -44,6 +45,9 @@ class HomePage extends HookConsumerWidget {
     // final eventDetailState = ref.watch(eventDetailPageNotifierProvider);
     final eventDetailNotifier = ref.watch(eventDetailPageNotifierProvider
         .notifier);
+
+    // final endDrawerState = ref.watch(endDrawerPageNotifierProvider);
+    final endDrawerNotifier = ref.watch(endDrawerPageNotifierProvider.notifier);
 
     final designConfigState = ref.watch(designConfigNotifierProvider);
     final designConfigNotifier = ref.watch(designConfigNotifierProvider
@@ -107,6 +111,7 @@ class HomePage extends HookConsumerWidget {
           if (calendarState.initialized && designConfigNotifier
               .applyColorConfig(brightness)) {
             await calendarNotifier.updateCalendar(dataExclusion: true);
+            await endDrawerNotifier.updateWeekdayList();
             await designConfigNotifier.updateState();
           }
 
