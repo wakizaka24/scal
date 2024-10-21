@@ -192,7 +192,7 @@ class EndDrawerPage extends HookConsumerWidget {
                   case EndDrawerMenuType.privacyPolicyAndTermsOfUse:
                     launchUrl(Uri.https('wakizaka24.github.io',
                         '/starlight/privacy-policy_terms-of-use.html'),
-                        mode: LaunchMode.inAppWebView);
+                        mode: LaunchMode.externalApplication);
                     break;
                   // case EndDrawerMenuType.initialSettingsMethod:
                   //   break;

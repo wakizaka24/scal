@@ -40,7 +40,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   # ローカライゼーション
-  intl: ^0.18.1
+  intl: ^0.19.0
   # データ保存
   shared_preferences: ^2.2.3
   # WidgetとStateNotifierの分離
@@ -54,7 +54,7 @@ dependencies:
   # 外部Webブラウザ起動
   url_launcher: ^6.3.1
   # バージョン情報取得
-  package_info_plus: ^8.0.0
+  package_info_plus: ^8.0.2
   # アプリアイコン
   flutter_launcher_icons: ^0.14.1
   # Firebase
@@ -64,8 +64,8 @@ dependencies:
   # Firebase Crashlytics
   firebase_crashlytics: ^4.1.2
 
-dependency_overrides:
-    intl: ^0.19.0
+#dependency_overrides:
+#    intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -76,12 +76,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.1
-
-  # コマンドによるコード生成
-  build_runner: ^2.4.8
-  # json_serializableのソース生成時に必要
-  json_serializable: ^6.7.1
+  flutter_lints:
 
 flutter_launcher_icons:
   android: true
