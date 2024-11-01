@@ -65,9 +65,11 @@ sudo gem uninstall cocoapods
 ## アプリアイコン設定
 % vi pubspec.yaml
 flutter_launcher_icons:
-android: true
 ios: true
-image_path: "images/app_icon_starlight.png"
+image_path: "images/ios_app_icon_starlight.png"
+android: true
+adaptive_icon_background: "images/launcher/icon_adaptive_background.png"
+adaptive_icon_foreground: "images/launcher/icon_adaptive_foreground.png"
 
 % fvm dart run flutter_launcher_icons:main
 
