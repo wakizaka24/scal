@@ -8,7 +8,7 @@
 % fvm use 3.24.3
 
 ## FVMプロジェクト作成(FVMバージョン合わせの後)
-fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
+% fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
 
 ## Android/iOS共通
 ### デプロイの初期化
@@ -28,46 +28,47 @@ JP
 y
 
 ### リリース設定
-% cd scal
+% cd ~/pc\_data/project/scal
 % cp /Users/ryota24/wakizaka24-keystore.jks ./android
 
-% cd scal
+% cd ~/pc\_data/project/scal
 % vi ./android/key.properties
 storePassword=first-app-24
 keyPassword=first-app-24
 keyAlias=key
 storeFile=/Users/ryota24/wakizaka24-keystore.jks
 
-% cd scal
+% cd ~/pc\_data/project/scal
 % vi ./android/app/src/main/AndroidManifest.xml
 <application
 android:label="Starlight"
 
 ### app-release.aabファイル作成
-% cd scal
+% cd ~/pc\_data/project/scal
 % fvm flutter build appbundle --release
 
 ## iOS
 ### CocoaPods
-sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
-sudo gem uninstall cocoapods
+% sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
+% sudo gem uninstall cocoapods
 
 ### リリース設定
-% cd scal
+% cd ~/pc\_data/project/scal
 % vi ./ios/Runner/Info.plist
 <key>CFBundleName</key>
 <string>scal</string>
 
 ### Archive前のアプリ更新
-% cd scal
+% cd ~/pc\_data/project/scal
 % fvm flutter build ios
 
 ## Web(ベータ版)
 ### デプロイ
-% cd scal
+% cd ~/pc\_data/project/scal
 % sh deploy_sakura.sh
 
 ## アプリアイコン設定
+% cd ~/pc\_data/project/scal
 % vi pubspec.yaml
 flutter_launcher_icons:
 ios: true
@@ -80,9 +81,11 @@ adaptive_icon_foreground: "images/launcher/icon_adaptive_foreground.png"
 
 ## Firebase
 ### Firebase CLI
+% cd ~/pc\_data/project/scal
 % curl -sL https://firebase.tools | bash
 
 ### ログイン
+% cd ~/pc\_data/project/scal
 % firebase login
 〜
 ? Allow Firebase to collect CLI and Emulator Suite usage and error reporting information? Yes
@@ -90,6 +93,7 @@ adaptive_icon_foreground: "images/launcher/icon_adaptive_foreground.png"
 ✔  Success! Logged in as wakizaka24@gmail.com
 
 ### FlutterFire CLI
+% cd ~/pc\_data/project/scal
 % fvm dart pub global activate flutterfire_cli
 
 ### Firebase Coreをプロジェクトに適用する
@@ -97,9 +101,11 @@ adaptive_icon_foreground: "images/launcher/icon_adaptive_foreground.png"
 % fvm flutter pub add firebase_core
 
 ### プロジェクトにFirebaseを適用/初期化する
+% cd ~/pc\_data/project/scal
 % sudo fvm dart pub global run flutterfire_cli:flutterfire configure
 
 ### Firebaseサービスを追加する
+% cd ~/pc\_data/project/scal
 % fvm flutter pub add firebase_crashlytics
 % fvm flutter pub add firebase_analytics
 ? You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.jso✔ You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.json` file to configure your project? · yes
