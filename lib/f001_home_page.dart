@@ -289,8 +289,7 @@ class HomePage extends HookConsumerWidget {
                   '登録', 'イベントの登録には、OSの${packageInfo.appName}の'
                       '設定でカレンダーへのアクセスを許可する必要があります。\n\n'
                       'また、OS標準のカレンダーアプリでカレンダー設定をする'
-                      '必要があります。\n\n'
-                      '詳しくは右上のアイコンから初期設定方法を参照ください。');
+                      '必要があります。');
               return;
             }
           } else {

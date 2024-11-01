@@ -62,6 +62,11 @@ sudo gem uninstall cocoapods
 % cd scal
 % fvm flutter build ios
 
+## Web(ベータ版)
+### デプロイ
+% cd scal
+% sh deploy_sakura.sh
+
 ## アプリアイコン設定
 % vi pubspec.yaml
 flutter_launcher_icons:
