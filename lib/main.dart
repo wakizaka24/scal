@@ -157,6 +157,7 @@ class SCalApp extends StatelessWidget {
               }
 
               return MaterialApp(
+                debugShowCheckedModeBanner: false,
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
