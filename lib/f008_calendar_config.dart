@@ -46,6 +46,10 @@ enum CalendarHolidayDisplayMode {
 }
 
 initCalendarConfig() async {
+  if (!await CalendarRepository().hasPermissions()) {
+    return;
+  }
+
   var init = await SharedPreferencesRepository().getBool(
       SharedPreferenceKey.initCalendarConfig) ?? false;
   await SharedPreferencesRepository().setBool(
@@ -57,7 +61,6 @@ initCalendarConfig() async {
   const iOSCalendarAccountName = 'Subscribed Calendars';
   const japaneseHolidayName = '日本の祝日';
 
-  await CalendarRepository().hasPermissions();
   var calendars = await CalendarRepository().getCalendars();
 
   var holidayCalendarId = calendars

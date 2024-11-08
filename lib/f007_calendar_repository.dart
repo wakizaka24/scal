@@ -26,7 +26,7 @@ class CalendarRepository {
     }
   }
 
-  Future<void> hasPermissions() async {
+  Future<bool> hasPermissions() async {
     var permissions = await _plugin.hasPermissions();
     if (permissions.isSuccess) {
       calendarPermission = permissions.data!;
@@ -38,6 +38,7 @@ class CalendarRepository {
         }
       }
     }
+    return calendarPermission;
   }
 
   Future<List<Calendar>> getCalendars() async {
