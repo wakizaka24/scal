@@ -1,18 +1,18 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum SharedPreferenceKey {
-  brightnessMode('brightnessMode'),
-  lightColorMode('lightColorMode'),
-  darkColorMode('darkColorMode'),
-  initCalendarConfig('initCalendarConfig'),
-  calendarHolidayList('calendarHolidayList'),
-  calendarHiddenMode('calendarHiddenMode'),
-  calendarHiddenCalendarIds('calendarHiddenCalendarIds'),
-  calendarBothCalendarIds('calendarBothCalendarIds'),
-  calendarInvisibleCalendarIds('calendarInvisibleCalendarIds'),
-  calendarNotEditableCalendarIds('calendarNotEditableCalendarIds'),
-  calendarUseCalendarId('calendarUseCalendarId'),
-  calendarHolidayCalendarIds('calendarHolidayCalendarIds'),
+  brightnessMode('brightnessMode'), // 暗さ(システム or ライト or ダーク)
+  lightColorMode('lightColorMode'), // ライトモードカラー
+  darkColorMode('darkColorMode'), // ダークモードカラー
+  initCalendarConfig('initCalendarConfig'), // 初期化済み
+  calendarHolidayList('calendarHolidayList'), // 祝日曜日設定
+  calendarHiddenMode('calendarHiddenMode'), // 隠し表示モード
+  calendarHiddenCalendarIds('calendarHiddenCalendarIds'), // 隠し表示
+  calendarBothCalendarIds('calendarBothCalendarIds'), // 両方表示
+  calendarInvisibleCalendarIds('calendarInvisibleCalendarIds'), // 非表示
+  calendarNotEditableCalendarIds('calendarNotEditableCalendarIds'), // 編集不可
+  calendarUseCalendarId('calendarUseCalendarId'), // 使用中
+  calendarHolidayCalendarIds('calendarHolidayCalendarIds'), // 祝日表示
   ;
 
   final String id;

@@ -83,17 +83,17 @@ initCalendarConfig() async {
         SharedPreferenceKey.calendarBothCalendarIds,
         holidayCalendarId
     );
-
-    var otherHolidayCalendars = calendars
-        .where((calendar) => calendar.name == japaneseHolidayName
-        && calendar.id != holidayCalendarId)
-        .map((calendar) => calendar.id!).toList();
-
-    await SharedPreferencesRepository().setString(
-        SharedPreferenceKey.calendarInvisibleCalendarIds,
-        listToCalendarConfig(otherHolidayCalendars)
-    );
   }
+
+  var otherReadonlyCalendars = calendars
+      .where((calendar) => calendar.isReadOnly!
+        && calendar.id != holidayCalendarId)
+      .map((calendar) => calendar.id!).toList();
+
+  await SharedPreferencesRepository().setString(
+      SharedPreferenceKey.calendarInvisibleCalendarIds,
+      listToCalendarConfig(otherReadonlyCalendars)
+  );
 
   var useCalendar = calendars.where((calendar) => calendar.isDefault!)
       .map((calendar) => calendar.id!)
