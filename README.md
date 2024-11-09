@@ -1,17 +1,17 @@
 ## FVMバージョン合わせ
 % fvm releases
 % fvm list
-% fvm install 3.24.3
+% fvm install 3.24.4
 インストール先は~/fvm/versions
 % fvm remove 2.10.4
 % cd ~/pc_data/project
-% fvm use 3.24.3
+% fvm use 3.24.4
 
 ## FVMプロジェクト作成(FVMバージョン合わせの後)
 % fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
 
 ## Android/iOS共通
-### デプロイの初期化
+### ライブラリ更新前
 % fvm flutter clean
 
 ## Android

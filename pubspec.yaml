@@ -46,7 +46,7 @@ dependencies:
   # WidgetとStateNotifierの分離
   hooks_riverpod: ^2.5.1
   # カレンダーアクセス
-  device_calendar: ^4.3.2
+  device_calendar: ^4.3.3
   # タイムゾーン
   flutter_native_timezone: ^2.0.0
   # iOS/Android/Webの判定
