@@ -907,9 +907,9 @@ class _EventPartState extends ConsumerState<EventPart>
                   onPressed: () async {
                     await calendarNotifier.selectEventListPart(index);
 
-                    var eventId = await calendarNotifier.moveIndexEvent(
-                        index);
                     if (!await calendarNotifier.isHourMove()) {
+                      var eventId = await calendarNotifier.moveIndexEvent(
+                          index);
                       if (eventId == null) {
                         if (context.mounted) {
                           await UIUtils().showMessageDialog(context, ref,
@@ -919,14 +919,15 @@ class _EventPartState extends ConsumerState<EventPart>
                         await calendarNotifier.updateEditingEvent(eventId);
                         await calendarNotifier.editingCancel(index);
                       }
+
+                      await calendarNotifier.updateCalendar();
+                      if (eventId != null) {
+                        await calendarNotifier.selectEventList(eventId);
+                      }
                     } else {
                       await calendarNotifier.setHourChoiceMode(true);
                     }
 
-                    await calendarNotifier.updateCalendar();
-                    if (eventId != null) {
-                      await calendarNotifier.selectEventList(eventId);
-                    }
                     await calendarNotifier.updateState();
                   },
                 ),
