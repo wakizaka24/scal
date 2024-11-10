@@ -286,10 +286,14 @@ class HomePage extends HookConsumerWidget {
             PackageInfo packageInfo = await PackageInfo.fromPlatform();
             if (context.mounted) {
               await UIUtils().showMessageDialog(context, ref,
-                  '登録', 'イベントの登録には、OSの${packageInfo.appName}の'
-                      '設定でカレンダーへのアクセスを許可する必要があります。\n\n'
-                      'また、OS標準のカレンダーアプリでカレンダー設定をする'
-                      '必要があります。');
+                  '登録', 'STEP1\n'
+                      'イベントの登録には、OSの${packageInfo.appName}の'
+                      '設定でカレンダーへのアクセスを許可する必要があります。\n'
+                      '\n'
+                      'STEP2\n'
+                      'OS標準のカレンダーアプリでカレンダー設定をし、'
+                      '10分前後程度、OS標準カレンダーを起動したままにして、'
+                      'データをアプリ間で同期する必要があります。');
               return;
             }
           } else {
