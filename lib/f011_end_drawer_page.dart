@@ -235,40 +235,50 @@ class EndDrawerPage extends HookConsumerWidget {
                   }
                 ]),
                 const SizedBox(height: 15),
-                CWText('カレンダー表示設定',
+                CWText(calendarList.isNotEmpty ? 'カレンダー表示設定'
+                    : 'カレンダー情報の取得',
                     fontSize: drawerSettingTitleFontSize,
                     color: colorConfig.normalTextColor
                 ),
                 const SizedBox(height: 8),
 
-                CWCell(
-                    borderColor: colorConfig.borderColor,
-                    child: Column(children: [
-                      Row(children: [
-                        Expanded(child: createCell(title: 'アカウント',
-                            height: cellHeaderHeight)),
-                        Expanded(child: createCell(title: 'カレンダー',
-                            height: cellHeaderHeight)),
-                        createCell(title: '設定', width: cellSettingWidth,
-                            height: cellHeaderHeight),
-                        createCell(title: '表示', width: cellSettingWidth,
-                            height: cellHeaderHeight),
-                      ]),
+                if (calendarList.isEmpty)
+                  CWText(CalendarUtils().convertCharWrapString(endDrawerState
+                      .calendarEmptyMessage)!,
+                      structHeight: 1.3,
+                      fontSize: drawerSettingItemFontSize,
+                      color: colorConfig.normalTextColor
+                  ),
 
-                      for (int i=0; i < calendarList.length; i++) ... {
+                if (calendarList.isNotEmpty)
+                  CWCell(
+                      borderColor: colorConfig.borderColor,
+                      child: Column(children: [
                         Row(children: [
-                          Expanded(child: createCell(
-                              title: calendarList[i].accountName)),
-                          Expanded(child: createCell(
-                              title: calendarList[i].calendarName)),
-                          createCell(width: cellSettingWidth,
-                              child: createSettingButtonColumn(i)),
-                          createCell(width: cellSettingWidth,
-                              child: createDisplayButtonColumn(i)),
+                          Expanded(child: createCell(title: 'アカウント',
+                              height: cellHeaderHeight)),
+                          Expanded(child: createCell(title: 'カレンダー',
+                              height: cellHeaderHeight)),
+                          createCell(title: '設定', width: cellSettingWidth,
+                              height: cellHeaderHeight),
+                          createCell(title: '表示', width: cellSettingWidth,
+                              height: cellHeaderHeight),
                         ]),
-                      }
-                    ])
-                ),
+
+                        for (int i=0; i < calendarList.length; i++) ... {
+                          Row(children: [
+                            Expanded(child: createCell(
+                                title: calendarList[i].accountName)),
+                            Expanded(child: createCell(
+                                title: calendarList[i].calendarName)),
+                            createCell(width: cellSettingWidth,
+                                child: createSettingButtonColumn(i)),
+                            createCell(width: cellSettingWidth,
+                                child: createDisplayButtonColumn(i)),
+                          ]),
+                        }
+                      ])
+                  ),
               ]
           ),
 

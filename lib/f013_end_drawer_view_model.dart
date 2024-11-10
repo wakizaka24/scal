@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'f008_calendar_config.dart';
 import 'f017_design_config.dart';
@@ -35,11 +36,13 @@ class CalendarDisplayDisplay {
 class EndDrawerPageState {
   List<WeekdayDisplay> weekdayList = [];
   List<CalendarDisplayDisplay> calendarList = [];
+  String? calendarEmptyMessage;
 
   static EndDrawerPageState copy(EndDrawerPageState state) {
     var nState = EndDrawerPageState();
     nState.weekdayList = state.weekdayList;
     nState.calendarList = state.calendarList;
+    nState.calendarEmptyMessage = state.calendarEmptyMessage;
     return nState;
   }
 }
@@ -53,6 +56,17 @@ class EndDrawerPageNotifier extends StateNotifier<EndDrawerPageState> {
   initState() async {
     state.weekdayList = createWeekdayList();
     state.calendarList = await createCalendarDisplayList();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    state.calendarEmptyMessage = 'STEP1\n'
+        'カレンダー情報の取得には、OSの${packageInfo.appName}の'
+        '設定でカレンダーへのアクセスを全て許可する必要があります。\n'
+        '\n'
+        'STEP2\n'
+        'OS標準のカレンダーアプリでカレンダー設定をし、'
+        '10分前後程度、OS標準カレンダーを起動したままにして、'
+        'データをアプリ間で同期する必要があります。';
+
     await updateState();
   }
 

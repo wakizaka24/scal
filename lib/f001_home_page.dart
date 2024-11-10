@@ -288,7 +288,7 @@ class HomePage extends HookConsumerWidget {
               await UIUtils().showMessageDialog(context, ref,
                   '登録', 'STEP1\n'
                       'イベントの登録には、OSの${packageInfo.appName}の'
-                      '設定でカレンダーへのアクセスを許可する必要があります。\n'
+                      '設定でカレンダーへのアクセスを全て許可する必要があります。\n'
                       '\n'
                       'STEP2\n'
                       'OS標準のカレンダーアプリでカレンダー設定をし、'
