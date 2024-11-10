@@ -244,7 +244,7 @@ class EndDrawerPage extends HookConsumerWidget {
 
                 if (calendarList.isEmpty)
                   CWText(CalendarUtils().convertCharWrapString(endDrawerState
-                      .calendarEmptyMessage)!,
+                      .calendarEmptyMessage ?? "")!,
                       structHeight: 1.3,
                       fontSize: drawerSettingItemFontSize,
                       color: colorConfig.normalTextColor
