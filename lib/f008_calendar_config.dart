@@ -50,6 +50,11 @@ initCalendarConfig() async {
     return;
   }
 
+  var calendars = await CalendarRepository().getCalendars();
+  if (calendars.isEmpty) {
+    return;
+  }
+
   var init = await SharedPreferencesRepository().getBool(
       SharedPreferenceKey.initCalendarConfig) ?? false;
   await SharedPreferencesRepository().setBool(
@@ -60,8 +65,6 @@ initCalendarConfig() async {
 
   const iOSCalendarAccountName = 'Subscribed Calendars';
   const japaneseHolidayName = '日本の祝日';
-
-  var calendars = await CalendarRepository().getCalendars();
 
   var holidayCalendarId = calendars
       .where((calendar) => calendar.accountName == iOSCalendarAccountName
