@@ -47,6 +47,9 @@ android:label="Starlight"
 % cd ~/pc\_data/project/scal
 % fvm flutter build appbundle --release
 
+### Application IDを変更する(com.wakizaka24.scal.v3に変更)
+% fvm flutter pub run change_app_package_name:main com.wakizaka24.scal.v3
+
 ## iOS
 ### CocoaPods
 % sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
