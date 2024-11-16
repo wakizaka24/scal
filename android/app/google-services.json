@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1058866964717:android:050502531c4f96cd84c4e4",
+        "mobilesdk_app_id": "1:1058866964717:android:7c99f2b44c8dda9684c4e4",
         "android_client_info": {
-          "package_name": "com.wakizaka24.scal.v3"
+          "package_name": "com.wakizaka24.scal"
         }
       },
       "oauth_client": [],

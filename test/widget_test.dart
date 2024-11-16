@@ -7,7 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scal/f006_shared_preferences_repository.dart';
 import 'package:scal/f008_calendar_config.dart';
+import 'package:scal/f017_design_config.dart';
 
 import 'package:scal/main.dart';
 
