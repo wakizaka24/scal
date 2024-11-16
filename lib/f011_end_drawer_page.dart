@@ -55,8 +55,7 @@ class EndDrawerPage extends HookConsumerWidget {
       await Navigator.push(context, MaterialPageRoute(
           builder: (context) => LicensePage(
               applicationName: packageInfo.appName,
-              applicationVersion: '${packageInfo.version}'
-                  '(${packageInfo.buildNumber})'
+              applicationVersion: packageInfo.version
           )
       ));
 
