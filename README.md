@@ -1,3 +1,19 @@
+## Homebrewをインストール(FVMインストールで使用)
+% /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+% vi ~/.zshrc
+export PATH=$PATH:/opt/homebrew/bin
+% source ~/.zshrc
+
+## FVMインストール
+% brew tap leoafarias/fvm
+% brew install fvm
+
+{
+## FVMアンインストール
+% brew uninstall fvm
+% brew untap leoafarias/fvm
+}
+
 ## FVMバージョン合わせ
 % fvm releases
 % fvm list
@@ -10,11 +26,45 @@
 ## FVMプロジェクト作成(FVMバージョン合わせの後)
 % fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
 
+## Flutterの環境構築
+### Android
+1. Google Developerサイト(https://developer.android.com/studio?hl=ja)から開発対象のAndroid Studioをインストールする。
+2. Android SDK Command-line Toolsをインストールする。
+Preferences > SDK Manager > System Settings > Android SDK > SDK Tools > Android SDK Command-line Toolsのチェックを入れる
+3. ライセンスを許諾する。
+% fvm flutter doctor --android-licenses
+### iOS
+1. App StoreでXcodeをインストールする。
+(Xcodeの標準の名前でアプリがないとgemでCocoaPodsをインストールできないため)
+2. Apple Developerサイト(https://developer.apple.com/download/all/)から開発対象のXcodeをインストールし、リネームしてアプリケーションフォルダに入れる。
+例) Xcode_16.1.app
+3. CocoaPodsをインストールする。
+% sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
+{
+4. CocoaPodsをアンインストールする。
+% sudo gem uninstall cocoapods
+}
+5. Flutterの使用するXcodeの設定
+% sudo xcode-select --switch "/Applications/Xcode_16.1.app/Contents/Developer"
+% sudo xcodebuild -runFirstLaunch
+% [Enter]
+% agree[Enter]
+% open -a Simulator
+
+### FVMの環境パスを設定する
+% vi ~/.zshrc
+export PATH=$PATH:$HOME/.pub-cache/bin
+export PATH=~/fvm/default/bin:$PATH
+% source ~/.zshrc
+
+### Flutterの設定診断
+% fvm flutter doctor -v
+
 ## Android/iOS共通
 ### ライブラリ更新前
 % fvm flutter clean
 
-## Android
+## Androidのリリース時
 ### wakizaka24-keystore.jksファイル作成
 % keytool -genkey -v -keystore ~/wakizaka24-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
 first-app-24
@@ -47,11 +97,7 @@ android:label="Starlight"
 % cd ~/pc\_data/project/scal
 % fvm flutter build appbundle --release
 
-## iOS
-### CocoaPods
-% sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
-% sudo gem uninstall cocoapods
-
+## iOSのリリース時
 ### リリース設定
 % cd ~/pc\_data/project/scal
 % vi ./ios/Runner/Info.plist
@@ -62,12 +108,12 @@ android:label="Starlight"
 % cd ~/pc\_data/project/scal
 % fvm flutter build ios
 
-## Web(ベータ版)
+## Web(ベータ版)のリリース時
 ### デプロイ
 % cd ~/pc\_data/project/scal
 % sh deploy_sakura.sh
 
-## アプリアイコン設定
+## iOS/Androidのアプリアイコン設定
 % cd ~/pc\_data/project/scal
 % vi pubspec.yaml
 flutter_launcher_icons:
