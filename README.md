@@ -23,6 +23,28 @@ export PATH=$PATH:/opt/homebrew/bin
 % cd ~/pc_data/project
 % fvm use 3.24.4
 
+## Flutterバージョンが使用するGradleのJavaバージョンにPCを合わせる
+バージョンが合わない時のエラーメッセージ
+「Unsupported class file major version 65」
+1. Gradleのバージョンの確認
+cat scal/android/gradle/wrapper/gradle-wrapper.properties
+「distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip」
+2. Javaのバージョンの確認
+% Java --version
+java 11.0.22 2024-01-16 LTS
+→ gradle7.5のJavaバージョンはJava18なのでJava18をインストールする。
+3. Javaのインストール
+https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
+「macOS 64 DMG Installer」
+インストール先の確認。アンインストールはフォルダごと削除で良い。
+% ls -al /Library/Java/JavaVirtualMachines/
+% sudo rm -rf /Library/Java/JavaVirtualMachines/jdk-17.jdk
+4. 使用するJavaを変更する
+% /usr/libexec/java_home -V
+18.0.2.1 (arm64) "Oracle Corporation" - "Java SE 18.0.2.1" /Library/Java/JavaVirtualMachines/jdk-18.0.2.1.jdk/Contents/Home
+11.0.22 (arm64) "Oracle Corporation" - "Java SE 11.0.22" /Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home
+% fvm flutter config --jdk-dir="/Library/Java/JavaVirtualMachines/jdk-18.0.2.1.jdk/Contents/Home"
+
 ## FVMプロジェクト作成(FVMバージョン合わせの後)
 % fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
 
