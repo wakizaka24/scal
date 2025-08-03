@@ -5,7 +5,7 @@ FOLDER_NAME=$1
 fi
 
 rm -rf ./build/web
-fvm flutter build web --web-renderer canvaskit -t lib/main.dart
+fvm flutter build web -t lib/main.dart --dart-define=FLUTTER_WEB_RENDERER=canvaskit
 cd ./build/web
 # base href="/" -> base href="/scal/deploy/20230521_1852_37/"
 # sed -e "s/base href=\"\/\"/base href=\"\/scal\/deploy\/20230521_1852_37\/\"/g" ./index.html

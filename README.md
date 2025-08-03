@@ -138,6 +138,9 @@ android:label="Starlight"
 
 ## Web(ベータ版)のリリース時
 ### デプロイ
+vi pubspec.yaml
+intl: ^0.20.2
+
 % cd ~/pc\_data/project/scal
 % sh deploy_sakura.sh
 

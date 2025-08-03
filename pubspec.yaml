@@ -40,6 +40,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   # ローカライゼーション
+  # Webデプロイ時には0.20.2にする
   intl: ^0.19.0
   # データ保存
   shared_preferences: ^2.2.3
