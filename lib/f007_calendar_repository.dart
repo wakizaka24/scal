@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:device_calendar/device_calendar.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 class CalendarRepository {
   static final CalendarRepository _instance = CalendarRepository._internal();
@@ -18,7 +18,7 @@ class CalendarRepository {
 
   Future setNativeLocation() async {
     try {
-      String timezone = await FlutterNativeTimezone.getLocalTimezone();
+      String timezone = await FlutterTimezone.getLocalTimezone();
       _location = getLocation(timezone);
       setLocalLocation(_location);
     } catch (e) {

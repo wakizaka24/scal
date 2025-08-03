@@ -15,13 +15,13 @@ export PATH=$PATH:/opt/homebrew/bin
 }
 
 ## FVMバージョン合わせ(更新1)
-(Android SDKはFlutter SDKのデフォルトを使用している
+Android SDKはFlutter SDKのデフォルトを使用しているが、
+最新版のSDKを使いたい場合は、直接指定する必要がある
 android/app/build.gradle
 targetSdkVersion flutter.targetSdkVersion
-scal/.fvm/flutter_sdk/packages/flutter_tools/lib/src/android/gradle_utils.dart
-const String compileSdkVersion = '35';)
+targetSdkVersion 35
 
-% fvm releases
+% fvm releases --all
 % fvm list
 % fvm install 3.32.8
 インストール先は~/fvm/versions
@@ -106,9 +106,6 @@ JP
 y
 
 ### リリース設定
-% cd ~/pc\_data/project/scal
-% cp /Users/ryota24/wakizaka24-keystore.jks ./android
-
 % cd ~/pc\_data/project/scal
 % vi ./android/key.properties
 storePassword=first-app-24
@@ -218,3 +215,17 @@ ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRO
 ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist
 $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist
 $(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)
+
+## Flutter(iOS/Android)の更新処理
+1.前記の更新1〜更新3を再度行う
+2.AGPを更新する(Android)
+vi scal/android/settings.gradle
+plugins {
+id "com.android.application" version "8.12.0" apply false
+3.Gradleを更新する(Android)
+vi scal/android/gradle/wrapper/gradle-wrapper.properties
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+4.ライブラリを更新する(Android)
+/Users/ryota24/pc_data/project/scal/pubspec.yaml
+5.Androidリリースファイル作成時のエラーから、AGP8.4以降の圧縮で、圧縮ファイルを追加する(Android)
+vi scal/android/app/proguard-rules.pro
