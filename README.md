@@ -14,14 +14,20 @@ export PATH=$PATH:/opt/homebrew/bin
 % brew untap leoafarias/fvm
 }
 
-## FVMバージョン合わせ
+## FVMバージョン合わせ(更新1)
+(Android SDKはFlutter SDKのデフォルトを使用している
+android/app/build.gradle
+targetSdkVersion flutter.targetSdkVersion
+scal/.fvm/flutter_sdk/packages/flutter_tools/lib/src/android/gradle_utils.dart
+const String compileSdkVersion = '35';)
+
 % fvm releases
 % fvm list
-% fvm install 3.24.4
+% fvm install 3.32.8
 インストール先は~/fvm/versions
 % fvm remove 2.10.4
 % cd ~/pc_data/project
-% fvm use 3.24.4
+% fvm use 3.32.8
 
 ## Flutterバージョンが使用するGradleのJavaバージョンにPCを合わせる
 バージョンが合わない時のエラーメッセージ
@@ -49,25 +55,25 @@ https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
 % fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
 
 ## Flutterの環境構築
-### Android
+### Android(更新2 Androidのビルド環境最新にする時も必要)
 1. Google Developerサイト(https://developer.android.com/studio?hl=ja)から開発対象のAndroid Studioをインストールする。
-2. Android SDK Command-line Toolsをインストールする。
+2. Android SDK Command-line Toolsをインストールする(ここは初回だけ)。
 Preferences > SDK Manager > System Settings > Android SDK > SDK Tools > Android SDK Command-line Toolsのチェックを入れる
 3. ライセンスを許諾する。
 % fvm flutter doctor --android-licenses
-### iOS
+### iOS(更新3 iOSのビルド環境最新にする時も必要)
 1. App StoreでXcodeをインストールする。
 (Xcodeの標準の名前でアプリがないとgemでCocoaPodsをインストールできないため)
 2. Apple Developerサイト(https://developer.apple.com/download/all/)から開発対象のXcodeをインストールし、リネームしてアプリケーションフォルダに入れる。
-例) Xcode_16.1.app
+例) Xcode_16.4.app
 3. CocoaPodsをインストールする。
-% sudo gem install -n /usr/local/bin -v 1.15.2 cocoapods
+% sudo gem install -n /usr/local/bin -v 1.16.2 cocoapods
 {
 4. CocoaPodsをアンインストールする。
 % sudo gem uninstall cocoapods
 }
 5. Flutterの使用するXcodeの設定
-% sudo xcode-select --switch "/Applications/Xcode_16.1.app/Contents/Developer"
+% sudo xcode-select --switch "/Applications/Xcode_16.4.app/Contents/Developer"
 % sudo xcodebuild -runFirstLaunch
 % [Enter]
 % agree[Enter]
