@@ -58,9 +58,11 @@ https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
 ### Android(更新2 Androidのビルド環境最新にする時も必要)
 1. Google Developerサイト(https://developer.android.com/studio?hl=ja)から開発対象のAndroid Studioをインストールする。
 2. Android SDK Command-line Toolsをインストールする(ここは初回だけ)。
-Preferences > SDK Manager > System Settings > Android SDK > SDK Tools > Android SDK Command-line Toolsのチェックを入れる
+Tools > SDK Manager > Language & Frameworks > Android SDK > SDK Tools > Android SDK Command-line Toolsのチェックを入れる
 3. ライセンスを許諾する。
 % fvm flutter doctor --android-licenses
+4. Android SDK Platform-Toolsの更新(初回以降の更新)。
+Tools > SDK Manager > Language & Frameworks > Android SDK > SDK Tools > Android SDK Platform-Toolsにチェックして最新に更新する
 ### iOS(更新3 iOSのビルド環境最新にする時も必要)
 1. App StoreでXcodeをインストールする。
 (Xcodeの標準の名前でアプリがないとgemでCocoaPodsをインストールできないため)
