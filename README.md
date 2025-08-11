@@ -15,11 +15,13 @@ export PATH=$PATH:/opt/homebrew/bin
 }
 
 ## FVMバージョン合わせ(更新1)
-Android SDKはFlutter SDKのデフォルトを使用しているが、
-最新版のSDKを使いたい場合は、直接指定する必要がある
+Android SDKはFlutter SDKのデフォルトを使用している
+直接指定する場合は値を変更する必要がある
 android/app/build.gradle
-targetSdkVersion flutter.targetSdkVersion
-targetSdkVersion 35
+compileSdkVersion flutter.compileSdkVersion
+ndkVersion flutter.ndkVersion
+compileSdkVersion 35 
+ndkVersion "27.0.12077973"
 
 % fvm releases --channel all
 % fvm list
