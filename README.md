@@ -21,13 +21,13 @@ android/app/build.gradle
 targetSdkVersion flutter.targetSdkVersion
 targetSdkVersion 35
 
-% fvm releases --all
+% fvm releases --channel all
 % fvm list
-% fvm install 3.32.8
+% fvm install 3.35.0-0.2.pre
 インストール先は~/fvm/versions
 % fvm remove 2.10.4
 % cd ~/pc_data/project
-% fvm use 3.32.8
+% fvm use 3.35.0-0.2.pre
 
 ## Flutterバージョンが使用するGradleのJavaバージョンにPCを合わせる
 バージョンが合わない時のエラーメッセージ
