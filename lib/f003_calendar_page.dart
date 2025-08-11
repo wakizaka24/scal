@@ -124,8 +124,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage>
         Expanded(
             child: PageView.builder(
                 controller: calendarState.calendarSwitchingController,
-                physics: const CustomScrollPhysics(mass: 75,
-                    stiffness: 100, damping: 0.85),
+                physics: const ClampingScrollPhysics(),
                 //physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 onPageChanged: (int index) {
@@ -231,8 +230,7 @@ class _MonthCalendarPageState extends ConsumerState<MonthCalendarPage>
 
     return PageView.builder(
       controller: calendarState.monthCalendarController,
-      physics: const CustomScrollPhysics(mass: 75, stiffness: 100,
-          damping: 0.85),
+      physics: const ClampingScrollPhysics(),
       onPageChanged: (int index) async {
         await calendarNotifier.onCalendarPageChanged(index);
       },
@@ -311,33 +309,6 @@ class _WeekCalendarPageState extends ConsumerState<WeekCalendarPage>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-// Common
-class CustomScrollPhysics extends ClampingScrollPhysics {
-  final double mass; // 速度(50)
-  final double stiffness; // 100
-  final double damping; // 0.85
-
-  const CustomScrollPhysics({
-    super.parent,
-    required this.mass,
-    required this.stiffness,
-    required this.damping,
-  });
-
-  @override
-  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollPhysics(parent: buildParent(ancestor)!,
-      mass: mass, stiffness: stiffness, damping: damping);
-  }
-
-  @override
-  SpringDescription get spring => SpringDescription(
-    mass: mass,
-    stiffness: stiffness,
-    damping: damping,
-  );
 }
 
 class SelectableCalendarCell extends HookConsumerWidget {

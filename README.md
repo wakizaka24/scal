@@ -96,6 +96,9 @@ export PATH=~/fvm/default/bin:$PATH
 ### ライブラリ更新前
 % fvm flutter clean
 
+## リリースと同じ状態で実行
+% fvm flutter run --release
+
 ## Androidのリリース時
 ### wakizaka24-keystore.jksファイル作成
 % keytool -genkey -v -keystore ~/wakizaka24-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
