@@ -1,7 +1,8 @@
 ## Homebrewをインストール(FVMインストールで使用)
 % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 % vi ~/.zshrc
-export PATH=$PATH:/opt/homebrew/bin
+# Brewコマンド
+export PATH="/opt/homebrew/bin:$PATH"
 % source ~/.zshrc
 
 ## FVMインストール
@@ -14,9 +15,19 @@ export PATH=$PATH:/opt/homebrew/bin
 % brew untap leoafarias/fvm
 }
 
+### FVMの環境パスを設定する
+% vi ~/.zshrc
+# FVM変更パス
+export FVM_CACHE_PATH="$HOME/fvm"
+# FVMのデフォルトのパス
+export PATH="$FVM_CACHE_PATH/default/bin:$PATH"
+# FVMコマンド
+export PATH="$PATH:$HOME/.pub-cache/bin"
+% source ~/.zshrc
+
 ## FVMバージョン合わせ(更新1)
 Android SDKはFlutter SDKのデフォルトを使用している
-直接指定する場合は値を変更する必要がある
+直接指定する場合は値を変更する必要がある(普通はやらない)
 android/app/build.gradle
 compileSdkVersion flutter.compileSdkVersion
 ndkVersion flutter.ndkVersion
@@ -25,33 +36,38 @@ ndkVersion "27.0.12077973"
 
 % fvm releases --channel all
 % fvm list
-% fvm install 3.35.0-0.2.pre
+% fvm install 3.38.1
 インストール先は~/fvm/versions
-% fvm remove 2.10.4
-% cd ~/pc_data/project
-% fvm use 3.35.0-0.2.pre
+% fvm remove 3.38.1
+% cd ~/pc_data/project/scal
+% fvm global 3.38.1
+
+## FlutterのAndroid Studioへの設定
+Android Studio > Settings... > Languages & Frameworks > Flutter SDK path
+/Users/ryota24/fvm/default
+OKボタンを押す。
 
 ## Flutterバージョンが使用するGradleのJavaバージョンにPCを合わせる
 バージョンが合わない時のエラーメッセージ
 「Unsupported class file major version 65」
 1. Gradleのバージョンの確認
-cat scal/android/gradle/wrapper/gradle-wrapper.properties
-「distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip」
+% cd ~/pc_data/project/scal
+% cat ./android/gradle/wrapper/gradle-wrapper.properties
+「distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip」
 2. Javaのバージョンの確認
 % Java --version
-java 11.0.22 2024-01-16 LTS
-→ gradle7.5のJavaバージョンはJava18なのでJava18をインストールする。
+openjdk 25.0.1 2025-10-21 LTS
+OpenJDK Runtime Environment Temurin-25.0.1+8 (build 25.0.1+8-LTS)
+OpenJDK 64-Bit Server VM Temurin-25.0.1+8 (build 25.0.1+8-LTS, mixed mode, sharing)
+→ gradle8.13のJavaバージョンはJava17以上なのでJava17をインストールする。
 3. Javaのインストール
-https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
-「macOS 64 DMG Installer」
-インストール先の確認。アンインストールはフォルダごと削除で良い。
-% ls -al /Library/Java/JavaVirtualMachines/
-% sudo rm -rf /Library/Java/JavaVirtualMachines/jdk-17.jdk
+% brew install --cask temurin
 4. 使用するJavaを変更する
 % /usr/libexec/java_home -V
-18.0.2.1 (arm64) "Oracle Corporation" - "Java SE 18.0.2.1" /Library/Java/JavaVirtualMachines/jdk-18.0.2.1.jdk/Contents/Home
-11.0.22 (arm64) "Oracle Corporation" - "Java SE 11.0.22" /Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home
-% fvm flutter config --jdk-dir="/Library/Java/JavaVirtualMachines/jdk-18.0.2.1.jdk/Contents/Home"
+Matching Java Virtual Machines (1):
+   25.0.1 (arm64) "Eclipse Adoptium" - "OpenJDK 25.0.1" /Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home
+   /Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home
+% fvm flutter config --jdk-dir="/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home"
 
 ## FVMプロジェクト作成(FVMバージョン合わせの後)
 % fvm flutter create ./scal --project-name scal --platforms android,ios,web --org com.wakizaka
@@ -59,7 +75,7 @@ https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
 ## Flutterの環境構築
 ### Android(更新2 Androidのビルド環境最新にする時も必要)
 1. Google Developerサイト(https://developer.android.com/studio?hl=ja)から開発対象のAndroid Studioをインストールする。
-2. Android SDK Command-line Toolsをインストールする(ここは初回だけ)。
+2. Android SDK Command-line Toolsをインストールする(ここは初回)。
 Tools > SDK Manager > Language & Frameworks > Android SDK > SDK Tools > Android SDK Command-line Toolsのチェックを入れる
 3. ライセンスを許諾する。
 % fvm flutter doctor --android-licenses
@@ -72,22 +88,33 @@ Tools > SDK Manager > Language & Frameworks > Android SDK > SDK Tools > Android 
 例) Xcode_16.4.app
 3. CocoaPodsをインストールする。
 % sudo gem install -n /usr/local/bin -v 1.16.2 cocoapods
+4. Rubyのバージョンが古い場合エラーが出るので、Rubyをインストールする。
+ERROR:  Error installing cocoapods:
+The last version of securerandom (>= 0.3) to support your Ruby & RubyGems was 0.3.2. Try installing it with `gem install securerandom -v 0.3.2` and then running the current command again
+securerandom requires Ruby version >= 3.1.0. The current ruby version is 2.6.10.210.
+% brew install ruby
+% vi ~/.zshrc
+# Ruby(CocoaPodに使用)
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+% source ~/.zshrc
+% which ruby
+% ruby --version
+### iOSのライブラリを更新する。
+% cd ./ios
+% pod repo update
+% rm Podfile.lock
+% pod install --repo-update
+
 {
 4. CocoaPodsをアンインストールする。
 % sudo gem uninstall cocoapods
 }
 5. Flutterの使用するXcodeの設定
-% sudo xcode-select --switch "/Applications/Xcode_16.4.app/Contents/Developer"
+% sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 % sudo xcodebuild -runFirstLaunch
 % [Enter]
 % agree[Enter]
 % open -a Simulator
-
-### FVMの環境パスを設定する
-% vi ~/.zshrc
-export PATH=$PATH:$HOME/.pub-cache/bin
-export PATH=~/fvm/default/bin:$PATH
-% source ~/.zshrc
 
 ### Flutterの設定診断
 % fvm flutter doctor -v
@@ -226,13 +253,13 @@ $(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)
 ## Flutter(iOS/Android)の更新処理
 1.前記の更新1〜更新3を再度行う
 2.AGPを更新する(Android)
-vi scal/android/settings.gradle
+vi ./android/settings.gradle
 plugins {
 id "com.android.application" version "8.12.0" apply false
 3.Gradleを更新する(Android)
-vi scal/android/gradle/wrapper/gradle-wrapper.properties
+vi ./android/gradle/wrapper/gradle-wrapper.properties
 distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
 4.ライブラリを更新する(Android)
 /Users/ryota24/pc_data/project/scal/pubspec.yaml
 5.Androidリリースファイル作成時のエラーから、AGP8.4以降の圧縮で、圧縮ファイルを追加する(Android)
-vi scal/android/app/proguard-rules.pro
+vi ./android/app/proguard-rules.pro
