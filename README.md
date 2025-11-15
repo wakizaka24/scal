@@ -169,9 +169,6 @@ android:label="Starlight"
 
 ## Web(ベータ版)のリリース時
 ### デプロイ
-vi pubspec.yaml
-intl: ^0.20.2
-
 % cd ~/pc\_data/project/scal
 % sh deploy_sakura.sh
 
@@ -188,36 +185,35 @@ adaptive_icon_foreground: "images/launcher/icon_adaptive_foreground.png"
 % fvm dart run flutter_launcher_icons:main
 
 ## Firebase
-### Firebase CLI
-% cd ~/pc\_data/project/scal
-% curl -sL https://firebase.tools | bash
 
-### ログイン
-% cd ~/pc\_data/project/scal
+### Rosetta2 インストール
+% softwareupdate --install-rosetta --agree-to-license
+
+### Node インストール
+% brew install node
+
+### Firebase CLI インストール
+% npm install -g firebase-tools@latest
+
+### Firebase ログイン
 % firebase login
-〜
-? Allow Firebase to collect CLI and Emulator Suite usage and error reporting information? Yes
-〜
-✔  Success! Logged in as wakizaka24@gmail.com
-
-### FlutterFire CLI
-% cd ~/pc\_data/project/scal
-% fvm dart pub global activate flutterfire_cli
-
-### Firebase Coreをプロジェクトに適用する
-% cd ~/pc\_data/project/scal
-% fvm flutter pub add firebase_core
-
-### プロジェクトにFirebaseを適用/初期化する
-% cd ~/pc\_data/project/scal
-% sudo fvm dart pub global run flutterfire_cli:flutterfire configure
+i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data
+? Enable Gemini in Firebase features? (Y/n)
+n コード生成などのAI機能使用しない
+i  Firebase optionally collects CLI and Emulator Suite usage and error reporting information to help improve our products. Data is collected in accordance with Google's privacy policy (https://policies.google.com/privacy) and is not used to identify you.
+? Allow Firebase to collect CLI and Emulator Suite usage and error reporting information? (Y/n)
+n データ収集しない
 
 ### Firebaseサービスを追加する
-% cd ~/pc\_data/project/scal
-% fvm flutter pub add firebase_crashlytics
+% cd ~/pc_data/project/scal
+% fvm flutter pub add firebase_core
 % fvm flutter pub add firebase_analytics
-? You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.jso✔ You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.json` file to configure your project? · yes
-% sudo fvm dart pub global run flutterfire_cli:flutterfire configure
+% fvm flutter pub add firebase_crashlytics
+
+### プロジェクトにFirebaseを適用/初期化する
+% flutterfire configure
+? You have an existing `firebase.json` file and possibly already configured your project for Firebase. Would you prefer to reuse the values in your existing `firebase.json` file to configure your project? (y/n) › yes
+yes 既存のfirebase.jsonを使用
 
 ## dSYM(iOSのデバッグシンボル)
 ### dSYMの場所

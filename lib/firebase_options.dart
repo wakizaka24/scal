@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1058866964717',
     projectId: 'scal-20c71',
     authDomain: 'scal-20c71.firebaseapp.com',
-    storageBucket: 'scal-20c71.appspot.com',
+    storageBucket: 'scal-20c71.firebasestorage.app',
     measurementId: 'G-MJ26BTS4E3',
   );
 
@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
     appId: '1:1058866964717:android:7c99f2b44c8dda9684c4e4',
     messagingSenderId: '1058866964717',
     projectId: 'scal-20c71',
-    storageBucket: 'scal-20c71.appspot.com',
+    storageBucket: 'scal-20c71.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -69,7 +69,7 @@ class DefaultFirebaseOptions {
     appId: '1:1058866964717:ios:90aa21e9065b20eb84c4e4',
     messagingSenderId: '1058866964717',
     projectId: 'scal-20c71',
-    storageBucket: 'scal-20c71.appspot.com',
+    storageBucket: 'scal-20c71.firebasestorage.app',
     iosBundleId: 'com.wakizaka24.scal',
   );
 
