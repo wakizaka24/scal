@@ -64,11 +64,8 @@ class EndDrawerPage extends HookConsumerWidget {
 
       // ステータスバーの設定
       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        // iOSの文字を白にする。
         statusBarBrightness: Brightness.dark,
-        // Androidの文字を白にする。
         statusBarIconBrightness: Brightness.light,
-        // Androidの背景色を透明にする。
         statusBarColor: Colors.transparent,
       ));
     }

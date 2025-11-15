@@ -399,7 +399,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
                     if (!eventDetailState.allDay!)
                       SizedBox(
-                        width: 60, height: 36,
+                        width: 80, height: 36,
                         child: CWTextField(
                             controller: eventDetailState.textEditingControllers!
                             [TextFieldItem.startTime]!,
@@ -446,7 +446,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
                     ),
 
                     if (!eventDetailState.allDay!)
-                      SizedBox(width: 60, height: 36,
+                      SizedBox(width: 80, height: 36,
                           child: CWTextField(
                               controller: eventDetailState
                                   .textEditingControllers!

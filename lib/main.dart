@@ -20,18 +20,18 @@ void main() async {
       DeviceOrientation.portraitUp
     ]);
 
-    // Androidのジェスチャーナビゲーションを透明にする。
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-        overlays: [SystemUiOverlay.top]).then((_) {
-      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
-        // Androidのステータスバーの背景色を透明にする。
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-      ));
-    });
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top],
+    );
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ));
 
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

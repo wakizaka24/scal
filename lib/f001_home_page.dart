@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -457,6 +458,14 @@ class HomePage extends HookConsumerWidget {
           body: stack
       );
     }
+
+    scaffold = AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: scaffold
+    );
 
     // 右端スワイプでナビゲーションを戻さない
     var popScope = PopScope(

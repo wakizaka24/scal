@@ -1,7 +1,7 @@
 ## Homebrewをインストール(FVMインストールで使用)
 % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 % vi ~/.zshrc
-# Brewコマンド
+\# Brewコマンド
 export PATH="/opt/homebrew/bin:$PATH"
 % source ~/.zshrc
 
@@ -17,11 +17,11 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 ### FVMの環境パスを設定する
 % vi ~/.zshrc
-# FVM変更パス
+\# FVM変更パス
 export FVM_CACHE_PATH="$HOME/fvm"
-# FVMのデフォルトのパス
+\# FVMのデフォルトのパス
 export PATH="$FVM_CACHE_PATH/default/bin:$PATH"
-# FVMコマンド
+\# FVMコマンド
 export PATH="$PATH:$HOME/.pub-cache/bin"
 % source ~/.zshrc
 
@@ -38,7 +38,7 @@ ndkVersion "27.0.12077973"
 % fvm list
 % fvm install 3.38.1
 インストール先は~/fvm/versions
-% fvm remove 3.38.1
+% fvm remove 3.35.7
 % cd ~/pc_data/project/scal
 % fvm global 3.38.1
 
@@ -53,7 +53,7 @@ OKボタンを押す。
 1. Gradleのバージョンの確認
 % cd ~/pc_data/project/scal
 % cat ./android/gradle/wrapper/gradle-wrapper.properties
-「distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip」
+「distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.0-bin.zip」
 2. Javaのバージョンの確認
 % Java --version
 openjdk 25.0.1 2025-10-21 LTS
@@ -94,27 +94,25 @@ The last version of securerandom (>= 0.3) to support your Ruby & RubyGems was 0.
 securerandom requires Ruby version >= 3.1.0. The current ruby version is 2.6.10.210.
 % brew install ruby
 % vi ~/.zshrc
-# Ruby(CocoaPodに使用)
+\# Ruby(CocoaPodに使用)
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 % source ~/.zshrc
 % which ruby
 % ruby --version
-### iOSのライブラリを更新する。
-% cd ./ios
-% pod repo update
-% rm Podfile.lock
-% pod install --repo-update
-
-{
-4. CocoaPodsをアンインストールする。
+5. CocoaPodsをアンインストール(削除したい場合)
 % sudo gem uninstall cocoapods
-}
-5. Flutterの使用するXcodeの設定
+6. Flutterの使用するXcodeの設定
 % sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 % sudo xcodebuild -runFirstLaunch
 % [Enter]
 % agree[Enter]
 % open -a Simulator
+
+### iOSのライブラリを更新する。
+% cd ./ios
+% pod repo update
+% rm Podfile.lock
+% pod install --repo-update
 
 ### Flutterの設定診断
 % fvm flutter doctor -v
@@ -162,6 +160,10 @@ android:label="Starlight"
 % vi ./ios/Runner/Info.plist
 <key>CFBundleName</key>
 <string>scal</string>
+
+### プロビジョニングプロファイルの作成に必要なCSRの作成
+キーチェーンアクセス > 証明書アシスタント > 認証局に証明書を要求 
+メールアドレス + 名前（任意） > 「ディスクに保存」 > 作成
 
 ### Archive前のアプリ更新
 % cd ~/pc\_data/project/scal
@@ -254,7 +256,7 @@ plugins {
 id "com.android.application" version "8.12.0" apply false
 3.Gradleを更新する(Android)
 vi ./android/gradle/wrapper/gradle-wrapper.properties
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.0-bin.zip
 4.ライブラリを更新する(Android)
 /Users/ryota24/pc_data/project/scal/pubspec.yaml
 5.Androidリリースファイル作成時のエラーから、AGP8.4以降の圧縮で、圧縮ファイルを追加する(Android)
