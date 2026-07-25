@@ -34,7 +34,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.wakizaka24.scal"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion "27.0.12077973"
 
     compileOptions {
@@ -56,7 +56,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
