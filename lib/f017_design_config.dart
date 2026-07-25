@@ -17,6 +17,9 @@ const double drawerSettingTitleFontSize = 13.5;
 const double drawerSettingItemFontSize = 11;
 
 MaterialColor createMaterialColor(Color primary) {
+  final red = (primary.r * 255.0).round().clamp(0, 255);
+  final green = (primary.g * 255.0).round().clamp(0, 255);
+  final blue = (primary.b * 255.0).round().clamp(0, 255);
   List<double> strengths = [.05];
   for (int i = 1; i < 10; i++) {
     strengths.add(0.1 * i);
@@ -29,13 +32,13 @@ MaterialColor createMaterialColor(Color primary) {
       return ((rate < 0 ? value : (255 - value)) * rate).round();
     });
     swatch[(strength * 1000).round()] = Color.fromRGBO(
-      primary.red + addValue(primary.red, rate),
-      primary.green + addValue(primary.green, rate),
-      primary.blue + addValue(primary.blue, rate),
+      red + addValue(red, rate),
+      green + addValue(green, rate),
+      blue + addValue(blue, rate),
       1,
     );
   }
-  return MaterialColor(primary.value, swatch);
+  return MaterialColor(primary.toARGB32(), swatch);
 }
 
 abstract final class BackgroundColors {
