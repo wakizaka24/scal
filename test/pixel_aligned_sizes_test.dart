@@ -2,6 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:scal/f003_calendar_page.dart';
 
 void main() {
+  test('returns no widths while calendar columns are not initialized', () {
+    expect(createPixelAlignedSizes(393, 0, 3), isEmpty);
+  });
+
   for (final (logicalWidth, columnCount, devicePixelRatio) in [
     (393.0, 7, 3.0),
     (375.0, 7, 2.0),

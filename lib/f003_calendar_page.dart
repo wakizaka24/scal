@@ -14,8 +14,12 @@ import 'f025_common_widgets.dart';
 // すべての境界と合計幅を画面の物理ピクセルに一致させる。
 List<double> createPixelAlignedSizes(
     double totalLogicalSize, int count, double devicePixelRatio) {
-  assert(count > 0);
   assert(devicePixelRatio > 0);
+
+  // カレンダーデータの初期化前は列数が0になる。
+  if (count <= 0) {
+    return const [];
+  }
 
   final totalPhysicalPixels = (totalLogicalSize * devicePixelRatio).round();
   return List<double>.generate(count, (index) {
