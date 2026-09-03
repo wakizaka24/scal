@@ -1,0 +1,91 @@
+name: Apply event detail modal centering fix
+
+on:
+  push:
+    branches:
+      - fix/center-event-detail-modal
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/center-event-detail-modal
+
+      - name: Center the modal in the whole screen while preserving safe margins
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          source = Path('lib/f018_event_detail_page.dart')
+          text = source.read_text(encoding='utf-8')
+
+          height_pattern = re.compile(
+              r"    var baseContentsHeight = eventDetailState\.contentsHeight!\n"
+              r"\s*\+ widget\.unsafeAreaTopHeight \+ widget\.unsafeAreaBottomHeight;"
+          )
+          height_replacement = """    // 上下に同じセーフエリア余白を確保し、画面全体の中央に配置する。
+              final verticalSafeAreaHeight =
+                  widget.unsafeAreaTopHeight > widget.unsafeAreaBottomHeight
+                      ? widget.unsafeAreaTopHeight
+                      : widget.unsafeAreaBottomHeight;
+              var baseContentsHeight = eventDetailState.contentsHeight!
+                  + verticalSafeAreaHeight * 2;"""
+
+          text, replacement_count = height_pattern.subn(
+              height_replacement,
+              text,
+              count=1,
+          )
+          if replacement_count != 1:
+              raise SystemExit(
+                  f'Expected one modal height block, replaced {replacement_count}.'
+              )
+
+          top_spacer = (
+              '          SizedBox(width: deviceWidth, '
+              'height: widget.unsafeAreaTopHeight),'
+          )
+          bottom_spacer = (
+              '          SizedBox(width: deviceWidth, '
+              'height: widget.unsafeAreaBottomHeight),'
+          )
+          equal_spacer = (
+              '          SizedBox(width: deviceWidth, '
+              'height: verticalSafeAreaHeight),'
+          )
+
+          if text.count(top_spacer) != 1:
+              raise SystemExit(
+                  f'Expected one top safe-area spacer, found {text.count(top_spacer)}.'
+              )
+          if text.count(bottom_spacer) != 1:
+              raise SystemExit(
+                  f'Expected one bottom safe-area spacer, found {text.count(bottom_spacer)}.'
+              )
+
+          text = text.replace(top_spacer, equal_spacer, 1)
+          text = text.replace(bottom_spacer, equal_spacer, 1)
+          source.write_text(text, encoding='utf-8')
+
+          Path('.github/workflows/apply-modal-centering-fix.yml').unlink()
+          PY
+
+      - name: Verify and commit the focused change
+        shell: bash
+        run: |
+          git diff --check
+          git diff -- lib/f018_event_detail_page.dart
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: center event detail modal including safe areas"
+          git push origin HEAD:fix/center-event-detail-modal
