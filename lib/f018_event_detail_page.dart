@@ -607,8 +607,13 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         )
     );
 
+    // 上下に同じセーフエリア余白を確保し、画面全体の中央に配置する。
+    final verticalSafeAreaHeight =
+        widget.unsafeAreaTopHeight > widget.unsafeAreaBottomHeight
+            ? widget.unsafeAreaTopHeight
+            : widget.unsafeAreaBottomHeight;
     var baseContentsHeight = eventDetailState.contentsHeight!
-      + widget.unsafeAreaTopHeight + widget.unsafeAreaBottomHeight;
+        + verticalSafeAreaHeight * 2;
     var contentHeight = baseContentsHeight
         < deviceHeight ? deviceHeight : baseContentsHeight;
 
@@ -618,7 +623,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
         contentsWidth: deviceWidth,
         contentsHeight: contentHeight,
         child: Column(children: [
-          SizedBox(width: deviceWidth, height: widget.unsafeAreaTopHeight),
+          SizedBox(width: deviceWidth, height: verticalSafeAreaHeight),
 
           const Spacer(),
 
@@ -636,7 +641,7 @@ class _EventDetailPage extends ConsumerState<EventDetailPage> {
 
           const Spacer(),
 
-          SizedBox(width: deviceWidth, height: widget.unsafeAreaBottomHeight),
+          SizedBox(width: deviceWidth, height: verticalSafeAreaHeight),
         ])
     );
 
